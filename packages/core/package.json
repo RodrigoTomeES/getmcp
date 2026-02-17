@@ -42,7 +42,7 @@
     "url": "https://github.com/mcp-hub/mcp-hub/issues"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "zod": "^3.24.0"

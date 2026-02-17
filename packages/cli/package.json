@@ -52,7 +52,7 @@
     "url": "https://github.com/mcp-hub/mcp-hub/issues"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "@mcp-hub/core": "^0.1.0",
