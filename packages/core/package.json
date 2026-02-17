@@ -1,0 +1,22 @@
+{
+  "name": "@mcp-hub/core",
+  "version": "0.1.0",
+  "description": "Core types, schemas, and validation for MCP Hub canonical configuration format",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
+  }
+}
