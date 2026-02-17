@@ -1,0 +1,23 @@
+import type { RegistryEntryType } from "@mcp-hub/core";
+
+export const postgres: RegistryEntryType = {
+  id: "postgres",
+  name: "PostgreSQL",
+  description:
+    "Read-only database access with schema inspection and query execution for PostgreSQL databases",
+  config: {
+    command: "npx",
+    args: ["-y", "@modelcontextprotocol/server-postgres"],
+    env: {
+      POSTGRES_CONNECTION_STRING: "",
+    },
+    transport: "stdio",
+  },
+  package: "@modelcontextprotocol/server-postgres",
+  runtime: "node",
+  repository: "https://github.com/modelcontextprotocol/servers",
+  homepage: "https://github.com/modelcontextprotocol/servers/tree/main/src/postgres",
+  author: "Anthropic",
+  categories: ["database", "sql"],
+  requiredEnvVars: ["POSTGRES_CONNECTION_STRING"],
+};

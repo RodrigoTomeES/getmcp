@@ -1,0 +1,23 @@
+import type { RegistryEntryType } from "@mcp-hub/core";
+
+export const googleMaps: RegistryEntryType = {
+  id: "google-maps",
+  name: "Google Maps",
+  description:
+    "Location services, directions, place details, and geocoding via the Google Maps Platform API",
+  config: {
+    command: "npx",
+    args: ["-y", "@modelcontextprotocol/server-google-maps"],
+    env: {
+      GOOGLE_MAPS_API_KEY: "",
+    },
+    transport: "stdio",
+  },
+  package: "@modelcontextprotocol/server-google-maps",
+  runtime: "node",
+  repository: "https://github.com/modelcontextprotocol/servers",
+  homepage: "https://github.com/modelcontextprotocol/servers/tree/main/src/google-maps",
+  author: "Anthropic",
+  categories: ["maps", "location", "utilities"],
+  requiredEnvVars: ["GOOGLE_MAPS_API_KEY"],
+};

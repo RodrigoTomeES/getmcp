@@ -2,11 +2,12 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
-    "composite": true
+    "rootDir": "./src"
   },
   "include": ["src/**/*"],
   "references": [
-    { "path": "../core" }
+    { "path": "../core" },
+    { "path": "../generators" },
+    { "path": "../registry" }
   ]
 }
