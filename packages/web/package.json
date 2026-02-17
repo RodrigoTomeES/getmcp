@@ -1,0 +1,28 @@
+{
+  "name": "@mcp-hub/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Web directory for browsing and configuring MCP servers",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@mcp-hub/core": "*",
+    "@mcp-hub/generators": "*",
+    "@mcp-hub/registry": "*",
+    "lightningcss-win32-x64-msvc": "^1.31.1",
+    "next": "^15.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.0"
+  }
+}
