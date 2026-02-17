@@ -1,7 +1,7 @@
 {
   "name": "@mcp-hub/cli",
   "version": "0.1.0",
-  "description": "CLI tool to install MCP servers into any AI application",
+  "description": "CLI tool to install MCP servers into any AI application with one command",
   "type": "module",
   "bin": {
     "mcp-hub": "./dist/bin.js"
@@ -14,15 +14,50 @@
       "import": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "cli",
+    "installer",
+    "claude-desktop",
+    "cursor",
+    "vscode",
+    "windsurf",
+    "cline",
+    "roo-code",
+    "goose",
+    "opencode",
+    "zed",
+    "ai-tools"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcp-hub/mcp-hub.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/mcp-hub/mcp-hub/tree/main/packages/cli#readme",
+  "bugs": {
+    "url": "https://github.com/mcp-hub/mcp-hub/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
-    "@mcp-hub/core": "*",
-    "@mcp-hub/generators": "*",
-    "@mcp-hub/registry": "*",
+    "@mcp-hub/core": "^0.1.0",
+    "@mcp-hub/generators": "^0.1.0",
+    "@mcp-hub/registry": "^0.1.0",
     "@inquirer/prompts": "^7.0.0"
   }
 }

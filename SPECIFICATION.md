@@ -787,6 +787,36 @@ Detailed documentation of every app's MCP config format, gathered from official 
 ## Git History
 
 ```
+01b8fb9 feat: add web directory with server browsing, search, and config generator UI
+02a7438 docs: add SPECIFICATION.md with complete project plan and research
 83f35e1 feat: add registry with 12 MCP servers and CLI tool for installation
 a9133ba feat: scaffold monorepo with core schemas and config generators for 10 AI apps
+```
+
+## Publishing
+
+All four library/CLI packages are ready for npm publishing:
+
+- **Package metadata**: name, version, description, license, repository, keywords, engines
+- **Exports**: ESM-only (`"type": "module"`), with `exports`, `main`, and `types` fields
+- **Files**: Only `dist/`, `README.md`, and `LICENSE` are included in published tarballs
+- **CLI bin**: `@mcp-hub/cli` registers `mcp-hub` binary via `bin` field
+- **Build**: `prepublishOnly` script ensures build runs before publish
+- **Workspace deps**: Internal deps use `^0.1.0` version ranges for npm compatibility
+
+### Publish order (respecting dependencies):
+
+```bash
+npm publish --workspace=@mcp-hub/core --access=public
+npm publish --workspace=@mcp-hub/generators --access=public
+npm publish --workspace=@mcp-hub/registry --access=public
+npm publish --workspace=@mcp-hub/cli --access=public
+```
+
+### Usage after publishing:
+
+```bash
+npx @mcp-hub/cli add github
+npx @mcp-hub/cli list
+npx @mcp-hub/cli list --search=database
 ```

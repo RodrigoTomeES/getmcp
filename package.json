@@ -1,13 +1,20 @@
 {
   "name": "mcp-hub",
   "private": true,
+  "description": "Universal installer and configuration tool for MCP servers across all AI applications",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcp-hub/mcp-hub.git"
+  },
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces",
-    "test": "npm run test --workspaces",
-    "lint": "npm run lint --workspaces"
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "clean": "rimraf packages/*/dist packages/web/.next"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

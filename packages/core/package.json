@@ -11,10 +11,38 @@
       "import": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "config",
+    "schema",
+    "zod",
+    "validation"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcp-hub/mcp-hub.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/mcp-hub/mcp-hub/tree/main/packages/core#readme",
+  "bugs": {
+    "url": "https://github.com/mcp-hub/mcp-hub/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "zod": "^3.24.0"
