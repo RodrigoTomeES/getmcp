@@ -1,5 +1,5 @@
 /**
- * `mcp-hub remove` command.
+ * `getmcp remove` command.
  *
  * Workflow:
  * 1. User provides server name to remove
@@ -18,7 +18,7 @@ import {
 
 export async function removeCommand(serverName?: string): Promise<void> {
   if (!serverName) {
-    console.error("Usage: mcp-hub remove <server-name>");
+    console.error("Usage: getmcp remove <server-name>");
     console.error("  Provide the name/key of the MCP server to remove.");
     process.exit(1);
   }

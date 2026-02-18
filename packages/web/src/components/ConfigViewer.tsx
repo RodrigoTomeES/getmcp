@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { AppIdType, LooseServerConfigType } from "@mcp-hub/core";
-import { generators } from "@mcp-hub/generators";
+import type { AppIdType, LooseServerConfigType } from "@getmcp/core";
+import { generators } from "@getmcp/generators";
 
 const APP_LABELS: Record<AppIdType, string> = {
   "claude-desktop": "Claude Desktop",

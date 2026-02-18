@@ -1,11 +1,11 @@
-# @mcp-hub/registry
+# @getmcp/registry
 
 Registry of popular MCP server definitions in canonical format. Provides lookup, search, and listing functions.
 
 ## Install
 
 ```bash
-npm install @mcp-hub/registry
+npm install @getmcp/registry
 ```
 
 ## Usage
@@ -13,7 +13,7 @@ npm install @mcp-hub/registry
 ### Find and use a server
 
 ```ts
-import { getServer, getServerOrThrow, searchServers } from "@mcp-hub/registry";
+import { getServer, getServerOrThrow, searchServers } from "@getmcp/registry";
 
 // Lookup by ID
 const github = getServer("github");
@@ -36,7 +36,7 @@ import {
   getServersByCategory,
   getCategories,
   getServerCount,
-} from "@mcp-hub/registry";
+} from "@getmcp/registry";
 
 getAllServers();              // All 12 server entries, sorted by ID
 getServerIds();              // ["brave-search", "context7", "fetch", ...]
@@ -48,7 +48,7 @@ getServerCount();            // 12
 ### Access individual server definitions
 
 ```ts
-import { github, filesystem, braveSearch, memory, slack, postgres } from "@mcp-hub/registry";
+import { github, filesystem, braveSearch, memory, slack, postgres } from "@getmcp/registry";
 
 console.log(github.config);
 // { command: "npx", args: ["-y", "@modelcontextprotocol/server-github"], env: { GITHUB_TOKEN: "" } }

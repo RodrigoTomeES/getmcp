@@ -1,11 +1,11 @@
 {
-  "name": "mcp-hub",
+  "name": "getmcp",
   "private": true,
   "description": "Universal installer and configuration tool for MCP servers across all AI applications",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mcp-hub/mcp-hub.git"
+    "url": "https://github.com/RodrigoTomeES/getmcp.git"
   },
   "workspaces": [
     "packages/*"

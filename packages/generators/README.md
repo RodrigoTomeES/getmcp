@@ -1,11 +1,11 @@
-# @mcp-hub/generators
+# @getmcp/generators
 
 Config generators that transform canonical MCP server definitions into app-specific configuration formats for 10 AI applications.
 
 ## Install
 
 ```bash
-npm install @mcp-hub/generators
+npm install @getmcp/generators
 ```
 
 ## Usage
@@ -13,7 +13,7 @@ npm install @mcp-hub/generators
 ### Generate config for a specific app
 
 ```ts
-import { generateConfig, getGenerator } from "@mcp-hub/generators";
+import { generateConfig, getGenerator } from "@getmcp/generators";
 
 // Quick generation
 const config = generateConfig("claude-desktop", "github", {
@@ -32,7 +32,7 @@ const text = generator.serialize(obj);
 ### Generate config for ALL apps at once
 
 ```ts
-import { generateAllConfigs } from "@mcp-hub/generators";
+import { generateAllConfigs } from "@getmcp/generators";
 
 const configs = generateAllConfigs("github", {
   command: "npx",
@@ -60,7 +60,7 @@ import {
   WindsurfGenerator,
   OpenCodeGenerator,
   ZedGenerator,
-} from "@mcp-hub/generators";
+} from "@getmcp/generators";
 
 const goose = new GooseGenerator();
 const config = goose.generate("github", {

@@ -21,8 +21,8 @@
  *   - Extra fields: "enabled", "timeout" (in seconds), "name" (display name)
  */
 
-import type { AppMetadata, LooseServerConfigType } from "@mcp-hub/core";
-import { isStdioConfig, isRemoteConfig, inferTransport } from "@mcp-hub/core";
+import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
+import { isStdioConfig, isRemoteConfig, inferTransport } from "@getmcp/core";
 import { BaseGenerator } from "./base.js";
 
 export class GooseGenerator extends BaseGenerator {

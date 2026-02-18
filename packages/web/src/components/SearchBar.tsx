@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { RegistryEntryType } from "@mcp-hub/core";
+import type { RegistryEntryType } from "@getmcp/core";
 import { ServerCard } from "./ServerCard";
 
 export function SearchBar({

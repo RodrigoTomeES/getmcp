@@ -11,8 +11,8 @@
  *   - Supports "envFile" for .env loading
  */
 
-import type { AppMetadata, LooseServerConfigType } from "@mcp-hub/core";
-import { isStdioConfig, isRemoteConfig, inferTransport } from "@mcp-hub/core";
+import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
+import { isStdioConfig, isRemoteConfig, inferTransport } from "@getmcp/core";
 import { BaseGenerator, toStdioFields, toRemoteFields } from "./base.js";
 
 export class VSCodeGenerator extends BaseGenerator {

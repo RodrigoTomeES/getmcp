@@ -1,4 +1,4 @@
-# MCP Hub
+# getmcp
 
 Universal installer and configuration tool for MCP (Model Context Protocol) servers across all AI applications.
 
@@ -10,16 +10,16 @@ Universal installer and configuration tool for MCP (Model Context Protocol) serv
 
 ```bash
 # Install the GitHub MCP server into all your detected AI apps
-npx @mcp-hub/cli add github
+npx @getmcp/cli add github
 
 # Browse available servers
-npx @mcp-hub/cli list
+npx @getmcp/cli list
 
 # Search for database servers
-npx @mcp-hub/cli list --search=database
+npx @getmcp/cli list --search=database
 
 # Remove a server
-npx @mcp-hub/cli remove github
+npx @getmcp/cli remove github
 ```
 
 ## How It Works
@@ -76,18 +76,18 @@ npx @mcp-hub/cli remove github
 
 | Package | Description | npm |
 |---------|-------------|-----|
-| [`@mcp-hub/cli`](packages/cli) | CLI tool for installing MCP servers | [![npm](https://img.shields.io/npm/v/@mcp-hub/cli)](https://www.npmjs.com/package/@mcp-hub/cli) |
-| [`@mcp-hub/core`](packages/core) | Zod schemas, types, and utilities | [![npm](https://img.shields.io/npm/v/@mcp-hub/core)](https://www.npmjs.com/package/@mcp-hub/core) |
-| [`@mcp-hub/generators`](packages/generators) | Config generators for 10 apps | [![npm](https://img.shields.io/npm/v/@mcp-hub/generators)](https://www.npmjs.com/package/@mcp-hub/generators) |
-| [`@mcp-hub/registry`](packages/registry) | Registry of MCP server definitions | [![npm](https://img.shields.io/npm/v/@mcp-hub/registry)](https://www.npmjs.com/package/@mcp-hub/registry) |
-| [`@mcp-hub/web`](packages/web) | Web directory (Next.js, not published) | -- |
+| [`@getmcp/cli`](packages/cli) | CLI tool for installing MCP servers | [![npm](https://img.shields.io/npm/v/@getmcp/cli)](https://www.npmjs.com/package/@getmcp/cli) |
+| [`@getmcp/core`](packages/core) | Zod schemas, types, and utilities | [![npm](https://img.shields.io/npm/v/@getmcp/core)](https://www.npmjs.com/package/@getmcp/core) |
+| [`@getmcp/generators`](packages/generators) | Config generators for 10 apps | [![npm](https://img.shields.io/npm/v/@getmcp/generators)](https://www.npmjs.com/package/@getmcp/generators) |
+| [`@getmcp/registry`](packages/registry) | Registry of MCP server definitions | [![npm](https://img.shields.io/npm/v/@getmcp/registry)](https://www.npmjs.com/package/@getmcp/registry) |
+| [`@getmcp/web`](packages/web) | Web directory (Next.js, not published) | -- |
 
 ## Library Usage
 
 ### Generate config for any app
 
 ```ts
-import { generateConfig, generateAllConfigs } from "@mcp-hub/generators";
+import { generateConfig, generateAllConfigs } from "@getmcp/generators";
 
 // Generate for a specific app
 const config = generateConfig("goose", "github", {
@@ -110,7 +110,7 @@ const all = generateAllConfigs("github", {
 ### Validate configs with Zod schemas
 
 ```ts
-import { StdioServerConfig, CanonicalMCPConfig } from "@mcp-hub/core";
+import { StdioServerConfig, CanonicalMCPConfig } from "@getmcp/core";
 
 StdioServerConfig.parse({ command: "npx", args: ["server"] });
 // throws ZodError if invalid
@@ -119,7 +119,7 @@ StdioServerConfig.parse({ command: "npx", args: ["server"] });
 ### Search the registry
 
 ```ts
-import { searchServers, getServersByCategory } from "@mcp-hub/registry";
+import { searchServers, getServersByCategory } from "@getmcp/registry";
 
 searchServers("database");          // [{ id: "postgres", ... }]
 getServersByCategory("web");        // [{ id: "brave-search", ... }, { id: "fetch", ... }]
@@ -138,14 +138,14 @@ npm run build
 npm run test
 
 # Build and test a specific package
-npm run build --workspace=@mcp-hub/core
-npm run test --workspace=@mcp-hub/core
+npm run build --workspace=@getmcp/core
+npm run test --workspace=@getmcp/core
 ```
 
 ## Architecture
 
 ```
-mcp-hub/
+getmcp/
   packages/
     core/          # Zod schemas, TS types, utility functions
     generators/    # 10 config generators (one per app)

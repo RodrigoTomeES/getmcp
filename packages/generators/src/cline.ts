@@ -9,8 +9,8 @@
  *   - SSE servers use "url" + "headers" instead of "command"/"args"
  */
 
-import type { AppMetadata, LooseServerConfigType } from "@mcp-hub/core";
-import { isStdioConfig, isRemoteConfig } from "@mcp-hub/core";
+import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
+import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
 import { BaseGenerator, toStdioFields } from "./base.js";
 
 export class ClineGenerator extends BaseGenerator {

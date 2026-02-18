@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { LooseServerConfigType } from "@mcp-hub/core";
+import type { LooseServerConfigType } from "@getmcp/core";
 import {
   ClaudeDesktopGenerator,
   ClaudeCodeGenerator,

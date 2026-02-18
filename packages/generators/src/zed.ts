@@ -20,8 +20,8 @@
  *   - Also installable via Zed extensions
  */
 
-import type { AppMetadata, LooseServerConfigType } from "@mcp-hub/core";
-import { isStdioConfig, isRemoteConfig } from "@mcp-hub/core";
+import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
+import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
 import { BaseGenerator, toStdioFields } from "./base.js";
 
 export class ZedGenerator extends BaseGenerator {

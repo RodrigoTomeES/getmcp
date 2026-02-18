@@ -1,4 +1,4 @@
-import type { RegistryEntryType } from "@mcp-hub/core";
+import type { RegistryEntryType } from "@getmcp/core";
 
 export const sequentialThinking: RegistryEntryType = {
   id: "sequential-thinking",

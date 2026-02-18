@@ -1,11 +1,11 @@
-# @mcp-hub/core
+# @getmcp/core
 
 Core types, schemas, and validation for the MCP Hub canonical configuration format. Aligned with [FastMCP](https://github.com/jlowin/fastmcp)'s standard.
 
 ## Install
 
 ```bash
-npm install @mcp-hub/core
+npm install @getmcp/core
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ npm install @mcp-hub/core
 All schemas use [Zod](https://zod.dev) for runtime validation:
 
 ```ts
-import { StdioServerConfig, RemoteServerConfig, CanonicalMCPConfig } from "@mcp-hub/core";
+import { StdioServerConfig, RemoteServerConfig, CanonicalMCPConfig } from "@getmcp/core";
 
 // Validate a stdio server config
 const result = StdioServerConfig.safeParse({
@@ -46,7 +46,7 @@ CanonicalMCPConfig.parse({
 ### Type Guards
 
 ```ts
-import { isStdioConfig, isRemoteConfig, inferTransport } from "@mcp-hub/core";
+import { isStdioConfig, isRemoteConfig, inferTransport } from "@getmcp/core";
 
 const config = { command: "npx", args: ["server"] };
 
@@ -68,7 +68,7 @@ import type {
   AppIdType,
   ConfigGenerator,
   AppMetadata,
-} from "@mcp-hub/core";
+} from "@getmcp/core";
 ```
 
 ## Schemas

@@ -1,4 +1,4 @@
-# @mcp-hub/cli
+# @getmcp/cli
 
 CLI tool to install MCP servers into any AI application with one command. Auto-detects installed apps, generates the correct config format, and merges it into existing config files without overwriting.
 
@@ -6,27 +6,27 @@ CLI tool to install MCP servers into any AI application with one command. Auto-d
 
 ```bash
 # Run directly with npx (no install needed)
-npx @mcp-hub/cli add github
+npx @getmcp/cli add github
 
 # Or install globally
-npm install -g @mcp-hub/cli
+npm install -g @getmcp/cli
 ```
 
 ## Commands
 
-### `mcp-hub add [server-id]`
+### `getmcp add [server-id]`
 
 Install an MCP server into your AI apps.
 
 ```bash
 # Interactive mode — select a server and target apps
-mcp-hub add
+getmcp add
 
 # Install a specific server
-mcp-hub add github
+getmcp add github
 
 # Install with environment variables prompted interactively
-mcp-hub add brave-search
+getmcp add brave-search
 # => Prompts: Enter BRAVE_API_KEY: ****
 ```
 
@@ -38,30 +38,30 @@ The `add` command will:
 5. Generate the correct config format for each app
 6. Merge the config into each app's config file (never overwrites existing servers)
 
-### `mcp-hub remove <server-name>`
+### `getmcp remove <server-name>`
 
 Remove an MCP server from your AI app configs.
 
 ```bash
-mcp-hub remove github
+getmcp remove github
 ```
 
-### `mcp-hub list`
+### `getmcp list`
 
 Browse the server registry.
 
 ```bash
 # List all available servers
-mcp-hub list
+getmcp list
 
 # Search for servers
-mcp-hub list --search=database
+getmcp list --search=database
 
 # Filter by category
-mcp-hub list --category=developer-tools
+getmcp list --category=developer-tools
 
 # List servers installed in your detected apps
-mcp-hub list --installed
+getmcp list --installed
 ```
 
 ## Supported Apps
@@ -94,7 +94,7 @@ import {
   mergeServerIntoConfig,
   removeServerFromConfig,
   listServersInConfig,
-} from "@mcp-hub/cli";
+} from "@getmcp/cli";
 
 // Detect which apps are installed
 const apps = await detectInstalledApps();
@@ -112,8 +112,8 @@ await writeConfigFile("/path/to/config.json", updated);
 ## Options
 
 ```
-mcp-hub --help       Show help message
-mcp-hub --version    Show version number
+getmcp --help       Show help message
+getmcp --version    Show version number
 ```
 
 ## License

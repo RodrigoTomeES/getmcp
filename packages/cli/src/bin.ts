@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * mcp-hub CLI entry point.
+ * getmcp CLI entry point.
  *
  * Usage:
- *   mcp-hub add [server-id]       Install an MCP server
- *   mcp-hub remove <server-name>  Remove an MCP server
- *   mcp-hub list [--installed]    List available or installed servers
- *   mcp-hub list [--search=query] Search the registry
- *   mcp-hub list [--category=cat] Filter by category
+ *   getmcp add [server-id]       Install an MCP server
+ *   getmcp remove <server-name>  Remove an MCP server
+ *   getmcp list [--installed]    List available or installed servers
+ *   getmcp list [--search=query] Search the registry
+ *   getmcp list [--category=cat] Filter by category
  */
 
 import { addCommand } from "./commands/add.js";
@@ -19,26 +19,26 @@ const VERSION = "0.1.0";
 
 function printHelp(): void {
   console.log(`
-mcp-hub v${VERSION} — Install MCP servers into any AI application
+getmcp v${VERSION} — Install MCP servers into any AI application
 
 Usage:
-  mcp-hub add [server-id]         Install an MCP server interactively
-  mcp-hub remove <server-name>    Remove an MCP server from app configs
-  mcp-hub list                    List all available MCP servers
-  mcp-hub list --installed        List servers installed in detected apps
-  mcp-hub list --search=<query>   Search the registry
-  mcp-hub list --category=<cat>   Filter by category
+  getmcp add [server-id]         Install an MCP server interactively
+  getmcp remove <server-name>    Remove an MCP server from app configs
+  getmcp list                    List all available MCP servers
+  getmcp list --installed        List servers installed in detected apps
+  getmcp list --search=<query>   Search the registry
+  getmcp list --category=<cat>   Filter by category
 
 Options:
   --help, -h     Show this help message
   --version, -v  Show version number
 
 Examples:
-  mcp-hub add                     # Interactive server selection
-  mcp-hub add github              # Install GitHub MCP server
-  mcp-hub remove github           # Remove GitHub from all apps
-  mcp-hub list --search=database  # Find database-related servers
-  mcp-hub list --installed        # See what's configured in your apps
+  getmcp add                     # Interactive server selection
+  getmcp add github              # Install GitHub MCP server
+  getmcp remove github           # Remove GitHub from all apps
+  getmcp list --search=database  # Find database-related servers
+  getmcp list --installed        # See what's configured in your apps
 `);
 }
 

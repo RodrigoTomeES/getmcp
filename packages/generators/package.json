@@ -1,5 +1,5 @@
 {
-  "name": "@mcp-hub/generators",
+  "name": "@getmcp/generators",
   "version": "0.1.0",
   "description": "Config generators that transform canonical MCP server definitions to app-specific formats",
   "type": "module",
@@ -39,17 +39,17 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mcp-hub/mcp-hub.git",
+    "url": "https://github.com/RodrigoTomeES/getmcp.git",
     "directory": "packages/generators"
   },
-  "homepage": "https://github.com/mcp-hub/mcp-hub/tree/main/packages/generators#readme",
+  "homepage": "https://github.com/RodrigoTomeES/getmcp/tree/main/packages/generators#readme",
   "bugs": {
-    "url": "https://github.com/mcp-hub/mcp-hub/issues"
+    "url": "https://github.com/RodrigoTomeES/getmcp/issues"
   },
   "engines": {
     "node": ">=22.0.0"
   },
   "dependencies": {
-    "@mcp-hub/core": "^0.1.0"
+    "@getmcp/core": "^0.1.0"
   }
 }

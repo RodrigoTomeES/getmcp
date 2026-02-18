@@ -8,8 +8,8 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
-import { generators } from "@mcp-hub/generators";
-import type { AppIdType, AppMetadata } from "@mcp-hub/core";
+import { generators } from "@getmcp/generators";
+import type { AppIdType, AppMetadata } from "@getmcp/core";
 
 /**
  * Resolve platform-specific path placeholders.

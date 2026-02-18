@@ -1,4 +1,4 @@
-import type { RegistryEntryType } from "@mcp-hub/core";
+import type { RegistryEntryType } from "@getmcp/core";
 
 export function ServerCard({ server }: { server: RegistryEntryType }) {
   const isRemote = "url" in server.config;

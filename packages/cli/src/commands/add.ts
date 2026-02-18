@@ -1,5 +1,5 @@
 /**
- * `mcp-hub add` command.
+ * `getmcp add` command.
  *
  * Workflow:
  * 1. User picks a server from the registry (or provides ID as argument)
@@ -15,10 +15,10 @@ import {
   getAllServers,
   getServer,
   searchServers,
-} from "@mcp-hub/registry";
-import { getGenerator } from "@mcp-hub/generators";
-import { isStdioConfig } from "@mcp-hub/core";
-import type { AppIdType, LooseServerConfigType, RegistryEntryType } from "@mcp-hub/core";
+} from "@getmcp/registry";
+import { getGenerator } from "@getmcp/generators";
+import { isStdioConfig } from "@getmcp/core";
+import type { AppIdType, LooseServerConfigType, RegistryEntryType } from "@getmcp/core";
 import { detectInstalledApps, type DetectedApp } from "../detect.js";
 import { mergeServerIntoConfig, writeConfigFile } from "../config-file.js";
 

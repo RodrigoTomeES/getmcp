@@ -1,5 +1,5 @@
 /**
- * @mcp-hub/generators
+ * @getmcp/generators
  *
  * Config generators that transform canonical MCP server definitions
  * into app-specific configuration formats for 10 AI applications.
@@ -21,14 +21,14 @@ export { ZedGenerator } from "./zed.js";
 export { BaseGenerator, deepMerge, toStdioFields, toRemoteFields } from "./base.js";
 
 // Re-export core types used by generators
-export type { ConfigGenerator, AppMetadata, LooseServerConfigType } from "@mcp-hub/core";
-export type { AppIdType } from "@mcp-hub/core";
+export type { ConfigGenerator, AppMetadata, LooseServerConfigType } from "@getmcp/core";
+export type { AppIdType } from "@getmcp/core";
 
 // ---------------------------------------------------------------------------
 // Generator registry — map of AppId to generator instance
 // ---------------------------------------------------------------------------
 
-import type { AppIdType, ConfigGenerator } from "@mcp-hub/core";
+import type { AppIdType, ConfigGenerator } from "@getmcp/core";
 import { ClaudeDesktopGenerator } from "./claude-desktop.js";
 import { ClaudeCodeGenerator } from "./claude-code.js";
 import { VSCodeGenerator } from "./vscode.js";
@@ -80,7 +80,7 @@ export function getAppIds(): AppIdType[] {
 export function generateConfig(
   appId: AppIdType,
   serverName: string,
-  config: import("@mcp-hub/core").LooseServerConfigType,
+  config: import("@getmcp/core").LooseServerConfigType,
 ): Record<string, unknown> {
   return getGenerator(appId).generate(serverName, config);
 }
@@ -91,7 +91,7 @@ export function generateConfig(
  */
 export function generateAllConfigs(
   serverName: string,
-  config: import("@mcp-hub/core").LooseServerConfigType,
+  config: import("@getmcp/core").LooseServerConfigType,
 ): Record<AppIdType, string> {
   const result = {} as Record<AppIdType, string>;
   for (const [appId, generator] of Object.entries(generators)) {

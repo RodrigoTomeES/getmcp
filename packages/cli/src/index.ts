@@ -1,5 +1,5 @@
 /**
- * @mcp-hub/cli
+ * @getmcp/cli
  *
  * CLI tool to install MCP servers into any AI application.
  * Supports: add, remove, list commands.

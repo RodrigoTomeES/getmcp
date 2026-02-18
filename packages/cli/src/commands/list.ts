@@ -1,5 +1,5 @@
 /**
- * `mcp-hub list` command.
+ * `getmcp list` command.
  *
  * Lists all MCP servers from the registry, or lists servers
  * installed in detected AI apps.
@@ -11,7 +11,7 @@ import {
   getCategories,
   getServersByCategory,
   getServerCount,
-} from "@mcp-hub/registry";
+} from "@getmcp/registry";
 import { detectInstalledApps } from "../detect.js";
 import { listServersInConfig } from "../config-file.js";
 

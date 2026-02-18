@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { RegistryEntry } from "@mcp-hub/core";
+import { RegistryEntry } from "@getmcp/core";
 import {
   getServer,
   getServerOrThrow,

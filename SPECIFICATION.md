@@ -88,12 +88,12 @@ Every major AI application that supports MCP has chosen a slightly (or drastical
 ### Monorepo Structure
 
 ```
-mcp-hub/
+getmcp/
   package.json                     # Root workspace config
   tsconfig.json                    # Shared TypeScript settings
   SPECIFICATION.md                 # This file
   packages/
-    core/                          # @mcp-hub/core (v0.1.0)
+    core/                          # @getmcp/core (v0.1.0)
       src/
         schemas.ts                 # Zod validation schemas
         types.ts                   # TypeScript types (inferred from Zod)
@@ -103,7 +103,7 @@ mcp-hub/
         schemas.test.ts            # 19 tests
         utils.test.ts              # 11 tests
 
-    generators/                    # @mcp-hub/generators (v0.1.0)
+    generators/                    # @getmcp/generators (v0.1.0)
       src/
         base.ts                    # BaseGenerator class + helpers
         claude-desktop.ts          # Generator for Claude Desktop
@@ -120,7 +120,7 @@ mcp-hub/
       tests/
         generators.test.ts         # 45 tests
 
-    registry/                      # @mcp-hub/registry (v0.1.0)
+    registry/                      # @getmcp/registry (v0.1.0)
       src/
         servers/
           github.ts                # GitHub MCP Server
@@ -139,15 +139,15 @@ mcp-hub/
       tests/
         registry.test.ts           # 37 tests
 
-    cli/                           # @mcp-hub/cli (v0.1.0)
+    cli/                           # @getmcp/cli (v0.1.0)
       src/
-        bin.ts                     # CLI entry point (mcp-hub command)
+        bin.ts                     # CLI entry point (getmcp command)
         detect.ts                  # App auto-detection
         config-file.ts             # Config read/write/merge operations
         commands/
-          add.ts                   # mcp-hub add [server-id]
-          remove.ts                # mcp-hub remove <server-name>
-          list.ts                  # mcp-hub list [options]
+          add.ts                   # getmcp add [server-id]
+          remove.ts                # getmcp remove <server-name>
+          list.ts                  # getmcp list [options]
         index.ts                   # Public API barrel
       tests/
         detect.test.ts             # 7 tests
@@ -157,9 +157,9 @@ mcp-hub/
 ### Dependency Graph
 
 ```
-@mcp-hub/cli
-  |---> @mcp-hub/generators ---> @mcp-hub/core
-  |---> @mcp-hub/registry   ---> @mcp-hub/core
+@getmcp/cli
+  |---> @getmcp/generators ---> @getmcp/core
+  |---> @getmcp/registry   ---> @getmcp/core
   |---> @inquirer/prompts (interactive prompts)
 ```
 
@@ -410,7 +410,7 @@ getServerCount(): number
 Example:
 
 ```typescript
-import type { RegistryEntryType } from "@mcp-hub/core";
+import type { RegistryEntryType } from "@getmcp/core";
 
 export const myServer: RegistryEntryType = {
   id: "my-server",
@@ -436,12 +436,12 @@ export const myServer: RegistryEntryType = {
 ### Installation (Planned)
 
 ```bash
-npx @mcp-hub/cli add github
+npx @getmcp/cli add github
 ```
 
 ### Commands
 
-#### `mcp-hub add [server-id]`
+#### `getmcp add [server-id]`
 
 Interactive installation workflow:
 
@@ -454,7 +454,7 @@ Interactive installation workflow:
 7. Merges into existing config files (preserves all existing servers)
 8. Reports success per app
 
-#### `mcp-hub remove <server-name>`
+#### `getmcp remove <server-name>`
 
 1. Scans all detected apps for the named server
 2. Shows which apps have it configured
@@ -463,7 +463,7 @@ Interactive installation workflow:
 5. Removes the server entry from each selected config
 6. Reports results
 
-#### `mcp-hub list [options]`
+#### `getmcp list [options]`
 
 | Option | Description |
 |--------|-------------|
@@ -530,7 +530,7 @@ A Next.js website that serves as a public directory for MCP servers. Think "npm 
 
 - Next.js (App Router)
 - Tailwind CSS
-- The existing `@mcp-hub/core`, `@mcp-hub/generators`, and `@mcp-hub/registry` packages imported directly
+- The existing `@getmcp/core`, `@getmcp/generators`, and `@getmcp/registry` packages imported directly
 - Static generation for server pages (data comes from the registry)
 
 ---
@@ -549,10 +549,10 @@ A Next.js website that serves as a public directory for MCP servers. Think "npm 
 
 ### Additional CLI Commands
 
-- `mcp-hub update` — update a server's config (e.g., after env var changes)
-- `mcp-hub sync` — sync all app configs to match a canonical source
-- `mcp-hub doctor` — diagnose config issues across apps
-- `mcp-hub init` — generate a `.mcp-hub.json` project file
+- `getmcp update` — update a server's config (e.g., after env var changes)
+- `getmcp sync` — sync all app configs to match a canonical source
+- `getmcp doctor` — diagnose config issues across apps
+- `getmcp init` — generate a `.getmcp.json` project file
 
 ### Registry Enhancements
 
@@ -563,8 +563,8 @@ A Next.js website that serves as a public directory for MCP servers. Think "npm 
 
 ### npm Publishing
 
-- Publish `@mcp-hub/cli` to npm so users can run `npx @mcp-hub/cli add github`
-- Publish `@mcp-hub/core` and `@mcp-hub/generators` for library consumers
+- Publish `@getmcp/cli` to npm so users can run `npx @getmcp/cli add github`
+- Publish `@getmcp/core` and `@getmcp/generators` for library consumers
 
 ---
 
@@ -776,10 +776,10 @@ Detailed documentation of every app's MCP config format, gathered from official 
 
 | Package | Test Files | Tests | Description |
 |---------|-----------|-------|-------------|
-| `@mcp-hub/core` | 2 | 30 | Schema validation, type guards, transport inference |
-| `@mcp-hub/generators` | 1 | 45 | All 10 generators (stdio + remote), multi-server, serialization |
-| `@mcp-hub/registry` | 1 | 37 | Entry validation, lookup, search, categories, content integrity |
-| `@mcp-hub/cli` | 2 | 27 | Path resolution, app detection, config read/write/merge/remove |
+| `@getmcp/core` | 2 | 30 | Schema validation, type guards, transport inference |
+| `@getmcp/generators` | 1 | 45 | All 10 generators (stdio + remote), multi-server, serialization |
+| `@getmcp/registry` | 1 | 37 | Entry validation, lookup, search, categories, content integrity |
+| `@getmcp/cli` | 2 | 27 | Path resolution, app detection, config read/write/merge/remove |
 | **Total** | **6** | **139** | |
 
 ---
@@ -800,23 +800,23 @@ All four library/CLI packages are ready for npm publishing:
 - **Package metadata**: name, version, description, license, repository, keywords, engines
 - **Exports**: ESM-only (`"type": "module"`), with `exports`, `main`, and `types` fields
 - **Files**: Only `dist/`, `README.md`, and `LICENSE` are included in published tarballs
-- **CLI bin**: `@mcp-hub/cli` registers `mcp-hub` binary via `bin` field
+- **CLI bin**: `@getmcp/cli` registers `getmcp` binary via `bin` field
 - **Build**: `prepublishOnly` script ensures build runs before publish
 - **Workspace deps**: Internal deps use `^0.1.0` version ranges for npm compatibility
 
 ### Publish order (respecting dependencies):
 
 ```bash
-npm publish --workspace=@mcp-hub/core --access=public
-npm publish --workspace=@mcp-hub/generators --access=public
-npm publish --workspace=@mcp-hub/registry --access=public
-npm publish --workspace=@mcp-hub/cli --access=public
+npm publish --workspace=@getmcp/core --access=public
+npm publish --workspace=@getmcp/generators --access=public
+npm publish --workspace=@getmcp/registry --access=public
+npm publish --workspace=@getmcp/cli --access=public
 ```
 
 ### Usage after publishing:
 
 ```bash
-npx @mcp-hub/cli add github
-npx @mcp-hub/cli list
-npx @mcp-hub/cli list --search=database
+npx @getmcp/cli add github
+npx @getmcp/cli list
+npx @getmcp/cli list --search=database
 ```

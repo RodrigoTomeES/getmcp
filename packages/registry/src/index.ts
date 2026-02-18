@@ -1,11 +1,11 @@
 /**
- * @mcp-hub/registry
+ * @getmcp/registry
  *
  * Registry of popular MCP server definitions in canonical format.
  * Provides lookup, search, and listing functions.
  */
 
-import type { RegistryEntryType } from "@mcp-hub/core";
+import type { RegistryEntryType } from "@getmcp/core";
 
 // Server definitions
 import { github } from "./servers/github.js";

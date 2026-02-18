@@ -1,5 +1,5 @@
 {
-  "name": "@mcp-hub/web",
+  "name": "@getmcp/web",
   "version": "0.1.0",
   "private": true,
   "description": "Web directory for browsing and configuring MCP servers",
@@ -10,9 +10,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@mcp-hub/core": "*",
-    "@mcp-hub/generators": "*",
-    "@mcp-hub/registry": "*",
+    "@getmcp/core": "*",
+    "@getmcp/generators": "*",
+    "@getmcp/registry": "*",
     "lightningcss": "^1.30.0",
     "next": "^15.3.0",
     "react": "^19.0.0",

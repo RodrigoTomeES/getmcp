@@ -1,4 +1,4 @@
-import { getAllServers, getCategories, getServerCount } from "@mcp-hub/registry";
+import { getAllServers, getCategories, getServerCount } from "@getmcp/registry";
 import { SearchBar } from "@/components/SearchBar";
 
 export default function HomePage() {
@@ -25,7 +25,7 @@ export default function HomePage() {
         <p className="text-sm text-[var(--color-text-secondary)]">
           Install any server with the CLI:{" "}
           <code className="text-[var(--color-accent)] bg-[var(--color-code-bg)] px-2 py-0.5 rounded">
-            npx @mcp-hub/cli add &lt;server-id&gt;
+            npx @getmcp/cli add &lt;server-id&gt;
           </code>
         </p>
       </div>

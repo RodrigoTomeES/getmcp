@@ -12,8 +12,8 @@
  * optional transport type for remote servers.
  */
 
-import type { AppMetadata, LooseServerConfigType } from "@mcp-hub/core";
-import { isStdioConfig, isRemoteConfig } from "@mcp-hub/core";
+import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
+import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
 import { BaseGenerator, toStdioFields, toRemoteFields } from "./base.js";
 
 export class ClaudeCodeGenerator extends BaseGenerator {

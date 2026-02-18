@@ -1,5 +1,5 @@
 {
-  "name": "@mcp-hub/registry",
+  "name": "@getmcp/registry",
   "version": "0.1.0",
   "description": "Registry of popular MCP server definitions in canonical format",
   "type": "module",
@@ -34,17 +34,17 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mcp-hub/mcp-hub.git",
+    "url": "https://github.com/RodrigoTomeES/getmcp.git",
     "directory": "packages/registry"
   },
-  "homepage": "https://github.com/mcp-hub/mcp-hub/tree/main/packages/registry#readme",
+  "homepage": "https://github.com/RodrigoTomeES/getmcp/tree/main/packages/registry#readme",
   "bugs": {
-    "url": "https://github.com/mcp-hub/mcp-hub/issues"
+    "url": "https://github.com/RodrigoTomeES/getmcp/issues"
   },
   "engines": {
     "node": ">=22.0.0"
   },
   "dependencies": {
-    "@mcp-hub/core": "^0.1.0"
+    "@getmcp/core": "^0.1.0"
   }
 }

@@ -1,4 +1,4 @@
-import type { RegistryEntryType } from "@mcp-hub/core";
+import type { RegistryEntryType } from "@getmcp/core";
 
 export const sentry: RegistryEntryType = {
   id: "sentry",

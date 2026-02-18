@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { getServer, getAllServers } from "@mcp-hub/registry";
-import type { RegistryEntryType } from "@mcp-hub/core";
+import { getServer, getAllServers } from "@getmcp/registry";
+import type { RegistryEntryType } from "@getmcp/core";
 import { ConfigViewer } from "@/components/ConfigViewer";
 
 export function generateStaticParams() {
@@ -13,7 +13,7 @@ export function generateMetadata({ params }: { params: Promise<{ id: string }> }
     const server = getServer(id);
     if (!server) return { title: "Not Found" };
     return {
-      title: `${server.name} — MCP Hub`,
+      title: `${server.name} — getmcp`,
       description: server.description,
     };
   });
@@ -157,7 +157,7 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
           Install with the CLI:
         </p>
         <code className="text-[var(--color-accent)]">
-          npx @mcp-hub/cli add {server.id}
+          npx @getmcp/cli add {server.id}
         </code>
       </div>
 

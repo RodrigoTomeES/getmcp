@@ -7,7 +7,7 @@ import type {
   ConfigGenerator,
   AppMetadata,
   LooseServerConfigType,
-} from "@mcp-hub/core";
+} from "@getmcp/core";
 
 export abstract class BaseGenerator implements ConfigGenerator {
   abstract app: AppMetadata;
