@@ -33,6 +33,12 @@ import { claudeContext } from "./servers/claude-context.js";
 import { pdf2zh } from "./servers/pdf2zh.js";
 import { unityMcp } from "./servers/unity-mcp.js";
 import { idaPro } from "./servers/ida-pro.js";
+import { trendradar } from "./servers/trendradar.js";
+import { mindsdb } from "./servers/mindsdb.js";
+import { genaiToolbox } from "./servers/genai-toolbox.js";
+import { scrapling } from "./servers/scrapling.js";
+import { xiaohongshuMcp } from "./servers/xiaohongshu-mcp.js";
+import { awsDocs } from "./servers/aws-docs.js";
 
 // Re-export individual servers for direct access
 export {
@@ -61,6 +67,12 @@ export {
   pdf2zh,
   unityMcp,
   idaPro,
+  trendradar,
+  mindsdb,
+  genaiToolbox,
+  scrapling,
+  xiaohongshuMcp,
+  awsDocs,
 };
 
 // ---------------------------------------------------------------------------
@@ -99,6 +111,12 @@ register(claudeContext);
 register(pdf2zh);
 register(unityMcp);
 register(idaPro);
+register(trendradar);
+register(mindsdb);
+register(genaiToolbox);
+register(scrapling);
+register(xiaohongshuMcp);
+register(awsDocs);
 
 // ---------------------------------------------------------------------------
 // Public API

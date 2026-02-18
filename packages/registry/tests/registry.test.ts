@@ -34,6 +34,12 @@ import {
   pdf2zh,
   unityMcp,
   idaPro,
+  trendradar,
+  mindsdb,
+  genaiToolbox,
+  scrapling,
+  xiaohongshuMcp,
+  awsDocs,
 } from "../src/index.js";
 
 // ---------------------------------------------------------------------------
@@ -67,6 +73,12 @@ describe("registry entries validate against schema", () => {
     pdf2zh,
     unityMcp,
     idaPro,
+    trendradar,
+    mindsdb,
+    genaiToolbox,
+    scrapling,
+    xiaohongshuMcp,
+    awsDocs,
   ];
 
   for (const server of allServers) {
@@ -119,7 +131,7 @@ describe("getServerOrThrow", () => {
 describe("getServerIds", () => {
   it("returns all IDs sorted alphabetically", () => {
     const ids = getServerIds();
-    expect(ids.length).toBe(25);
+    expect(ids.length).toBe(31);
     // Verify sorted
     const sorted = [...ids].sort();
     expect(ids).toEqual(sorted);
@@ -137,7 +149,7 @@ describe("getServerIds", () => {
 describe("getAllServers", () => {
   it("returns all server entries", () => {
     const servers = getAllServers();
-    expect(servers.length).toBe(25);
+    expect(servers.length).toBe(31);
   });
 
   it("entries are sorted by ID", () => {
@@ -150,7 +162,7 @@ describe("getAllServers", () => {
 
 describe("getServerCount", () => {
   it("returns the correct count", () => {
-    expect(getServerCount()).toBe(25);
+    expect(getServerCount()).toBe(31);
   });
 });
 
@@ -160,8 +172,8 @@ describe("getServerCount", () => {
 
 describe("searchServers", () => {
   it("returns all servers for empty query", () => {
-    expect(searchServers("").length).toBe(25);
-    expect(searchServers("  ").length).toBe(25);
+    expect(searchServers("").length).toBe(31);
+    expect(searchServers("  ").length).toBe(31);
   });
 
   it("finds servers by name", () => {

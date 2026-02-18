@@ -1,0 +1,21 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const scrapling: RegistryEntryType = {
+  id: "scrapling",
+  name: "Scrapling",
+  description:
+    "Adaptive web scraping framework with a built-in MCP server for AI-assisted data extraction. Smart element tracking, anti-bot bypass, and concurrent crawling",
+  config: {
+    command: "uvx",
+    args: ["--from", "scrapling[ai]", "scrapling", "mcp"],
+    env: {},
+    transport: "stdio",
+  },
+  package: "scrapling",
+  runtime: "python",
+  repository: "https://github.com/D4Vinci/Scrapling",
+  homepage: "https://scrapling.readthedocs.io",
+  author: "Karim Shoair",
+  categories: ["web-scraping", "ai", "automation"],
+  requiredEnvVars: [],
+};

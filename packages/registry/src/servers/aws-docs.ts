@@ -1,0 +1,23 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const awsDocs: RegistryEntryType = {
+  id: "aws-docs",
+  name: "AWS Documentation",
+  description:
+    "Access AWS documentation, search content via the official AWS search API, and get content recommendations. Converts AWS doc pages to markdown format",
+  config: {
+    command: "uvx",
+    args: ["awslabs.aws-documentation-mcp-server@latest"],
+    env: {
+      FASTMCP_LOG_LEVEL: "ERROR",
+    },
+    transport: "stdio",
+  },
+  package: "awslabs.aws-documentation-mcp-server",
+  runtime: "python",
+  repository: "https://github.com/awslabs/mcp",
+  homepage: "https://github.com/awslabs/mcp",
+  author: "AWS",
+  categories: ["documents", "cloud", "developer-tools"],
+  requiredEnvVars: [],
+};
