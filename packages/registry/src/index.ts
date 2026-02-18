@@ -42,6 +42,7 @@ import { awsDocs } from "./servers/aws-docs.js";
 import { nextDevtools } from "./servers/next-devtools.js";
 import { supabase } from "./servers/supabase.js";
 import { openaiDocs } from "./servers/openai-docs.js";
+import { shadcn } from "./servers/shadcn.js";
 
 // Re-export individual servers for direct access
 export {
@@ -79,6 +80,7 @@ export {
   nextDevtools,
   supabase,
   openaiDocs,
+  shadcn,
 };
 
 // ---------------------------------------------------------------------------
@@ -126,6 +128,7 @@ register(awsDocs);
 register(nextDevtools);
 register(supabase);
 register(openaiDocs);
+register(shadcn);
 
 // ---------------------------------------------------------------------------
 // Public API

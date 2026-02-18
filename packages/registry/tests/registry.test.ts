@@ -43,6 +43,7 @@ import {
   nextDevtools,
   supabase,
   openaiDocs,
+  shadcn,
 } from "../src/index.js";
 
 // ---------------------------------------------------------------------------
@@ -85,6 +86,7 @@ describe("registry entries validate against schema", () => {
     nextDevtools,
     supabase,
     openaiDocs,
+    shadcn,
   ];
 
   for (const server of allServers) {
@@ -137,7 +139,7 @@ describe("getServerOrThrow", () => {
 describe("getServerIds", () => {
   it("returns all IDs sorted alphabetically", () => {
     const ids = getServerIds();
-    expect(ids.length).toBe(34);
+    expect(ids.length).toBe(35);
     // Verify sorted
     const sorted = [...ids].sort();
     expect(ids).toEqual(sorted);
@@ -155,7 +157,7 @@ describe("getServerIds", () => {
 describe("getAllServers", () => {
   it("returns all server entries", () => {
     const servers = getAllServers();
-    expect(servers.length).toBe(34);
+    expect(servers.length).toBe(35);
   });
 
   it("entries are sorted by ID", () => {
@@ -168,7 +170,7 @@ describe("getAllServers", () => {
 
 describe("getServerCount", () => {
   it("returns the correct count", () => {
-    expect(getServerCount()).toBe(34);
+    expect(getServerCount()).toBe(35);
   });
 });
 
@@ -178,8 +180,8 @@ describe("getServerCount", () => {
 
 describe("searchServers", () => {
   it("returns all servers for empty query", () => {
-    expect(searchServers("").length).toBe(34);
-    expect(searchServers("  ").length).toBe(34);
+    expect(searchServers("").length).toBe(35);
+    expect(searchServers("  ").length).toBe(35);
   });
 
   it("finds servers by name", () => {
