@@ -5,10 +5,18 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   publish:
     name: Validate, Build, Test & Publish
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Checkout
@@ -45,21 +53,13 @@ jobs:
         run: npm run test
 
       - name: Publish @getmcp/core
-        run: npm publish --workspace=@getmcp/core --access=public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --workspace=@getmcp/core --access=public --provenance
 
       - name: Publish @getmcp/generators
-        run: npm publish --workspace=@getmcp/generators --access=public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --workspace=@getmcp/generators --access=public --provenance
 
       - name: Publish @getmcp/registry
-        run: npm publish --workspace=@getmcp/registry --access=public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --workspace=@getmcp/registry --access=public --provenance
 
       - name: Publish @getmcp/cli
-        run: npm publish --workspace=@getmcp/cli --access=public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --workspace=@getmcp/cli --access=public --provenance
