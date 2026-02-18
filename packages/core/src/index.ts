@@ -1,7 +1,7 @@
 /**
  * @getmcp/core
  *
- * Core types, schemas, and validation for the MCP Hub canonical configuration format.
+ * Core types, schemas, and validation for the getmcp canonical configuration format.
  * Aligned with FastMCP's CanonicalMCPConfig standard.
  */
 

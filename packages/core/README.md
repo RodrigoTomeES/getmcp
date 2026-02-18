@@ -1,6 +1,6 @@
 # @getmcp/core
 
-Core types, schemas, and validation for the MCP Hub canonical configuration format. Aligned with [FastMCP](https://github.com/jlowin/fastmcp)'s standard.
+Core types, schemas, and validation for the getmcp canonical configuration format. Aligned with [FastMCP](https://github.com/jlowin/fastmcp)'s standard.
 
 ## Install
 

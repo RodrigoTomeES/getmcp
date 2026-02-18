@@ -1,4 +1,4 @@
-# MCP Hub — Specification
+# getmcp — Specification
 
 > A universal installer and configuration tool for MCP (Model Context Protocol) servers across all AI applications.
 
@@ -21,11 +21,11 @@
 
 ## 1. Project Overview
 
-### What is MCP Hub?
+### What is getmcp?
 
-MCP Hub is a tool that solves a fundamental problem in the AI tooling ecosystem: **every AI application uses a different configuration format for MCP servers**. MCP (Model Context Protocol) is an open protocol that enables LLMs to access custom tools and services, but there is no standard way to configure these servers across different AI apps.
+getmcp is a tool that solves a fundamental problem in the AI tooling ecosystem: **every AI application uses a different configuration format for MCP servers**. MCP (Model Context Protocol) is an open protocol that enables LLMs to access custom tools and services, but there is no standard way to configure these servers across different AI apps.
 
-MCP Hub provides:
+getmcp provides:
 
 - **A canonical configuration format** aligned with [FastMCP](https://github.com/jlowin/fastmcp)'s standard
 - **Config generators** that transform the canonical format into 10 app-specific formats
@@ -35,7 +35,7 @@ MCP Hub provides:
 
 ### Inspiration
 
-Inspired by [skills.sh](https://skills.sh/) — a platform that provides one-command installation of tools. MCP Hub applies the same model to the MCP server ecosystem: a central registry, auto-detection of installed apps, config merging (not overwriting), and simple add/remove/list commands.
+Inspired by [skills.sh](https://skills.sh/) — a platform that provides one-command installation of tools. getmcp applies the same model to the MCP server ecosystem: a central registry, auto-detection of installed apps, config merging (not overwriting), and simple add/remove/list commands.
 
 ### Key Design Principles
 

@@ -6,7 +6,7 @@
  *   - Stdio: command, args, env, cwd, timeout, description
  *   - Remote: url, transport, headers, timeout, description
  *
- * Extended with registry metadata for the MCP Hub ecosystem.
+ * Extended with registry metadata for the getmcp ecosystem.
  */
 
 import { z } from "zod";
