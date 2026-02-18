@@ -6,17 +6,13 @@ on:
       - "v*"
 
 permissions:
-  contents: read
   id-token: write
+  contents: read
 
 jobs:
   publish:
     name: Validate, Build, Test & Publish
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
       - name: Checkout
@@ -53,13 +49,13 @@ jobs:
         run: npm run test
 
       - name: Publish @getmcp/core
-        run: npm publish --workspace=@getmcp/core --access=public
+        run: npm publish --workspace=@getmcp/core
 
       - name: Publish @getmcp/generators
-        run: npm publish --workspace=@getmcp/generators --access=public
+        run: npm publish --workspace=@getmcp/generators
 
       - name: Publish @getmcp/registry
-        run: npm publish --workspace=@getmcp/registry --access=public
+        run: npm publish --workspace=@getmcp/registry
 
       - name: Publish @getmcp/cli
-        run: npm publish --workspace=@getmcp/cli --access=public
+        run: npm publish --workspace=@getmcp/cli
