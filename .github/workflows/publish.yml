@@ -1,0 +1,65 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    name: Validate, Build, Test & Publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate tag matches package versions
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          echo "Tag version: $TAG_VERSION"
+
+          for pkg in core generators registry cli; do
+            PKG_VERSION=$(node -p "require('./packages/$pkg/package.json').version")
+            if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+              echo "::error::packages/$pkg/package.json version ($PKG_VERSION) does not match tag v$TAG_VERSION"
+              exit 1
+            fi
+            echo "packages/$pkg/package.json: $PKG_VERSION ✓"
+          done
+
+      - name: Build all packages
+        run: npm run build
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Publish @getmcp/core
+        run: npm publish --workspace=@getmcp/core --access=public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @getmcp/generators
+        run: npm publish --workspace=@getmcp/generators --access=public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @getmcp/registry
+        run: npm publish --workspace=@getmcp/registry --access=public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @getmcp/cli
+        run: npm publish --workspace=@getmcp/cli --access=public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
