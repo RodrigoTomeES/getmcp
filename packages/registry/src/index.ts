@@ -39,6 +39,7 @@ import { genaiToolbox } from "./servers/genai-toolbox.js";
 import { scrapling } from "./servers/scrapling.js";
 import { xiaohongshuMcp } from "./servers/xiaohongshu-mcp.js";
 import { awsDocs } from "./servers/aws-docs.js";
+import { nextDevtools } from "./servers/next-devtools.js";
 
 // Re-export individual servers for direct access
 export {
@@ -73,6 +74,7 @@ export {
   scrapling,
   xiaohongshuMcp,
   awsDocs,
+  nextDevtools,
 };
 
 // ---------------------------------------------------------------------------
@@ -117,6 +119,7 @@ register(genaiToolbox);
 register(scrapling);
 register(xiaohongshuMcp);
 register(awsDocs);
+register(nextDevtools);
 
 // ---------------------------------------------------------------------------
 // Public API
