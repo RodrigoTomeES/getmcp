@@ -41,6 +41,7 @@ import { xiaohongshuMcp } from "./servers/xiaohongshu-mcp.js";
 import { awsDocs } from "./servers/aws-docs.js";
 import { nextDevtools } from "./servers/next-devtools.js";
 import { supabase } from "./servers/supabase.js";
+import { openaiDocs } from "./servers/openai-docs.js";
 
 // Re-export individual servers for direct access
 export {
@@ -77,6 +78,7 @@ export {
   awsDocs,
   nextDevtools,
   supabase,
+  openaiDocs,
 };
 
 // ---------------------------------------------------------------------------
@@ -123,6 +125,7 @@ register(xiaohongshuMcp);
 register(awsDocs);
 register(nextDevtools);
 register(supabase);
+register(openaiDocs);
 
 // ---------------------------------------------------------------------------
 // Public API

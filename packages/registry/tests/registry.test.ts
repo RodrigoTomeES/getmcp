@@ -40,6 +40,9 @@ import {
   scrapling,
   xiaohongshuMcp,
   awsDocs,
+  nextDevtools,
+  supabase,
+  openaiDocs,
 } from "../src/index.js";
 
 // ---------------------------------------------------------------------------
@@ -79,6 +82,9 @@ describe("registry entries validate against schema", () => {
     scrapling,
     xiaohongshuMcp,
     awsDocs,
+    nextDevtools,
+    supabase,
+    openaiDocs,
   ];
 
   for (const server of allServers) {
@@ -131,7 +137,7 @@ describe("getServerOrThrow", () => {
 describe("getServerIds", () => {
   it("returns all IDs sorted alphabetically", () => {
     const ids = getServerIds();
-    expect(ids.length).toBe(33);
+    expect(ids.length).toBe(34);
     // Verify sorted
     const sorted = [...ids].sort();
     expect(ids).toEqual(sorted);
@@ -149,7 +155,7 @@ describe("getServerIds", () => {
 describe("getAllServers", () => {
   it("returns all server entries", () => {
     const servers = getAllServers();
-    expect(servers.length).toBe(33);
+    expect(servers.length).toBe(34);
   });
 
   it("entries are sorted by ID", () => {
@@ -162,7 +168,7 @@ describe("getAllServers", () => {
 
 describe("getServerCount", () => {
   it("returns the correct count", () => {
-    expect(getServerCount()).toBe(33);
+    expect(getServerCount()).toBe(34);
   });
 });
 
@@ -172,8 +178,8 @@ describe("getServerCount", () => {
 
 describe("searchServers", () => {
   it("returns all servers for empty query", () => {
-    expect(searchServers("").length).toBe(33);
-    expect(searchServers("  ").length).toBe(33);
+    expect(searchServers("").length).toBe(34);
+    expect(searchServers("  ").length).toBe(34);
   });
 
   it("finds servers by name", () => {
