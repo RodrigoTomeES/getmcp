@@ -9,13 +9,13 @@ describe("resolvePath", () => {
     expect(result).toBe(path.normalize(path.join(os.homedir(), "test", "path")));
   });
 
-  it("expands %AppData%", () => {
+  it.skipIf(process.platform !== "win32")("expands %AppData%", () => {
     const result = resolvePath("%AppData%\\test");
     const expected = process.env.APPDATA ?? path.join(os.homedir(), "AppData", "Roaming");
     expect(result).toBe(path.normalize(path.join(expected, "test")));
   });
 
-  it("expands %UserProfile%", () => {
+  it.skipIf(process.platform !== "win32")("expands %UserProfile%", () => {
     const result = resolvePath("%UserProfile%\\test");
     expect(result).toBe(path.normalize(path.join(os.homedir(), "test")));
   });
