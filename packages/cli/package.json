@@ -59,5 +59,8 @@
     "@getmcp/generators": "^0.1.0",
     "@getmcp/registry": "^0.1.0",
     "@inquirer/prompts": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0"
   }
 }
