@@ -53,13 +53,13 @@ jobs:
         run: npm run test
 
       - name: Publish @getmcp/core
-        run: npm publish --workspace=@getmcp/core --access=public --provenance
+        run: npm publish --workspace=@getmcp/core --access=public
 
       - name: Publish @getmcp/generators
-        run: npm publish --workspace=@getmcp/generators --access=public --provenance
+        run: npm publish --workspace=@getmcp/generators --access=public
 
       - name: Publish @getmcp/registry
-        run: npm publish --workspace=@getmcp/registry --access=public --provenance
+        run: npm publish --workspace=@getmcp/registry --access=public
 
       - name: Publish @getmcp/cli
-        run: npm publish --workspace=@getmcp/cli --access=public --provenance
+        run: npm publish --workspace=@getmcp/cli --access=public
