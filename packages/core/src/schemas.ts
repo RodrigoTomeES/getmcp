@@ -187,4 +187,5 @@ export const AppId = z.enum([
   "windsurf",
   "opencode",
   "zed",
+  "pycharm",
 ]);

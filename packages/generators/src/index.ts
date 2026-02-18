@@ -2,7 +2,7 @@
  * @getmcp/generators
  *
  * Config generators that transform canonical MCP server definitions
- * into app-specific configuration formats for 10 AI applications.
+ * into app-specific configuration formats for 11 AI applications.
  */
 
 // Individual generators
@@ -16,6 +16,7 @@ export { GooseGenerator } from "./goose.js";
 export { WindsurfGenerator } from "./windsurf.js";
 export { OpenCodeGenerator } from "./opencode.js";
 export { ZedGenerator } from "./zed.js";
+export { PyCharmGenerator } from "./pycharm.js";
 
 // Base class and utilities
 export { BaseGenerator, deepMerge, toStdioFields, toRemoteFields } from "./base.js";
@@ -39,6 +40,7 @@ import { GooseGenerator } from "./goose.js";
 import { WindsurfGenerator } from "./windsurf.js";
 import { OpenCodeGenerator } from "./opencode.js";
 import { ZedGenerator } from "./zed.js";
+import { PyCharmGenerator } from "./pycharm.js";
 
 /**
  * Map of all available generators, keyed by AppId.
@@ -54,6 +56,7 @@ export const generators: Record<AppIdType, ConfigGenerator> = {
   "windsurf": new WindsurfGenerator(),
   "opencode": new OpenCodeGenerator(),
   "zed": new ZedGenerator(),
+  "pycharm": new PyCharmGenerator(),
 };
 
 /**

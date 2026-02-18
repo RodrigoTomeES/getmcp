@@ -49,7 +49,7 @@ Inspired by [skills.sh](https://skills.sh/) — a platform that provides one-com
 
 ## 2. The Problem: MCP Config Fragmentation
 
-### 10 Apps, 6 Root Keys, 3 Formats
+### 11 Apps, 6 Root Keys, 3 Formats
 
 Every major AI application that supports MCP has chosen a slightly (or drastically) different configuration format. Here is the fragmentation landscape:
 
@@ -65,6 +65,7 @@ Every major AI application that supports MCP has chosen a slightly (or drastical
 | Windsurf | `mcpServers` | JSON | `~/.codeium/windsurf/mcp_config.json` | `command` | `env` | `serverUrl` |
 | OpenCode | `mcp` | JSONC | `opencode.json` | `command` (array) | `environment` | `url` |
 | Zed | `context_servers` | JSON | `settings.json` | `command` | `env` | `url` |
+| PyCharm | `mcpServers` | JSON | IDE Settings UI (version-specific directory) | `command` | `env` | `url` |
 
 ### Key Fragmentation Dimensions
 
@@ -260,7 +261,8 @@ type AppId =
   | "goose"
   | "windsurf"
   | "opencode"
-  | "zed";
+  | "zed"
+  | "pycharm";
 ```
 
 ---
@@ -349,6 +351,15 @@ interface ConfigGenerator {
 - Remote: `url` + `headers`
 - Config path: `~/.config/zed/settings.json`
 
+#### PyCharm — `PyCharmGenerator`
+- **Passthrough**: same as Claude Desktop / Cursor
+- Root key: `mcpServers`
+- Config path: **None** (managed via IDE Settings → Tools → AI Assistant → MCP)
+- PyCharm stores configs in version-specific IDE directories (e.g., `%AppData%\JetBrains\PyCharm2025.3\`), so auto-detection is not supported
+- Users paste the generated JSON snippet into the IDE's MCP settings dialog
+- Supports stdio, streamable-http, and SSE transports
+- Docs: https://www.jetbrains.com/help/ai-assistant/mcp.html
+
 ### Transformation Summary Table
 
 | App | Root Key | `command` | `args` | `env` | Remote URL | Extra Fields | Format |
@@ -363,6 +374,7 @@ interface ConfigGenerator {
 | Windsurf | `mcpServers` | `command` | `args` | `env` | `serverUrl` | — | JSON |
 | OpenCode | `mcp` | `command` (array) | (merged) | `environment` | `url` + `type` | `type`, `enabled` | JSONC |
 | Zed | `context_servers` | `command` | `args` | `env` | `url` | — | JSON |
+| PyCharm | `mcpServers` | `command` | `args` | `env` | `url` | — | JSON |
 
 ---
 

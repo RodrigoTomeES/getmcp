@@ -11,6 +11,7 @@ import {
   WindsurfGenerator,
   OpenCodeGenerator,
   ZedGenerator,
+  PyCharmGenerator,
   generators,
   getGenerator,
   getAppIds,
@@ -387,20 +388,69 @@ describe("ZedGenerator", () => {
 });
 
 // ---------------------------------------------------------------------------
+// PyCharm
+// ---------------------------------------------------------------------------
+
+describe("PyCharmGenerator", () => {
+  const gen = new PyCharmGenerator();
+
+  it("generates standard mcpServers format for stdio", () => {
+    const result = gen.generate("github", stdioConfig);
+    expect(result).toHaveProperty("mcpServers");
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).github;
+    expect(server.command).toBe("npx");
+    expect(server.args).toEqual(["-y", "@modelcontextprotocol/server-github"]);
+    expect(server.env).toEqual({ GITHUB_PERSONAL_ACCESS_TOKEN: "abc123" });
+  });
+
+  it("generates remote config", () => {
+    const result = gen.generate("remote", remoteConfig);
+    expect(result).toEqual({
+      mcpServers: {
+        remote: {
+          url: "https://mcp.example.com/mcp",
+          headers: { Authorization: "Bearer token123" },
+        },
+      },
+    });
+  });
+
+  it("omits empty args and env", () => {
+    const result = gen.generate("minimal", minimalStdio);
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).minimal;
+    expect(server.args).toBeUndefined();
+    expect(server.env).toBeUndefined();
+  });
+
+  it("has no configPaths (IDE-managed config)", () => {
+    expect(gen.app.configPaths.win32).toBeUndefined();
+    expect(gen.app.configPaths.darwin).toBeUndefined();
+    expect(gen.app.configPaths.linux).toBeUndefined();
+  });
+
+  it("serializes to valid JSON", () => {
+    const result = gen.generate("github", stdioConfig);
+    const json = gen.serialize(result);
+    expect(() => JSON.parse(json)).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Registry & utilities
 // ---------------------------------------------------------------------------
 
 describe("generators registry", () => {
-  it("has all 10 generators", () => {
-    expect(Object.keys(generators)).toHaveLength(10);
+  it("has all 11 generators", () => {
+    expect(Object.keys(generators)).toHaveLength(11);
   });
 
-  it("getAppIds returns all 10 IDs", () => {
+  it("getAppIds returns all 11 IDs", () => {
     const ids = getAppIds();
-    expect(ids).toHaveLength(10);
+    expect(ids).toHaveLength(11);
     expect(ids).toContain("claude-desktop");
     expect(ids).toContain("goose");
     expect(ids).toContain("zed");
+    expect(ids).toContain("pycharm");
   });
 
   it("getGenerator returns correct generator for each app", () => {
@@ -412,9 +462,9 @@ describe("generators registry", () => {
     expect(() => getGenerator("unknown" as any)).toThrow();
   });
 
-  it("generateAllConfigs returns configs for all 10 apps", () => {
+  it("generateAllConfigs returns configs for all 11 apps", () => {
     const configs = generateAllConfigs("github", stdioConfig);
-    expect(Object.keys(configs)).toHaveLength(10);
+    expect(Object.keys(configs)).toHaveLength(11);
     // Each config should be a valid string
     for (const [, configStr] of Object.entries(configs)) {
       expect(typeof configStr).toBe("string");

@@ -15,6 +15,7 @@ const APP_LABELS: Record<AppIdType, string> = {
   windsurf: "Windsurf",
   opencode: "OpenCode",
   zed: "Zed",
+  pycharm: "PyCharm",
 };
 
 const APP_IDS = Object.keys(generators) as AppIdType[];
