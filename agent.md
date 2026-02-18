@@ -1,0 +1,185 @@
+# agent.md — getmcp Codebase Guide
+
+> For the complete specification (schemas, transformation rules, config formats, research appendix), see [`SPECIFICATION.md`](./SPECIFICATION.md).
+
+---
+
+## Project Summary
+
+**getmcp** is a universal installer and configuration tool for MCP (Model Context Protocol) servers across all AI applications. Every AI app (Claude Desktop, VS Code, Cursor, Goose, Windsurf, Zed, etc.) uses a different config format for MCP servers — different root keys, field names, file formats, and conventions. getmcp solves this by defining a single canonical format (aligned with FastMCP), then using generators to transform it into each app's native format. A registry of popular servers, a CLI for automated installation, and a web directory complete the toolchain.
+
+---
+
+## Architecture Overview
+
+This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22) with 5 packages:
+
+```
+@getmcp/cli -----> @getmcp/generators -----> @getmcp/core
+            \----> @getmcp/registry   -----> @getmcp/core
+@getmcp/web -----> @getmcp/core + @getmcp/generators + @getmcp/registry
+```
+
+| Package | npm Name | Purpose |
+|---------|----------|---------|
+| `packages/core` | `@getmcp/core` | Zod schemas, TypeScript types, utility functions (type guards, transport inference) |
+| `packages/generators` | `@getmcp/generators` | 11 config generators (one per AI app), each transforms canonical format to app-native format |
+| `packages/registry` | `@getmcp/registry` | Catalog of MCP server definitions with search/filter API |
+| `packages/cli` | `@getmcp/cli` | CLI tool: `add`, `remove`, `list` commands with app auto-detection and config merging |
+| `packages/web` | `@getmcp/web` | Next.js (App Router) web directory for browsing servers and generating config snippets |
+
+**Tech stack**: TypeScript 5.7+, Zod 3.24+, Vitest 3.0+, Next.js 15.3+ (web), Tailwind CSS 4.0+ (web), `@inquirer/prompts` (CLI).
+
+> See `SPECIFICATION.md` Section 3 for the full architecture breakdown.
+
+---
+
+## Key Concepts
+
+### Canonical Format
+
+All server configs are defined in a single FastMCP-aligned format. Root key: `mcpServers`.
+
+- **Stdio servers**: `command`, `args`, `env`, `cwd`, `timeout`, `description`
+- **Remote servers**: `url`, `transport` (`http` | `streamable-http` | `sse`), `headers`, `timeout`, `description`
+
+Transport is auto-inferred: URLs with `/sse` default to SSE, others to HTTP.
+
+> See `SPECIFICATION.md` Section 4 for full schema definitions.
+
+### Generators
+
+Each generator implements the `ConfigGenerator` interface (defined in `packages/core/src/types.ts`) and extends `BaseGenerator` (in `packages/generators/src/base.ts`). A generator transforms the canonical format into one app's native format — renaming fields, changing root keys, adding app-specific fields, or switching file formats (e.g., YAML for Goose).
+
+> See `SPECIFICATION.md` Section 5 for all transformation rules per app.
+
+### Registry
+
+A `Map<string, RegistryEntry>` of server definitions. Each entry contains metadata (id, name, description, categories, author, runtime) plus the canonical `ServerConfig`. The registry exposes lookup, search, and filtering functions.
+
+### CLI
+
+The CLI auto-detects installed AI apps by checking platform-specific config paths, prompts for required environment variables, generates app-specific configs, and **merges** them into existing config files (never overwrites). It handles JSON, JSONC, and YAML formats.
+
+### Design Principles
+
+1. **Never overwrite** — always merge into existing config files
+2. **Canonical format** — one source of truth, generators handle transformations
+3. **Auto-detect** — find installed apps by checking known config paths per OS
+4. **Platform-aware** — resolves `~`, `%AppData%`, `%UserProfile%`, `%LocalAppData%`
+5. **Schema-validated** — all data flows through Zod schemas at runtime
+
+---
+
+## Package Map — Key Files
+
+### `@getmcp/core` (`packages/core/src/`)
+
+| File | Purpose |
+|------|---------|
+| `schemas.ts` | All Zod schemas: `StdioServerConfig`, `RemoteServerConfig`, `ServerConfig`, `CanonicalMCPConfig`, `RegistryEntry`, `AppId` |
+| `types.ts` | TypeScript types inferred from Zod; `ConfigGenerator` and `AppMetadata` interfaces |
+| `utils.ts` | Type guards (`isStdioConfig`, `isRemoteConfig`) and `inferTransport()` |
+
+### `@getmcp/generators` (`packages/generators/src/`)
+
+| File | Purpose |
+|------|---------|
+| `base.ts` | `BaseGenerator` abstract class with `generate()`, `generateAll()`, `serialize()`, `deepMerge()`, field extraction helpers |
+| `claude-desktop.ts` | Passthrough — canonical IS the native format |
+| `claude-code.ts` | Near-passthrough; renames `transport` to `type` for remote |
+| `vscode.ts` | Root key `servers`; adds `type` field on every server; maps `streamable-http` to `http` |
+| `cursor.ts` | Passthrough (same as Claude Desktop) |
+| `cline.ts` | Adds `alwaysAllow: []` and `disabled: false` |
+| `roo-code.ts` | Adds `alwaysAllow: []`, `disabled: false`; maps `http` to `streamable-http` |
+| `goose.ts` | YAML output; root key `extensions`; renames `command` to `cmd`, `env` to `envs`; timeout ms to seconds |
+| `windsurf.ts` | Remote uses `serverUrl` instead of `url` |
+| `opencode.ts` | Root key `mcp`; merges `command`+`args` into array; renames `env` to `environment` |
+| `zed.ts` | Root key `context_servers` |
+| `pycharm.ts` | Passthrough; no auto-detectable config path |
+| `index.ts` | Generator registry: maps `AppId` to generator instances; exports `generateConfig()`, `getGenerator()`, `getAppIds()` |
+
+### `@getmcp/registry` (`packages/registry/src/`)
+
+| File | Purpose |
+|------|---------|
+| `index.ts` | Registry engine: `getServer()`, `getAllServers()`, `searchServers()`, `getServersByCategory()`, `getCategories()` |
+| `servers/*.ts` | Individual server definitions (one file per server), each exports a `RegistryEntryType` |
+
+### `@getmcp/cli` (`packages/cli/src/`)
+
+| File | Purpose |
+|------|---------|
+| `bin.ts` | Entry point; parses argv, dispatches to `add`/`remove`/`list` |
+| `detect.ts` | `resolvePath()`, `getConfigPath()`, `detectApps()`, `detectInstalledApps()` |
+| `config-file.ts` | `readConfigFile()`, `writeConfigFile()`, `mergeServerIntoConfig()`, `removeServerFromConfig()`, `listServersInConfig()` |
+| `commands/add.ts` | Interactive add workflow: pick server, prompt env vars, detect apps, generate + merge configs |
+| `commands/remove.ts` | Interactive remove workflow |
+| `commands/list.ts` | List/search/filter servers |
+
+### `@getmcp/web` (`packages/web/src/`)
+
+| File | Purpose |
+|------|---------|
+| `app/page.tsx` | Homepage with hero section and search |
+| `app/servers/[id]/page.tsx` | Dynamic server detail page (statically generated from registry) |
+| `components/ConfigViewer.tsx` | Client component: tab selector for all 11 apps, shows generated config snippet with copy button |
+| `components/SearchBar.tsx` | Search and filter component |
+| `components/ServerCard.tsx` | Server listing card |
+
+---
+
+## Common Tasks
+
+### Adding a new MCP server to the registry
+
+1. Create `packages/registry/src/servers/<id>.ts` exporting a `RegistryEntryType` object
+2. Import and register it in `packages/registry/src/index.ts` (add to the `Map`)
+3. Add a validation test in `packages/registry/tests/registry.test.ts`
+4. The server will automatically appear in CLI search, web directory, and all generators
+
+> See `SPECIFICATION.md` Section 6 for the `RegistryEntry` schema and an example.
+
+### Adding a new generator (supporting a new AI app)
+
+1. Add the new app ID to the `AppId` enum in `packages/core/src/schemas.ts`
+2. Create `packages/generators/src/<app-name>.ts` extending `BaseGenerator`
+3. Implement `generate()` with the app's field mappings; override `serialize()` if non-JSON
+4. Set the `app` property with `AppMetadata` (id, name, configFileName, configPaths per platform, docsUrl)
+5. Register the generator in `packages/generators/src/index.ts`
+6. Add stdio + remote tests in `packages/generators/tests/generators.test.ts`
+7. Add detection paths in `packages/cli/src/detect.ts` if the app has a known config file location
+8. Update `packages/web/src/components/ConfigViewer.tsx` to include the new app tab
+
+### Modifying an existing generator's transformation rules
+
+1. Locate the generator file: `packages/generators/src/<app-name>.ts`
+2. Review its `generate()` method to understand current field mappings
+3. Make changes and run `npx vitest packages/generators` to validate
+4. Cross-reference with `SPECIFICATION.md` Section 5 and Section 10 for the app's official format
+
+### Adding a CLI command
+
+1. Create `packages/cli/src/commands/<command>.ts`
+2. Wire it into `packages/cli/src/bin.ts` argument dispatch
+3. Add tests in `packages/cli/tests/`
+
+---
+
+## Testing
+
+- **139 tests** across 6 test files
+- Run all tests: `npx vitest` (from repo root)
+- Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc.
+- Test locations:
+  - `packages/core/tests/` — schema validation, type guards, transport inference
+  - `packages/generators/tests/` — all 11 generators (stdio + remote + multi-server + serialization)
+  - `packages/registry/tests/` — entry validation, lookup, search, categories, content integrity
+  - `packages/cli/tests/` — path resolution, app detection, config read/write/merge/remove
+
+---
+
+## References
+
+- **[`SPECIFICATION.md`](./SPECIFICATION.md)** — Complete project specification: schemas, transformation rules per app, registry format, CLI behavior, research appendix with every app's config format documented
+- **Repository**: `https://github.com/RodrigoTomeES/getmcp`
