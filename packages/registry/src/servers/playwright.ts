@@ -16,6 +16,6 @@ export const playwright: RegistryEntryType = {
   repository: "https://github.com/microsoft/playwright-mcp",
   homepage: "https://github.com/microsoft/playwright-mcp",
   author: "Microsoft",
-  categories: ["browser", "automation", "testing"],
+  categories: ["web", "automation", "developer-tools"],
   requiredEnvVars: [],
 };

@@ -18,6 +18,6 @@ export const googleMaps: RegistryEntryType = {
   repository: "https://github.com/modelcontextprotocol/servers",
   homepage: "https://github.com/modelcontextprotocol/servers/tree/main/src/google-maps",
   author: "Anthropic",
-  categories: ["maps", "location", "utilities"],
+  categories: ["utilities"],
   requiredEnvVars: ["GOOGLE_MAPS_API_KEY"],
 };

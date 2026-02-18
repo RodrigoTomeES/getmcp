@@ -16,6 +16,6 @@ export const idaPro: RegistryEntryType = {
   repository: "https://github.com/mrexodia/ida-pro-mcp",
   homepage: "https://github.com/mrexodia/ida-pro-mcp",
   author: "mrexodia",
-  categories: ["security", "reverse-engineering", "developer-tools"],
+  categories: ["security", "developer-tools"],
   requiredEnvVars: [],
 };

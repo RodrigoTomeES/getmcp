@@ -14,6 +14,6 @@ export const xiaohongshuMcp: RegistryEntryType = {
   repository: "https://github.com/xpzouying/xiaohongshu-mcp",
   homepage: "https://github.com/xpzouying/xiaohongshu-mcp",
   author: "xpzouying",
-  categories: ["social-media", "automation"],
+  categories: ["communication", "automation"],
   requiredEnvVars: [],
 };

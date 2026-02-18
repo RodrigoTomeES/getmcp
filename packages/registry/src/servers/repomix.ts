@@ -16,6 +16,6 @@ export const repomix: RegistryEntryType = {
   repository: "https://github.com/yamadashy/repomix",
   homepage: "https://repomix.com",
   author: "yamadashy",
-  categories: ["developer-tools", "code-analysis"],
+  categories: ["developer-tools"],
   requiredEnvVars: [],
 };

@@ -24,6 +24,6 @@ export const github: RegistryEntryType = {
   repository: "https://github.com/github/github-mcp-server",
   homepage: "https://github.com/github/github-mcp-server",
   author: "GitHub",
-  categories: ["developer-tools", "git", "version-control"],
+  categories: ["developer-tools", "devops"],
   requiredEnvVars: ["GITHUB_PERSONAL_ACCESS_TOKEN"],
 };

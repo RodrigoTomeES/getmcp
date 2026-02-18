@@ -16,6 +16,6 @@ export const chromeDevtools: RegistryEntryType = {
   repository: "https://github.com/ChromeDevTools/chrome-devtools-mcp",
   homepage: "https://github.com/ChromeDevTools/chrome-devtools-mcp",
   author: "Google Chrome",
-  categories: ["browser", "debugging", "developer-tools"],
+  categories: ["web", "developer-tools"],
   requiredEnvVars: [],
 };

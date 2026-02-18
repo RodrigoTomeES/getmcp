@@ -16,6 +16,6 @@ export const scrapling: RegistryEntryType = {
   repository: "https://github.com/D4Vinci/Scrapling",
   homepage: "https://scrapling.readthedocs.io",
   author: "Karim Shoair",
-  categories: ["web-scraping", "ai", "automation"],
+  categories: ["web", "ai", "automation"],
   requiredEnvVars: [],
 };

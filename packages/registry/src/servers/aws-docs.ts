@@ -18,6 +18,6 @@ export const awsDocs: RegistryEntryType = {
   repository: "https://github.com/awslabs/mcp",
   homepage: "https://github.com/awslabs/mcp",
   author: "AWS",
-  categories: ["documents", "cloud", "developer-tools"],
+  categories: ["documentation", "cloud", "developer-tools"],
   requiredEnvVars: [],
 };

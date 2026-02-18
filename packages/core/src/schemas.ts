@@ -125,6 +125,23 @@ export const PlatformOverride = z.object({
 // Registry entry (our metadata layer on top of canonical config)
 // ---------------------------------------------------------------------------
 
+export const Category = z.enum([
+  "developer-tools",
+  "web",
+  "automation",
+  "data",
+  "search",
+  "ai",
+  "cloud",
+  "communication",
+  "design",
+  "documentation",
+  "devops",
+  "utilities",
+  "security",
+  "gaming",
+]);
+
 export const Runtime = z.enum(["node", "python", "docker", "binary"]);
 
 /**
@@ -160,8 +177,8 @@ export const RegistryEntry = z.object({
   /** Author or organization */
   author: z.string().optional(),
 
-  /** Discovery categories (e.g. ["developer-tools", "git"]) */
-  categories: z.array(z.string()).optional().default([]),
+  /** Discovery categories (e.g. ["developer-tools", "data"]) */
+  categories: z.array(Category).optional().default([]),
 
   /** Environment variables that the user MUST provide */
   requiredEnvVars: z.array(z.string()).optional().default([]),

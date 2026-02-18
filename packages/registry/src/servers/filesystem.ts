@@ -16,6 +16,6 @@ export const filesystem: RegistryEntryType = {
   repository: "https://github.com/modelcontextprotocol/servers",
   homepage: "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
   author: "Anthropic",
-  categories: ["filesystem", "utilities"],
+  categories: ["utilities"],
   requiredEnvVars: [],
 };

@@ -16,7 +16,7 @@ export default function HomePage() {
         <p className="text-lg text-[var(--color-text-secondary)] max-w-2xl mx-auto">
           Browse {count} MCP servers and get the exact configuration for your AI
           app. One canonical format, generated for{" "}
-          <span className="text-[var(--color-text)]">10 applications</span>.
+          <span className="text-[var(--color-text)]">11 applications</span>.
         </p>
       </div>
 

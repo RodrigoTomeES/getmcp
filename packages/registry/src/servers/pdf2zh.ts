@@ -16,6 +16,6 @@ export const pdf2zh: RegistryEntryType = {
   repository: "https://github.com/PDFMathTranslate/PDFMathTranslate",
   homepage: "https://github.com/PDFMathTranslate/PDFMathTranslate",
   author: "PDFMathTranslate",
-  categories: ["documents", "translation", "utilities"],
+  categories: ["documentation", "utilities"],
   requiredEnvVars: [],
 };

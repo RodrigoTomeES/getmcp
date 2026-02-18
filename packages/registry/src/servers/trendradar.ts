@@ -14,6 +14,6 @@ export const trendradar: RegistryEntryType = {
   repository: "https://github.com/sansan0/TrendRadar",
   homepage: "https://github.com/sansan0/TrendRadar",
   author: "sansan0",
-  categories: ["data-analysis", "news", "monitoring"],
+  categories: ["data", "devops"],
   requiredEnvVars: [],
 };

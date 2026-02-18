@@ -19,6 +19,6 @@ export const slack: RegistryEntryType = {
   repository: "https://github.com/modelcontextprotocol/servers",
   homepage: "https://github.com/modelcontextprotocol/servers/tree/main/src/slack",
   author: "Anthropic",
-  categories: ["communication", "messaging"],
+  categories: ["communication"],
   requiredEnvVars: ["SLACK_BOT_TOKEN", "SLACK_TEAM_ID"],
 };

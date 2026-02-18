@@ -18,6 +18,6 @@ export const claudeContext: RegistryEntryType = {
   repository: "https://github.com/zilliztech/claude-context",
   homepage: "https://github.com/zilliztech/claude-context",
   author: "Zilliz",
-  categories: ["code-analysis", "search", "developer-tools"],
+  categories: ["developer-tools", "search"],
   requiredEnvVars: ["OPENAI_API_KEY"],
 };

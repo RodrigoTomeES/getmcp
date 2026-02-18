@@ -14,6 +14,6 @@ export const unityMcp: RegistryEntryType = {
   repository: "https://github.com/CoplayDev/unity-mcp",
   homepage: "https://github.com/CoplayDev/unity-mcp",
   author: "Coplay",
-  categories: ["game-development", "developer-tools"],
+  categories: ["gaming", "developer-tools"],
   requiredEnvVars: [],
 };

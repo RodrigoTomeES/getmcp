@@ -16,6 +16,6 @@ export const browserTools: RegistryEntryType = {
   repository: "https://github.com/AgentDeskAI/browser-tools-mcp",
   homepage: "https://github.com/AgentDeskAI/browser-tools-mcp",
   author: "AgentDesk AI",
-  categories: ["browser", "debugging", "developer-tools"],
+  categories: ["web", "developer-tools"],
   requiredEnvVars: [],
 };

@@ -189,7 +189,7 @@ describe("searchServers", () => {
   });
 
   it("finds servers by category", () => {
-    const results = searchServers("web-scraping");
+    const results = searchServers("automation");
     expect(results.length).toBeGreaterThanOrEqual(1);
     expect(results.some((s) => s.id === "puppeteer")).toBe(true);
   });
@@ -243,7 +243,7 @@ describe("getCategories", () => {
   it("includes known categories", () => {
     const categories = getCategories();
     expect(categories).toContain("developer-tools");
-    expect(categories).toContain("database");
+    expect(categories).toContain("data");
     expect(categories).toContain("search");
   });
 });

@@ -18,6 +18,6 @@ export const firecrawl: RegistryEntryType = {
   repository: "https://github.com/firecrawl/firecrawl-mcp-server",
   homepage: "https://github.com/firecrawl/firecrawl-mcp-server",
   author: "Firecrawl",
-  categories: ["web-scraping", "search", "web"],
+  categories: ["web", "search"],
   requiredEnvVars: ["FIRECRAWL_API_KEY"],
 };

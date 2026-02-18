@@ -16,6 +16,6 @@ export const desktopCommander: RegistryEntryType = {
   repository: "https://github.com/wonderwhy-er/DesktopCommanderMCP",
   homepage: "https://github.com/wonderwhy-er/DesktopCommanderMCP",
   author: "wonderwhy-er",
-  categories: ["filesystem", "utilities", "automation"],
+  categories: ["utilities", "automation"],
   requiredEnvVars: [],
 };

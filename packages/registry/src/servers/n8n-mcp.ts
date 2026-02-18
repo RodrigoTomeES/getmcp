@@ -19,6 +19,6 @@ export const n8nMcp: RegistryEntryType = {
   repository: "https://github.com/czlonkowski/n8n-mcp",
   homepage: "https://github.com/czlonkowski/n8n-mcp",
   author: "czlonkowski",
-  categories: ["automation", "workflow"],
+  categories: ["automation"],
   requiredEnvVars: ["N8N_API_URL", "N8N_API_KEY"],
 };

@@ -167,7 +167,7 @@ describe("RegistryEntry", () => {
       package: "@modelcontextprotocol/server-github",
       runtime: "node",
       repository: "https://github.com/modelcontextprotocol/servers",
-      categories: ["developer-tools", "git"],
+      categories: ["developer-tools", "devops"],
       requiredEnvVars: ["GITHUB_PERSONAL_ACCESS_TOKEN"],
     });
     expect(result.id).toBe("github-mcp-server");

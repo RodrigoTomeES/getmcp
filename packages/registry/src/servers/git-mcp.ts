@@ -13,6 +13,6 @@ export const gitMcp: RegistryEntryType = {
   homepage: "https://gitmcp.io",
   repository: "https://github.com/idosal/git-mcp",
   author: "idosal",
-  categories: ["documentation", "developer-tools", "git"],
+  categories: ["documentation", "developer-tools", "devops"],
   requiredEnvVars: [],
 };

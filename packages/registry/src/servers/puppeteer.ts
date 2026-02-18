@@ -16,6 +16,6 @@ export const puppeteer: RegistryEntryType = {
   repository: "https://github.com/modelcontextprotocol/servers",
   homepage: "https://github.com/modelcontextprotocol/servers/tree/main/src/puppeteer",
   author: "Anthropic",
-  categories: ["browser", "automation", "web-scraping"],
+  categories: ["web", "automation"],
   requiredEnvVars: [],
 };

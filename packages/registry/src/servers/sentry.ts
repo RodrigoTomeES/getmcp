@@ -14,6 +14,6 @@ export const sentry: RegistryEntryType = {
   repository: "https://github.com/getsentry/sentry-mcp",
   homepage: "https://mcp.sentry.dev",
   author: "Sentry",
-  categories: ["monitoring", "error-tracking", "developer-tools"],
+  categories: ["developer-tools", "devops"],
   requiredEnvVars: [],
 };

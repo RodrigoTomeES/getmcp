@@ -15,6 +15,6 @@ export const genaiToolbox: RegistryEntryType = {
   repository: "https://github.com/googleapis/genai-toolbox",
   homepage: "https://github.com/googleapis/genai-toolbox",
   author: "Google",
-  categories: ["databases", "developer-tools", "cloud"],
+  categories: ["data", "developer-tools", "cloud"],
   requiredEnvVars: [],
 };

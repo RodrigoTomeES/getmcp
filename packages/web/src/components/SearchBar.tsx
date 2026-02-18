@@ -9,10 +9,10 @@ export function SearchBar({
   categories,
 }: {
   servers: RegistryEntryType[];
-  categories: string[];
+  categories: RegistryEntryType['categories'];
 }) {
   const [query, setQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<RegistryEntryType['categories'][number] | null>(null);
 
   const filtered = useMemo(() => {
     let result = servers;

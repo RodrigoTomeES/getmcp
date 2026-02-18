@@ -16,6 +16,6 @@ export const memory: RegistryEntryType = {
   repository: "https://github.com/modelcontextprotocol/servers",
   homepage: "https://github.com/modelcontextprotocol/servers/tree/main/src/memory",
   author: "Anthropic",
-  categories: ["memory", "knowledge-graph"],
+  categories: ["utilities"],
   requiredEnvVars: [],
 };

@@ -16,6 +16,6 @@ export const sequentialThinking: RegistryEntryType = {
   repository: "https://github.com/modelcontextprotocol/servers",
   homepage: "https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking",
   author: "Anthropic",
-  categories: ["reasoning", "utilities"],
+  categories: ["ai", "utilities"],
   requiredEnvVars: [],
 };

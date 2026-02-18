@@ -14,6 +14,6 @@ export const mindsdb: RegistryEntryType = {
   repository: "https://github.com/mindsdb/mindsdb",
   homepage: "https://mindsdb.com",
   author: "MindsDB",
-  categories: ["databases", "ai", "data-analysis"],
+  categories: ["data", "ai"],
   requiredEnvVars: [],
 };

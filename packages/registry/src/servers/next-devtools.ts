@@ -16,6 +16,6 @@ export const nextDevtools: RegistryEntryType = {
   repository: "https://github.com/vercel/next-devtools-mcp",
   homepage: "https://nextjs.org/docs/app/guides/mcp",
   author: "Vercel",
-  categories: ["developer-tools", "web-development", "nextjs", "debugging"],
+  categories: ["developer-tools", "web"],
   requiredEnvVars: [],
 };

@@ -18,6 +18,6 @@ export const postgres: RegistryEntryType = {
   repository: "https://github.com/modelcontextprotocol/servers",
   homepage: "https://github.com/modelcontextprotocol/servers/tree/main/src/postgres",
   author: "Anthropic",
-  categories: ["database", "sql"],
+  categories: ["data"],
   requiredEnvVars: ["POSTGRES_CONNECTION_STRING"],
 };

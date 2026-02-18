@@ -12,6 +12,6 @@ export const supabase: RegistryEntryType = {
   repository: "https://github.com/supabase-community/supabase-mcp",
   homepage: "https://supabase.com/docs/guides/getting-started/mcp",
   author: "Supabase",
-  categories: ["database", "developer-tools", "backend", "cloud"],
+  categories: ["data", "developer-tools", "cloud"],
   requiredEnvVars: [],
 };
