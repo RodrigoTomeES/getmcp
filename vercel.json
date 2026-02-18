@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run build -w @getmcp/core && npm run build -w @getmcp/generators && npm run build -w @getmcp/registry && npm run build -w @getmcp/web",
+  "framework": "nextjs",
+  "installCommand": "npm install",
+  "outputDirectory": "packages/web/.next"
+}

@@ -1,6 +1,6 @@
 {
   "name": "@getmcp/generators",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Config generators that transform canonical MCP server definitions to app-specific formats",
   "type": "module",
   "main": "./dist/index.js",
