@@ -124,6 +124,17 @@ export async function addCommand(serverIdArg?: string): Promise<void> {
   if (needsRestart) {
     console.log("Note: Some apps may need to be restarted to pick up changes.");
   }
+
+  // PyCharm-specific warning: plugin requirement + restart
+  const hasPycharm = selectedApps.some((a) => a.id === "pycharm");
+  if (hasPycharm) {
+    console.log(
+      "\nImportant: MCP servers in PyCharm require the JetBrains AI Assistant plugin:" +
+      "\n  https://plugins.jetbrains.com/plugin/22282-jetbrains-ai-assistant" +
+      "\n\nPyCharm must be closed and reopened for MCP configuration changes to take effect." +
+      "\nThe new servers will not appear until you restart the IDE.",
+    );
+  }
 }
 
 function printManualConfig(

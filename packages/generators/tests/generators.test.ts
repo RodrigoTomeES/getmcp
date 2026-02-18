@@ -422,10 +422,10 @@ describe("PyCharmGenerator", () => {
     expect(server.env).toBeUndefined();
   });
 
-  it("has no configPaths (IDE-managed config)", () => {
-    expect(gen.app.configPaths.win32).toBeUndefined();
-    expect(gen.app.configPaths.darwin).toBeUndefined();
-    expect(gen.app.configPaths.linux).toBeUndefined();
+  it("has project-level configPaths", () => {
+    expect(gen.app.configPaths.win32).toBe(".ai/mcp/mcp.json");
+    expect(gen.app.configPaths.darwin).toBe(".ai/mcp/mcp.json");
+    expect(gen.app.configPaths.linux).toBe(".ai/mcp/mcp.json");
   });
 
   it("serializes to valid JSON", () => {

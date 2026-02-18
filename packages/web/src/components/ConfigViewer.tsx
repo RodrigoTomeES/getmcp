@@ -101,6 +101,22 @@ export function ConfigViewer({
         </pre>
       </div>
 
+      {/* PyCharm-specific warning */}
+      {selectedApp === "pycharm" && (
+        <p className="text-xs text-amber-500 mt-3">
+          Requires the{" "}
+          <a
+            href="https://plugins.jetbrains.com/plugin/22282-jetbrains-ai-assistant"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-amber-400"
+          >
+            JetBrains AI Assistant
+          </a>{" "}
+          plugin. PyCharm must be closed and reopened for configuration changes to take effect.
+        </p>
+      )}
+
       {/* Docs link */}
       <p className="text-xs text-[var(--color-text-secondary)] mt-3">
         <a

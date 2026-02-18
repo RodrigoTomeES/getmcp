@@ -65,7 +65,7 @@ Every major AI application that supports MCP has chosen a slightly (or drastical
 | Windsurf | `mcpServers` | JSON | `~/.codeium/windsurf/mcp_config.json` | `command` | `env` | `serverUrl` |
 | OpenCode | `mcp` | JSONC | `opencode.json` | `command` (array) | `environment` | `url` |
 | Zed | `context_servers` | JSON | `settings.json` | `command` | `env` | `url` |
-| PyCharm | `mcpServers` | JSON | IDE Settings UI (version-specific directory) | `command` | `env` | `url` |
+| PyCharm | `mcpServers` | JSON | `.ai/mcp/mcp.json` (project-level) | `command` | `env` | `url` |
 
 ### Key Fragmentation Dimensions
 
@@ -354,9 +354,11 @@ interface ConfigGenerator {
 #### PyCharm — `PyCharmGenerator`
 - **Passthrough**: same as Claude Desktop / Cursor
 - Root key: `mcpServers`
-- Config path: **None** (managed via IDE Settings → Tools → AI Assistant → MCP)
-- PyCharm stores configs in version-specific IDE directories (e.g., `%AppData%\JetBrains\PyCharm2025.3\`), so auto-detection is not supported
-- Users paste the generated JSON snippet into the IDE's MCP settings dialog
+- Config path: `.ai/mcp/mcp.json` (project-level, cross-platform)
+- PyCharm supports project-level MCP configuration via `.ai/mcp/mcp.json`, similar to VS Code's `.vscode/mcp.json`
+- This file is shareable via version control and uses the canonical `mcpServers` format
+- Requires the [JetBrains AI Assistant](https://plugins.jetbrains.com/plugin/22282-jetbrains-ai-assistant) plugin
+- **Important**: PyCharm must be closed and reopened for config changes to take effect
 - Supports stdio, streamable-http, and SSE transports
 - Docs: https://www.jetbrains.com/help/ai-assistant/mcp.html
 
@@ -781,6 +783,36 @@ Detailed documentation of every app's MCP config format, gathered from official 
 - Also installable via Zed extensions.
 - Tool permissions: granular per-tool via `mcp:<server>:<tool_name>` key format.
 - Supports custom agent profiles to control which tools are active.
+
+### PyCharm
+
+- **Docs**: https://www.jetbrains.com/help/ai-assistant/mcp.html
+- **Plugin**: [JetBrains AI Assistant](https://plugins.jetbrains.com/plugin/22282-jetbrains-ai-assistant) (required)
+- **Config file**: `.ai/mcp/mcp.json` (project-level, cross-platform)
+- **Format**:
+  ```json
+  {
+    "mcpServers": {
+      "server-name": {
+        "command": "npx",
+        "args": ["-y", "some-package"],
+        "env": {
+          "API_KEY": "value"
+        }
+      },
+      "remote-server": {
+        "url": "https://mcp.example.com/mcp"
+      }
+    }
+  }
+  ```
+- Root key: `mcpServers` — identical to Claude Desktop canonical format (pure passthrough).
+- Project-level config at `.ai/mcp/mcp.json` is shareable via version control (not in `.idea/`).
+- IDE-level state (enable/disable, allowed tools) is stored in `.idea/workspace.xml` under `<component name="McpProjectServerCommands">`, which is gitignored.
+- Also configurable globally via IDE Settings → Tools → AI Assistant → Model Context Protocol (MCP), stored in version-specific IDE directories (e.g., `%AppData%\JetBrains\PyCharm2025.3\`).
+- Supports stdio, streamable-http, and SSE transports.
+- Can import configs from Claude Desktop via the "Import from Claude" button in settings.
+- **Important**: PyCharm must be fully closed and reopened for MCP configuration changes to take effect.
 
 ---
 

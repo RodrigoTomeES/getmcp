@@ -96,7 +96,7 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 | `windsurf.ts` | Remote uses `serverUrl` instead of `url` |
 | `opencode.ts` | Root key `mcp`; merges `command`+`args` into array; renames `env` to `environment` |
 | `zed.ts` | Root key `context_servers` |
-| `pycharm.ts` | Passthrough; no auto-detectable config path |
+| `pycharm.ts` | Passthrough; project-level config at `.ai/mcp/mcp.json` (requires JetBrains AI Assistant plugin) |
 | `index.ts` | Generator registry: maps `AppId` to generator instances; exports `generateConfig()`, `getGenerator()`, `getAppIds()` |
 
 ### `@getmcp/registry` (`packages/registry/src/`)
