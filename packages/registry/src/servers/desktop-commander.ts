@@ -1,0 +1,21 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const desktopCommander: RegistryEntryType = {
+  id: "desktop-commander",
+  name: "Desktop Commander",
+  description:
+    "Terminal control, filesystem search, and diff-based file editing capabilities. Execute commands, manage processes, and search files with advanced pattern matching",
+  config: {
+    command: "npx",
+    args: ["-y", "@wonderwhy-er/desktop-commander@latest"],
+    env: {},
+    transport: "stdio",
+  },
+  package: "@wonderwhy-er/desktop-commander",
+  runtime: "node",
+  repository: "https://github.com/wonderwhy-er/DesktopCommanderMCP",
+  homepage: "https://github.com/wonderwhy-er/DesktopCommanderMCP",
+  author: "wonderwhy-er",
+  categories: ["filesystem", "utilities", "automation"],
+  requiredEnvVars: [],
+};

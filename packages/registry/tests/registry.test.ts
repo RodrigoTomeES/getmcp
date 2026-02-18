@@ -21,6 +21,19 @@ import {
   context7,
   fetch,
   googleMaps,
+  playwright,
+  chromeDevtools,
+  figma,
+  firecrawl,
+  browserTools,
+  desktopCommander,
+  repomix,
+  gitMcp,
+  n8nMcp,
+  claudeContext,
+  pdf2zh,
+  unityMcp,
+  idaPro,
 } from "../src/index.js";
 
 // ---------------------------------------------------------------------------
@@ -41,6 +54,19 @@ describe("registry entries validate against schema", () => {
     context7,
     fetch,
     googleMaps,
+    playwright,
+    chromeDevtools,
+    figma,
+    firecrawl,
+    browserTools,
+    desktopCommander,
+    repomix,
+    gitMcp,
+    n8nMcp,
+    claudeContext,
+    pdf2zh,
+    unityMcp,
+    idaPro,
   ];
 
   for (const server of allServers) {
@@ -93,7 +119,7 @@ describe("getServerOrThrow", () => {
 describe("getServerIds", () => {
   it("returns all IDs sorted alphabetically", () => {
     const ids = getServerIds();
-    expect(ids.length).toBe(12);
+    expect(ids.length).toBe(25);
     // Verify sorted
     const sorted = [...ids].sort();
     expect(ids).toEqual(sorted);
@@ -111,7 +137,7 @@ describe("getServerIds", () => {
 describe("getAllServers", () => {
   it("returns all server entries", () => {
     const servers = getAllServers();
-    expect(servers.length).toBe(12);
+    expect(servers.length).toBe(25);
   });
 
   it("entries are sorted by ID", () => {
@@ -124,7 +150,7 @@ describe("getAllServers", () => {
 
 describe("getServerCount", () => {
   it("returns the correct count", () => {
-    expect(getServerCount()).toBe(12);
+    expect(getServerCount()).toBe(25);
   });
 });
 
@@ -134,14 +160,14 @@ describe("getServerCount", () => {
 
 describe("searchServers", () => {
   it("returns all servers for empty query", () => {
-    expect(searchServers("").length).toBe(12);
-    expect(searchServers("  ").length).toBe(12);
+    expect(searchServers("").length).toBe(25);
+    expect(searchServers("  ").length).toBe(25);
   });
 
   it("finds servers by name", () => {
     const results = searchServers("GitHub");
     expect(results.length).toBeGreaterThanOrEqual(1);
-    expect(results[0].id).toBe("github");
+    expect(results.some((s) => s.id === "github")).toBe(true);
   });
 
   it("finds servers by description keywords", () => {

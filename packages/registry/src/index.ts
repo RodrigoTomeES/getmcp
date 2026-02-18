@@ -20,6 +20,19 @@ import { sentry } from "./servers/sentry.js";
 import { context7 } from "./servers/context7.js";
 import { fetch } from "./servers/fetch.js";
 import { googleMaps } from "./servers/google-maps.js";
+import { playwright } from "./servers/playwright.js";
+import { chromeDevtools } from "./servers/chrome-devtools.js";
+import { figma } from "./servers/figma.js";
+import { firecrawl } from "./servers/firecrawl.js";
+import { browserTools } from "./servers/browser-tools.js";
+import { desktopCommander } from "./servers/desktop-commander.js";
+import { repomix } from "./servers/repomix.js";
+import { gitMcp } from "./servers/git-mcp.js";
+import { n8nMcp } from "./servers/n8n-mcp.js";
+import { claudeContext } from "./servers/claude-context.js";
+import { pdf2zh } from "./servers/pdf2zh.js";
+import { unityMcp } from "./servers/unity-mcp.js";
+import { idaPro } from "./servers/ida-pro.js";
 
 // Re-export individual servers for direct access
 export {
@@ -35,6 +48,19 @@ export {
   context7,
   fetch,
   googleMaps,
+  playwright,
+  chromeDevtools,
+  figma,
+  firecrawl,
+  browserTools,
+  desktopCommander,
+  repomix,
+  gitMcp,
+  n8nMcp,
+  claudeContext,
+  pdf2zh,
+  unityMcp,
+  idaPro,
 };
 
 // ---------------------------------------------------------------------------
@@ -60,6 +86,19 @@ register(sentry);
 register(context7);
 register(fetch);
 register(googleMaps);
+register(playwright);
+register(chromeDevtools);
+register(figma);
+register(firecrawl);
+register(browserTools);
+register(desktopCommander);
+register(repomix);
+register(gitMcp);
+register(n8nMcp);
+register(claudeContext);
+register(pdf2zh);
+register(unityMcp);
+register(idaPro);
 
 // ---------------------------------------------------------------------------
 // Public API
