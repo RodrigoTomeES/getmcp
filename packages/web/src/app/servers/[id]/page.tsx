@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getServer, getAllServers } from "@getmcp/registry";
 import type { RegistryEntryType } from "@getmcp/core";
 import { ConfigViewer } from "@/components/ConfigViewer";
+import { PackageManagerCommand } from "@/components/PackageManagerCommand";
 
 export function generateStaticParams() {
   return getAllServers().map((server) => ({ id: server.id }));
@@ -151,15 +152,8 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
         )}
       </div>
 
-      {/* CLI install hint */}
-      <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4 mb-8">
-        <p className="text-sm text-[var(--color-text-secondary)] mb-1">
-          Install with the CLI:
-        </p>
-        <code className="text-[var(--color-accent)]">
-          npx @getmcp/cli add {server.id}
-        </code>
-      </div>
+      {/* CLI install command */}
+      <PackageManagerCommand serverId={server.id} />
 
       {/* Config generator */}
       <ConfigViewer serverName={server.id} config={server.config} />

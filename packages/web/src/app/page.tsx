@@ -1,5 +1,6 @@
 import { getAllServers, getCategories, getServerCount } from "@getmcp/registry";
 import { SearchBar } from "@/components/SearchBar";
+import { PackageManagerCommand } from "@/components/PackageManagerCommand";
 
 export default function HomePage() {
   const servers = getAllServers();
@@ -16,18 +17,13 @@ export default function HomePage() {
         <p className="text-lg text-[var(--color-text-secondary)] max-w-2xl mx-auto">
           Browse {count} MCP servers and get the exact configuration for your AI
           app. One canonical format, generated for{" "}
-          <span className="text-[var(--color-text)]">11 applications</span>.
+          <span className="text-[var(--color-text)]">12 applications</span>.
         </p>
       </div>
 
       {/* Install hint */}
-      <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4 mb-8 text-center">
-        <p className="text-sm text-[var(--color-text-secondary)]">
-          Install any server with the CLI:{" "}
-          <code className="text-[var(--color-accent)] bg-[var(--color-code-bg)] px-2 py-0.5 rounded">
-            npx @getmcp/cli add &lt;server-id&gt;
-          </code>
-        </p>
+      <div className="max-w-xl mx-auto">
+        <PackageManagerCommand />
       </div>
 
       {/* Search + server listing */}
