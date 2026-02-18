@@ -2,7 +2,7 @@
 
 Universal installer and configuration tool for MCP (Model Context Protocol) servers across all AI applications.
 
-**The problem:** Every AI app uses a different config format for MCP servers. Claude Desktop uses `mcpServers`, VS Code uses `servers`, Goose uses YAML with `cmd`/`envs`, OpenCode merges command+args into an array... there are 10 apps, 6 root keys, and 3 formats.
+**The problem:** Every AI app uses a different config format for MCP servers. Claude Desktop uses `mcpServers`, VS Code uses `servers`, Goose uses YAML with `cmd`/`envs`, OpenCode merges command+args into an array... there are 11 apps, 6 root keys, and 3 formats.
 
 **The solution:** One canonical format, config generators for every app, a registry of popular servers, and a CLI that auto-detects your apps and writes the correct config.
 
@@ -52,10 +52,11 @@ npx @getmcp/cli remove github
 | Windsurf | `mcpServers` | JSON |
 | OpenCode | `mcp` | JSONC |
 | Zed | `context_servers` | JSON |
+| PyCharm | `mcpServers` | JSON |
 
 ## Registry
 
-12 popular MCP servers included out of the box:
+33 MCP servers included out of the box. Here are some highlights:
 
 | Server | Transport | Description |
 |--------|-----------|-------------|
@@ -63,14 +64,20 @@ npx @getmcp/cli remove github
 | Filesystem | stdio | Secure file operations with access controls |
 | Brave Search | stdio | Web search via Brave Search API |
 | Memory | stdio | Knowledge graph-based persistent memory |
-| Slack | stdio | Channel management and messaging |
+| Playwright | stdio | Browser automation, screenshots, and element interaction |
 | PostgreSQL | stdio | Read-only database access and queries |
-| Puppeteer | stdio | Browser automation and web scraping |
-| Sequential Thinking | stdio | Structured problem-solving |
+| Figma | stdio | Read Figma design files and provide layout info to AI agents |
+| Context7 | remote | Up-to-date library documentation and code examples |
 | Sentry | remote | Error tracking and monitoring |
-| Context7 | remote | Library documentation search |
-| Fetch | stdio | Web content fetching and HTML-to-markdown |
-| Google Maps | stdio | Location services and geocoding |
+| Supabase | remote | Query databases, manage projects, deploy Edge Functions |
+| Firecrawl | stdio | Web scraping and search with JavaScript rendering |
+| Repomix | stdio | Pack entire repositories into a single AI-friendly file |
+
+Browse the full catalog of 33 servers:
+
+```bash
+npx @getmcp/cli list
+```
 
 ## Packages
 
@@ -78,7 +85,7 @@ npx @getmcp/cli remove github
 |---------|-------------|-----|
 | [`@getmcp/cli`](packages/cli) | CLI tool for installing MCP servers | [![npm](https://img.shields.io/npm/v/@getmcp/cli)](https://www.npmjs.com/package/@getmcp/cli) |
 | [`@getmcp/core`](packages/core) | Zod schemas, types, and utilities | [![npm](https://img.shields.io/npm/v/@getmcp/core)](https://www.npmjs.com/package/@getmcp/core) |
-| [`@getmcp/generators`](packages/generators) | Config generators for 10 apps | [![npm](https://img.shields.io/npm/v/@getmcp/generators)](https://www.npmjs.com/package/@getmcp/generators) |
+| [`@getmcp/generators`](packages/generators) | Config generators for 11 apps | [![npm](https://img.shields.io/npm/v/@getmcp/generators)](https://www.npmjs.com/package/@getmcp/generators) |
 | [`@getmcp/registry`](packages/registry) | Registry of MCP server definitions | [![npm](https://img.shields.io/npm/v/@getmcp/registry)](https://www.npmjs.com/package/@getmcp/registry) |
 | [`@getmcp/web`](packages/web) | Web directory (Next.js, not published) | -- |
 
@@ -134,7 +141,7 @@ npm install
 # Build all packages
 npm run build
 
-# Run all tests (139 tests)
+# Run all tests (163 tests)
 npm run test
 
 # Build and test a specific package
@@ -148,8 +155,8 @@ npm run test --workspace=@getmcp/core
 getmcp/
   packages/
     core/          # Zod schemas, TS types, utility functions
-    generators/    # 10 config generators (one per app)
-    registry/      # 12 MCP server definitions
+    generators/    # 11 config generators (one per app)
+    registry/      # 33 MCP server definitions
     cli/           # add/remove/list commands, app detection
     web/           # Next.js web directory (static export)
 ```
