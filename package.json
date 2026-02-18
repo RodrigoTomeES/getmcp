@@ -11,10 +11,10 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build -w @getmcp/core && npm run build -w @getmcp/generators && npm run build -w @getmcp/registry && npm run build -w @getmcp/cli && npm run build -w @getmcp/web",
     "test": "npm run test --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
-    "clean": "rimraf packages/*/dist packages/web/.next"
+    "clean": "rimraf packages/*/dist packages/*/tsconfig.tsbuildinfo packages/web/.next"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

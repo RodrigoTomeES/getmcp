@@ -129,7 +129,7 @@ export function searchServers(query: string): RegistryEntryType[] {
 export function getServersByCategory(category: string): RegistryEntryType[] {
   const cat = category.toLowerCase();
   return getAllServers().filter((entry) =>
-    (entry.categories ?? []).some((c) => c.toLowerCase() === cat),
+    (entry.categories ?? []).some((c: string) => c.toLowerCase() === cat),
   );
 }
 
