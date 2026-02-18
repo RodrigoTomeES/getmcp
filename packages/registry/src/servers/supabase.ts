@@ -1,0 +1,17 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const supabase: RegistryEntryType = {
+  id: "supabase",
+  name: "Supabase",
+  description:
+    "Connect AI tools to Supabase. Query databases, manage projects, deploy Edge Functions, view logs, search docs, and manage storage. Supports read-only mode and project scoping",
+  config: {
+    url: "https://mcp.supabase.com/mcp",
+    headers: {},
+  },
+  repository: "https://github.com/supabase-community/supabase-mcp",
+  homepage: "https://supabase.com/docs/guides/getting-started/mcp",
+  author: "Supabase",
+  categories: ["database", "developer-tools", "backend", "cloud"],
+  requiredEnvVars: [],
+};

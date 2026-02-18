@@ -40,6 +40,7 @@ import { scrapling } from "./servers/scrapling.js";
 import { xiaohongshuMcp } from "./servers/xiaohongshu-mcp.js";
 import { awsDocs } from "./servers/aws-docs.js";
 import { nextDevtools } from "./servers/next-devtools.js";
+import { supabase } from "./servers/supabase.js";
 
 // Re-export individual servers for direct access
 export {
@@ -75,6 +76,7 @@ export {
   xiaohongshuMcp,
   awsDocs,
   nextDevtools,
+  supabase,
 };
 
 // ---------------------------------------------------------------------------
@@ -120,6 +122,7 @@ register(scrapling);
 register(xiaohongshuMcp);
 register(awsDocs);
 register(nextDevtools);
+register(supabase);
 
 // ---------------------------------------------------------------------------
 // Public API
