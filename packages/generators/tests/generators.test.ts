@@ -12,6 +12,7 @@ import {
   OpenCodeGenerator,
   ZedGenerator,
   PyCharmGenerator,
+  CodexGenerator,
   generators,
   getGenerator,
   getAppIds,
@@ -436,21 +437,127 @@ describe("PyCharmGenerator", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Codex (OpenAI)
+// ---------------------------------------------------------------------------
+
+describe("CodexGenerator", () => {
+  const gen = new CodexGenerator();
+
+  it("uses 'mcp_servers' root key (not 'mcpServers')", () => {
+    const result = gen.generate("github", stdioConfig);
+    expect(result).toHaveProperty("mcp_servers");
+    expect(result).not.toHaveProperty("mcpServers");
+  });
+
+  it("preserves command, args, env for stdio", () => {
+    const result = gen.generate("github", stdioConfig);
+    const server = (result.mcp_servers as Record<string, Record<string, unknown>>).github;
+    expect(server.command).toBe("npx");
+    expect(server.args).toEqual(["-y", "@modelcontextprotocol/server-github"]);
+    expect(server.env).toEqual({ GITHUB_PERSONAL_ACCESS_TOKEN: "abc123" });
+  });
+
+  it("renames headers to http_headers for remote", () => {
+    const result = gen.generate("remote", remoteConfig);
+    const server = (result.mcp_servers as Record<string, Record<string, unknown>>).remote;
+    expect(server.url).toBe("https://mcp.example.com/mcp");
+    expect(server.http_headers).toEqual({ Authorization: "Bearer token123" });
+    expect(server.headers).toBeUndefined();
+  });
+
+  it("drops transport field", () => {
+    const result = gen.generate("remote", sseConfig);
+    const server = (result.mcp_servers as Record<string, Record<string, unknown>>).remote;
+    expect(server.transport).toBeUndefined();
+    expect(server.type).toBeUndefined();
+  });
+
+  it("converts timeout from ms to seconds (startup_timeout_sec)", () => {
+    const withTimeout: LooseServerConfigType = {
+      command: "npx",
+      args: [],
+      env: {},
+      transport: "stdio",
+      timeout: 30000,
+    };
+    const result = gen.generate("test", withTimeout);
+    const server = (result.mcp_servers as Record<string, Record<string, unknown>>).test;
+    expect(server.startup_timeout_sec).toBe(30);
+    expect(server.timeout).toBeUndefined();
+  });
+
+  it("rounds up timeout when not evenly divisible", () => {
+    const withTimeout: LooseServerConfigType = {
+      command: "npx",
+      args: [],
+      env: {},
+      transport: "stdio",
+      timeout: 1500,
+    };
+    const result = gen.generate("test", withTimeout);
+    const server = (result.mcp_servers as Record<string, Record<string, unknown>>).test;
+    expect(server.startup_timeout_sec).toBe(2);
+  });
+
+  it("omits empty args and env", () => {
+    const result = gen.generate("minimal", minimalStdio);
+    const server = (result.mcp_servers as Record<string, Record<string, unknown>>).minimal;
+    expect(server.args).toBeUndefined();
+    expect(server.env).toBeUndefined();
+  });
+
+  it("omits empty headers for remote", () => {
+    const result = gen.generate("remote", sseConfig);
+    const server = (result.mcp_servers as Record<string, Record<string, unknown>>).remote;
+    expect(server.http_headers).toBeUndefined();
+  });
+
+  it("serializes to TOML format", () => {
+    const result = gen.generate("github", stdioConfig);
+    const toml = gen.serialize(result);
+    expect(toml).toContain("[mcp_servers.github]");
+    expect(toml).toContain('command = "npx"');
+    expect(toml).toContain("[mcp_servers.github.env]");
+    expect(toml).toContain('GITHUB_PERSONAL_ACCESS_TOKEN = "abc123"');
+  });
+
+  it("serializes remote config to TOML with http_headers table", () => {
+    const result = gen.generate("remote", remoteConfig);
+    const toml = gen.serialize(result);
+    expect(toml).toContain("[mcp_servers.remote]");
+    expect(toml).toContain('url = "https://mcp.example.com/mcp"');
+    expect(toml).toContain("[mcp_servers.remote.http_headers]");
+    expect(toml).toContain('Authorization = "Bearer token123"');
+  });
+
+  it("has TOML config format", () => {
+    expect(gen.app.configFormat).toBe("toml");
+  });
+
+  it("has correct config paths", () => {
+    expect(gen.app.configPaths.darwin).toBe("~/.codex/config.toml");
+    expect(gen.app.configPaths.linux).toBe("~/.codex/config.toml");
+    expect(gen.app.configPaths.win32).toBe("%UserProfile%\\.codex\\config.toml");
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Registry & utilities
 // ---------------------------------------------------------------------------
 
 describe("generators registry", () => {
-  it("has all 11 generators", () => {
-    expect(Object.keys(generators)).toHaveLength(11);
+  it("has all 12 generators", () => {
+    expect(Object.keys(generators)).toHaveLength(12);
   });
 
-  it("getAppIds returns all 11 IDs", () => {
+  it("getAppIds returns all 12 IDs", () => {
     const ids = getAppIds();
-    expect(ids).toHaveLength(11);
+    expect(ids).toHaveLength(12);
     expect(ids).toContain("claude-desktop");
     expect(ids).toContain("goose");
     expect(ids).toContain("zed");
     expect(ids).toContain("pycharm");
+    expect(ids).toContain("codex");
   });
 
   it("getGenerator returns correct generator for each app", () => {
@@ -462,9 +569,9 @@ describe("generators registry", () => {
     expect(() => getGenerator("unknown" as any)).toThrow();
   });
 
-  it("generateAllConfigs returns configs for all 11 apps", () => {
+  it("generateAllConfigs returns configs for all 12 apps", () => {
     const configs = generateAllConfigs("github", stdioConfig);
-    expect(Object.keys(configs)).toHaveLength(11);
+    expect(Object.keys(configs)).toHaveLength(12);
     // Each config should be a valid string
     for (const [, configStr] of Object.entries(configs)) {
       expect(typeof configStr).toBe("string");
@@ -535,5 +642,14 @@ describe("generateAll (multi-server)", () => {
     const result = gen.generateAll(servers);
     const cs = result.context_servers as Record<string, unknown>;
     expect(Object.keys(cs)).toHaveLength(2);
+  });
+
+  it("Codex merges under 'mcp_servers' key", () => {
+    const gen = new CodexGenerator();
+    const result = gen.generateAll(servers);
+    const mcpServers = result.mcp_servers as Record<string, unknown>;
+    expect(Object.keys(mcpServers)).toHaveLength(2);
+    expect(mcpServers).toHaveProperty("github");
+    expect(mcpServers).toHaveProperty("remote");
   });
 });

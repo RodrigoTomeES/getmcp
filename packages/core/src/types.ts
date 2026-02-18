@@ -77,7 +77,7 @@ export interface AppMetadata {
   };
 
   /** Config file format */
-  configFormat: "json" | "jsonc" | "yaml";
+  configFormat: "json" | "jsonc" | "yaml" | "toml";
 
   /** URL to the app's MCP documentation */
   docsUrl: string;

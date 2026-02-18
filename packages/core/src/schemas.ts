@@ -205,4 +205,5 @@ export const AppId = z.enum([
   "opencode",
   "zed",
   "pycharm",
+  "codex",
 ]);

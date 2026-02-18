@@ -580,6 +580,68 @@ A Next.js website that serves as a public directory for MCP servers. Think "npm 
 - Publish `@getmcp/cli` to npm so users can run `npx @getmcp/cli add github`
 - Publish `@getmcp/core` and `@getmcp/generators` for library consumers
 
+### CLI Multi-Format Config File Support
+
+The CLI's `config-file.ts` module (`readConfigFile`, `writeConfigFile`, `mergeServerIntoConfig`, `removeServerFromConfig`) currently only handles JSON/JSONC. Apps that use other formats — Goose (YAML) and Codex (TOML) — cannot be fully managed by the CLI's `add`/`remove` commands. This is a latent bug for Goose (writes JSON to `config.yaml`) and a known limitation for Codex.
+
+#### File Extension Detector
+
+Implement a `detectConfigFormat()` utility that infers the config format from the file path:
+
+| Extension(s) | Format | Parser | Serializer |
+|---|---|---|---|
+| `.json`, `.jsonc` | JSON/JSONC | `JSON.parse` (with comment stripping for JSONC) | `JSON.stringify` |
+| `.yaml`, `.yml` | YAML | YAML parser library | YAML serializer (extract/generalize from Goose's `toYaml`) |
+| `.toml` | TOML | TOML parser library | TOML serializer (extract/generalize from Codex's `toToml`) |
+
+#### Refactored Config File Module
+
+- `readConfigFile(filePath)` — calls `detectConfigFormat(filePath)`, dispatches to the correct parser
+- `writeConfigFile(filePath, config)` — calls `detectConfigFormat(filePath)`, dispatches to the correct serializer
+- `mergeServerIntoConfig(filePath, generatedConfig)` — format-agnostic at the object level; format only matters at read/write boundaries
+- `removeServerFromConfig(filePath, serverName)` — same approach
+- `listServersInConfig(filePath)` — same approach; add `mcp_servers` to the list of known root keys to scan
+
+#### Dependencies
+
+- Add a TOML library (e.g., `smol-toml`) to `@getmcp/cli` for parse + serialize
+- Add a YAML library (e.g., `yaml`) to `@getmcp/cli` for parsing (serialization already exists as `toYaml` in the Goose generator, but should be extracted to a shared utility)
+- Alternatively, hand-roll minimal parsers as done with `toYaml` — evaluate trade-offs between bundle size and correctness
+
+#### Priority
+
+High — this unblocks full CLI support for Goose (existing) and Codex (new), and establishes the pattern for any future non-JSON app configs.
+
+### Codex Full Integration
+
+The initial Codex generator (`packages/generators/src/codex.ts`) maps only canonical fields to TOML output for web preview and config snippet generation. Full Codex support requires additional work:
+
+#### CLI Read/Write/Merge for TOML
+
+Depends on the **CLI Multi-Format Config File Support** refactor above. Once implemented, `getmcp add` and `getmcp remove` will be able to read, merge into, and write `~/.codex/config.toml` natively.
+
+#### Codex-Specific Config Fields
+
+The canonical format does not include Codex-specific fields. Future work could extend the generator (or add an options/extras mechanism) to support:
+
+- `enabled` (`boolean`) — enable/disable a server without removing it
+- `required` (`boolean`) — fail startup if an enabled server can't initialize
+- `enabled_tools` (`string[]`) — tool allow list
+- `disabled_tools` (`string[]`) — tool deny list (applied after `enabled_tools`)
+- `startup_timeout_sec` (`number`) — server startup timeout in seconds
+- `tool_timeout_sec` (`number`) — per-tool execution timeout in seconds
+- `bearer_token_env_var` (`string`) — env var name for bearer token auth
+- `env_vars` (`string[]`) — env var forwarding allow list
+- `env_http_headers` (`Record<string, string>`) — HTTP headers whose values are env var names
+
+#### OAuth Support
+
+Codex supports OAuth for remote MCP servers via `codex mcp login <server-name>`. Consider adding guidance or CLI integration for OAuth-authenticated servers, including the optional `mcp_oauth_callback_port` top-level config.
+
+#### Project-Scoped Config
+
+Codex supports project-level config at `.codex/config.toml` (trusted projects only). The CLI's `detectApps()` currently only checks global config paths. Add support for detecting and managing project-scoped config files.
+
 ---
 
 ## 10. Research Appendix: Config Formats Per App
@@ -814,6 +876,38 @@ Detailed documentation of every app's MCP config format, gathered from official 
 - Can import configs from Claude Desktop via the "Import from Claude" button in settings.
 - **Important**: PyCharm must be fully closed and reopened for MCP configuration changes to take effect.
 
+### Codex
+
+- **Docs**: https://developers.openai.com/codex/mcp/
+- **Config file**: `~/.codex/config.toml` (global), `.codex/config.toml` (project-scoped, trusted projects only)
+- **Format** (**TOML**, not JSON):
+  ```toml
+  [mcp_servers.server-name]
+  command = "npx"
+  args = ["-y", "@package/name"]
+
+  [mcp_servers.server-name.env]
+  API_KEY = "value"
+  ```
+- **Format** (remote / Streamable HTTP):
+  ```toml
+  [mcp_servers.remote-server]
+  url = "https://mcp.example.com/mcp"
+  bearer_token_env_var = "TOKEN_ENV_VAR"
+
+  [mcp_servers.remote-server.http_headers]
+  X-Custom-Header = "value"
+  ```
+- Root key: `mcp_servers` (TOML table prefix).
+- Supports stdio and Streamable HTTP transports.
+- CLI: `codex mcp add <name> -- <command>`, `codex mcp` for management.
+- Shared config between CLI and IDE extension.
+- Extra fields (not in canonical): `enabled`, `required`, `enabled_tools`, `disabled_tools`, `startup_timeout_sec`, `tool_timeout_sec`, `bearer_token_env_var`, `env_vars`, `env_http_headers`.
+- Other config options: `startup_timeout_sec` (default 10), `tool_timeout_sec` (default 60), `enabled` (default true), `required` (default false).
+- OAuth support via `codex mcp login <server-name>`.
+- Configurable OAuth callback port: `mcp_oauth_callback_port` (top-level config).
+- Environment variable forwarding: `env_vars` (allow list), `env_http_headers` (header values from env vars).
+
 ---
 
 ## Test Coverage Summary
@@ -821,10 +915,10 @@ Detailed documentation of every app's MCP config format, gathered from official 
 | Package | Test Files | Tests | Description |
 |---------|-----------|-------|-------------|
 | `@getmcp/core` | 2 | 30 | Schema validation, type guards, transport inference |
-| `@getmcp/generators` | 1 | 45 | All 10 generators (stdio + remote), multi-server, serialization |
-| `@getmcp/registry` | 1 | 37 | Entry validation, lookup, search, categories, content integrity |
+| `@getmcp/generators` | 1 | 63 | All 12 generators (stdio + remote), multi-server, serialization |
+| `@getmcp/registry` | 1 | 59 | Entry validation, lookup, search, categories, content integrity |
 | `@getmcp/cli` | 2 | 27 | Path resolution, app detection, config read/write/merge/remove |
-| **Total** | **6** | **139** | |
+| **Total** | **6** | **179** | |
 
 ---
 

@@ -16,6 +16,7 @@ const APP_LABELS: Record<AppIdType, string> = {
   opencode: "OpenCode",
   zed: "Zed",
   pycharm: "PyCharm",
+  codex: "Codex",
 };
 
 const APP_IDS = Object.keys(generators) as AppIdType[];
@@ -100,6 +101,16 @@ export function ConfigViewer({
           <code>{serialized}</code>
         </pre>
       </div>
+
+      {/* Codex-specific note */}
+      {selectedApp === "codex" && (
+        <p className="text-xs text-amber-500 mt-3">
+          Codex uses TOML configuration. Save as{" "}
+          <code className="font-mono">~/.codex/config.toml</code> or{" "}
+          <code className="font-mono">.codex/config.toml</code> for
+          project-scoped config.
+        </p>
+      )}
 
       {/* PyCharm-specific warning */}
       {selectedApp === "pycharm" && (
