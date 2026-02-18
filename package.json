@@ -12,15 +12,17 @@
   ],
   "scripts": {
     "build": "npm run build -w @getmcp/core && npm run build -w @getmcp/generators && npm run build -w @getmcp/registry && npm run build -w @getmcp/cli && npm run build -w @getmcp/web",
-    "test": "npm run test --workspaces --if-present",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "lint": "npm run lint --workspaces --if-present",
     "clean": "rimraf packages/*/dist packages/*/tsconfig.tsbuildinfo packages/web/.next",
     "fetch-repos": "tsx scripts/fetch-mcp-repos.ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "@vitest/coverage-v8": "^4.0.18",
     "tsx": "^4.21.0",
     "typescript": "^5.7.0",
-    "vitest": "^3.0.0"
+    "vitest": "^4.0.0"
   }
 }
