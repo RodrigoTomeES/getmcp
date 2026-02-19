@@ -16,3 +16,9 @@ export {
   removeServerFromConfig,
   listServersInConfig,
 } from "./config-file.js";
+export {
+  getPreferencesPath,
+  readPreferences,
+  saveSelectedApps,
+  getSavedSelectedApps,
+} from "./preferences.js";

@@ -21,6 +21,7 @@ import { isStdioConfig } from "@getmcp/core";
 import type { LooseServerConfigType, RegistryEntryType } from "@getmcp/core";
 import { detectApps, type DetectedApp } from "../detect.js";
 import { mergeServerIntoConfig, writeConfigFile } from "../config-file.js";
+import { getSavedSelectedApps, saveSelectedApps } from "../preferences.js";
 
 export async function addCommand(serverIdArg?: string): Promise<void> {
   // Step 1: Select server
@@ -93,13 +94,17 @@ export async function addCommand(serverIdArg?: string): Promise<void> {
   }
 
   // Step 4: Select target apps
-  // Detected apps come first (pre-checked), then project-scoped non-detected
-  // apps after a separator (unchecked) so users can still configure them.
+  // On first run (no saved preferences), detected apps are pre-checked and
+  // project-scoped non-detected apps are unchecked.
+  // On subsequent runs, the previously selected apps are pre-checked instead.
+  const savedApps = getSavedSelectedApps();
+  const hasSavedPreferences = savedApps !== null;
+
   const choices: (Separator | { name: string; value: DetectedApp; checked: boolean })[] = [
     ...detected.map((app) => ({
       name: app.name,
       value: app,
-      checked: true,
+      checked: hasSavedPreferences ? savedApps.includes(app.id) : true,
     })),
   ];
 
@@ -109,7 +114,7 @@ export async function addCommand(serverIdArg?: string): Promise<void> {
       ...notDetectedProjectScoped.map((app) => ({
         name: app.name,
         value: app,
-        checked: false,
+        checked: hasSavedPreferences ? savedApps.includes(app.id) : false,
       })),
     );
   }
@@ -120,6 +125,9 @@ export async function addCommand(serverIdArg?: string): Promise<void> {
     validate: (selected) =>
       selected.length > 0 ? true : "Select at least one app",
   });
+
+  // Save selected apps for next run
+  saveSelectedApps(selectedApps.map((app) => app.id));
 
   // Step 5+6: Generate and merge for each selected app
   for (const app of selectedApps) {
