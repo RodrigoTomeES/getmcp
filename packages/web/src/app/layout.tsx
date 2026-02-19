@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: "getmcp — Universal MCP Server Directory",
   description:
     "Browse, discover, and install MCP servers into any AI application. One config, every app.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -18,6 +21,13 @@ export default function RootLayout({
         <header className="border-b border-[var(--color-border)] px-6 py-4">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
             <a href="/" className="flex items-center gap-2">
+              <img
+                src="/icon.svg"
+                alt="getmcp"
+                width={32}
+                height={32}
+                className="h-6 w-auto"
+              />
               <span className="text-xl font-bold tracking-tight">
                 getmcp
               </span>

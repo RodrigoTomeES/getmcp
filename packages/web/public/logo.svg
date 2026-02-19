@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="147" height="40" viewBox="0 0 147 40" fill="none">
+  <!-- Icon: downward arrow + node + connections -->
+  <g transform="translate(4, 4)">
+    <!-- Downward arrow (the "get") -->
+    <path d="M16 1 L16 14" stroke="#ededed" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M11 10 L16 15 L21 10" stroke="#ededed" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Central node -->
+    <circle cx="16" cy="21" r="3.5" stroke="#ededed" stroke-width="2" fill="none"/>
+    <!-- Radiating connections -->
+    <path d="M16 24.5 L16 30" stroke="#ededed" stroke-width="2" stroke-linecap="round"/>
+    <path d="M12.9 23.6 L8 28" stroke="#ededed" stroke-width="2" stroke-linecap="round"/>
+    <path d="M19.1 23.6 L24 28" stroke="#ededed" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="45" y="25" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="26" font-weight="700" letter-spacing="-0.5" fill="#ededed">getmcp</text>
+</svg>

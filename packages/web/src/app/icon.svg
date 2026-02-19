@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+  <!-- Downward arrow (the "get") -->
+  <path d="M16 3 L16 15" stroke="#ededed" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M11 11 L16 16 L21 11" stroke="#ededed" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Central node (MCP connection point) -->
+  <circle cx="16" cy="20" r="3.5" stroke="#ededed" stroke-width="2" fill="none"/>
+  <!-- Radiating connections (universal plug-in) -->
+  <path d="M16 23.5 L16 29" stroke="#ededed" stroke-width="2" stroke-linecap="round"/>
+  <path d="M12.9 22.6 L8 27" stroke="#ededed" stroke-width="2" stroke-linecap="round"/>
+  <path d="M19.1 22.6 L24 27" stroke="#ededed" stroke-width="2" stroke-linecap="round"/>
+</svg>

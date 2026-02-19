@@ -1,6 +1,14 @@
-# getmcp
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="packages/web/public/logo.svg">
+    <source media="(prefers-color-scheme: light)" srcset="packages/web/public/logo-light.svg">
+    <img alt="getmcp" src="packages/web/public/logo-light.svg" width="280">
+  </picture>
+</p>
 
-Universal installer and configuration tool for MCP (Model Context Protocol) servers across all AI applications.
+<p align="center">
+  Universal installer and configuration tool for MCP (Model Context Protocol) servers across all AI applications.
+</p>
 
 **The problem:** Every AI app uses a different config format for MCP servers. Claude Desktop uses `mcpServers`, VS Code uses `servers`, Goose uses YAML with `cmd`/`envs`, OpenCode merges command+args into an array... there are 11 apps, 6 root keys, and 3 formats.
 
