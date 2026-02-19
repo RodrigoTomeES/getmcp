@@ -13,9 +13,23 @@ export function generateMetadata({ params }: { params: Promise<{ id: string }> }
   return params.then(({ id }) => {
     const server = getServer(id);
     if (!server) return { title: "Not Found" };
+
+    const title = `${server.name} — getmcp`;
+    const description = server.description;
+
     return {
-      title: `${server.name} — getmcp`,
-      description: server.description,
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        type: "article",
+      },
+      twitter: {
+        card: "summary_large_image" as const,
+        title,
+        description,
+      },
     };
   });
 }

@@ -2,11 +2,20 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://getmcp.es"),
   title: "getmcp — Universal MCP Server Directory",
   description:
     "Browse, discover, and install MCP servers into any AI application. One config, every app.",
   icons: {
     icon: "/icon.svg",
+  },
+  openGraph: {
+    siteName: "getmcp",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
   },
 };
 
