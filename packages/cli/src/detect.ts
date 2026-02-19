@@ -53,6 +53,7 @@ export interface DetectedApp {
   name: string;
   configPath: string;
   exists: boolean;
+  scope: "project" | "global";
 }
 
 /**
@@ -76,6 +77,7 @@ export function detectApps(): DetectedApp[] {
       name: generator.app.name,
       configPath,
       exists: fileExists || parentExists,
+      scope: generator.app.scope,
     });
   }
 

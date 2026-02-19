@@ -36,6 +36,7 @@ export class ZedGenerator extends BaseGenerator {
     },
     configFormat: "json",
     docsUrl: "https://zed.dev/docs/ai/mcp",
+    scope: "global",
   };
 
   generate(

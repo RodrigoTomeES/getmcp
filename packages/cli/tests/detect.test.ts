@@ -40,6 +40,7 @@ describe("detectApps", () => {
       expect(app.name).toBeDefined();
       expect(app.configPath).toBeDefined();
       expect(typeof app.exists).toBe("boolean");
+      expect(["project", "global"]).toContain(app.scope);
     }
   });
 
@@ -49,5 +50,25 @@ describe("detectApps", () => {
     // These should always have config paths regardless of platform
     expect(ids).toContain("claude-code"); // .mcp.json - relative
     expect(ids).toContain("opencode"); // opencode.json - relative
+  });
+
+  it("project-scoped apps have scope 'project'", () => {
+    const apps = detectApps();
+    const projectIds = ["claude-code", "vscode", "cursor", "opencode", "pycharm"];
+    for (const app of apps) {
+      if (projectIds.includes(app.id)) {
+        expect(app.scope).toBe("project");
+      }
+    }
+  });
+
+  it("global-scoped apps have scope 'global'", () => {
+    const apps = detectApps();
+    const globalIds = ["claude-desktop", "cline", "roo-code", "goose", "windsurf", "zed", "codex"];
+    for (const app of apps) {
+      if (globalIds.includes(app.id)) {
+        expect(app.scope).toBe("global");
+      }
+    }
   });
 });

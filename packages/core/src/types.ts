@@ -81,6 +81,9 @@ export interface AppMetadata {
 
   /** URL to the app's MCP documentation */
   docsUrl: string;
+
+  /** Whether the config is project-scoped or global */
+  scope: "project" | "global";
 }
 
 /**

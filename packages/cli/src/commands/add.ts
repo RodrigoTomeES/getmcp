@@ -10,7 +10,7 @@
  * 6. Merge into existing config files (never overwrite)
  */
 
-import { select, checkbox, input, confirm } from "@inquirer/prompts";
+import { select, checkbox, input, Separator } from "@inquirer/prompts";
 import {
   getAllServers,
   getServer,
@@ -18,8 +18,8 @@ import {
 } from "@getmcp/registry";
 import { getGenerator } from "@getmcp/generators";
 import { isStdioConfig } from "@getmcp/core";
-import type { AppIdType, LooseServerConfigType, RegistryEntryType } from "@getmcp/core";
-import { detectInstalledApps, type DetectedApp } from "../detect.js";
+import type { LooseServerConfigType, RegistryEntryType } from "@getmcp/core";
+import { detectApps, type DetectedApp } from "../detect.js";
 import { mergeServerIntoConfig, writeConfigFile } from "../config-file.js";
 
 export async function addCommand(serverIdArg?: string): Promise<void> {
@@ -78,10 +78,14 @@ export async function addCommand(serverIdArg?: string): Promise<void> {
     console.log();
   }
 
-  // Step 3: Detect installed apps
-  const installed = detectInstalledApps();
+  // Step 3: Detect apps and build selection list
+  const allApps = detectApps();
+  const detected = allApps.filter((app) => app.exists);
+  const notDetectedProjectScoped = allApps.filter(
+    (app) => !app.exists && app.scope === "project",
+  );
 
-  if (installed.length === 0) {
+  if (detected.length === 0 && notDetectedProjectScoped.length === 0) {
     console.log("No AI applications detected on this system.");
     console.log("You can manually copy the config from below:\n");
     printManualConfig(entry, config);
@@ -89,13 +93,30 @@ export async function addCommand(serverIdArg?: string): Promise<void> {
   }
 
   // Step 4: Select target apps
-  const selectedApps = await checkbox<DetectedApp>({
-    message: "Select apps to configure:",
-    choices: installed.map((app) => ({
+  // Detected apps come first (pre-checked), then project-scoped non-detected
+  // apps after a separator (unchecked) so users can still configure them.
+  const choices: (Separator | { name: string; value: DetectedApp; checked: boolean })[] = [
+    ...detected.map((app) => ({
       name: app.name,
       value: app,
-      checked: true, // Pre-select all detected apps
+      checked: true,
     })),
+  ];
+
+  if (notDetectedProjectScoped.length > 0) {
+    choices.push(new Separator("── Other supported apps ──"));
+    choices.push(
+      ...notDetectedProjectScoped.map((app) => ({
+        name: app.name,
+        value: app,
+        checked: false,
+      })),
+    );
+  }
+
+  const selectedApps = await checkbox<DetectedApp>({
+    message: "Select apps to configure:",
+    choices,
     validate: (selected) =>
       selected.length > 0 ? true : "Select at least one app",
   });

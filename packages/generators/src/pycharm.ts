@@ -34,6 +34,7 @@ export class PyCharmGenerator extends BaseGenerator {
     },
     configFormat: "json",
     docsUrl: "https://www.jetbrains.com/help/ai-assistant/mcp.html",
+    scope: "project",
   };
 
   generate(

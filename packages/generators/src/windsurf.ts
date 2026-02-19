@@ -27,6 +27,7 @@ export class WindsurfGenerator extends BaseGenerator {
     },
     configFormat: "json",
     docsUrl: "https://docs.windsurf.com/windsurf/cascade/mcp",
+    scope: "global",
   };
 
   generate(

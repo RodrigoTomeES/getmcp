@@ -37,6 +37,7 @@ export class GooseGenerator extends BaseGenerator {
     },
     configFormat: "yaml",
     docsUrl: "https://block.github.io/goose/docs/getting-started/using-extensions",
+    scope: "global",
   };
 
   generate(

@@ -28,6 +28,7 @@ export class ClaudeCodeGenerator extends BaseGenerator {
     },
     configFormat: "json",
     docsUrl: "https://docs.anthropic.com/en/docs/claude-code/mcp",
+    scope: "project",
   };
 
   generate(

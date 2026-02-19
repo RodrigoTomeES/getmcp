@@ -41,6 +41,7 @@ export class CodexGenerator extends BaseGenerator {
     },
     configFormat: "toml",
     docsUrl: "https://developers.openai.com/codex/mcp/",
+    scope: "global",
   };
 
   generate(

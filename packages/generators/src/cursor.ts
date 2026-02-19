@@ -24,6 +24,7 @@ export class CursorGenerator extends BaseGenerator {
     },
     configFormat: "json",
     docsUrl: "https://docs.cursor.com/context/model-context-protocol",
+    scope: "project",
   };
 
   generate(

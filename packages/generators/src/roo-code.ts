@@ -28,6 +28,7 @@ export class RooCodeGenerator extends BaseGenerator {
     },
     configFormat: "json",
     docsUrl: "https://docs.roocode.com/features/mcp/using-mcp-in-roo",
+    scope: "global",
   };
 
   generate(

@@ -25,6 +25,7 @@ export class ClineGenerator extends BaseGenerator {
     },
     configFormat: "json",
     docsUrl: "https://docs.cline.bot/mcp-servers/configuring-mcp-servers",
+    scope: "global",
   };
 
   generate(

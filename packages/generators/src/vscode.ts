@@ -27,6 +27,7 @@ export class VSCodeGenerator extends BaseGenerator {
     },
     configFormat: "json",
     docsUrl: "https://code.visualstudio.com/docs/copilot/chat/mcp-servers",
+    scope: "project",
   };
 
   generate(

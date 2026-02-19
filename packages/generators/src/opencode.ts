@@ -41,6 +41,7 @@ export class OpenCodeGenerator extends BaseGenerator {
     },
     configFormat: "jsonc",
     docsUrl: "https://opencode.ai/docs/mcp-servers/",
+    scope: "project",
   };
 
   generate(
