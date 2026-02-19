@@ -1,6 +1,6 @@
 {
   "name": "@getmcp/web",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "description": "Web directory for browsing and configuring MCP servers",
   "scripts": {
