@@ -2,7 +2,7 @@ export const PACKAGE_MANAGERS = ["pnpm", "npm", "yarn", "bun"] as const;
 export type PackageManager = (typeof PACKAGE_MANAGERS)[number];
 
 export const STORAGE_KEY = "getmcp-pm";
-export const DEFAULT_PM: PackageManager = "pnpm";
+export const DEFAULT_PM: PackageManager = "npm";
 
 export function getCommand(pm: PackageManager, serverId?: string): string {
   const id = serverId ?? "<server-id>";
