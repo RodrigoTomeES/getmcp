@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { getServer, getAllServers } from "@getmcp/registry";
 import { isStdioConfig } from "@getmcp/core";
+import { getCommand, DEFAULT_PM } from "@/lib/package-manager";
 
 export function generateStaticParams() {
   return getAllServers().map((server) => ({ id: server.id }));
@@ -61,7 +62,7 @@ export default async function Image({
   }
 
   const categories = (server.categories ?? []).slice(0, 4);
-  const installCommand = `npx @getmcp/cli add ${server.id}`;
+  const installCommand = getCommand(DEFAULT_PM, server.id);
 
   return new ImageResponse(
     (

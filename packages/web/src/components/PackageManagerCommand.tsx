@@ -1,26 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-const PACKAGE_MANAGERS = ["pnpm", "npm", "yarn", "bun"] as const;
-type PackageManager = (typeof PACKAGE_MANAGERS)[number];
-
-const STORAGE_KEY = "getmcp-pm";
-const DEFAULT_PM: PackageManager = "pnpm";
-
-function getCommand(pm: PackageManager, serverId?: string): string {
-  const id = serverId ?? "<server-id>";
-  switch (pm) {
-    case "pnpm":
-      return `pnpm dlx @getmcp/cli add ${id}`;
-    case "npm":
-      return `npx @getmcp/cli add ${id}`;
-    case "yarn":
-      return `yarn dlx @getmcp/cli add ${id}`;
-    case "bun":
-      return `bunx @getmcp/cli add ${id}`;
-  }
-}
+import {
+  PACKAGE_MANAGERS,
+  type PackageManager,
+  STORAGE_KEY,
+  DEFAULT_PM,
+  getCommand,
+} from "@/lib/package-manager";
 
 export function PackageManagerCommand({
   serverId,
