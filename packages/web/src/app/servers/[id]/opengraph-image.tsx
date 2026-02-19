@@ -264,7 +264,7 @@ export default async function Image({
           >
             <span
               style={{
-                fontSize: "16px",
+                fontSize: "21px",
                 color: "#3b82f6",
                 fontWeight: 700,
               }}
@@ -273,7 +273,7 @@ export default async function Image({
             </span>
             <span
               style={{
-                fontSize: "16px",
+                fontSize: "21px",
                 color: "#94a3b8",
                 fontFamily: "monospace",
               }}
