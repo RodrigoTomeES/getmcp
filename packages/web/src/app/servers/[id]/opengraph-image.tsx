@@ -46,30 +46,13 @@ export default async function Image({
     );
   }
 
-  const [interBold, interSemiBold, interRegular] = await Promise.all([
+  const [interBold, interRegular] = await Promise.all([
     readFile(join(process.cwd(), "assets/Inter-Bold.ttf")),
-    readFile(join(process.cwd(), "assets/Inter-SemiBold.ttf")),
     readFile(join(process.cwd(), "assets/Inter-Regular.ttf")),
   ]);
 
   const isStdio = isStdioConfig(server.config);
   const transport = isStdio ? "stdio" : "remote";
-
-  // Build the command or URL string
-  let commandText = "";
-  if (isStdio && "command" in server.config) {
-    const parts = [server.config.command, ...(server.config.args ?? [])];
-    commandText = parts.join(" ");
-    // Truncate long commands
-    if (commandText.length > 80) {
-      commandText = commandText.slice(0, 77) + "...";
-    }
-  } else if ("url" in server.config) {
-    commandText = server.config.url;
-    if (commandText.length > 80) {
-      commandText = commandText.slice(0, 77) + "...";
-    }
-  }
 
   // Truncate description
   let description = server.description;
@@ -78,6 +61,7 @@ export default async function Image({
   }
 
   const categories = (server.categories ?? []).slice(0, 4);
+  const installCommand = `npx @getmcp/cli add ${server.id}`;
 
   return new ImageResponse(
     (
@@ -88,29 +72,28 @@ export default async function Image({
           display: "flex",
           flexDirection: "column",
           backgroundColor: "#0a0a0a",
-          padding: "48px 56px",
+          padding: "60px",
           fontFamily: "Inter",
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Background gradient */}
+        {/* Background gradient accent */}
         <div
           style={{
             position: "absolute",
-            bottom: "-300px",
+            top: "-200px",
             right: "-200px",
             width: "600px",
             height: "600px",
             borderRadius: "50%",
-            background: isStdio
-              ? "radial-gradient(circle, rgba(34,197,94,0.1) 0%, transparent 70%)"
-              : "radial-gradient(circle, rgba(168,85,247,0.1) 0%, transparent 70%)",
+            background:
+              "radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)",
             display: "flex",
           }}
         />
 
-        {/* Top accent line */}
+        {/* Top bar with accent line */}
         <div
           style={{
             position: "absolute",
@@ -118,98 +101,101 @@ export default async function Image({
             left: 0,
             right: 0,
             height: "4px",
-            background: isStdio
-              ? "linear-gradient(90deg, #22c55e, #16a34a, #22c55e)"
-              : "linear-gradient(90deg, #a855f7, #7c3aed, #a855f7)",
+            background:
+              "linear-gradient(90deg, #3b82f6, #2563eb, #3b82f6)",
             display: "flex",
           }}
         />
 
-        {/* Header: logo + domain */}
+        {/* Logo section */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "32px",
+            gap: "16px",
+            marginBottom: "16px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            {/* Logo icon */}
-            <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-              <path
-                d="M16 3 L16 15"
-                stroke="#a0a0a0"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-              />
-              <path
-                d="M11 11 L16 16 L21 11"
-                stroke="#a0a0a0"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <circle
-                cx="16"
-                cy="20"
-                r="3.5"
-                stroke="#a0a0a0"
-                strokeWidth="2"
-                fill="none"
-              />
-              <path
-                d="M16 23.5 L16 29"
-                stroke="#a0a0a0"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <path
-                d="M12.9 22.6 L8 27"
-                stroke="#a0a0a0"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <path
-                d="M19.1 22.6 L24 27"
-                stroke="#a0a0a0"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-            <span
-              style={{
-                fontSize: "24px",
-                fontWeight: 700,
-                color: "#a0a0a0",
-                letterSpacing: "-0.5px",
-              }}
-            >
-              getmcp
-            </span>
-          </div>
+          {/* Logo icon */}
+          <svg
+            width="56"
+            height="56"
+            viewBox="0 0 32 32"
+            fill="none"
+          >
+            <path
+              d="M16 3 L16 15"
+              stroke="#ededed"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M11 11 L16 16 L21 11"
+              stroke="#ededed"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle
+              cx="16"
+              cy="20"
+              r="3.5"
+              stroke="#ededed"
+              strokeWidth="2"
+              fill="none"
+            />
+            <path
+              d="M16 23.5 L16 29"
+              stroke="#ededed"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M12.9 22.6 L8 27"
+              stroke="#ededed"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M19.1 22.6 L24 27"
+              stroke="#ededed"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
           <span
             style={{
-              fontSize: "18px",
-              color: "#a0a0a0",
+              fontSize: "48px",
+              fontWeight: 700,
+              color: "#ededed",
+              letterSpacing: "-1px",
             }}
           >
-            getmcp.es
+            getmcp
+          </span>
+          <span
+            style={{
+              fontSize: "16px",
+              fontWeight: 600,
+              color: "white",
+              backgroundColor: "#3b82f6",
+              padding: "4px 12px",
+              borderRadius: "20px",
+              marginLeft: "4px",
+            }}
+          >
+            beta
           </span>
         </div>
 
-        {/* Main content card */}
+        {/* Main content */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             flex: 1,
-            border: "1px solid #262626",
-            borderRadius: "16px",
-            backgroundColor: "#141414",
-            padding: "40px 44px",
-            gap: "20px",
-            overflow: "hidden",
+            justifyContent: "center",
+            gap: "24px",
           }}
         >
           {/* Server name + transport badge */}
@@ -220,21 +206,22 @@ export default async function Image({
               gap: "16px",
             }}
           >
-            <span
+            <div
               style={{
-                fontSize: "44px",
+                fontSize: "64px",
                 fontWeight: 700,
                 color: "#ededed",
-                letterSpacing: "-1px",
-                lineHeight: 1,
+                lineHeight: 1.1,
+                letterSpacing: "-2px",
+                display: "flex",
               }}
             >
               {server.name}
-            </span>
+            </div>
             <span
               style={{
                 fontSize: "16px",
-                fontWeight: 600,
+                fontWeight: 700,
                 color: isStdio ? "#4ade80" : "#c084fc",
                 backgroundColor: isStdio
                   ? "rgba(34,197,94,0.1)"
@@ -242,7 +229,7 @@ export default async function Image({
                 border: isStdio
                   ? "1px solid rgba(34,197,94,0.2)"
                   : "1px solid rgba(168,85,247,0.2)",
-                padding: "4px 14px",
+                padding: "6px 16px",
                 borderRadius: "20px",
               }}
             >
@@ -253,78 +240,82 @@ export default async function Image({
           {/* Description */}
           <div
             style={{
-              fontSize: "22px",
+              fontSize: "26px",
               color: "#a0a0a0",
-              lineHeight: 1.5,
+              lineHeight: 1.4,
               display: "flex",
             }}
           >
             {description}
           </div>
 
-          {/* Command / URL box */}
-          {commandText && (
-            <div
+          {/* Install command box */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              backgroundColor: "#1a1a2e",
+              border: "1px solid #262626",
+              borderRadius: "10px",
+              padding: "14px 20px",
+            }}
+          >
+            <span
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                backgroundColor: "#1a1a2e",
-                border: "1px solid #262626",
-                borderRadius: "10px",
-                padding: "14px 20px",
-                marginTop: "4px",
+                fontSize: "16px",
+                color: "#3b82f6",
+                fontWeight: 700,
               }}
             >
-              <span
-                style={{
-                  fontSize: "16px",
-                  color: "#3b82f6",
-                  fontWeight: 600,
-                }}
-              >
-                {isStdio ? "$" : "URL"}
-              </span>
-              <span
-                style={{
-                  fontSize: "16px",
-                  color: "#94a3b8",
-                  fontFamily: "monospace",
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {commandText}
-              </span>
-            </div>
-          )}
+              $
+            </span>
+            <span
+              style={{
+                fontSize: "16px",
+                color: "#94a3b8",
+                fontFamily: "monospace",
+              }}
+            >
+              {installCommand}
+            </span>
+          </div>
+        </div>
 
-          {/* Categories */}
-          {categories.length > 0 && (
-            <div
-              style={{
-                display: "flex",
-                gap: "8px",
-                flexWrap: "wrap",
-                marginTop: "auto",
-              }}
-            >
-              {categories.map((cat) => (
-                <span
-                  key={cat}
-                  style={{
-                    fontSize: "14px",
-                    color: "#94a3b8",
-                    backgroundColor: "#1e293b",
-                    padding: "6px 14px",
-                    borderRadius: "20px",
-                  }}
-                >
-                  {cat}
-                </span>
-              ))}
-            </div>
-          )}
+        {/* Bottom section */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          {/* Category pills */}
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            {categories.map((cat) => (
+              <span
+                key={cat}
+                style={{
+                  fontSize: "14px",
+                  color: "#94a3b8",
+                  backgroundColor: "#1e293b",
+                  padding: "6px 14px",
+                  borderRadius: "20px",
+                }}
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
+
+          <span
+            style={{
+              fontSize: "20px",
+              color: "#a0a0a0",
+            }}
+          >
+            getmcp.es
+          </span>
         </div>
       </div>
     ),
@@ -336,12 +327,6 @@ export default async function Image({
           data: interBold,
           style: "normal",
           weight: 700,
-        },
-        {
-          name: "Inter",
-          data: interSemiBold,
-          style: "normal",
-          weight: 600,
         },
         {
           name: "Inter",
