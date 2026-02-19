@@ -15,9 +15,7 @@
     "website": "npm run dev -w @getmcp/web",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "lint": "npm run lint --workspaces --if-present",
-    "clean": "rimraf packages/*/dist packages/*/tsconfig.tsbuildinfo packages/web/.next",
-    "fetch-repos": "tsx scripts/fetch-mcp-repos.ts"
+    "lint": "npm run lint --workspaces --if-present"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
