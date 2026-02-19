@@ -10,7 +10,7 @@
  * 6. Merge into existing config files (never overwrite)
  */
 
-import { select, checkbox, input, Separator } from "@inquirer/prompts";
+import { select, checkbox, input } from "@inquirer/prompts";
 import {
   getAllServers,
   getServer,
@@ -100,24 +100,18 @@ export async function addCommand(serverIdArg?: string): Promise<void> {
   const savedApps = getSavedSelectedApps();
   const hasSavedPreferences = savedApps !== null;
 
-  const choices: (Separator | { name: string; value: DetectedApp; checked: boolean })[] = [
+  const choices = [
     ...detected.map((app) => ({
       name: app.name,
       value: app,
       checked: hasSavedPreferences ? savedApps.includes(app.id) : true,
     })),
-  ];
-
-  if (notDetectedProjectScoped.length > 0) {
-    choices.push(new Separator("── Other supported apps ──"));
-    choices.push(
-      ...notDetectedProjectScoped.map((app) => ({
-        name: app.name,
-        value: app,
-        checked: hasSavedPreferences ? savedApps.includes(app.id) : false,
-      })),
-    );
-  }
+    ...notDetectedProjectScoped.map((app) => ({
+      name: app.name,
+      value: app,
+      checked: hasSavedPreferences ? savedApps.includes(app.id) : false,
+    })),
+  ].sort((a, b) => Number(b.checked) - Number(a.checked));
 
   const selectedApps = await checkbox<DetectedApp>({
     message: "Select apps to configure:",
