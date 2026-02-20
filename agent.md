@@ -180,6 +180,33 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 
 ---
 
+## Publishing
+
+This project uses [npm trusted publishing with OIDC](https://docs.npmjs.com/trusted-publishers) for authentication when publishing to npm. This is a tokenless flow — **never** add `NODE_AUTH_TOKEN`, `NPM_TOKEN`, or any npm access token secret to the publish workflow.
+
+### How it works
+
+1. The publish workflow (`.github/workflows/publish.yml`) declares `permissions: id-token: write`
+2. When `npm publish` runs, the npm CLI automatically detects the GitHub Actions OIDC environment
+3. npm exchanges the short-lived OIDC token for a temporary npm publish credential
+4. The package is published without any long-lived secrets
+
+### Rules
+
+- **NEVER** add `NODE_AUTH_TOKEN` or `NPM_TOKEN` environment variables to the publish workflow
+- **NEVER** create or store npm access tokens in repository secrets for publishing
+- **DO** keep `permissions: id-token: write` in the publish workflow — this is what enables OIDC
+- **DO** keep `registry-url: https://registry.npmjs.org` in the `actions/setup-node` step — this is required for the npm CLI to detect the OIDC environment
+- Provenance attestations are generated automatically when publishing via trusted publishing
+
+### References
+
+- [npm trusted publishing docs](https://docs.npmjs.com/trusted-publishers)
+- [GitHub Actions OIDC documentation](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect)
+- [npm trusted publishing announcement](https://github.blog/changelog/2025-07-31-npm-trusted-publishing-with-oidc-is-generally-available/)
+
+---
+
 ## Commit Convention
 
 This project follows the [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) specification. All commit messages must be structured as:

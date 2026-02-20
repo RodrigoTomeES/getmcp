@@ -20,8 +20,9 @@ These issues should be addressed immediately.
 - [ ] **Revoke committed secret** — A GitHub PAT exists in `.env` in the working tree. If it was ever committed to git history, the token is compromised and must be revoked.
   - File: `.env`
 
-- [ ] **Fix publish workflow authentication** — The `npm publish` steps are missing `env: NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}` and the `--access=public` flag required for scoped packages (`@getmcp/*`). All publish steps will fail without these.
+- [ ] **Add `--access=public` to publish workflow** — Scoped packages (`@getmcp/*`) default to `restricted` (private) on npm. The `npm publish` steps need `--access=public` or each package needs `"publishConfig": { "access": "public" }` in its `package.json`. Without this, publishing public scoped packages will fail.
   - File: `.github/workflows/publish.yml` (lines 51-61)
+  - **Note:** This project uses [npm trusted publishing with OIDC](https://docs.npmjs.com/trusted-publishers) for authentication. `NODE_AUTH_TOKEN` must **never** be added to the workflow — the `permissions: id-token: write` in `publish.yml` handles authentication via short-lived OIDC tokens. See the Publishing section in `CLAUDE.md` for details.
 
 - [ ] **Mask sensitive env var prompts** — The CLI prompts for API keys and tokens using cleartext `input()`. Should use `password()` from `@inquirer/prompts` so secrets are not visible on screen.
   - File: `packages/cli/src/commands/add.ts` (lines 72-78)
@@ -133,6 +134,9 @@ Improvements to the continuous integration pipeline and build process.
 
 - [ ] **Add Dependabot configuration** — No `.github/dependabot.yml` exists. Add automated dependency update checks for npm packages and GitHub Actions.
   - File: `.github/dependabot.yml` (new)
+
+> **Important — npm Publishing Authentication:**
+> This project uses [npm trusted publishing with OIDC](https://docs.npmjs.com/trusted-publishers) instead of long-lived npm tokens. The `permissions: id-token: write` in `.github/workflows/publish.yml` enables this. **Never** add `NODE_AUTH_TOKEN`, `NPM_TOKEN`, or any npm access token secret to the publish workflow. The npm CLI automatically detects the OIDC environment and authenticates using short-lived, workflow-specific credentials. See the [npm trusted publishing docs](https://docs.npmjs.com/trusted-publishers) and the Publishing section in `CLAUDE.md` for details.
 
 ---
 
