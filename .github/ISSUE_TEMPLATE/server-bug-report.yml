@@ -1,0 +1,154 @@
+name: Server Bug Report
+description: Report a bug with an MCP server in a specific AI application
+title: "[Server Bug]: "
+labels: ["bug", "server"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill out the form below so we can investigate the issue with this MCP server and AI application combination.
+
+  - type: dropdown
+    id: server
+    attributes:
+      label: MCP Server
+      description: Which MCP server is affected?
+      options:
+        - AWS Documentation
+        - Brave Search
+        - Browser Tools
+        - Chrome DevTools
+        - Claude Context
+        - Context7
+        - Desktop Commander
+        - Fetch
+        - Figma
+        - Filesystem
+        - Firecrawl
+        - GenAI Toolbox for Databases
+        - GitMCP
+        - GitHub
+        - Google Maps
+        - IDA Pro
+        - Memory
+        - MindsDB
+        - n8n
+        - "Next.js DevTools MCP"
+        - OpenAI Docs
+        - PDF Math Translate
+        - Playwright
+        - PostgreSQL
+        - Puppeteer
+        - Repomix
+        - Scrapling
+        - Sentry
+        - Sequential Thinking
+        - "shadcn/ui"
+        - Slack
+        - Supabase
+        - TrendRadar
+        - Unity
+        - Xiaohongshu
+    validations:
+      required: true
+
+  - type: dropdown
+    id: app
+    attributes:
+      label: AI Application
+      description: Which AI application are you using the server with?
+      options:
+        - Claude Desktop
+        - Claude Code
+        - VS Code / GitHub Copilot
+        - Cursor
+        - Cline
+        - Roo Code
+        - Goose
+        - Windsurf
+        - OpenCode
+        - Zed
+        - PyCharm
+        - Codex
+    validations:
+      required: true
+
+  - type: dropdown
+    id: installation-method
+    attributes:
+      label: Installation Method
+      description: How did you install/configure the MCP server?
+      options:
+        - getmcp CLI (`getmcp add`)
+        - Web-generated config snippet (getmcp.com)
+        - Manual configuration
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Describe the bug. What happened? What did you expect to happen?
+      placeholder: |
+        **What happened:**
+        The server fails to connect and shows a timeout error after 30 seconds.
+
+        **What I expected:**
+        The server should start and respond to tool calls normally.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Step-by-step instructions to reproduce the issue.
+      placeholder: |
+        1. Run `getmcp add github`
+        2. Select "Claude Desktop" as the target app
+        3. Enter the GitHub token when prompted
+        4. Open Claude Desktop
+        5. Try to use the GitHub server — see the error
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Config File Content
+      description: Paste the relevant section of your config file (redact any secrets/tokens).
+      render: json
+    validations:
+      required: false
+
+  - type: textarea
+    id: error-output
+    attributes:
+      label: Error Output
+      description: Paste any error messages, logs, or stack traces.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Provide details about your environment.
+      value: |
+        - **OS:** (e.g., Windows 11, macOS 15, Ubuntu 24.04)
+        - **Node.js version:** (run `node -v`)
+        - **App version:** (e.g., Claude Desktop 1.2.0, VS Code 1.96)
+        - **getmcp version:** (run `getmcp --version`, if applicable)
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or workarounds you've tried.
+    validations:
+      required: false
