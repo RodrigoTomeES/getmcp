@@ -31,8 +31,8 @@ These issues should be addressed immediately.
 
 Bugs and incorrect behavior that affect users.
 
-- [ ] **Fix hardcoded CLI version** — `VERSION = "0.1.0"` does not match `package.json` (`0.1.4`). Should read the version dynamically from `package.json` or inject it at build time.
-  - File: `packages/cli/src/bin.ts` (line 18)
+- [x] **Fix hardcoded CLI version** — Replaced the hardcoded `VERSION = "0.1.0"` with a dynamic read from `package.json` using `createRequire`. The version can never drift again.
+  - File: `packages/cli/src/bin.ts`
 
 - [ ] **Fix AppId test coverage** — The test titled "accepts all 10 known app IDs" only tests 10 IDs, but the `AppId` enum has 12 entries. `pycharm` and `codex` are missing from the test.
   - File: `packages/core/tests/schemas.test.ts` (lines 199-215)

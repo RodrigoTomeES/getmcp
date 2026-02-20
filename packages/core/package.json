@@ -1,6 +1,6 @@
 {
   "name": "@getmcp/core",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Core types, schemas, and validation for getmcp canonical configuration format",
   "type": "module",
   "main": "./dist/index.js",
@@ -33,7 +33,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/RodrigoTomeES/getmcp.git",
+    "url": "git+https://github.com/RodrigoTomeES/getmcp.git",
     "directory": "packages/core"
   },
   "homepage": "https://github.com/RodrigoTomeES/getmcp/tree/main/packages/core#readme",

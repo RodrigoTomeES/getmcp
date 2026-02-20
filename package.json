@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/RodrigoTomeES/getmcp.git"
+    "url": "git+https://github.com/RodrigoTomeES/getmcp.git"
   },
   "workspaces": [
     "packages/*"

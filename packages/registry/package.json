@@ -1,6 +1,6 @@
 {
   "name": "@getmcp/registry",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Registry of popular MCP server definitions in canonical format",
   "type": "module",
   "main": "./dist/index.js",
@@ -33,7 +33,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/RodrigoTomeES/getmcp.git",
+    "url": "git+https://github.com/RodrigoTomeES/getmcp.git",
     "directory": "packages/registry"
   },
   "homepage": "https://github.com/RodrigoTomeES/getmcp/tree/main/packages/registry#readme",

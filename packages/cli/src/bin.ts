@@ -11,11 +11,13 @@
  *   getmcp list [--category=cat] Filter by category
  */
 
+import { createRequire } from "node:module";
 import { addCommand } from "./commands/add.js";
 import { removeCommand } from "./commands/remove.js";
 import { listCommand } from "./commands/list.js";
 
-const VERSION = "0.1.0";
+const require = createRequire(import.meta.url);
+const { version: VERSION } = require("../package.json") as { version: string };
 
 function printHelp(): void {
   console.log(`

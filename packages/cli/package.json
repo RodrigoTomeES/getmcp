@@ -1,6 +1,6 @@
 {
   "name": "@getmcp/cli",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "CLI tool to install MCP servers into any AI application with one command",
   "type": "module",
   "bin": {
@@ -43,7 +43,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/RodrigoTomeES/getmcp.git",
+    "url": "git+https://github.com/RodrigoTomeES/getmcp.git",
     "directory": "packages/cli"
   },
   "homepage": "https://github.com/RodrigoTomeES/getmcp/tree/main/packages/cli#readme",
