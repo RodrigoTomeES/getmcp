@@ -1,0 +1,107 @@
+name: IDE / App Support Request
+description: Request adding support for a new AI application or IDE
+title: "[IDE Request]: "
+labels: ["enhancement", "ide-request"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new AI application! Please provide the details below so we can build a config generator for it. The more information you can share about the app's MCP config format, the faster we can add support.
+
+  - type: input
+    id: app-name
+    attributes:
+      label: Application Name
+      description: The name of the AI application or IDE.
+      placeholder: e.g., Warp, Continue, Aider
+    validations:
+      required: true
+
+  - type: input
+    id: app-homepage
+    attributes:
+      label: Application Homepage
+      description: URL to the application's website or documentation.
+      placeholder: e.g., https://www.warp.dev
+    validations:
+      required: true
+
+  - type: dropdown
+    id: config-format
+    attributes:
+      label: Config File Format
+      description: What format does the application use for its MCP config file?
+      options:
+        - JSON
+        - JSONC (JSON with comments)
+        - YAML
+        - TOML
+        - Other / Unknown
+    validations:
+      required: true
+
+  - type: dropdown
+    id: config-scope
+    attributes:
+      label: Config Scope
+      description: Is the MCP config stored per-project or globally for the user?
+      options:
+        - Project (per-project config file)
+        - Global (user-level config file)
+        - Both (supports project and global)
+        - Unknown
+    validations:
+      required: true
+
+  - type: textarea
+    id: config-location
+    attributes:
+      label: Config File Location
+      description: Where does the app store its MCP config file? Include platform-specific paths if known.
+      placeholder: |
+        - **macOS:** ~/.config/app-name/mcp.json
+        - **Windows:** %AppData%\app-name\mcp.json
+        - **Linux:** ~/.config/app-name/mcp.json
+    validations:
+      required: true
+
+  - type: input
+    id: config-docs
+    attributes:
+      label: Config Format Documentation
+      description: Link to the official docs describing the app's MCP config format, if available.
+      placeholder: e.g., https://docs.app.com/mcp-configuration
+    validations:
+      required: false
+
+  - type: textarea
+    id: example-config
+    attributes:
+      label: Example Config
+      description: Paste an example of what the app's native MCP config looks like. This helps us understand the field names, root keys, and structure.
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: field-mapping
+    attributes:
+      label: Field Mapping Notes
+      description: Any known differences from the standard MCP format? For example, different root key, renamed fields, extra required fields, or format quirks.
+      placeholder: |
+        - Root key is `extensions` instead of `mcpServers`
+        - `command` is renamed to `cmd`
+        - `env` is renamed to `envs`
+        - Adds an `enabled: true` field to every server
+        - Timeout is in seconds instead of milliseconds
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information — links to docs, screenshots, example projects, or workarounds currently used to configure MCP servers in this app.
+    validations:
+      required: false

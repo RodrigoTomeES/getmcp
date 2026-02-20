@@ -1,0 +1,138 @@
+name: Server Request
+description: Request adding a new MCP server to the getmcp registry
+title: "[Server Request]: "
+labels: ["enhancement", "server-request"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new MCP server! Please provide the details below so we can evaluate and add it to the registry.
+
+  - type: input
+    id: server-name
+    attributes:
+      label: Server Name
+      description: The human-readable name of the MCP server.
+      placeholder: e.g., Linear, Notion, Stripe
+    validations:
+      required: true
+
+  - type: input
+    id: repository
+    attributes:
+      label: Server Repository / Homepage
+      description: URL to the source code repository or project page.
+      placeholder: e.g., https://github.com/org/mcp-server-name
+    validations:
+      required: true
+
+  - type: input
+    id: package
+    attributes:
+      label: Package Name
+      description: The npm or PyPI package name, if published.
+      placeholder: e.g., @modelcontextprotocol/server-linear
+    validations:
+      required: false
+
+  - type: dropdown
+    id: transport
+    attributes:
+      label: Transport Type
+      description: How does the server communicate?
+      options:
+        - stdio (local process)
+        - http / streamable-http (remote)
+        - sse (remote, server-sent events)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Runtime
+      description: What runtime does the server require?
+      options:
+        - node
+        - python
+        - docker
+        - binary
+    validations:
+      required: true
+
+  - type: dropdown
+    id: categories
+    attributes:
+      label: Categories
+      description: Select all categories that apply to this server.
+      multiple: true
+      options:
+        - developer-tools
+        - web
+        - automation
+        - data
+        - search
+        - ai
+        - cloud
+        - communication
+        - design
+        - documentation
+        - devops
+        - utilities
+        - security
+        - gaming
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What does this server do? What tools or capabilities does it expose?
+      placeholder: |
+        This server provides tools for interacting with the Linear API, including:
+        - Creating and updating issues
+        - Managing projects and cycles
+        - Searching across the workspace
+    validations:
+      required: true
+
+  - type: textarea
+    id: example-config
+    attributes:
+      label: Example Configuration
+      description: Provide an example of the canonical MCP config for this server. Use the standard `mcpServers` format.
+      render: json
+      placeholder: |
+        {
+          "mcpServers": {
+            "linear": {
+              "command": "npx",
+              "args": ["-y", "@linear/mcp-server"],
+              "env": {
+                "LINEAR_API_KEY": "your-api-key"
+              }
+            }
+          }
+        }
+    validations:
+      required: false
+
+  - type: textarea
+    id: env-vars
+    attributes:
+      label: Required Environment Variables
+      description: List any environment variables that users need to provide (e.g., API keys, tokens).
+      placeholder: |
+        - `LINEAR_API_KEY` — API key from Linear settings (https://linear.app/settings/api)
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information — links to docs, usage examples, screenshots, related servers.
+    validations:
+      required: false
