@@ -17,15 +17,13 @@ This document tracks all planned improvements, bug fixes, and feature work for t
 
 These issues should be addressed immediately.
 
-- [ ] **Revoke committed secret** — A GitHub PAT exists in `.env` in the working tree. If it was ever committed to git history, the token is compromised and must be revoked.
-  - File: `.env`
+- [x] **Revoke committed secret** — Verified as a false positive: `.env` does not exist on disk and was never committed to git history. `.gitignore` already excludes `.env`, `.env.*`, and `.env.local`.
 
-- [ ] **Add `--access=public` to publish workflow** — Scoped packages (`@getmcp/*`) default to `restricted` (private) on npm. The `npm publish` steps need `--access=public` or each package needs `"publishConfig": { "access": "public" }` in its `package.json`. Without this, publishing public scoped packages will fail.
-  - File: `.github/workflows/publish.yml` (lines 51-61)
+- [x] **Add `publishConfig` for public access** — Added `"publishConfig": { "access": "public" }` to all 4 package.json files (`core`, `generators`, `registry`, `cli`) so scoped `@getmcp/*` packages publish as public.
   - **Note:** This project uses [npm trusted publishing with OIDC](https://docs.npmjs.com/trusted-publishers) for authentication. `NODE_AUTH_TOKEN` must **never** be added to the workflow — the `permissions: id-token: write` in `publish.yml` handles authentication via short-lived OIDC tokens. See the Publishing section in `CLAUDE.md` for details.
 
-- [ ] **Mask sensitive env var prompts** — The CLI prompts for API keys and tokens using cleartext `input()`. Should use `password()` from `@inquirer/prompts` so secrets are not visible on screen.
-  - File: `packages/cli/src/commands/add.ts` (lines 72-78)
+- [x] **Mask sensitive env var prompts** — The CLI now uses `password()` from `@inquirer/prompts` for env vars whose names match common secret patterns (`TOKEN`, `KEY`, `SECRET`, `PASSWORD`, `CREDENTIAL`, `AUTH`, `PAT`, `PRIVATE`). Non-sensitive vars (e.g., `GITHUB_OWNER`) still use cleartext `input()`.
+  - File: `packages/cli/src/commands/add.ts`
 
 ---
 

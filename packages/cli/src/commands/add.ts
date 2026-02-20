@@ -10,7 +10,7 @@
  * 6. Merge into existing config files (never overwrite)
  */
 
-import { select, checkbox, input } from "@inquirer/prompts";
+import { select, checkbox, input, password } from "@inquirer/prompts";
 import {
   getAllServers,
   getServer,
@@ -70,7 +70,8 @@ export async function addCommand(serverIdArg?: string): Promise<void> {
   if (entry.requiredEnvVars.length > 0 && isStdioConfig(config)) {
     console.log("This server requires environment variables:\n");
     for (const envVar of entry.requiredEnvVars) {
-      const value = await input({
+      const prompt = isSensitiveEnvVar(envVar) ? password : input;
+      const value = await prompt({
         message: `  ${envVar}:`,
         validate: (val) => (val.trim() ? true : `${envVar} is required`),
       });
@@ -171,4 +172,15 @@ function printManualConfig(
     },
   };
   console.log(JSON.stringify(canonical, null, 2));
+}
+
+/**
+ * Heuristic to detect if an environment variable name likely holds a secret.
+ * Returns true for names containing common secret-related keywords.
+ */
+const SENSITIVE_PATTERNS =
+  /TOKEN|KEY|SECRET|PASSWORD|CREDENTIAL|AUTH|PAT|PRIVATE/i;
+
+function isSensitiveEnvVar(name: string): boolean {
+  return SENSITIVE_PATTERNS.test(name);
 }
