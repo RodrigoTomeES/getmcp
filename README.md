@@ -10,9 +10,11 @@
   Universal installer and configuration tool for MCP (Model Context Protocol) servers across all AI applications.
 </p>
 
-**The problem:** Every AI app uses a different config format for MCP servers. Claude Desktop uses `mcpServers`, VS Code uses `servers`, Goose uses YAML with `cmd`/`envs`, OpenCode merges command+args into an array... there are 11 apps, 6 root keys, and 3 formats.
+**The problem:** Every AI app uses a different config format for MCP servers. Claude Desktop uses `mcpServers`, VS Code uses `servers`, Goose uses YAML with `cmd`/`envs`, Codex uses TOML with `mcp_servers`... there are 12 apps, 6 root keys, and 4 formats.
 
 **The solution:** One canonical format, config generators for every app, a registry of popular servers, and a CLI that auto-detects your apps and writes the correct config.
+
+> Browse the full server catalog at [getmcp.es](https://getmcp.es)
 
 ## Quick Start
 
@@ -33,13 +35,14 @@ npx @getmcp/cli remove github
 ## How It Works
 
 ```
-                    Canonical Format
-                   (FastMCP-aligned)
-                         |
-    +--------------------+--------------------+
-    |         |          |         |          |
- Claude    VS Code    Cursor    Goose    Windsurf  ...
- Desktop   (servers)  (mcpServers) (YAML)  (serverUrl)
+                      Canonical Format
+                     (FastMCP-aligned)
+                           |
+    +----------+-----------+-----------+----------+
+    |          |           |           |          |
+ Claude     VS Code     Goose      Codex    + 8 more
+ Desktop   (servers)   (YAML)     (TOML)     apps
+(mcpServers)          (extensions)(mcp_servers)
 ```
 
 1. Server definitions are stored in a **canonical format** (aligned with [FastMCP](https://github.com/jlowin/fastmcp))
@@ -61,10 +64,11 @@ npx @getmcp/cli remove github
 | OpenCode | `mcp` | JSONC |
 | Zed | `context_servers` | JSON |
 | PyCharm | `mcpServers` | JSON |
+| Codex | `mcp_servers` | TOML |
 
 ## Registry
 
-33 MCP servers included out of the box. Here are some highlights:
+35 MCP servers included out of the box. Here are some highlights:
 
 | Server | Transport | Description |
 |--------|-----------|-------------|
@@ -75,13 +79,16 @@ npx @getmcp/cli remove github
 | Playwright | stdio | Browser automation, screenshots, and element interaction |
 | PostgreSQL | stdio | Read-only database access and queries |
 | Figma | stdio | Read Figma design files and provide layout info to AI agents |
+| shadcn/ui | stdio | Browse and install shadcn components from AI |
 | Context7 | remote | Up-to-date library documentation and code examples |
 | Sentry | remote | Error tracking and monitoring |
 | Supabase | remote | Query databases, manage projects, deploy Edge Functions |
+| OpenAI Docs | remote | Search OpenAI developer documentation |
 | Firecrawl | stdio | Web scraping and search with JavaScript rendering |
 | Repomix | stdio | Pack entire repositories into a single AI-friendly file |
+| n8n | stdio | Build and manage n8n automation workflows from AI |
 
-Browse the full catalog of 33 servers:
+Browse the full catalog at [getmcp.es](https://getmcp.es) or from the CLI:
 
 ```bash
 npx @getmcp/cli list
@@ -93,7 +100,7 @@ npx @getmcp/cli list
 |---------|-------------|-----|
 | [`@getmcp/cli`](packages/cli) | CLI tool for installing MCP servers | [![npm](https://img.shields.io/npm/v/@getmcp/cli)](https://www.npmjs.com/package/@getmcp/cli) |
 | [`@getmcp/core`](packages/core) | Zod schemas, types, and utilities | [![npm](https://img.shields.io/npm/v/@getmcp/core)](https://www.npmjs.com/package/@getmcp/core) |
-| [`@getmcp/generators`](packages/generators) | Config generators for 11 apps | [![npm](https://img.shields.io/npm/v/@getmcp/generators)](https://www.npmjs.com/package/@getmcp/generators) |
+| [`@getmcp/generators`](packages/generators) | Config generators for 12 apps | [![npm](https://img.shields.io/npm/v/@getmcp/generators)](https://www.npmjs.com/package/@getmcp/generators) |
 | [`@getmcp/registry`](packages/registry) | Registry of MCP server definitions | [![npm](https://img.shields.io/npm/v/@getmcp/registry)](https://www.npmjs.com/package/@getmcp/registry) |
 | [`@getmcp/web`](packages/web) | Web directory (Next.js, not published) | -- |
 
@@ -120,6 +127,7 @@ const all = generateAllConfigs("github", {
 });
 // all["claude-desktop"] => JSON string
 // all["goose"]          => YAML string
+// all["codex"]          => TOML string
 ```
 
 ### Validate configs with Zod schemas
@@ -149,12 +157,19 @@ npm install
 # Build all packages
 npm run build
 
-# Run all tests (163 tests)
+# Run all tests (257 tests)
 npm run test
 
 # Build and test a specific package
 npm run build --workspace=@getmcp/core
 npm run test --workspace=@getmcp/core
+
+# Run the CLI locally (no build needed)
+npx tsx packages/cli/src/bin.ts add
+npx tsx packages/cli/src/bin.ts list --search=database
+
+# Run the web directory locally
+npm run website
 ```
 
 ## Architecture
@@ -163,11 +178,17 @@ npm run test --workspace=@getmcp/core
 getmcp/
   packages/
     core/          # Zod schemas, TS types, utility functions
-    generators/    # 11 config generators (one per app)
-    registry/      # 33 MCP server definitions
+    generators/    # 12 config generators (one per app)
+    registry/      # 35 MCP server definitions
     cli/           # add/remove/list commands, app detection
-    web/           # Next.js web directory (static export)
+    web/           # Next.js web directory at getmcp.es
 ```
+
+The CLI supports JSON, JSONC, YAML, and TOML config files natively. Format is auto-detected from the file extension, so Goose configs are read/written as YAML and Codex configs as TOML.
+
+## Contributing
+
+See [`ROADMAP.md`](./ROADMAP.md) for planned improvements and open tasks. Contributions are welcome.
 
 ## License
 
