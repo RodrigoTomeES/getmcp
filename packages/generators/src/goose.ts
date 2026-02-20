@@ -23,6 +23,7 @@
 
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig, inferTransport } from "@getmcp/core";
+import YAML from "yaml";
 import { BaseGenerator } from "./base.js";
 
 export class GooseGenerator extends BaseGenerator {
@@ -82,74 +83,9 @@ export class GooseGenerator extends BaseGenerator {
   }
 
   /**
-   * Serialize to YAML format.
-   * Uses a minimal YAML serializer to avoid heavy dependencies.
+   * Serialize to YAML format using the `yaml` library.
    */
   override serialize(config: Record<string, unknown>): string {
-    return toYaml(config, 0);
+    return YAML.stringify(config, { indent: 2 });
   }
-}
-
-/**
- * Minimal YAML serializer for Goose config.
- * Handles the simple object/array/scalar structures we produce.
- */
-function toYaml(value: unknown, indent: number): string {
-  const pad = "  ".repeat(indent);
-
-  if (value === null || value === undefined) {
-    return "null";
-  }
-
-  if (typeof value === "boolean") {
-    return value ? "true" : "false";
-  }
-
-  if (typeof value === "number") {
-    return String(value);
-  }
-
-  if (typeof value === "string") {
-    // Quote strings that could be ambiguous
-    if (
-      value === "" ||
-      value === "true" ||
-      value === "false" ||
-      value === "null" ||
-      /^[\d]/.test(value) ||
-      /[:{}\[\],&*?|>!%#@`]/.test(value) ||
-      value.includes("\n")
-    ) {
-      return JSON.stringify(value);
-    }
-    return value;
-  }
-
-  if (Array.isArray(value)) {
-    if (value.length === 0) return "[]";
-    return value
-      .map((item) => `${pad}- ${toYaml(item, indent + 1).trimStart()}`)
-      .join("\n");
-  }
-
-  if (typeof value === "object") {
-    const obj = value as Record<string, unknown>;
-    const keys = Object.keys(obj);
-    if (keys.length === 0) return "{}";
-
-    return keys
-      .map((key) => {
-        const val = obj[key];
-        if (typeof val === "object" && val !== null && !Array.isArray(val)) {
-          return `${pad}${key}:\n${toYaml(val, indent + 1)}`;
-        }
-        if (Array.isArray(val)) {
-          return `${pad}${key}:\n${toYaml(val, indent + 1)}`;
-        }
-        return `${pad}${key}: ${toYaml(val, indent)}`;
-      })
-      .join("\n");
-  }
-
-  return String(value);
 }

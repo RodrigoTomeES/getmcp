@@ -1,4 +1,6 @@
 import { describe, it, expect } from "vitest";
+import YAML from "yaml";
+import * as TOML from "smol-toml";
 import type { LooseServerConfigType } from "@getmcp/core";
 import {
   ClaudeDesktopGenerator,
@@ -651,5 +653,63 @@ describe("generateAll (multi-server)", () => {
     expect(Object.keys(mcpServers)).toHaveLength(2);
     expect(mcpServers).toHaveProperty("github");
     expect(mcpServers).toHaveProperty("remote");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Generator serialize → parse round-trip tests
+// ---------------------------------------------------------------------------
+
+describe("serialize → parse round-trip", () => {
+  it("Goose: serialized YAML can be parsed back to equivalent object", () => {
+    const gen = new GooseGenerator();
+    const result = gen.generate("github", stdioConfig);
+    const serialized = gen.serialize(result);
+    const parsed = YAML.parse(serialized);
+    expect(parsed).toEqual(result);
+  });
+
+  it("Goose: multi-server serialized YAML is parseable", () => {
+    const gen = new GooseGenerator();
+    const result = gen.generateAll({ github: stdioConfig, remote: remoteConfig });
+    const serialized = gen.serialize(result);
+    const parsed = YAML.parse(serialized);
+    expect(parsed).toEqual(result);
+  });
+
+  it("Codex: serialized TOML can be parsed back to equivalent object", () => {
+    const gen = new CodexGenerator();
+    const result = gen.generate("github", stdioConfig);
+    const serialized = gen.serialize(result);
+    const parsed = TOML.parse(serialized);
+    expect(parsed).toEqual(result);
+  });
+
+  it("Codex: multi-server serialized TOML is parseable", () => {
+    const gen = new CodexGenerator();
+    const result = gen.generateAll({ github: stdioConfig, remote: remoteConfig });
+    const serialized = gen.serialize(result);
+    const parsed = TOML.parse(serialized);
+    expect(parsed).toEqual(result);
+  });
+
+  it("Codex: remote config with http_headers round-trips through TOML", () => {
+    const gen = new CodexGenerator();
+    const result = gen.generate("remote", remoteConfig);
+    const serialized = gen.serialize(result);
+    const parsed = TOML.parse(serialized);
+    expect(parsed).toEqual(result);
+  });
+
+  it("All JSON generators produce parseable JSON round-trip", () => {
+    const jsonGenerators = Object.entries(generators).filter(
+      ([, gen]) => gen.app.configFormat === "json" || gen.app.configFormat === "jsonc"
+    );
+    for (const [appId, gen] of jsonGenerators) {
+      const result = gen.generate("test-server", stdioConfig);
+      const serialized = gen.serialize(result);
+      const parsed = JSON.parse(serialized);
+      expect(parsed, `${appId} JSON round-trip failed`).toEqual(result);
+    }
   });
 });

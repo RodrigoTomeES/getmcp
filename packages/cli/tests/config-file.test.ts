@@ -8,6 +8,7 @@ import {
   mergeServerIntoConfig,
   removeServerFromConfig,
   listServersInConfig,
+  stripJsoncComments,
 } from "../src/config-file.js";
 
 let tmpDir: string;
@@ -261,5 +262,423 @@ describe("listServersInConfig", () => {
     const f = tmpFile("list5.json");
     fs.writeFileSync(f, JSON.stringify({ someOtherKey: {} }), "utf-8");
     expect(listServersInConfig(f)).toEqual([]);
+  });
+
+  it("lists servers under 'mcp_servers' key (Codex)", () => {
+    const f = tmpFile("list6.toml");
+    fs.writeFileSync(
+      f,
+      `[mcp_servers.github]\ncommand = "npx"\n\n[mcp_servers.slack]\ncommand = "npx"\n`,
+      "utf-8",
+    );
+    expect(listServersInConfig(f)).toEqual(["github", "slack"]);
+  });
+
+  it("lists servers under 'extensions' key (Goose)", () => {
+    const f = tmpFile("list7.yaml");
+    fs.writeFileSync(
+      f,
+      `extensions:\n  github:\n    cmd: npx\n  slack:\n    cmd: npx\n`,
+      "utf-8",
+    );
+    expect(listServersInConfig(f)).toEqual(["github", "slack"]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// YAML format support
+// ---------------------------------------------------------------------------
+
+describe("readConfigFile (YAML)", () => {
+  it("reads and parses a valid YAML file", () => {
+    const f = tmpFile("config.yaml");
+    fs.writeFileSync(
+      f,
+      `extensions:\n  github:\n    cmd: npx\n    enabled: true\n`,
+      "utf-8",
+    );
+    const result = readConfigFile(f);
+    expect(result).toEqual({
+      extensions: { github: { cmd: "npx", enabled: true } },
+    });
+  });
+
+  it("reads .yml extension as YAML", () => {
+    const f = tmpFile("config.yml");
+    fs.writeFileSync(
+      f,
+      `extensions:\n  myserver:\n    cmd: node\n`,
+      "utf-8",
+    );
+    const result = readConfigFile(f);
+    expect(result).toEqual({
+      extensions: { myserver: { cmd: "node" } },
+    });
+  });
+
+  it("returns empty object for non-existent .yaml file", () => {
+    expect(readConfigFile(tmpFile("missing.yaml"))).toEqual({});
+  });
+
+  it("returns empty object for empty .yaml file", () => {
+    const f = tmpFile("empty.yaml");
+    fs.writeFileSync(f, "", "utf-8");
+    expect(readConfigFile(f)).toEqual({});
+  });
+
+  it("handles YAML with arrays", () => {
+    const f = tmpFile("arrays.yaml");
+    fs.writeFileSync(
+      f,
+      `extensions:\n  github:\n    cmd: npx\n    args:\n      - -y\n      - "@server/github"\n`,
+      "utf-8",
+    );
+    const result = readConfigFile(f);
+    const github = (result.extensions as Record<string, Record<string, unknown>>).github;
+    expect(github.args).toEqual(["-y", "@server/github"]);
+  });
+
+  it("handles YAML with nested env objects", () => {
+    const f = tmpFile("envs.yaml");
+    fs.writeFileSync(
+      f,
+      `extensions:\n  test:\n    cmd: npx\n    envs:\n      API_KEY: secret123\n      TOKEN: abc\n`,
+      "utf-8",
+    );
+    const result = readConfigFile(f);
+    const test = (result.extensions as Record<string, Record<string, unknown>>).test;
+    expect(test.envs).toEqual({ API_KEY: "secret123", TOKEN: "abc" });
+  });
+
+  it("throws for malformed YAML", () => {
+    const f = tmpFile("bad.yaml");
+    fs.writeFileSync(f, `extensions:\n  - invalid: [unterminated`, "utf-8");
+    expect(() => readConfigFile(f)).toThrow(/Failed to parse/);
+  });
+});
+
+describe("writeConfigFile (YAML)", () => {
+  it("writes valid YAML to a .yaml file", () => {
+    const f = tmpFile("out.yaml");
+    writeConfigFile(f, { extensions: { github: { cmd: "npx", enabled: true } } });
+    const content = fs.readFileSync(f, "utf-8");
+    expect(content).toContain("extensions:");
+    expect(content).toContain("cmd: npx");
+    expect(content).toContain("enabled: true");
+  });
+
+  it("writes .yml file as YAML", () => {
+    const f = tmpFile("out.yml");
+    writeConfigFile(f, { test: { key: "value" } });
+    const content = fs.readFileSync(f, "utf-8");
+    expect(content).toContain("test:");
+    expect(content).toContain("key: value");
+  });
+
+  it("creates parent directories for YAML", () => {
+    const f = path.join(tmpDir, "nested", "deep", "config.yaml");
+    writeConfigFile(f, { test: true });
+    expect(fs.existsSync(f)).toBe(true);
+  });
+
+  it("produces content that can be read back", () => {
+    const f = tmpFile("roundtrip.yaml");
+    const original = { extensions: { github: { cmd: "npx", args: ["-y", "server"], enabled: true } } };
+    writeConfigFile(f, original);
+    const result = readConfigFile(f);
+    expect(result).toEqual(original);
+  });
+});
+
+describe("mergeServerIntoConfig (YAML)", () => {
+  it("merges into an existing Goose YAML config", () => {
+    const f = tmpFile("merge.yaml");
+    fs.writeFileSync(
+      f,
+      `extensions:\n  existing:\n    cmd: node\n    enabled: true\n`,
+      "utf-8",
+    );
+    const result = mergeServerIntoConfig(f, {
+      extensions: { github: { cmd: "npx", enabled: true } },
+    });
+    expect(result.extensions).toEqual({
+      existing: { cmd: "node", enabled: true },
+      github: { cmd: "npx", enabled: true },
+    });
+  });
+
+  it("merges into non-existent .yaml file", () => {
+    const f = tmpFile("merge-new.yaml");
+    const result = mergeServerIntoConfig(f, {
+      extensions: { github: { cmd: "npx" } },
+    });
+    expect(result).toEqual({ extensions: { github: { cmd: "npx" } } });
+  });
+});
+
+describe("removeServerFromConfig (YAML)", () => {
+  it("removes a server from a Goose YAML config", () => {
+    const f = tmpFile("remove.yaml");
+    fs.writeFileSync(
+      f,
+      `extensions:\n  github:\n    cmd: npx\n  slack:\n    cmd: npx\n`,
+      "utf-8",
+    );
+    const result = removeServerFromConfig(f, "github");
+    expect(result).not.toBeNull();
+    expect((result!.extensions as Record<string, unknown>).github).toBeUndefined();
+    expect((result!.extensions as Record<string, unknown>).slack).toBeDefined();
+  });
+
+  it("returns null if server not found in YAML", () => {
+    const f = tmpFile("remove2.yaml");
+    fs.writeFileSync(
+      f,
+      `extensions:\n  slack:\n    cmd: npx\n`,
+      "utf-8",
+    );
+    expect(removeServerFromConfig(f, "nonexistent")).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TOML format support
+// ---------------------------------------------------------------------------
+
+describe("readConfigFile (TOML)", () => {
+  it("reads and parses a valid TOML file", () => {
+    const f = tmpFile("config.toml");
+    fs.writeFileSync(
+      f,
+      `[mcp_servers.github]\ncommand = "npx"\nargs = ["-y", "@server/github"]\n`,
+      "utf-8",
+    );
+    const result = readConfigFile(f);
+    expect((result.mcp_servers as Record<string, Record<string, unknown>>).github).toEqual({
+      command: "npx",
+      args: ["-y", "@server/github"],
+    });
+  });
+
+  it("returns empty object for non-existent .toml file", () => {
+    expect(readConfigFile(tmpFile("missing.toml"))).toEqual({});
+  });
+
+  it("returns empty object for empty .toml file", () => {
+    const f = tmpFile("empty.toml");
+    fs.writeFileSync(f, "", "utf-8");
+    expect(readConfigFile(f)).toEqual({});
+  });
+
+  it("handles TOML with nested tables", () => {
+    const f = tmpFile("nested.toml");
+    fs.writeFileSync(
+      f,
+      `[mcp_servers.github]\ncommand = "npx"\n\n[mcp_servers.github.env]\nGITHUB_TOKEN = "abc123"\n`,
+      "utf-8",
+    );
+    const result = readConfigFile(f);
+    const github = (result.mcp_servers as Record<string, Record<string, unknown>>).github;
+    expect(github.command).toBe("npx");
+    expect(github.env).toEqual({ GITHUB_TOKEN: "abc123" });
+  });
+
+  it("handles TOML with remote server config", () => {
+    const f = tmpFile("remote.toml");
+    fs.writeFileSync(
+      f,
+      `[mcp_servers.remote]\nurl = "https://mcp.example.com/mcp"\n\n[mcp_servers.remote.http_headers]\nAuthorization = "Bearer token123"\n`,
+      "utf-8",
+    );
+    const result = readConfigFile(f);
+    const remote = (result.mcp_servers as Record<string, Record<string, unknown>>).remote;
+    expect(remote.url).toBe("https://mcp.example.com/mcp");
+    expect(remote.http_headers).toEqual({ Authorization: "Bearer token123" });
+  });
+
+  it("throws for malformed TOML", () => {
+    const f = tmpFile("bad.toml");
+    fs.writeFileSync(f, `[invalid\nkey = `, "utf-8");
+    expect(() => readConfigFile(f)).toThrow(/Failed to parse/);
+  });
+});
+
+describe("writeConfigFile (TOML)", () => {
+  it("writes valid TOML to a .toml file", () => {
+    const f = tmpFile("out.toml");
+    writeConfigFile(f, { mcp_servers: { github: { command: "npx" } } });
+    const content = fs.readFileSync(f, "utf-8");
+    expect(content).toContain("[mcp_servers.github]");
+    expect(content).toContain('command = "npx"');
+  });
+
+  it("creates parent directories for TOML", () => {
+    const f = path.join(tmpDir, "nested", "deep", "config.toml");
+    writeConfigFile(f, { mcp_servers: { test: { command: "npx" } } });
+    expect(fs.existsSync(f)).toBe(true);
+  });
+
+  it("produces content that can be read back", () => {
+    const f = tmpFile("roundtrip.toml");
+    const original = { mcp_servers: { github: { command: "npx", args: ["-y", "server"] } } };
+    writeConfigFile(f, original);
+    const result = readConfigFile(f);
+    expect(result).toEqual(original);
+  });
+});
+
+describe("mergeServerIntoConfig (TOML)", () => {
+  it("merges into an existing Codex TOML config", () => {
+    const f = tmpFile("merge.toml");
+    fs.writeFileSync(
+      f,
+      `[mcp_servers.existing]\ncommand = "node"\n`,
+      "utf-8",
+    );
+    const result = mergeServerIntoConfig(f, {
+      mcp_servers: { github: { command: "npx" } },
+    });
+    expect(result.mcp_servers).toEqual({
+      existing: { command: "node" },
+      github: { command: "npx" },
+    });
+  });
+
+  it("merges into non-existent .toml file", () => {
+    const f = tmpFile("merge-new.toml");
+    const result = mergeServerIntoConfig(f, {
+      mcp_servers: { github: { command: "npx" } },
+    });
+    expect(result).toEqual({ mcp_servers: { github: { command: "npx" } } });
+  });
+});
+
+describe("removeServerFromConfig (TOML)", () => {
+  it("removes a server from a Codex TOML config", () => {
+    const f = tmpFile("remove.toml");
+    fs.writeFileSync(
+      f,
+      `[mcp_servers.github]\ncommand = "npx"\n\n[mcp_servers.slack]\ncommand = "npx"\n`,
+      "utf-8",
+    );
+    const result = removeServerFromConfig(f, "github");
+    expect(result).not.toBeNull();
+    expect((result!.mcp_servers as Record<string, unknown>).github).toBeUndefined();
+    expect((result!.mcp_servers as Record<string, unknown>).slack).toBeDefined();
+  });
+
+  it("returns null if server not found in TOML", () => {
+    const f = tmpFile("remove2.toml");
+    fs.writeFileSync(
+      f,
+      `[mcp_servers.slack]\ncommand = "npx"\n`,
+      "utf-8",
+    );
+    expect(removeServerFromConfig(f, "nonexistent")).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// JSONC comment stripping (bug fix verification)
+// ---------------------------------------------------------------------------
+
+describe("stripJsoncComments", () => {
+  it("preserves URLs with // inside string values", () => {
+    const input = '{"url": "https://example.com/path"}';
+    expect(stripJsoncComments(input)).toBe(input);
+  });
+
+  it("strips single-line comments outside strings", () => {
+    const input = `{
+  // this is a comment
+  "key": "value"
+}`;
+    const result = stripJsoncComments(input);
+    expect(result).not.toContain("// this is a comment");
+    expect(result).toContain('"key": "value"');
+  });
+
+  it("strips multi-line comments outside strings", () => {
+    const input = `{
+  /* multi-line
+     comment */
+  "key": "value"
+}`;
+    const result = stripJsoncComments(input);
+    expect(result).not.toContain("multi-line");
+    expect(result).toContain('"key": "value"');
+  });
+
+  it("preserves // inside string values even with surrounding comments", () => {
+    const input = `{
+  // a comment
+  "url": "https://example.com",
+  "other": "value" // trailing comment
+}`;
+    const result = stripJsoncComments(input);
+    expect(result).toContain('"https://example.com"');
+    expect(result).not.toContain("a comment");
+    expect(result).not.toContain("trailing comment");
+  });
+
+  it("handles escaped quotes inside strings", () => {
+    const input = '{"key": "value with \\"escaped\\" quotes"}';
+    const result = stripJsoncComments(input);
+    expect(result).toBe(input);
+  });
+
+  it("handles empty input", () => {
+    expect(stripJsoncComments("")).toBe("");
+  });
+
+  it("handles input with no comments", () => {
+    const input = '{"key": "value", "num": 42}';
+    expect(stripJsoncComments(input)).toBe(input);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Full round-trip tests (write then read back)
+// ---------------------------------------------------------------------------
+
+describe("round-trip JSON", () => {
+  it("write and read back a complex JSON config", () => {
+    const f = tmpFile("roundtrip.json");
+    const config = {
+      mcpServers: {
+        github: { command: "npx", args: ["-y", "server-github"], env: { TOKEN: "abc" } },
+        slack: { command: "node", args: ["slack.js"] },
+      },
+    };
+    writeConfigFile(f, config);
+    expect(readConfigFile(f)).toEqual(config);
+  });
+});
+
+describe("round-trip YAML", () => {
+  it("write and read back a Goose-style YAML config", () => {
+    const f = tmpFile("roundtrip.yaml");
+    const config = {
+      extensions: {
+        github: { name: "github", cmd: "npx", args: ["-y", "server"], enabled: true, type: "stdio" },
+        remote: { name: "remote", uri: "https://mcp.example.com", enabled: true, type: "sse" },
+      },
+    };
+    writeConfigFile(f, config);
+    expect(readConfigFile(f)).toEqual(config);
+  });
+});
+
+describe("round-trip TOML", () => {
+  it("write and read back a Codex-style TOML config", () => {
+    const f = tmpFile("roundtrip.toml");
+    const config = {
+      mcp_servers: {
+        github: { command: "npx", args: ["-y", "server-github"] },
+        remote: { url: "https://mcp.example.com/mcp" },
+      },
+    };
+    writeConfigFile(f, config);
+    expect(readConfigFile(f)).toEqual(config);
   });
 });

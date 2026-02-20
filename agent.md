@@ -112,7 +112,8 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 |------|---------|
 | `bin.ts` | Entry point; parses argv, dispatches to `add`/`remove`/`list` |
 | `detect.ts` | `resolvePath()`, `getConfigPath()`, `detectApps()`, `detectInstalledApps()` |
-| `config-file.ts` | `readConfigFile()`, `writeConfigFile()`, `mergeServerIntoConfig()`, `removeServerFromConfig()`, `listServersInConfig()` |
+| `format.ts` | `detectConfigFormat()` — infers config file format (json/jsonc/yaml/toml) from file extension |
+| `config-file.ts` | Multi-format config file I/O: `readConfigFile()`, `writeConfigFile()`, `mergeServerIntoConfig()`, `removeServerFromConfig()`, `listServersInConfig()`, `stripJsoncComments()`. Auto-detects format (JSON, JSONC, YAML, TOML) from file extension. |
 | `commands/add.ts` | Interactive add workflow: pick server, prompt env vars, detect apps, generate + merge configs |
 | `commands/remove.ts` | Interactive remove workflow |
 | `commands/list.ts` | List/search/filter servers |

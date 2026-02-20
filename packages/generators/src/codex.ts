@@ -27,6 +27,7 @@
 
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
+import * as TOML from "smol-toml";
 import { BaseGenerator } from "./base.js";
 
 export class CodexGenerator extends BaseGenerator {
@@ -84,110 +85,9 @@ export class CodexGenerator extends BaseGenerator {
   }
 
   /**
-   * Serialize to TOML format.
-   * Uses a minimal TOML serializer to avoid heavy dependencies.
+   * Serialize to TOML format using the `smol-toml` library.
    */
   override serialize(config: Record<string, unknown>): string {
-    return toToml(config);
+    return TOML.stringify(config as TOML.TomlPrimitive);
   }
-}
-
-/**
- * Minimal TOML serializer for Codex config.
- * Handles the table/key-value structures we produce.
- *
- * Outputs TOML tables like:
- *   [mcp_servers.name]
- *   command = "npx"
- *   args = ["-y", "@package/name"]
- *
- *   [mcp_servers.name.env]
- *   KEY = "value"
- */
-function toToml(value: unknown, prefix: string = ""): string {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
-    return "";
-  }
-
-  const obj = value as Record<string, unknown>;
-  const lines: string[] = [];
-
-  // Separate scalar/array keys from sub-table keys
-  const scalarKeys: string[] = [];
-  const tableKeys: string[] = [];
-
-  for (const key of Object.keys(obj)) {
-    const val = obj[key];
-    if (isTable(val)) {
-      tableKeys.push(key);
-    } else {
-      scalarKeys.push(key);
-    }
-  }
-
-  // If this level has scalar keys and a prefix, emit the table header
-  if (prefix && scalarKeys.length > 0) {
-    lines.push(`[${prefix}]`);
-  }
-
-  // Emit scalar/array key-value pairs
-  for (const key of scalarKeys) {
-    lines.push(`${key} = ${toTomlValue(obj[key])}`);
-  }
-
-  // Recurse into sub-tables
-  for (const key of tableKeys) {
-    if (lines.length > 0) {
-      lines.push(""); // blank line before sub-table
-    }
-    const subPrefix = prefix ? `${prefix}.${key}` : key;
-    lines.push(toToml(obj[key], subPrefix));
-  }
-
-  return lines.join("\n");
-}
-
-/**
- * Serialize a single TOML value (non-table).
- */
-function toTomlValue(value: unknown): string {
-  if (value === null || value === undefined) {
-    return '""';
-  }
-
-  if (typeof value === "boolean") {
-    return value ? "true" : "false";
-  }
-
-  if (typeof value === "number") {
-    return String(value);
-  }
-
-  if (typeof value === "string") {
-    return JSON.stringify(value); // always double-quoted in TOML
-  }
-
-  if (Array.isArray(value)) {
-    if (value.length === 0) return "[]";
-    const items = value.map((item) => toTomlValue(item));
-    return `[${items.join(", ")}]`;
-  }
-
-  // Inline table (shouldn't normally reach here — tables are handled by toToml)
-  if (typeof value === "object") {
-    const obj = value as Record<string, unknown>;
-    const pairs = Object.keys(obj).map(
-      (key) => `${key} = ${toTomlValue(obj[key])}`,
-    );
-    return `{ ${pairs.join(", ")} }`;
-  }
-
-  return JSON.stringify(String(value));
-}
-
-/**
- * Check if a value should be rendered as a TOML table (not inline).
- */
-function isTable(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

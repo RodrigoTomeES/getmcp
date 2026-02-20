@@ -580,45 +580,42 @@ A Next.js website that serves as a public directory for MCP servers. Think "npm 
 - Publish `@getmcp/cli` to npm so users can run `npx @getmcp/cli add github`
 - Publish `@getmcp/core` and `@getmcp/generators` for library consumers
 
-### CLI Multi-Format Config File Support
+### CLI Multi-Format Config File Support — IMPLEMENTED
 
-The CLI's `config-file.ts` module (`readConfigFile`, `writeConfigFile`, `mergeServerIntoConfig`, `removeServerFromConfig`) currently only handles JSON/JSONC. Apps that use other formats — Goose (YAML) and Codex (TOML) — cannot be fully managed by the CLI's `add`/`remove` commands. This is a latent bug for Goose (writes JSON to `config.yaml`) and a known limitation for Codex.
+The CLI's `config-file.ts` module now supports JSON, JSONC, YAML, and TOML formats. Format is auto-detected from the file extension via `detectConfigFormat()` in `format.ts`.
 
-#### File Extension Detector
-
-Implement a `detectConfigFormat()` utility that infers the config format from the file path:
+#### Implementation Details
 
 | Extension(s) | Format | Parser | Serializer |
 |---|---|---|---|
-| `.json`, `.jsonc` | JSON/JSONC | `JSON.parse` (with comment stripping for JSONC) | `JSON.stringify` |
-| `.yaml`, `.yml` | YAML | YAML parser library | YAML serializer (extract/generalize from Goose's `toYaml`) |
-| `.toml` | TOML | TOML parser library | TOML serializer (extract/generalize from Codex's `toToml`) |
+| `.json`, `.jsonc` | JSON/JSONC | `JSON.parse` (with proper string-aware comment stripping for JSONC) | `JSON.stringify` |
+| `.yaml`, `.yml` | YAML | `yaml` library (`YAML.parse`) | `yaml` library (`YAML.stringify`) |
+| `.toml` | TOML | `smol-toml` library (`TOML.parse`) | `smol-toml` library (`TOML.stringify`) |
 
-#### Refactored Config File Module
+All five config operations are format-aware:
 
-- `readConfigFile(filePath)` — calls `detectConfigFormat(filePath)`, dispatches to the correct parser
-- `writeConfigFile(filePath, config)` — calls `detectConfigFormat(filePath)`, dispatches to the correct serializer
-- `mergeServerIntoConfig(filePath, generatedConfig)` — format-agnostic at the object level; format only matters at read/write boundaries
+- `readConfigFile(filePath)` — auto-detects format from extension, dispatches to correct parser
+- `writeConfigFile(filePath, config)` — auto-detects format from extension, dispatches to correct serializer
+- `mergeServerIntoConfig(filePath, generatedConfig)` — format-agnostic merge logic; format handled at read/write boundaries
 - `removeServerFromConfig(filePath, serverName)` — same approach
-- `listServersInConfig(filePath)` — same approach; add `mcp_servers` to the list of known root keys to scan
+- `listServersInConfig(filePath)` — scans all known root keys including `mcp_servers` (Codex)
+
+The JSONC comment stripping was also fixed to properly handle `//` sequences inside JSON string values (e.g., URLs like `https://example.com`), using a character-by-character state machine that respects string boundaries.
 
 #### Dependencies
 
-- Add a TOML library (e.g., `smol-toml`) to `@getmcp/cli` for parse + serialize
-- Add a YAML library (e.g., `yaml`) to `@getmcp/cli` for parsing (serialization already exists as `toYaml` in the Goose generator, but should be extracted to a shared utility)
-- Alternatively, hand-roll minimal parsers as done with `toYaml` — evaluate trade-offs between bundle size and correctness
+- `yaml` (^2.8) — added to both `@getmcp/cli` and `@getmcp/generators`
+- `smol-toml` (^1.6) — added to both `@getmcp/cli` and `@getmcp/generators`
 
-#### Priority
-
-High — this unblocks full CLI support for Goose (existing) and Codex (new), and establishes the pattern for any future non-JSON app configs.
+The hand-rolled serializers (`toYaml` in Goose generator, `toToml`/`toTomlValue` in Codex generator) have been replaced with the corresponding library calls for consistency and round-trip correctness.
 
 ### Codex Full Integration
 
-The initial Codex generator (`packages/generators/src/codex.ts`) maps only canonical fields to TOML output for web preview and config snippet generation. Full Codex support requires additional work:
+The Codex generator (`packages/generators/src/codex.ts`) maps canonical fields to TOML output using the `smol-toml` library. The CLI can now fully read, merge into, and write `~/.codex/config.toml` natively via the multi-format config file support.
 
-#### CLI Read/Write/Merge for TOML
+#### CLI Read/Write/Merge for TOML — IMPLEMENTED
 
-Depends on the **CLI Multi-Format Config File Support** refactor above. Once implemented, `getmcp add` and `getmcp remove` will be able to read, merge into, and write `~/.codex/config.toml` natively.
+The CLI's multi-format config file support (see above) enables full `getmcp add` and `getmcp remove` support for Codex's TOML config files.
 
 #### Codex-Specific Config Fields
 
