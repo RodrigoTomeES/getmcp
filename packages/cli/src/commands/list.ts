@@ -52,9 +52,8 @@ async function listRegistry(search?: string): Promise<void> {
     const transport = "command" in server.config ? "stdio" : "remote";
     const envCount = server.requiredEnvVars.length;
     const envNote = envCount > 0 ? ` [${envCount} env var${envCount > 1 ? "s" : ""} required]` : "";
-    const categories = server.categories && server.categories.length > 0
-      ? ` (${server.categories.join(", ")})`
-      : "";
+    const categories =
+      server.categories && server.categories.length > 0 ? ` (${server.categories.join(", ")})` : "";
 
     lines.push(`${server.id} — ${server.name}`);
     lines.push(`  ${server.description}`);
@@ -101,15 +100,11 @@ async function listInstalledServers(): Promise<void> {
 
     try {
       const servers = listServersInConfig(app.configPath);
-      serversLine = servers.length > 0
-        ? servers.join(", ")
-        : "(none configured)";
+      serversLine = servers.length > 0 ? servers.join(", ") : "(none configured)";
     } catch {
       serversLine = "(config not readable)";
     }
 
-    p.log.info(
-      `${app.name}\n  Config: ${shortenPath(app.configPath)}\n  Servers: ${serversLine}`,
-    );
+    p.log.info(`${app.name}\n  Config: ${shortenPath(app.configPath)}\n  Servers: ${serversLine}`);
   }
 }

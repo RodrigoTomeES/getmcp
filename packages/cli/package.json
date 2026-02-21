@@ -2,10 +2,41 @@
   "name": "@getmcp/cli",
   "version": "0.1.5",
   "description": "CLI tool to install MCP servers into any AI application with one command",
-  "type": "module",
+  "keywords": [
+    "ai-tools",
+    "claude-desktop",
+    "cli",
+    "cline",
+    "cursor",
+    "goose",
+    "installer",
+    "mcp",
+    "model-context-protocol",
+    "opencode",
+    "roo-code",
+    "vscode",
+    "windsurf",
+    "zed"
+  ],
+  "homepage": "https://github.com/RodrigoTomeES/getmcp/tree/main/packages/cli#readme",
+  "bugs": {
+    "url": "https://github.com/RodrigoTomeES/getmcp/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RodrigoTomeES/getmcp.git",
+    "directory": "packages/cli"
+  },
   "bin": {
     "getmcp": "./dist/bin.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -14,47 +45,13 @@
       "import": "./dist/index.js"
     }
   },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"
-  },
-  "keywords": [
-    "mcp",
-    "model-context-protocol",
-    "cli",
-    "installer",
-    "claude-desktop",
-    "cursor",
-    "vscode",
-    "windsurf",
-    "cline",
-    "roo-code",
-    "goose",
-    "opencode",
-    "zed",
-    "ai-tools"
-  ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/RodrigoTomeES/getmcp.git",
-    "directory": "packages/cli"
-  },
-  "homepage": "https://github.com/RodrigoTomeES/getmcp/tree/main/packages/cli#readme",
-  "bugs": {
-    "url": "https://github.com/RodrigoTomeES/getmcp/issues"
-  },
-  "engines": {
-    "node": ">=22.0.0"
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "dependencies": {
     "@clack/prompts": "^1.0.1",
@@ -66,5 +63,8 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }

@@ -3,8 +3,7 @@ import type { RegistryEntryType } from "@getmcp/core";
 export const slack: RegistryEntryType = {
   id: "slack",
   name: "Slack",
-  description:
-    "Channel management and messaging capabilities for Slack workspaces",
+  description: "Channel management and messaging capabilities for Slack workspaces",
   config: {
     command: "npx",
     args: ["-y", "@modelcontextprotocol/server-slack"],

@@ -281,7 +281,7 @@ describe("GooseGenerator", () => {
     expect(yaml).toContain("enabled: true");
     // Simple strings should not be quoted, but strings with special YAML
     // characters (like @) are correctly quoted
-    expect(yaml).not.toContain('"npx"');  // Simple strings stay unquoted
+    expect(yaml).not.toContain('"npx"'); // Simple strings stay unquoted
   });
 });
 
@@ -324,11 +324,7 @@ describe("OpenCodeGenerator", () => {
   it("merges command + args into command array", () => {
     const result = gen.generate("github", stdioConfig);
     const server = (result.mcp as Record<string, Record<string, unknown>>).github;
-    expect(server.command).toEqual([
-      "npx",
-      "-y",
-      "@modelcontextprotocol/server-github",
-    ]);
+    expect(server.command).toEqual(["npx", "-y", "@modelcontextprotocol/server-github"]);
   });
 
   it("uses 'environment' instead of 'env'", () => {
@@ -703,7 +699,7 @@ describe("serialize → parse round-trip", () => {
 
   it("All JSON generators produce parseable JSON round-trip", () => {
     const jsonGenerators = Object.entries(generators).filter(
-      ([, gen]) => gen.app.configFormat === "json" || gen.app.configFormat === "jsonc"
+      ([, gen]) => gen.app.configFormat === "json" || gen.app.configFormat === "jsonc",
     );
     for (const [appId, gen] of jsonGenerators) {
       const result = gen.generate("test-server", stdioConfig);

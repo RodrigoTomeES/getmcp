@@ -2,6 +2,30 @@
   "name": "@getmcp/registry",
   "version": "0.1.5",
   "description": "Registry of popular MCP server definitions in canonical format",
+  "keywords": [
+    "brave-search-mcp",
+    "filesystem-mcp",
+    "github-mcp",
+    "mcp",
+    "model-context-protocol",
+    "registry",
+    "server-directory"
+  ],
+  "homepage": "https://github.com/RodrigoTomeES/getmcp/tree/main/packages/registry#readme",
+  "bugs": {
+    "url": "https://github.com/RodrigoTomeES/getmcp/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RodrigoTomeES/getmcp.git",
+    "directory": "packages/registry"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,42 +35,18 @@
       "import": "./dist/index.js"
     }
   },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [
-    "mcp",
-    "model-context-protocol",
-    "registry",
-    "server-directory",
-    "github-mcp",
-    "filesystem-mcp",
-    "brave-search-mcp"
-  ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/RodrigoTomeES/getmcp.git",
-    "directory": "packages/registry"
-  },
-  "homepage": "https://github.com/RodrigoTomeES/getmcp/tree/main/packages/registry#readme",
-  "bugs": {
-    "url": "https://github.com/RodrigoTomeES/getmcp/issues"
+  "dependencies": {
+    "@getmcp/core": "^0.1.0"
   },
   "engines": {
     "node": ">=22.0.0"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "dependencies": {
-    "@getmcp/core": "^0.1.0"
   }
 }

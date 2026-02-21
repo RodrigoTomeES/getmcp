@@ -1,0 +1,16 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: oxlint
+      glob: "*.{js,ts,jsx,tsx}"
+      run: npx oxlint --fix {staged_files}
+      stage_fixed: true
+
+    - name: oxfmt
+      glob: "*.{js,ts,jsx,tsx,json,css,md,yaml,yml,toml}"
+      run: npx oxfmt {staged_files}
+      stage_fixed: true
+
+    - name: typecheck
+      glob: "*.{ts,tsx}"
+      run: npm run lint

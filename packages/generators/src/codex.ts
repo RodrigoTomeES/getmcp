@@ -45,23 +45,16 @@ export class CodexGenerator extends BaseGenerator {
     scope: "global",
   };
 
-  generate(
-    serverName: string,
-    config: LooseServerConfigType,
-  ): Record<string, unknown> {
+  generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
     let serverConfig: Record<string, unknown>;
 
     if (isStdioConfig(config)) {
       serverConfig = {
         command: config.command,
         ...(config.args && config.args.length > 0 ? { args: config.args } : {}),
-        ...(config.env && Object.keys(config.env).length > 0
-          ? { env: config.env }
-          : {}),
+        ...(config.env && Object.keys(config.env).length > 0 ? { env: config.env } : {}),
         ...(config.cwd ? { cwd: config.cwd } : {}),
-        ...(config.timeout
-          ? { startup_timeout_sec: Math.ceil(config.timeout / 1000) }
-          : {}),
+        ...(config.timeout ? { startup_timeout_sec: Math.ceil(config.timeout / 1000) } : {}),
       };
     } else if (isRemoteConfig(config)) {
       serverConfig = {
@@ -69,9 +62,7 @@ export class CodexGenerator extends BaseGenerator {
         ...(config.headers && Object.keys(config.headers).length > 0
           ? { http_headers: config.headers }
           : {}),
-        ...(config.timeout
-          ? { startup_timeout_sec: Math.ceil(config.timeout / 1000) }
-          : {}),
+        ...(config.timeout ? { startup_timeout_sec: Math.ceil(config.timeout / 1000) } : {}),
       };
     } else {
       throw new Error("Invalid config: must have either 'command' or 'url'");

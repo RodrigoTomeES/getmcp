@@ -51,42 +51,42 @@ npx @getmcp/cli remove github
 
 ## Supported Apps
 
-| App | Root Key | Format |
-|-----|----------|--------|
-| Claude Desktop | `mcpServers` | JSON |
-| Claude Code | `mcpServers` | JSON |
-| VS Code / Copilot | `servers` | JSON |
-| Cursor | `mcpServers` | JSON |
-| Cline | `mcpServers` | JSON |
-| Roo Code | `mcpServers` | JSON |
-| Goose | `extensions` | YAML |
-| Windsurf | `mcpServers` | JSON |
-| OpenCode | `mcp` | JSONC |
-| Zed | `context_servers` | JSON |
-| PyCharm | `mcpServers` | JSON |
-| Codex | `mcp_servers` | TOML |
+| App               | Root Key          | Format |
+| ----------------- | ----------------- | ------ |
+| Claude Desktop    | `mcpServers`      | JSON   |
+| Claude Code       | `mcpServers`      | JSON   |
+| VS Code / Copilot | `servers`         | JSON   |
+| Cursor            | `mcpServers`      | JSON   |
+| Cline             | `mcpServers`      | JSON   |
+| Roo Code          | `mcpServers`      | JSON   |
+| Goose             | `extensions`      | YAML   |
+| Windsurf          | `mcpServers`      | JSON   |
+| OpenCode          | `mcp`             | JSONC  |
+| Zed               | `context_servers` | JSON   |
+| PyCharm           | `mcpServers`      | JSON   |
+| Codex             | `mcp_servers`     | TOML   |
 
 ## Registry
 
 35 MCP servers included out of the box. Here are some highlights:
 
-| Server | Transport | Description |
-|--------|-----------|-------------|
-| GitHub | stdio | Repository management, issues, PRs via GitHub API |
-| Filesystem | stdio | Secure file operations with access controls |
-| Brave Search | stdio | Web search via Brave Search API |
-| Memory | stdio | Knowledge graph-based persistent memory |
-| Playwright | stdio | Browser automation, screenshots, and element interaction |
-| PostgreSQL | stdio | Read-only database access and queries |
-| Figma | stdio | Read Figma design files and provide layout info to AI agents |
-| shadcn/ui | stdio | Browse and install shadcn components from AI |
-| Context7 | remote | Up-to-date library documentation and code examples |
-| Sentry | remote | Error tracking and monitoring |
-| Supabase | remote | Query databases, manage projects, deploy Edge Functions |
-| OpenAI Docs | remote | Search OpenAI developer documentation |
-| Firecrawl | stdio | Web scraping and search with JavaScript rendering |
-| Repomix | stdio | Pack entire repositories into a single AI-friendly file |
-| n8n | stdio | Build and manage n8n automation workflows from AI |
+| Server       | Transport | Description                                                  |
+| ------------ | --------- | ------------------------------------------------------------ |
+| GitHub       | stdio     | Repository management, issues, PRs via GitHub API            |
+| Filesystem   | stdio     | Secure file operations with access controls                  |
+| Brave Search | stdio     | Web search via Brave Search API                              |
+| Memory       | stdio     | Knowledge graph-based persistent memory                      |
+| Playwright   | stdio     | Browser automation, screenshots, and element interaction     |
+| PostgreSQL   | stdio     | Read-only database access and queries                        |
+| Figma        | stdio     | Read Figma design files and provide layout info to AI agents |
+| shadcn/ui    | stdio     | Browse and install shadcn components from AI                 |
+| Context7     | remote    | Up-to-date library documentation and code examples           |
+| Sentry       | remote    | Error tracking and monitoring                                |
+| Supabase     | remote    | Query databases, manage projects, deploy Edge Functions      |
+| OpenAI Docs  | remote    | Search OpenAI developer documentation                        |
+| Firecrawl    | stdio     | Web scraping and search with JavaScript rendering            |
+| Repomix      | stdio     | Pack entire repositories into a single AI-friendly file      |
+| n8n          | stdio     | Build and manage n8n automation workflows from AI            |
 
 Browse the full catalog at [getmcp.es](https://getmcp.es) or from the CLI:
 
@@ -96,13 +96,13 @@ npx @getmcp/cli list
 
 ## Packages
 
-| Package | Description | npm |
-|---------|-------------|-----|
-| [`@getmcp/cli`](packages/cli) | CLI tool for installing MCP servers | [![npm](https://img.shields.io/npm/v/@getmcp/cli)](https://www.npmjs.com/package/@getmcp/cli) |
-| [`@getmcp/core`](packages/core) | Zod schemas, types, and utilities | [![npm](https://img.shields.io/npm/v/@getmcp/core)](https://www.npmjs.com/package/@getmcp/core) |
-| [`@getmcp/generators`](packages/generators) | Config generators for 12 apps | [![npm](https://img.shields.io/npm/v/@getmcp/generators)](https://www.npmjs.com/package/@getmcp/generators) |
-| [`@getmcp/registry`](packages/registry) | Registry of MCP server definitions | [![npm](https://img.shields.io/npm/v/@getmcp/registry)](https://www.npmjs.com/package/@getmcp/registry) |
-| [`@getmcp/web`](packages/web) | Web directory (Next.js, not published) | -- |
+| Package                                     | Description                            | npm                                                                                                         |
+| ------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| [`@getmcp/cli`](packages/cli)               | CLI tool for installing MCP servers    | [![npm](https://img.shields.io/npm/v/@getmcp/cli)](https://www.npmjs.com/package/@getmcp/cli)               |
+| [`@getmcp/core`](packages/core)             | Zod schemas, types, and utilities      | [![npm](https://img.shields.io/npm/v/@getmcp/core)](https://www.npmjs.com/package/@getmcp/core)             |
+| [`@getmcp/generators`](packages/generators) | Config generators for 12 apps          | [![npm](https://img.shields.io/npm/v/@getmcp/generators)](https://www.npmjs.com/package/@getmcp/generators) |
+| [`@getmcp/registry`](packages/registry)     | Registry of MCP server definitions     | [![npm](https://img.shields.io/npm/v/@getmcp/registry)](https://www.npmjs.com/package/@getmcp/registry)     |
+| [`@getmcp/web`](packages/web)               | Web directory (Next.js, not published) | --                                                                                                          |
 
 ## Library Usage
 
@@ -144,8 +144,8 @@ StdioServerConfig.parse({ command: "npx", args: ["server"] });
 ```ts
 import { searchServers, getServersByCategory } from "@getmcp/registry";
 
-searchServers("database");          // [{ id: "postgres", ... }]
-getServersByCategory("web");        // [{ id: "brave-search", ... }, { id: "fetch", ... }]
+searchServers("database"); // [{ id: "postgres", ... }]
+getServersByCategory("web"); // [{ id: "brave-search", ... }, { id: "fetch", ... }]
 ```
 
 ## Development

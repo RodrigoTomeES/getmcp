@@ -47,9 +47,7 @@ describe("StdioServerConfig", () => {
   });
 
   it("rejects negative timeout", () => {
-    expect(() =>
-      StdioServerConfig.parse({ command: "npx", timeout: -1 })
-    ).toThrow();
+    expect(() => StdioServerConfig.parse({ command: "npx", timeout: -1 })).toThrow();
   });
 });
 
@@ -81,9 +79,7 @@ describe("RemoteServerConfig", () => {
   });
 
   it("rejects invalid URL", () => {
-    expect(() =>
-      RemoteServerConfig.parse({ url: "not-a-url" })
-    ).toThrow();
+    expect(() => RemoteServerConfig.parse({ url: "not-a-url" })).toThrow();
   });
 
   it("accepts all transport types", () => {
@@ -181,7 +177,7 @@ describe("RegistryEntry", () => {
         name: "Test",
         description: "Test",
         config: { command: "test" },
-      })
+      }),
     ).toThrow();
   });
 

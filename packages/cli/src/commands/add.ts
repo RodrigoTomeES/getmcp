@@ -14,11 +14,7 @@
  */
 
 import * as p from "@clack/prompts";
-import {
-  getAllServers,
-  getServer,
-  searchServers,
-} from "@getmcp/registry";
+import { getAllServers, getServer, searchServers } from "@getmcp/registry";
 import { getGenerator, getAppIds } from "@getmcp/generators";
 import { isStdioConfig } from "@getmcp/core";
 import type { LooseServerConfigType, RegistryEntryType, AppIdType } from "@getmcp/core";
@@ -42,10 +38,7 @@ export interface AddOptions {
   dryRun?: boolean;
 }
 
-export async function addCommand(
-  serverIdArg?: string,
-  options: AddOptions = {},
-): Promise<void> {
+export async function addCommand(serverIdArg?: string, options: AddOptions = {}): Promise<void> {
   const isNonInteractive = options.yes || !process.stdin.isTTY;
 
   p.intro("getmcp add");
@@ -88,9 +81,7 @@ export async function addCommand(
       entry = found;
     }
   } else if (isNonInteractive) {
-    p.log.error(
-      new NonInteractiveError("server ID is required in non-interactive mode").format(),
-    );
+    p.log.error(new NonInteractiveError("server ID is required in non-interactive mode").format());
     process.exit(1);
   } else {
     const servers = getAllServers();
@@ -157,9 +148,7 @@ export async function addCommand(
   // Step 3: Detect apps and build selection list
   const allApps = detectApps();
   const detected = allApps.filter((app) => app.exists);
-  const notDetectedProjectScoped = allApps.filter(
-    (app) => !app.exists && app.scope === "project",
-  );
+  const notDetectedProjectScoped = allApps.filter((app) => !app.exists && app.scope === "project");
 
   // Step 4: Select target apps
   let selectedApps: DetectedApp[];
@@ -208,7 +197,9 @@ export async function addCommand(
   } else {
     // Interactive mode
     if (detected.length === 0 && notDetectedProjectScoped.length === 0) {
-      p.log.warn("No AI applications detected on this system.\n  You can manually copy the config from below:");
+      p.log.warn(
+        "No AI applications detected on this system.\n  You can manually copy the config from below:",
+      );
       printManualConfig(entry, config);
       p.outro("Done");
       return;
@@ -231,11 +222,7 @@ export async function addCommand(
     ];
 
     const initialValues = choices
-      .filter((c) =>
-        hasSavedPreferences
-          ? savedApps.includes(c.value.id)
-          : c.value.exists,
-      )
+      .filter((c) => (hasSavedPreferences ? savedApps.includes(c.value.id) : c.value.exists))
       .map((c) => c.value);
 
     const selected = await p.multiselect({
@@ -274,10 +261,7 @@ export async function addCommand(
       if (options.dryRun) {
         spin.stop(`Preview for ${app.name}:`);
         const serialized = generator.serialize(generatedConfig);
-        p.note(
-          `File: ${shortenPath(app.configPath)}\n\n${serialized}`,
-          app.name,
-        );
+        p.note(`File: ${shortenPath(app.configPath)}\n\n${serialized}`, app.name);
         spin.start("Continuing...");
         results.push({ app, ok: true });
       } else {
@@ -329,16 +313,13 @@ export async function addCommand(
   if (hasPycharm && !options.dryRun) {
     p.log.warn(
       "MCP servers in PyCharm require the JetBrains AI Assistant plugin:\n" +
-      "  https://plugins.jetbrains.com/plugin/22282-jetbrains-ai-assistant\n\n" +
-      "  PyCharm must be closed and reopened for changes to take effect.",
+        "  https://plugins.jetbrains.com/plugin/22282-jetbrains-ai-assistant\n\n" +
+        "  PyCharm must be closed and reopened for changes to take effect.",
     );
   }
 }
 
-function printManualConfig(
-  entry: RegistryEntryType,
-  config: LooseServerConfigType,
-): void {
+function printManualConfig(entry: RegistryEntryType, config: LooseServerConfigType): void {
   const canonical = {
     mcpServers: {
       [entry.id]: config,
@@ -350,5 +331,4 @@ function printManualConfig(
 /**
  * Heuristic to detect if an environment variable name likely holds a secret.
  */
-const SENSITIVE_PATTERNS =
-  /TOKEN|KEY|SECRET|PASSWORD|CREDENTIAL|AUTH|PAT|PRIVATE/i;
+const SENSITIVE_PATTERNS = /TOKEN|KEY|SECRET|PASSWORD|CREDENTIAL|AUTH|PAT|PRIVATE/i;

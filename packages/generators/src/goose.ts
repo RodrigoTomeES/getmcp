@@ -41,10 +41,7 @@ export class GooseGenerator extends BaseGenerator {
     scope: "global",
   };
 
-  generate(
-    serverName: string,
-    config: LooseServerConfigType,
-  ): Record<string, unknown> {
+  generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
     let extensionConfig: Record<string, unknown>;
 
     if (isStdioConfig(config)) {
@@ -53,9 +50,7 @@ export class GooseGenerator extends BaseGenerator {
         cmd: config.command,
         ...(config.args && config.args.length > 0 ? { args: config.args } : {}),
         enabled: true,
-        ...(config.env && Object.keys(config.env).length > 0
-          ? { envs: config.env }
-          : {}),
+        ...(config.env && Object.keys(config.env).length > 0 ? { envs: config.env } : {}),
         type: "stdio",
         ...(config.timeout ? { timeout: Math.ceil(config.timeout / 1000) } : {}),
       };

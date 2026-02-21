@@ -76,29 +76,29 @@ goose.serialize(config);
 
 ## Supported Apps
 
-| App | Root Key | Format | Key Differences |
-|-----|----------|--------|-----------------|
-| Claude Desktop | `mcpServers` | JSON | Canonical passthrough |
-| Claude Code | `mcpServers` | JSON | `type` field for remote |
-| VS Code / Copilot | `servers` | JSON | Requires `type` field |
-| Cursor | `mcpServers` | JSON | Passthrough |
-| Cline | `mcpServers` | JSON | `alwaysAllow`, `disabled` |
-| Roo Code | `mcpServers` | JSON | `alwaysAllow`, `disabled` |
-| Goose | `extensions` | YAML | `cmd`/`envs` keys |
-| Windsurf | `mcpServers` | JSON | `serverUrl` for remote |
-| OpenCode | `mcp` | JSONC | `command` is array |
-| Zed | `context_servers` | JSON | Standard fields |
+| App               | Root Key          | Format | Key Differences           |
+| ----------------- | ----------------- | ------ | ------------------------- |
+| Claude Desktop    | `mcpServers`      | JSON   | Canonical passthrough     |
+| Claude Code       | `mcpServers`      | JSON   | `type` field for remote   |
+| VS Code / Copilot | `servers`         | JSON   | Requires `type` field     |
+| Cursor            | `mcpServers`      | JSON   | Passthrough               |
+| Cline             | `mcpServers`      | JSON   | `alwaysAllow`, `disabled` |
+| Roo Code          | `mcpServers`      | JSON   | `alwaysAllow`, `disabled` |
+| Goose             | `extensions`      | YAML   | `cmd`/`envs` keys         |
+| Windsurf          | `mcpServers`      | JSON   | `serverUrl` for remote    |
+| OpenCode          | `mcp`             | JSONC  | `command` is array        |
+| Zed               | `context_servers` | JSON   | Standard fields           |
 
 ## API
 
-| Export | Description |
-|--------|-------------|
-| `generators` | Map of `AppId` to generator instances |
-| `getGenerator(appId)` | Get a generator by app ID |
-| `getAppIds()` | List all available app IDs |
-| `generateConfig(appId, name, config)` | Generate config object for one app |
-| `generateAllConfigs(name, config)` | Generate serialized config strings for all apps |
-| `BaseGenerator` | Abstract base class for building custom generators |
+| Export                                | Description                                        |
+| ------------------------------------- | -------------------------------------------------- |
+| `generators`                          | Map of `AppId` to generator instances              |
+| `getGenerator(appId)`                 | Get a generator by app ID                          |
+| `getAppIds()`                         | List all available app IDs                         |
+| `generateConfig(appId, name, config)` | Generate config object for one app                 |
+| `generateAllConfigs(name, config)`    | Generate serialized config strings for all apps    |
+| `BaseGenerator`                       | Abstract base class for building custom generators |
 
 ## License
 

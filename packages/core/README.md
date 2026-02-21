@@ -50,9 +50,9 @@ import { isStdioConfig, isRemoteConfig, inferTransport } from "@getmcp/core";
 
 const config = { command: "npx", args: ["server"] };
 
-isStdioConfig(config);   // true
-isRemoteConfig(config);  // false
-inferTransport(config);  // "stdio"
+isStdioConfig(config); // true
+isRemoteConfig(config); // false
+inferTransport(config); // "stdio"
 ```
 
 ### TypeScript Types
@@ -73,16 +73,16 @@ import type {
 
 ## Schemas
 
-| Schema | Description |
-|--------|-------------|
-| `StdioServerConfig` | Local server with `command`, `args`, `env` |
-| `RemoteServerConfig` | Remote server with `url`, `headers` |
-| `ServerConfig` | Union of stdio and remote |
-| `LooseServerConfig` | Passthrough schema for unknown fields |
-| `CanonicalMCPConfig` | Top-level `{ mcpServers: { ... } }` |
-| `RegistryEntry` | Server definition for the registry |
-| `AppId` | Enum of supported app identifiers |
-| `TransportType` | `"stdio" | "sse" | "streamable-http"` |
+| Schema               | Description                                |
+| -------------------- | ------------------------------------------ | ----- | ------------------ |
+| `StdioServerConfig`  | Local server with `command`, `args`, `env` |
+| `RemoteServerConfig` | Remote server with `url`, `headers`        |
+| `ServerConfig`       | Union of stdio and remote                  |
+| `LooseServerConfig`  | Passthrough schema for unknown fields      |
+| `CanonicalMCPConfig` | Top-level `{ mcpServers: { ... } }`        |
+| `RegistryEntry`      | Server definition for the registry         |
+| `AppId`              | Enum of supported app identifiers          |
+| `TransportType`      | `"stdio"                                   | "sse" | "streamable-http"` |
 
 ## Supported Apps
 

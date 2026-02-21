@@ -53,9 +53,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "command"
-          ],
+          "required": ["command"],
           "additionalProperties": false
         },
         {
@@ -67,11 +65,7 @@
             },
             "transport": {
               "type": "string",
-              "enum": [
-                "http",
-                "streamable-http",
-                "sse"
-              ]
+              "enum": ["http", "streamable-http", "sse"]
             },
             "headers": {
               "type": "object",
@@ -88,9 +82,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "url"
-          ],
+          "required": ["url"],
           "additionalProperties": false
         }
       ]
@@ -100,12 +92,7 @@
     },
     "runtime": {
       "type": "string",
-      "enum": [
-        "node",
-        "python",
-        "docker",
-        "binary"
-      ]
+      "enum": ["node", "python", "docker", "binary"]
     },
     "repository": {
       "type": "string",
@@ -224,12 +211,7 @@
       "additionalProperties": false
     }
   },
-  "required": [
-    "id",
-    "name",
-    "description",
-    "config"
-  ],
+  "required": ["id", "name", "description", "config"],
   "additionalProperties": false,
   "$schema": "http://json-schema.org/draft-07/schema#"
 }

@@ -43,6 +43,7 @@ getmcp add github --dry-run
 ```
 
 The `add` command will:
+
 1. Look up the server in the built-in registry
 2. Auto-detect which AI apps you have installed
 3. Ask which apps you want to configure (or configure all)
@@ -137,26 +138,26 @@ getmcp init
 
 ## Command Aliases
 
-| Command | Aliases |
-|---------|---------|
-| `add` | `install`, `i` |
+| Command  | Aliases                |
+| -------- | ---------------------- |
+| `add`    | `install`, `i`         |
 | `remove` | `rm`, `r`, `uninstall` |
-| `list` | `ls` |
-| `find` | `search`, `s`, `f` |
+| `list`   | `ls`                   |
+| `find`   | `search`, `s`, `f`     |
 
 ## Options
 
-| Flag | Description |
-|------|-------------|
-| `--help`, `-h` | Show help message |
-| `--version`, `-v` | Show version number |
-| `--yes`, `-y` | Skip confirmation prompts (use defaults) |
-| `--app <id>` | Target a specific app (repeatable for multiple apps) |
-| `--all-apps` | Target all detected apps |
-| `--dry-run` | Preview changes without writing files |
-| `--installed` | List servers installed in detected apps (for `list` command) |
-| `--search=<query>` | Search the registry (for `list` command) |
-| `--category=<cat>` | Filter by category (for `list` command) |
+| Flag               | Description                                                  |
+| ------------------ | ------------------------------------------------------------ |
+| `--help`, `-h`     | Show help message                                            |
+| `--version`, `-v`  | Show version number                                          |
+| `--yes`, `-y`      | Skip confirmation prompts (use defaults)                     |
+| `--app <id>`       | Target a specific app (repeatable for multiple apps)         |
+| `--all-apps`       | Target all detected apps                                     |
+| `--dry-run`        | Preview changes without writing files                        |
+| `--installed`      | List servers installed in detected apps (for `list` command) |
+| `--search=<query>` | Search the registry (for `list` command)                     |
+| `--category=<cat>` | Filter by category (for `list` command)                      |
 
 ## Installation Tracking
 
@@ -173,20 +174,20 @@ The lock file enables the `check` and `update` commands — `check` compares you
 
 The CLI auto-detects and generates configs for:
 
-| App | Config Location | Format |
-|-----|----------------|--------|
-| Claude Desktop | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS), `%AppData%\Claude\claude_desktop_config.json` (Windows) | JSON |
-| Claude Code | `.mcp.json` (project), `~/.claude.json` (user) | JSON |
-| VS Code / Copilot | `.vscode/mcp.json` | JSON |
-| Cursor | `.cursor/mcp.json` | JSON |
-| Cline | `cline_mcp_settings.json` (VS Code globalStorage) | JSON |
-| Roo Code | `mcp_settings.json` (VS Code globalStorage) | JSON |
-| Goose | `~/.config/goose/config.yaml` | YAML |
-| Windsurf | `~/.codeium/windsurf/mcp_config.json` | JSON |
-| OpenCode | `opencode.json` | JSONC |
-| Zed | `settings.json` (Zed settings) | JSON |
-| PyCharm | `.ai/mcp/mcp.json` (project-level, requires JetBrains AI Assistant plugin) | JSON |
-| Codex | `~/.codex/config.toml` (global), `.codex/config.toml` (project) | TOML |
+| App               | Config Location                                                                                                                    | Format |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| Claude Desktop    | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS), `%AppData%\Claude\claude_desktop_config.json` (Windows) | JSON   |
+| Claude Code       | `.mcp.json` (project), `~/.claude.json` (user)                                                                                     | JSON   |
+| VS Code / Copilot | `.vscode/mcp.json`                                                                                                                 | JSON   |
+| Cursor            | `.cursor/mcp.json`                                                                                                                 | JSON   |
+| Cline             | `cline_mcp_settings.json` (VS Code globalStorage)                                                                                  | JSON   |
+| Roo Code          | `mcp_settings.json` (VS Code globalStorage)                                                                                        | JSON   |
+| Goose             | `~/.config/goose/config.yaml`                                                                                                      | YAML   |
+| Windsurf          | `~/.codeium/windsurf/mcp_config.json`                                                                                              | JSON   |
+| OpenCode          | `opencode.json`                                                                                                                    | JSONC  |
+| Zed               | `settings.json` (Zed settings)                                                                                                     | JSON   |
+| PyCharm           | `.ai/mcp/mcp.json` (project-level, requires JetBrains AI Assistant plugin)                                                         | JSON   |
+| Codex             | `~/.codex/config.toml` (global), `.codex/config.toml` (project)                                                                    | TOML   |
 
 ## Programmatic API
 

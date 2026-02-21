@@ -22,19 +22,19 @@ export class RooCodeGenerator extends BaseGenerator {
     name: "Roo Code",
     description: "AI coding assistant VS Code extension (formerly Roo Cline)",
     configPaths: {
-      darwin: "~/Library/Application Support/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/mcp_settings.json",
-      win32: "%AppData%\\Code\\User\\globalStorage\\rooveterinaryinc.roo-cline\\settings\\mcp_settings.json",
-      linux: "~/.config/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/mcp_settings.json",
+      darwin:
+        "~/Library/Application Support/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/mcp_settings.json",
+      win32:
+        "%AppData%\\Code\\User\\globalStorage\\rooveterinaryinc.roo-cline\\settings\\mcp_settings.json",
+      linux:
+        "~/.config/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/mcp_settings.json",
     },
     configFormat: "json",
     docsUrl: "https://docs.roocode.com/features/mcp/using-mcp-in-roo",
     scope: "global",
   };
 
-  generate(
-    serverName: string,
-    config: LooseServerConfigType,
-  ): Record<string, unknown> {
+  generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
     let serverConfig: Record<string, unknown>;
 
     if (isStdioConfig(config)) {

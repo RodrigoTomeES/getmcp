@@ -3,23 +3,14 @@
  * Provides common functionality for all app-specific generators.
  */
 
-import type {
-  ConfigGenerator,
-  AppMetadata,
-  LooseServerConfigType,
-} from "@getmcp/core";
+import type { ConfigGenerator, AppMetadata, LooseServerConfigType } from "@getmcp/core";
 
 export abstract class BaseGenerator implements ConfigGenerator {
   abstract app: AppMetadata;
 
-  abstract generate(
-    serverName: string,
-    config: LooseServerConfigType,
-  ): Record<string, unknown>;
+  abstract generate(serverName: string, config: LooseServerConfigType): Record<string, unknown>;
 
-  generateAll(
-    servers: Record<string, LooseServerConfigType>,
-  ): Record<string, unknown> {
+  generateAll(servers: Record<string, LooseServerConfigType>): Record<string, unknown> {
     // Default: merge all individual generates under the same root key.
     // Subclasses can override if their format differs.
     let merged: Record<string, unknown> = {};
@@ -46,10 +37,7 @@ export function deepMerge(
   for (const key of Object.keys(source)) {
     const targetVal = target[key];
     const sourceVal = source[key];
-    if (
-      isPlainObject(targetVal) &&
-      isPlainObject(sourceVal)
-    ) {
+    if (isPlainObject(targetVal) && isPlainObject(sourceVal)) {
       result[key] = deepMerge(
         targetVal as Record<string, unknown>,
         sourceVal as Record<string, unknown>,

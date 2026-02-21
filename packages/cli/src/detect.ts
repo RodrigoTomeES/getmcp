@@ -23,7 +23,10 @@ export function resolvePath(configPath: string): string {
   }
 
   // %AppData% → Windows AppData\Roaming
-  resolved = resolved.replace(/%AppData%/gi, process.env.APPDATA ?? path.join(os.homedir(), "AppData", "Roaming"));
+  resolved = resolved.replace(
+    /%AppData%/gi,
+    process.env.APPDATA ?? path.join(os.homedir(), "AppData", "Roaming"),
+  );
 
   // %UserProfile% → Windows home
   resolved = resolved.replace(/%UserProfile%/gi, os.homedir());

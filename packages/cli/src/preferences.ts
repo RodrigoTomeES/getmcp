@@ -21,14 +21,12 @@ interface Preferences {
  */
 export function getPreferencesPath(): string {
   if (process.platform === "win32") {
-    const appData =
-      process.env.APPDATA ?? path.join(os.homedir(), "AppData", "Roaming");
+    const appData = process.env.APPDATA ?? path.join(os.homedir(), "AppData", "Roaming");
     return path.join(appData, "getmcp", "preferences.json");
   }
 
   // macOS and Linux: use XDG_CONFIG_HOME or ~/.config
-  const configDir =
-    process.env.XDG_CONFIG_HOME ?? path.join(os.homedir(), ".config");
+  const configDir = process.env.XDG_CONFIG_HOME ?? path.join(os.homedir(), ".config");
   return path.join(configDir, "getmcp", "preferences.json");
 }
 
@@ -36,9 +34,7 @@ export function getPreferencesPath(): string {
  * Read the preferences file.
  * Returns an empty object if the file doesn't exist or is corrupt.
  */
-export function readPreferences(
-  filePath?: string,
-): Preferences {
+export function readPreferences(filePath?: string): Preferences {
   const prefsPath = filePath ?? getPreferencesPath();
 
   if (!fs.existsSync(prefsPath)) {
@@ -59,9 +55,7 @@ export function readPreferences(
     if (
       parsed.selectedApps !== undefined &&
       (!Array.isArray(parsed.selectedApps) ||
-        !parsed.selectedApps.every(
-          (v: unknown) => typeof v === "string",
-        ))
+        !parsed.selectedApps.every((v: unknown) => typeof v === "string"))
     ) {
       return {};
     }
@@ -76,10 +70,7 @@ export function readPreferences(
  * Save the list of selected app IDs to the preferences file.
  * Creates parent directories if they don't exist.
  */
-export function saveSelectedApps(
-  appIds: AppIdType[],
-  filePath?: string,
-): void {
+export function saveSelectedApps(appIds: AppIdType[], filePath?: string): void {
   const prefsPath = filePath ?? getPreferencesPath();
   const existing = readPreferences(prefsPath);
 
@@ -90,20 +81,14 @@ export function saveSelectedApps(
     fs.mkdirSync(dir, { recursive: true });
   }
 
-  fs.writeFileSync(
-    prefsPath,
-    JSON.stringify(existing, null, 2) + "\n",
-    "utf-8",
-  );
+  fs.writeFileSync(prefsPath, JSON.stringify(existing, null, 2) + "\n", "utf-8");
 }
 
 /**
  * Get the previously saved list of selected app IDs.
  * Returns null if no preferences exist yet (first run).
  */
-export function getSavedSelectedApps(
-  filePath?: string,
-): AppIdType[] | null {
+export function getSavedSelectedApps(filePath?: string): AppIdType[] | null {
   const prefs = readPreferences(filePath);
   return prefs.selectedApps ?? null;
 }

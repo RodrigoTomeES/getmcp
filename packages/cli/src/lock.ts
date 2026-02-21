@@ -126,11 +126,7 @@ export function trackInstallation(
  * Record the removal of a server from one or more apps.
  * Removes the entire entry if no apps remain.
  */
-export function trackRemoval(
-  serverId: string,
-  appIds: AppIdType[],
-  filePath?: string,
-): void {
+export function trackRemoval(serverId: string, appIds: AppIdType[], filePath?: string): void {
   const lock = readLockFile(filePath);
   const existing = lock.installations[serverId];
 

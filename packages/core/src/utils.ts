@@ -2,23 +2,24 @@
  * Utility functions for working with canonical MCP server configs.
  */
 
-import type { LooseServerConfig, StdioServerConfig, RemoteServerConfig, TransportType } from "./types.js";
+import type {
+  LooseServerConfig,
+  StdioServerConfig,
+  RemoteServerConfig,
+  TransportType,
+} from "./types.js";
 
 /**
  * Type guard: checks if a config is a stdio transport config.
  */
-export function isStdioConfig(
-  config: LooseServerConfig,
-): config is StdioServerConfig {
+export function isStdioConfig(config: LooseServerConfig): config is StdioServerConfig {
   return "command" in config && typeof config.command === "string";
 }
 
 /**
  * Type guard: checks if a config is a remote transport config.
  */
-export function isRemoteConfig(
-  config: LooseServerConfig,
-): config is RemoteServerConfig {
+export function isRemoteConfig(config: LooseServerConfig): config is RemoteServerConfig {
   return "url" in config && typeof config.url === "string";
 }
 

@@ -15,9 +15,7 @@ export function ServerCard({ server }: { server: RegistryEntryType }) {
         <h3 className="font-semibold text-lg">{server.name}</h3>
         <span
           className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
-            isRemote
-              ? "bg-purple-500/10 text-purple-400"
-              : "bg-green-500/10 text-green-400"
+            isRemote ? "bg-purple-500/10 text-purple-400" : "bg-green-500/10 text-green-400"
           }`}
         >
           {transport}
@@ -45,9 +43,7 @@ export function ServerCard({ server }: { server: RegistryEntryType }) {
       </div>
 
       {server.author && (
-        <p className="text-xs text-[var(--color-text-secondary)] mt-3">
-          by {server.author}
-        </p>
+        <p className="text-xs text-[var(--color-text-secondary)] mt-3">by {server.author}</p>
       )}
     </Link>
   );

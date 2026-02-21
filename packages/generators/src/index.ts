@@ -50,16 +50,16 @@ import { CodexGenerator } from "./codex.js";
 export const generators: Record<AppIdType, ConfigGenerator> = {
   "claude-desktop": new ClaudeDesktopGenerator(),
   "claude-code": new ClaudeCodeGenerator(),
-  "vscode": new VSCodeGenerator(),
-  "cursor": new CursorGenerator(),
-  "cline": new ClineGenerator(),
+  vscode: new VSCodeGenerator(),
+  cursor: new CursorGenerator(),
+  cline: new ClineGenerator(),
   "roo-code": new RooCodeGenerator(),
-  "goose": new GooseGenerator(),
-  "windsurf": new WindsurfGenerator(),
-  "opencode": new OpenCodeGenerator(),
-  "zed": new ZedGenerator(),
-  "pycharm": new PyCharmGenerator(),
-  "codex": new CodexGenerator(),
+  goose: new GooseGenerator(),
+  windsurf: new WindsurfGenerator(),
+  opencode: new OpenCodeGenerator(),
+  zed: new ZedGenerator(),
+  pycharm: new PyCharmGenerator(),
+  codex: new CodexGenerator(),
 };
 
 /**

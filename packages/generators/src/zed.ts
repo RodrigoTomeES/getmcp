@@ -39,10 +39,7 @@ export class ZedGenerator extends BaseGenerator {
     scope: "global",
   };
 
-  generate(
-    serverName: string,
-    config: LooseServerConfigType,
-  ): Record<string, unknown> {
+  generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
     let serverConfig: Record<string, unknown>;
 
     if (isStdioConfig(config)) {

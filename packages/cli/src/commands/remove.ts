@@ -13,11 +13,7 @@
 
 import * as p from "@clack/prompts";
 import { detectInstalledApps, type DetectedApp } from "../detect.js";
-import {
-  removeServerFromConfig,
-  writeConfigFile,
-  listServersInConfig,
-} from "../config-file.js";
+import { removeServerFromConfig, writeConfigFile, listServersInConfig } from "../config-file.js";
 import { trackRemoval } from "../lock.js";
 import { shortenPath } from "../utils.js";
 import { formatError } from "../errors.js";
@@ -37,7 +33,9 @@ export async function removeCommand(
   p.intro("getmcp remove");
 
   if (!serverName) {
-    p.log.error("Usage: getmcp remove <server-name>\n  Provide the name/key of the MCP server to remove.");
+    p.log.error(
+      "Usage: getmcp remove <server-name>\n  Provide the name/key of the MCP server to remove.",
+    );
     process.exit(1);
   }
 
@@ -137,7 +135,9 @@ export async function removeCommand(
       const updated = removeServerFromConfig(app.configPath, serverName);
       if (updated) {
         if (options.dryRun) {
-          p.log.info(`${app.name}: would remove "${serverName}" from ${shortenPath(app.configPath)}`);
+          p.log.info(
+            `${app.name}: would remove "${serverName}" from ${shortenPath(app.configPath)}`,
+          );
         } else {
           writeConfigFile(app.configPath, updated);
           p.log.success(`${app.name}: removed`);
@@ -153,7 +153,10 @@ export async function removeCommand(
 
   // Track removal (unless dry-run)
   if (!options.dryRun && removedApps.length > 0) {
-    trackRemoval(serverName, removedApps.map((a) => a.id));
+    trackRemoval(
+      serverName,
+      removedApps.map((a) => a.id),
+    );
   }
 
   const action = options.dryRun ? "would be removed" : "has been removed";

@@ -109,20 +109,14 @@ function parseContent(
         return JSON.parse(raw);
     }
   } catch (err) {
-    throw new ConfigParseError(
-      filePath,
-      err instanceof Error ? err.message : undefined,
-    );
+    throw new ConfigParseError(filePath, err instanceof Error ? err.message : undefined);
   }
 }
 
 /**
  * Serialize a config object to a string in the given format.
  */
-function serializeContent(
-  config: Record<string, unknown>,
-  format: ConfigFormat,
-): string {
+function serializeContent(config: Record<string, unknown>, format: ConfigFormat): string {
   switch (format) {
     case "json":
     case "jsonc":
@@ -158,10 +152,7 @@ export function readConfigFile(filePath: string): Record<string, unknown> {
  * Creates parent directories if they don't exist.
  * Format is auto-detected from the file extension.
  */
-export function writeConfigFile(
-  filePath: string,
-  config: Record<string, unknown>,
-): void {
+export function writeConfigFile(filePath: string, config: Record<string, unknown>): void {
   const dir = path.dirname(filePath);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
@@ -192,13 +183,8 @@ export function mergeServerIntoConfig(
 
   // Deep merge: for each top-level key in generated config
   for (const [rootKey, value] of Object.entries(generatedConfig)) {
-    if (
-      typeof value === "object" &&
-      value !== null &&
-      !Array.isArray(value)
-    ) {
-      const existingSection =
-        (existing[rootKey] as Record<string, unknown>) ?? {};
+    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+      const existingSection = (existing[rootKey] as Record<string, unknown>) ?? {};
       existing[rootKey] = {
         ...existingSection,
         ...(value as Record<string, unknown>),
@@ -228,11 +214,7 @@ export function removeServerFromConfig(
   let found = false;
 
   for (const [, value] of Object.entries(existing)) {
-    if (
-      typeof value === "object" &&
-      value !== null &&
-      !Array.isArray(value)
-    ) {
+    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
       const section = value as Record<string, unknown>;
       if (serverName in section) {
         delete section[serverName];
@@ -250,18 +232,9 @@ export function removeServerFromConfig(
  * context_servers, mcp_servers.
  * Format is auto-detected from the file extension.
  */
-export function listServersInConfig(
-  filePath: string,
-): string[] {
+export function listServersInConfig(filePath: string): string[] {
   const existing = readConfigFile(filePath);
-  const rootKeys = [
-    "mcpServers",
-    "servers",
-    "extensions",
-    "mcp",
-    "context_servers",
-    "mcp_servers",
-  ];
+  const rootKeys = ["mcpServers", "servers", "extensions", "mcp", "context_servers", "mcp_servers"];
   const servers: string[] = [];
 
   for (const rootKey of rootKeys) {

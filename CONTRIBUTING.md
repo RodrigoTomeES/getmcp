@@ -45,18 +45,18 @@ Each server file exports a `RegistryEntryType` object:
 import type { RegistryEntryType } from "@getmcp/core";
 
 export const myServer: RegistryEntryType = {
-  id: "my-server",              // Unique, lowercase, hyphens only
-  name: "My Server",            // Display name
-  description: "What it does",  // One-line description
+  id: "my-server", // Unique, lowercase, hyphens only
+  name: "My Server", // Display name
+  description: "What it does", // One-line description
   config: {
     command: "npx",
     args: ["-y", "my-server-pkg"],
     env: { API_KEY: "" },
     transport: "stdio",
   },
-  package: "my-server-pkg",     // npm or PyPI package name
-  version: "1.0.0",             // Current package version
-  runtime: "node",              // "node" | "python" | "docker" | "binary"
+  package: "my-server-pkg", // npm or PyPI package name
+  version: "1.0.0", // Current package version
+  runtime: "node", // "node" | "python" | "docker" | "binary"
   repository: "https://github.com/user/repo",
   homepage: "https://github.com/user/repo",
   author: "Author Name",

@@ -205,8 +205,8 @@ export function getServersByCategory(category: string): RegistryEntryType[] {
 /**
  * Get all unique categories across all servers.
  */
-export function getCategories(): RegistryEntryType['categories'] {
-  const categories = new Set<RegistryEntryType['categories'][number]>();
+export function getCategories(): RegistryEntryType["categories"] {
+  const categories = new Set<RegistryEntryType["categories"][number]>();
   for (const entry of _registry.values()) {
     for (const cat of entry.categories ?? []) {
       categories.add(cat);

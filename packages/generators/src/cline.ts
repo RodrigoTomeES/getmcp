@@ -19,19 +19,19 @@ export class ClineGenerator extends BaseGenerator {
     name: "Cline",
     description: "AI coding assistant VS Code extension",
     configPaths: {
-      darwin: "~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json",
-      win32: "%AppData%\\Code\\User\\globalStorage\\saoudrizwan.claude-dev\\settings\\cline_mcp_settings.json",
-      linux: "~/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json",
+      darwin:
+        "~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json",
+      win32:
+        "%AppData%\\Code\\User\\globalStorage\\saoudrizwan.claude-dev\\settings\\cline_mcp_settings.json",
+      linux:
+        "~/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json",
     },
     configFormat: "json",
     docsUrl: "https://docs.cline.bot/mcp-servers/configuring-mcp-servers",
     scope: "global",
   };
 
-  generate(
-    serverName: string,
-    config: LooseServerConfigType,
-  ): Record<string, unknown> {
+  generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
     let serverConfig: Record<string, unknown>;
 
     if (isStdioConfig(config)) {

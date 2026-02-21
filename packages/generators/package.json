@@ -2,6 +2,35 @@
   "name": "@getmcp/generators",
   "version": "0.1.5",
   "description": "Config generators that transform canonical MCP server definitions to app-specific formats",
+  "keywords": [
+    "claude-desktop",
+    "cline",
+    "config-generator",
+    "cursor",
+    "goose",
+    "mcp",
+    "model-context-protocol",
+    "opencode",
+    "roo-code",
+    "vscode",
+    "windsurf",
+    "zed"
+  ],
+  "homepage": "https://github.com/RodrigoTomeES/getmcp/tree/main/packages/generators#readme",
+  "bugs": {
+    "url": "https://github.com/RodrigoTomeES/getmcp/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RodrigoTomeES/getmcp.git",
+    "directory": "packages/generators"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,49 +40,20 @@
       "import": "./dist/index.js"
     }
   },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [
-    "mcp",
-    "model-context-protocol",
-    "config-generator",
-    "claude-desktop",
-    "cursor",
-    "vscode",
-    "windsurf",
-    "cline",
-    "roo-code",
-    "goose",
-    "opencode",
-    "zed"
-  ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/RodrigoTomeES/getmcp.git",
-    "directory": "packages/generators"
-  },
-  "homepage": "https://github.com/RodrigoTomeES/getmcp/tree/main/packages/generators#readme",
-  "bugs": {
-    "url": "https://github.com/RodrigoTomeES/getmcp/issues"
-  },
-  "engines": {
-    "node": ">=22.0.0"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
   "dependencies": {
     "@getmcp/core": "^0.1.0",
     "smol-toml": "^1.6.0",
     "yaml": "^2.8.2"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }

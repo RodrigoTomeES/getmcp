@@ -44,10 +44,7 @@ export class OpenCodeGenerator extends BaseGenerator {
     scope: "project",
   };
 
-  generate(
-    serverName: string,
-    config: LooseServerConfigType,
-  ): Record<string, unknown> {
+  generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
     let serverConfig: Record<string, unknown>;
 
     if (isStdioConfig(config)) {
@@ -61,9 +58,7 @@ export class OpenCodeGenerator extends BaseGenerator {
         type: "local",
         command: commandArray,
         enabled: true,
-        ...(config.env && Object.keys(config.env).length > 0
-          ? { environment: config.env }
-          : {}),
+        ...(config.env && Object.keys(config.env).length > 0 ? { environment: config.env } : {}),
         ...(config.timeout ? { timeout: config.timeout } : {}),
       };
     } else if (isRemoteConfig(config)) {
@@ -87,9 +82,7 @@ export class OpenCodeGenerator extends BaseGenerator {
     };
   }
 
-  override generateAll(
-    servers: Record<string, LooseServerConfigType>,
-  ): Record<string, unknown> {
+  override generateAll(servers: Record<string, LooseServerConfigType>): Record<string, unknown> {
     const mcp: Record<string, unknown> = {};
     for (const [name, config] of Object.entries(servers)) {
       const single = this.generate(name, config);

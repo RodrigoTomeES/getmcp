@@ -53,34 +53,34 @@ Inspired by [skills.sh](https://skills.sh/) — a platform that provides one-com
 
 Every major AI application that supports MCP has chosen a slightly (or drastically) different configuration format. Here is the fragmentation landscape:
 
-| App | Root Key | Format | Config Location | Command Key | Env Key | Remote URL Key |
-|-----|----------|--------|-----------------|-------------|---------|----------------|
-| Claude Desktop | `mcpServers` | JSON | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS), `%AppData%\Claude\claude_desktop_config.json` (Win) | `command` | `env` | — |
-| Claude Code | `mcpServers` | JSON | `.mcp.json` (project), `~/.claude.json` (user) | `command` | `env` | `url` |
-| VS Code / Copilot | `servers` | JSON | `.vscode/mcp.json` | `command` | `env` | `url` |
-| Cursor | `mcpServers` | JSON | `.cursor/mcp.json` | `command` | `env` | `url` |
-| Cline | `mcpServers` | JSON | `cline_mcp_settings.json` | `command` | `env` | `url` |
-| Roo Code | `mcpServers` | JSON | `mcp_settings.json`, `.roo/mcp.json` | `command` | `env` | `url` |
-| Goose | `extensions` | **YAML** | `~/.config/goose/config.yaml` | `cmd` | `envs` | `uri` |
-| Windsurf | `mcpServers` | JSON | `~/.codeium/windsurf/mcp_config.json` | `command` | `env` | `serverUrl` |
-| OpenCode | `mcp` | JSONC | `opencode.json` | `command` (array) | `environment` | `url` |
-| Zed | `context_servers` | JSON | `settings.json` | `command` | `env` | `url` |
-| PyCharm | `mcpServers` | JSON | `.ai/mcp/mcp.json` (project-level) | `command` | `env` | `url` |
+| App               | Root Key          | Format   | Config Location                                                                                                                | Command Key       | Env Key       | Remote URL Key |
+| ----------------- | ----------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------- | ------------- | -------------- |
+| Claude Desktop    | `mcpServers`      | JSON     | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS), `%AppData%\Claude\claude_desktop_config.json` (Win) | `command`         | `env`         | —              |
+| Claude Code       | `mcpServers`      | JSON     | `.mcp.json` (project), `~/.claude.json` (user)                                                                                 | `command`         | `env`         | `url`          |
+| VS Code / Copilot | `servers`         | JSON     | `.vscode/mcp.json`                                                                                                             | `command`         | `env`         | `url`          |
+| Cursor            | `mcpServers`      | JSON     | `.cursor/mcp.json`                                                                                                             | `command`         | `env`         | `url`          |
+| Cline             | `mcpServers`      | JSON     | `cline_mcp_settings.json`                                                                                                      | `command`         | `env`         | `url`          |
+| Roo Code          | `mcpServers`      | JSON     | `mcp_settings.json`, `.roo/mcp.json`                                                                                           | `command`         | `env`         | `url`          |
+| Goose             | `extensions`      | **YAML** | `~/.config/goose/config.yaml`                                                                                                  | `cmd`             | `envs`        | `uri`          |
+| Windsurf          | `mcpServers`      | JSON     | `~/.codeium/windsurf/mcp_config.json`                                                                                          | `command`         | `env`         | `serverUrl`    |
+| OpenCode          | `mcp`             | JSONC    | `opencode.json`                                                                                                                | `command` (array) | `environment` | `url`          |
+| Zed               | `context_servers` | JSON     | `settings.json`                                                                                                                | `command`         | `env`         | `url`          |
+| PyCharm           | `mcpServers`      | JSON     | `.ai/mcp/mcp.json` (project-level)                                                                                             | `command`         | `env`         | `url`          |
 
 ### Key Fragmentation Dimensions
 
-| Dimension | Variations Found |
-|-----------|-----------------|
-| Root key | `mcpServers`, `servers`, `extensions`, `mcp`, `context_servers` |
-| Config format | JSON, JSONC, YAML |
-| Command key | `command` (string) vs `cmd` (string) vs `command` (array with args merged) |
-| Env key | `env` vs `envs` vs `environment` |
-| Remote URL key | `url` vs `serverUrl` vs `uri` |
-| Transport declaration | Implicit (most) vs `type` field (VS Code, Roo Code) vs `transport` field |
-| Extra fields | `alwaysAllow`, `disabled`, `timeout`, `watchPaths`, `disabledTools`, `cwd`, `enabled` |
-| Env var syntax | Direct values, `${VAR}`, `${VAR:-default}`, `${env:VAR}`, `{env:VAR}` |
-| Windows handling | Some need `cmd /c` wrapper |
-| Install method | File edit, CLI commands, UI, extensions, marketplace |
+| Dimension             | Variations Found                                                                      |
+| --------------------- | ------------------------------------------------------------------------------------- |
+| Root key              | `mcpServers`, `servers`, `extensions`, `mcp`, `context_servers`                       |
+| Config format         | JSON, JSONC, YAML                                                                     |
+| Command key           | `command` (string) vs `cmd` (string) vs `command` (array with args merged)            |
+| Env key               | `env` vs `envs` vs `environment`                                                      |
+| Remote URL key        | `url` vs `serverUrl` vs `uri`                                                         |
+| Transport declaration | Implicit (most) vs `type` field (VS Code, Roo Code) vs `transport` field              |
+| Extra fields          | `alwaysAllow`, `disabled`, `timeout`, `watchPaths`, `disabledTools`, `cwd`, `enabled` |
+| Env var syntax        | Direct values, `${VAR}`, `${VAR:-default}`, `${env:VAR}`, `{env:VAR}`                 |
+| Windows handling      | Some need `cmd /c` wrapper                                                            |
+| Install method        | File edit, CLI commands, UI, extensions, marketplace                                  |
 
 ---
 
@@ -182,6 +182,7 @@ getmcp/
 ```
 
 All packages use:
+
 - TypeScript with `NodeNext` module resolution
 - Zod for runtime validation
 - Vitest for testing
@@ -196,7 +197,7 @@ All packages use:
 - Remote: `url`, `transport`, `headers`, `timeout`, `description`
 - `extra="allow"` pattern — unknown fields pass through
 
-This means our canonical format is directly compatible with the most widely-used MCP framework. Our generators then transform *from* this standard *to* each app's specific format.
+This means our canonical format is directly compatible with the most widely-used MCP framework. Our generators then transform _from_ this standard _to_ each app's specific format.
 
 ---
 
@@ -206,27 +207,27 @@ This means our canonical format is directly compatible with the most widely-used
 
 For servers that run as local processes via stdio transport.
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `command` | `string` | Yes | — | The executable (e.g., `"npx"`, `"uvx"`, `"docker"`) |
-| `args` | `string[]` | No | `[]` | Arguments passed to the command |
-| `env` | `Record<string, string>` | No | `{}` | Environment variables |
-| `transport` | `"stdio"` | No | `"stdio"` | Transport type (always stdio) |
-| `cwd` | `string` | No | — | Working directory for execution |
-| `timeout` | `number` | No | — | Max response time in milliseconds |
-| `description` | `string` | No | — | Human-readable description |
+| Field         | Type                     | Required | Default   | Description                                         |
+| ------------- | ------------------------ | -------- | --------- | --------------------------------------------------- |
+| `command`     | `string`                 | Yes      | —         | The executable (e.g., `"npx"`, `"uvx"`, `"docker"`) |
+| `args`        | `string[]`               | No       | `[]`      | Arguments passed to the command                     |
+| `env`         | `Record<string, string>` | No       | `{}`      | Environment variables                               |
+| `transport`   | `"stdio"`                | No       | `"stdio"` | Transport type (always stdio)                       |
+| `cwd`         | `string`                 | No       | —         | Working directory for execution                     |
+| `timeout`     | `number`                 | No       | —         | Max response time in milliseconds                   |
+| `description` | `string`                 | No       | —         | Human-readable description                          |
 
 ### RemoteServerConfig
 
 For servers accessible via HTTP, Streamable HTTP, or SSE.
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `url` | `string` (URL) | Yes | — | The server URL |
-| `transport` | `"http" \| "streamable-http" \| "sse"` | No | Inferred | Transport type (auto-inferred from URL if absent) |
-| `headers` | `Record<string, string>` | No | `{}` | HTTP headers |
-| `timeout` | `number` | No | — | Max response time in milliseconds |
-| `description` | `string` | No | — | Human-readable description |
+| Field         | Type                                   | Required | Default  | Description                                       |
+| ------------- | -------------------------------------- | -------- | -------- | ------------------------------------------------- |
+| `url`         | `string` (URL)                         | Yes      | —        | The server URL                                    |
+| `transport`   | `"http" \| "streamable-http" \| "sse"` | No       | Inferred | Transport type (auto-inferred from URL if absent) |
+| `headers`     | `Record<string, string>`               | No       | `{}`     | HTTP headers                                      |
+| `timeout`     | `number`                               | No       | —        | Max response time in milliseconds                 |
+| `description` | `string`                               | No       | —        | Human-readable description                        |
 
 **Transport inference**: URLs containing `/sse` in the path are inferred as SSE; all others default to HTTP. This matches FastMCP's logic.
 
@@ -248,22 +249,22 @@ For servers accessible via HTTP, Streamable HTTP, or SSE.
 
 Extends the canonical server config with discovery and display metadata.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | `string` | Yes | Unique ID, lowercase alphanumeric with hyphens (e.g., `"github"`) |
-| `name` | `string` | Yes | Display name (e.g., `"GitHub"`) |
-| `description` | `string` | Yes | What the server does |
-| `config` | `StdioServerConfig \| RemoteServerConfig` | Yes | The canonical server configuration |
-| `package` | `string` | No | npm/pypi package name |
-| `runtime` | `"node" \| "python" \| "docker" \| "binary"` | No | Execution runtime |
-| `repository` | `string` (URL) | No | Source code URL |
-| `homepage` | `string` (URL) | No | Homepage URL |
-| `author` | `string` | No | Author or organization |
-| `categories` | `string[]` | No | Discovery categories |
-| `requiredEnvVars` | `string[]` | No | Env vars the user must provide |
-| `windows` | `PlatformOverride` | No | Windows-specific command overrides |
-| `linux` | `PlatformOverride` | No | Linux-specific command overrides |
-| `macos` | `PlatformOverride` | No | macOS-specific command overrides |
+| Field             | Type                                         | Required | Description                                                       |
+| ----------------- | -------------------------------------------- | -------- | ----------------------------------------------------------------- |
+| `id`              | `string`                                     | Yes      | Unique ID, lowercase alphanumeric with hyphens (e.g., `"github"`) |
+| `name`            | `string`                                     | Yes      | Display name (e.g., `"GitHub"`)                                   |
+| `description`     | `string`                                     | Yes      | What the server does                                              |
+| `config`          | `StdioServerConfig \| RemoteServerConfig`    | Yes      | The canonical server configuration                                |
+| `package`         | `string`                                     | No       | npm/pypi package name                                             |
+| `runtime`         | `"node" \| "python" \| "docker" \| "binary"` | No       | Execution runtime                                                 |
+| `repository`      | `string` (URL)                               | No       | Source code URL                                                   |
+| `homepage`        | `string` (URL)                               | No       | Homepage URL                                                      |
+| `author`          | `string`                                     | No       | Author or organization                                            |
+| `categories`      | `string[]`                                   | No       | Discovery categories                                              |
+| `requiredEnvVars` | `string[]`                                   | No       | Env vars the user must provide                                    |
+| `windows`         | `PlatformOverride`                           | No       | Windows-specific command overrides                                |
+| `linux`           | `PlatformOverride`                           | No       | Linux-specific command overrides                                  |
+| `macos`           | `PlatformOverride`                           | No       | macOS-specific command overrides                                  |
 
 ### Supported App IDs
 
@@ -316,12 +317,14 @@ interface AppMetadata {
 ### Generator Transformation Rules
 
 #### Claude Desktop — `ClaudeDesktopGenerator`
+
 - **Passthrough**: canonical format IS the native format
 - Root key: `mcpServers`
 - Config path: `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS), `%AppData%\Claude\claude_desktop_config.json` (Windows)
 - Omits empty `args` and `env`
 
 #### Claude Code — `ClaudeCodeGenerator`
+
 - **Near-passthrough**: same as canonical with `type` field for remote
 - Root key: `mcpServers`
 - Config path: `.mcp.json` (project scope)
@@ -329,6 +332,7 @@ interface AppMetadata {
 - Supports `${VAR}` and `${VAR:-default}` env variable syntax
 
 #### VS Code / Copilot — `VSCodeGenerator`
+
 - Root key: **`servers`** (not `mcpServers`)
 - Config path: `.vscode/mcp.json`
 - **Adds explicit `type` field** on every server (`"stdio"`, `"http"`, `"sse"`)
@@ -336,17 +340,20 @@ interface AppMetadata {
 - Supports `inputs` array for sensitive data (not generated, but preserved)
 
 #### Cursor — `CursorGenerator`
+
 - **Passthrough**: same as Claude Desktop
 - Root key: `mcpServers`
 - Config path: `.cursor/mcp.json`
 
 #### Cline — `ClineGenerator`
+
 - Root key: `mcpServers`
 - **Adds** `alwaysAllow: []` and `disabled: false` to every server
 - Remote servers use `url` + `headers` (no `command`/`args`)
 - Config path: `cline_mcp_settings.json` (in VS Code globalStorage)
 
 #### Roo Code — `RooCodeGenerator`
+
 - Root key: `mcpServers`
 - **Adds** `alwaysAllow: []` and `disabled: false`
 - Remote servers: adds `type: "streamable-http"` or `type: "sse"`
@@ -354,6 +361,7 @@ interface AppMetadata {
 - Config path: `mcp_settings.json` (in VS Code globalStorage)
 
 #### Goose — `GooseGenerator`
+
 - Root key: **`extensions`** (not `mcpServers`)
 - Format: **YAML** (not JSON)
 - **Renames**: `command` -> `cmd`, `env` -> `envs`
@@ -363,6 +371,7 @@ interface AppMetadata {
 - Config path: `~/.config/goose/config.yaml`
 
 #### Windsurf — `WindsurfGenerator`
+
 - Root key: `mcpServers`
 - Stdio: passthrough (same as canonical)
 - Remote: **uses `serverUrl`** instead of `url`
@@ -370,6 +379,7 @@ interface AppMetadata {
 - Config path: `~/.codeium/windsurf/mcp_config.json`
 
 #### OpenCode — `OpenCodeGenerator`
+
 - Root key: **`mcp`** (not `mcpServers`)
 - **Merges** `command` + `args` into a single `command` array
 - **Renames**: `env` -> `environment`
@@ -379,12 +389,14 @@ interface AppMetadata {
 - Config path: `opencode.json`
 
 #### Zed — `ZedGenerator`
+
 - Root key: **`context_servers`** (not `mcpServers`)
 - Otherwise standard `command`/`args`/`env` structure
 - Remote: `url` + `headers`
 - Config path: `~/.config/zed/settings.json`
 
 #### PyCharm — `PyCharmGenerator`
+
 - **Passthrough**: same as Claude Desktop / Cursor
 - Root key: `mcpServers`
 - Config path: `.ai/mcp/mcp.json` (project-level, cross-platform)
@@ -397,19 +409,19 @@ interface AppMetadata {
 
 ### Transformation Summary Table
 
-| App | Root Key | `command` | `args` | `env` | Remote URL | Extra Fields | Format |
-|-----|----------|-----------|--------|-------|------------|--------------|--------|
-| Claude Desktop | `mcpServers` | `command` | `args` | `env` | `url` | — | JSON |
-| Claude Code | `mcpServers` | `command` | `args` | `env` | `url` + `type` | — | JSON |
-| VS Code | `servers` | `command` | `args` | `env` | `url` + `type` | `type` on all | JSON |
-| Cursor | `mcpServers` | `command` | `args` | `env` | `url` | — | JSON |
-| Cline | `mcpServers` | `command` | `args` | `env` | `url` | `alwaysAllow`, `disabled` | JSON |
-| Roo Code | `mcpServers` | `command` | `args` | `env` | `url` + `type` | `alwaysAllow`, `disabled` | JSON |
-| Goose | `extensions` | `cmd` | `args` | `envs` | `uri` | `name`, `enabled`, `type`, `timeout` (sec) | YAML |
-| Windsurf | `mcpServers` | `command` | `args` | `env` | `serverUrl` | — | JSON |
-| OpenCode | `mcp` | `command` (array) | (merged) | `environment` | `url` + `type` | `type`, `enabled` | JSONC |
-| Zed | `context_servers` | `command` | `args` | `env` | `url` | — | JSON |
-| PyCharm | `mcpServers` | `command` | `args` | `env` | `url` | — | JSON |
+| App            | Root Key          | `command`         | `args`   | `env`         | Remote URL     | Extra Fields                               | Format |
+| -------------- | ----------------- | ----------------- | -------- | ------------- | -------------- | ------------------------------------------ | ------ |
+| Claude Desktop | `mcpServers`      | `command`         | `args`   | `env`         | `url`          | —                                          | JSON   |
+| Claude Code    | `mcpServers`      | `command`         | `args`   | `env`         | `url` + `type` | —                                          | JSON   |
+| VS Code        | `servers`         | `command`         | `args`   | `env`         | `url` + `type` | `type` on all                              | JSON   |
+| Cursor         | `mcpServers`      | `command`         | `args`   | `env`         | `url`          | —                                          | JSON   |
+| Cline          | `mcpServers`      | `command`         | `args`   | `env`         | `url`          | `alwaysAllow`, `disabled`                  | JSON   |
+| Roo Code       | `mcpServers`      | `command`         | `args`   | `env`         | `url` + `type` | `alwaysAllow`, `disabled`                  | JSON   |
+| Goose          | `extensions`      | `cmd`             | `args`   | `envs`        | `uri`          | `name`, `enabled`, `type`, `timeout` (sec) | YAML   |
+| Windsurf       | `mcpServers`      | `command`         | `args`   | `env`         | `serverUrl`    | —                                          | JSON   |
+| OpenCode       | `mcp`             | `command` (array) | (merged) | `environment` | `url` + `type` | `type`, `enabled`                          | JSONC  |
+| Zed            | `context_servers` | `command`         | `args`   | `env`         | `url`          | —                                          | JSON   |
+| PyCharm        | `mcpServers`      | `command`         | `args`   | `env`         | `url`          | —                                          | JSON   |
 
 ---
 
@@ -417,20 +429,20 @@ interface AppMetadata {
 
 ### Built-in Servers (12)
 
-| # | ID | Name | Transport | Runtime | Required Env Vars | Categories |
-|---|-----|------|-----------|---------|-------------------|------------|
-| 1 | `brave-search` | Brave Search | stdio | node | `BRAVE_API_KEY` | search, web |
-| 2 | `context7` | Context7 | remote (HTTP) | node | — | documentation, search, developer-tools |
-| 3 | `fetch` | Fetch | stdio | python | — | web, utilities |
-| 4 | `filesystem` | Filesystem | stdio | node | — | filesystem, utilities |
-| 5 | `github` | GitHub | stdio | node | `GITHUB_PERSONAL_ACCESS_TOKEN` | developer-tools, git, version-control |
-| 6 | `google-maps` | Google Maps | stdio | node | `GOOGLE_MAPS_API_KEY` | maps, location, utilities |
-| 7 | `memory` | Memory | stdio | node | — | memory, knowledge-graph |
-| 8 | `postgres` | PostgreSQL | stdio | node | `POSTGRES_CONNECTION_STRING` | database, sql |
-| 9 | `puppeteer` | Puppeteer | stdio | node | — | browser, automation, web-scraping |
-| 10 | `sequential-thinking` | Sequential Thinking | stdio | node | — | reasoning, utilities |
-| 11 | `sentry` | Sentry | remote (SSE) | node | — | monitoring, error-tracking, developer-tools |
-| 12 | `slack` | Slack | stdio | node | `SLACK_BOT_TOKEN`, `SLACK_TEAM_ID` | communication, messaging |
+| #   | ID                    | Name                | Transport     | Runtime | Required Env Vars                  | Categories                                  |
+| --- | --------------------- | ------------------- | ------------- | ------- | ---------------------------------- | ------------------------------------------- |
+| 1   | `brave-search`        | Brave Search        | stdio         | node    | `BRAVE_API_KEY`                    | search, web                                 |
+| 2   | `context7`            | Context7            | remote (HTTP) | node    | —                                  | documentation, search, developer-tools      |
+| 3   | `fetch`               | Fetch               | stdio         | python  | —                                  | web, utilities                              |
+| 4   | `filesystem`          | Filesystem          | stdio         | node    | —                                  | filesystem, utilities                       |
+| 5   | `github`              | GitHub              | stdio         | node    | `GITHUB_PERSONAL_ACCESS_TOKEN`     | developer-tools, git, version-control       |
+| 6   | `google-maps`         | Google Maps         | stdio         | node    | `GOOGLE_MAPS_API_KEY`              | maps, location, utilities                   |
+| 7   | `memory`              | Memory              | stdio         | node    | —                                  | memory, knowledge-graph                     |
+| 8   | `postgres`            | PostgreSQL          | stdio         | node    | `POSTGRES_CONNECTION_STRING`       | database, sql                               |
+| 9   | `puppeteer`           | Puppeteer           | stdio         | node    | —                                  | browser, automation, web-scraping           |
+| 10  | `sequential-thinking` | Sequential Thinking | stdio         | node    | —                                  | reasoning, utilities                        |
+| 11  | `sentry`              | Sentry              | remote (SSE)  | node    | —                                  | monitoring, error-tracking, developer-tools |
+| 12  | `slack`               | Slack               | stdio         | node    | `SLACK_BOT_TOKEN`, `SLACK_TEAM_ID` | communication, messaging                    |
 
 ### Registry API
 
@@ -512,12 +524,12 @@ Interactive installation workflow:
 
 #### `getmcp list [options]`
 
-| Option | Description |
-|--------|-------------|
-| (none) | List all servers in registry |
-| `--installed` | List servers configured in detected apps |
-| `--search=<query>` | Search the registry |
-| `--category=<cat>` | Filter by category |
+| Option             | Description                              |
+| ------------------ | ---------------------------------------- |
+| (none)             | List all servers in registry             |
+| `--installed`      | List servers configured in detected apps |
+| `--search=<query>` | Search the registry                      |
+| `--category=<cat>` | Filter by category                       |
 
 #### `getmcp find [query]`
 
@@ -541,12 +553,12 @@ Compares the lock file against the current registry and app configs to detect dr
 
 Re-generates and merges configs for all tracked installations using the current registry definitions.
 
-| Option | Description |
-|--------|-------------|
-| `--yes`, `-y` | Skip confirmation prompts |
-| `--app <id>` | Only update configs for a specific app (repeatable) |
-| `--all-apps` | Update across all detected apps |
-| `--dry-run` | Preview generated configs without writing files |
+| Option        | Description                                         |
+| ------------- | --------------------------------------------------- |
+| `--yes`, `-y` | Skip confirmation prompts                           |
+| `--app <id>`  | Only update configs for a specific app (repeatable) |
+| `--all-apps`  | Update across all detected apps                     |
+| `--dry-run`   | Preview generated configs without writing files     |
 
 #### `getmcp init`
 
@@ -572,6 +584,7 @@ The CLI detects installed apps by resolving platform-specific config paths:
 ```
 
 An app is considered "detected" if either:
+
 - Its config file exists, OR
 - Its config file's parent directory exists (the app is installed but hasn't been configured yet)
 
@@ -610,10 +623,10 @@ interface LockFile {
 }
 
 interface LockInstallation {
-  apps: AppIdType[];       // App IDs this server is installed in
-  installedAt: string;     // ISO timestamp of initial installation
-  updatedAt: string;       // ISO timestamp of last update
-  envVars: string[];       // Env var names that were set (values NOT stored for security)
+  apps: AppIdType[]; // App IDs this server is installed in
+  installedAt: string; // ISO timestamp of initial installation
+  updatedAt: string; // ISO timestamp of last update
+  envVars: string[]; // Env var names that were set (values NOT stored for security)
 }
 ```
 
@@ -630,12 +643,12 @@ getTrackedServers(filePath?: string): LockFile                     // Get all tr
 
 #### Usage by Commands
 
-| Command | Lock File Interaction |
-|---------|----------------------|
-| `add` | Calls `trackInstallation()` after successfully writing configs |
-| `remove` | Calls `trackRemoval()` after successfully removing configs |
-| `check` | Reads lock file and compares against registry and app configs |
-| `update` | Reads lock file, re-generates configs for all tracked servers |
+| Command  | Lock File Interaction                                          |
+| -------- | -------------------------------------------------------------- |
+| `add`    | Calls `trackInstallation()` after successfully writing configs |
+| `remove` | Calls `trackRemoval()` after successfully removing configs     |
+| `check`  | Reads lock file and compares against registry and app configs  |
+| `update` | Reads lock file, re-generates configs for all tracked servers  |
 
 ---
 
@@ -900,6 +913,7 @@ Detailed documentation of every app's MCP config format, gathered from official 
 - **Docs**: https://developers.openai.com/codex/mcp/
 - **Config file**: `~/.codex/config.toml` (global), `.codex/config.toml` (project-scoped, trusted projects only)
 - **Format** (**TOML**, not JSON):
+
   ```toml
   [mcp_servers.server-name]
   command = "npx"
@@ -908,7 +922,9 @@ Detailed documentation of every app's MCP config format, gathered from official 
   [mcp_servers.server-name.env]
   API_KEY = "value"
   ```
+
 - **Format** (remote / Streamable HTTP):
+
   ```toml
   [mcp_servers.remote-server]
   url = "https://mcp.example.com/mcp"
@@ -917,6 +933,7 @@ Detailed documentation of every app's MCP config format, gathered from official 
   [mcp_servers.remote-server.http_headers]
   X-Custom-Header = "value"
   ```
+
 - Root key: `mcp_servers` (TOML table prefix).
 - Supports stdio and Streamable HTTP transports.
 - CLI: `codex mcp add <name> -- <command>`, `codex mcp` for management.
@@ -931,13 +948,13 @@ Detailed documentation of every app's MCP config format, gathered from official 
 
 ## Test Coverage Summary
 
-| Package | Test Files | Tests | Description |
-|---------|-----------|-------|-------------|
-| `@getmcp/core` | 3 | 34 | Schema validation, type guards, transport inference, JSON Schema |
-| `@getmcp/generators` | 1 | 69 | All 12 generators (stdio + remote), multi-server, serialization |
-| `@getmcp/registry` | 1 | 60 | Entry validation, lookup, search, categories, content integrity |
-| `@getmcp/cli` | 7 | 172 | Path resolution, app detection, config read/write/merge/remove, lock file, errors, preferences, utils |
-| **Total** | **12** | **335** | |
+| Package              | Test Files | Tests   | Description                                                                                           |
+| -------------------- | ---------- | ------- | ----------------------------------------------------------------------------------------------------- |
+| `@getmcp/core`       | 3          | 34      | Schema validation, type guards, transport inference, JSON Schema                                      |
+| `@getmcp/generators` | 1          | 69      | All 12 generators (stdio + remote), multi-server, serialization                                       |
+| `@getmcp/registry`   | 1          | 60      | Entry validation, lookup, search, categories, content integrity                                       |
+| `@getmcp/cli`        | 7          | 172     | Path resolution, app detection, config read/write/merge/remove, lock file, errors, preferences, utils |
+| **Total**            | **12**     | **335** |                                                                                                       |
 
 ---
 

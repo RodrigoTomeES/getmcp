@@ -125,9 +125,7 @@ describe("getServerOrThrow", () => {
   });
 
   it("throws for unknown ID with helpful message", () => {
-    expect(() => getServerOrThrow("nonexistent")).toThrow(
-      /not found in registry/,
-    );
+    expect(() => getServerOrThrow("nonexistent")).toThrow(/not found in registry/);
     expect(() => getServerOrThrow("nonexistent")).toThrow(/Available:/);
   });
 });
@@ -262,9 +260,7 @@ describe("getCategories", () => {
 
 describe("server content integrity", () => {
   it("stdio servers have command field", () => {
-    const stdioServers = getAllServers().filter(
-      (s) => "command" in s.config,
-    );
+    const stdioServers = getAllServers().filter((s) => "command" in s.config);
     expect(stdioServers.length).toBeGreaterThan(0);
     for (const server of stdioServers) {
       const config = server.config as { command: string };
@@ -273,9 +269,7 @@ describe("server content integrity", () => {
   });
 
   it("remote servers have url field", () => {
-    const remoteServers = getAllServers().filter(
-      (s) => "url" in s.config,
-    );
+    const remoteServers = getAllServers().filter((s) => "url" in s.config);
     expect(remoteServers.length).toBeGreaterThan(0);
     for (const server of remoteServers) {
       const config = server.config as { url: string };
@@ -285,11 +279,7 @@ describe("server content integrity", () => {
 
   it("servers with requiredEnvVars have those vars in config.env", () => {
     for (const server of getAllServers()) {
-      if (
-        server.requiredEnvVars.length > 0 &&
-        "env" in server.config &&
-        server.config.env
-      ) {
+      if (server.requiredEnvVars.length > 0 && "env" in server.config && server.config.env) {
         for (const envVar of server.requiredEnvVars) {
           expect(
             envVar in server.config.env,

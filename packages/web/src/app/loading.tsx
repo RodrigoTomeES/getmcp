@@ -13,10 +13,7 @@ export default function Loading() {
       {/* Category pills skeleton */}
       <div className="flex gap-2 mb-6">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-7 w-16 rounded-full bg-[var(--color-surface)] animate-pulse"
-          />
+          <div key={i} className="h-7 w-16 rounded-full bg-[var(--color-surface)] animate-pulse" />
         ))}
       </div>
 

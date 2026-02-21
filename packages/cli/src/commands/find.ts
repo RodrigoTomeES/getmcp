@@ -8,10 +8,7 @@
  */
 
 import * as p from "@clack/prompts";
-import {
-  getAllServers,
-  searchServers,
-} from "@getmcp/registry";
+import { getAllServers, searchServers } from "@getmcp/registry";
 import type { RegistryEntryType } from "@getmcp/core";
 import { addCommand } from "./add.js";
 
@@ -64,9 +61,7 @@ export async function findCommand(initialQuery?: string): Promise<void> {
       process.exit(0);
     }
 
-    filteredServers = query.trim()
-      ? searchServers(query)
-      : servers;
+    filteredServers = query.trim() ? searchServers(query) : servers;
 
     if (filteredServers.length === 0) {
       p.log.warn(`No servers matching "${query}".`);
@@ -82,9 +77,8 @@ export async function findCommand(initialQuery?: string): Promise<void> {
       const transport = "command" in s.config ? "stdio" : "remote";
       const envCount = s.requiredEnvVars.length;
       const envNote = envCount > 0 ? ` | ${envCount} env var${envCount > 1 ? "s" : ""}` : "";
-      const categories = s.categories && s.categories.length > 0
-        ? ` | ${s.categories.join(", ")}`
-        : "";
+      const categories =
+        s.categories && s.categories.length > 0 ? ` | ${s.categories.join(", ")}` : "";
 
       return {
         label: s.name,

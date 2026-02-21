@@ -10,7 +10,7 @@ import { getServer } from "@getmcp/registry";
 import { getGenerator } from "@getmcp/generators";
 import type { LooseServerConfigType, AppIdType } from "@getmcp/core";
 import { getTrackedServers, trackInstallation } from "../lock.js";
-import { detectApps, type DetectedApp } from "../detect.js";
+import { detectApps } from "../detect.js";
 import { mergeServerIntoConfig, writeConfigFile } from "../config-file.js";
 import { shortenPath } from "../utils.js";
 import { formatError } from "../errors.js";
@@ -80,9 +80,7 @@ export async function updateCommand(options: UpdateOptions = {}): Promise<void> 
     let targetAppIds: AppIdType[];
 
     if (options.apps && options.apps.length > 0) {
-      targetAppIds = installation.apps.filter((id) =>
-        options.apps!.includes(id),
-      );
+      targetAppIds = installation.apps.filter((id) => options.apps!.includes(id));
     } else {
       targetAppIds = installation.apps;
     }
@@ -126,7 +124,5 @@ export async function updateCommand(options: UpdateOptions = {}): Promise<void> 
 
   spin.stop("Update complete.");
 
-  p.outro(
-    `Updated: ${updated}, Skipped: ${skipped}, Failed: ${failed}`,
-  );
+  p.outro(`Updated: ${updated}, Skipped: ${skipped}, Failed: ${failed}`);
 }

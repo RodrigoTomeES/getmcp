@@ -59,7 +59,11 @@ export async function initCommand(): Promise<void> {
     options: [
       { label: "stdio", hint: "Local process (npx, uvx, docker, etc.)", value: "stdio" as const },
       { label: "http", hint: "Remote HTTP server", value: "http" as const },
-      { label: "streamable-http", hint: "Remote streamable HTTP", value: "streamable-http" as const },
+      {
+        label: "streamable-http",
+        hint: "Remote streamable HTTP",
+        value: "streamable-http" as const,
+      },
       { label: "sse", hint: "Server-Sent Events", value: "sse" as const },
     ],
   });
@@ -96,9 +100,7 @@ export async function initCommand(): Promise<void> {
       process.exit(0);
     }
 
-    const args = argsRaw.trim()
-      ? argsRaw.trim().split(/\s+/)
-      : [];
+    const args = argsRaw.trim() ? argsRaw.trim().split(/\s+/) : [];
 
     const envRaw = await p.text({
       message: "Required env vars (comma-separated, or empty):",
@@ -111,16 +113,19 @@ export async function initCommand(): Promise<void> {
     }
 
     envVarNames = envRaw.trim()
-      ? envRaw.trim().split(/\s*,\s*/).filter(Boolean)
+      ? envRaw
+          .trim()
+          .split(/\s*,\s*/)
+          .filter(Boolean)
       : [];
 
-    const envObj = envVarNames.length > 0
-      ? `\n      env: {\n${envVarNames.map((v) => `        ${v}: "",`).join("\n")}\n      },`
-      : "";
+    const envObj =
+      envVarNames.length > 0
+        ? `\n      env: {\n${envVarNames.map((v) => `        ${v}: "",`).join("\n")}\n      },`
+        : "";
 
-    const argsStr = args.length > 0
-      ? `\n      args: [${args.map((a) => `"${a}"`).join(", ")}],`
-      : "";
+    const argsStr =
+      args.length > 0 ? `\n      args: [${args.map((a) => `"${a}"`).join(", ")}],` : "";
 
     configBlock = `    config: {
       command: "${command}",${argsStr}${envObj}
@@ -220,19 +225,17 @@ export async function initCommand(): Promise<void> {
 
   // Generate the TypeScript file
   const categoriesArr = categories as string[];
-  const categoriesStr = categoriesArr.length > 0
-    ? `\n    categories: [${categoriesArr.map((c) => `"${c}"`).join(", ")}],`
-    : "";
+  const categoriesStr =
+    categoriesArr.length > 0
+      ? `\n    categories: [${categoriesArr.map((c) => `"${c}"`).join(", ")}],`
+      : "";
   const runtimeStr = runtime ? `\n    runtime: "${runtime}",` : "";
-  const repoStr = repository.trim()
-    ? `\n    repository: "${repository.trim()}",`
-    : "";
-  const authorStr = author.trim()
-    ? `\n    author: "${author.trim()}",`
-    : "";
-  const envVarsStr = envVarNames.length > 0
-    ? `\n    requiredEnvVars: [${envVarNames.map((v) => `"${v}"`).join(", ")}],`
-    : "";
+  const repoStr = repository.trim() ? `\n    repository: "${repository.trim()}",` : "";
+  const authorStr = author.trim() ? `\n    author: "${author.trim()}",` : "";
+  const envVarsStr =
+    envVarNames.length > 0
+      ? `\n    requiredEnvVars: [${envVarNames.map((v) => `"${v}"`).join(", ")}],`
+      : "";
 
   const fileContent = `import type { RegistryEntryType } from "@getmcp/core";
 
@@ -286,9 +289,9 @@ export default server;
   p.log.success(`Created: ${outputPath}`);
   p.log.info(
     "Next steps:\n" +
-    `  1. Import and register in packages/registry/src/index.ts\n` +
-    `  2. Add a test in packages/registry/tests/registry.test.ts\n` +
-    `  3. Run: npx vitest packages/registry`,
+      `  1. Import and register in packages/registry/src/index.ts\n` +
+      `  2. Add a test in packages/registry/tests/registry.test.ts\n` +
+      `  3. Run: npx vitest packages/registry`,
   );
 
   p.outro("Server entry scaffolded successfully.");

@@ -2,6 +2,31 @@
   "name": "@getmcp/core",
   "version": "0.1.5",
   "description": "Core types, schemas, and validation for getmcp canonical configuration format",
+  "keywords": [
+    "ai",
+    "config",
+    "mcp",
+    "model-context-protocol",
+    "schema",
+    "validation",
+    "zod"
+  ],
+  "homepage": "https://github.com/RodrigoTomeES/getmcp/tree/main/packages/core#readme",
+  "bugs": {
+    "url": "https://github.com/RodrigoTomeES/getmcp/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RodrigoTomeES/getmcp.git",
+    "directory": "packages/core"
+  },
+  "files": [
+    "dist",
+    "registry-entry.schema.json",
+    "README.md",
+    "LICENSE"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,42 +37,14 @@
     },
     "./registry-entry.schema.json": "./registry-entry.schema.json"
   },
-  "files": [
-    "dist",
-    "registry-entry.schema.json",
-    "README.md",
-    "LICENSE"
-  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "generate-schema": "npx tsx scripts/generate-schema.ts",
     "build": "npm run generate-schema && tsc",
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"
-  },
-  "keywords": [
-    "mcp",
-    "model-context-protocol",
-    "ai",
-    "config",
-    "schema",
-    "zod",
-    "validation"
-  ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/RodrigoTomeES/getmcp.git",
-    "directory": "packages/core"
-  },
-  "homepage": "https://github.com/RodrigoTomeES/getmcp/tree/main/packages/core#readme",
-  "bugs": {
-    "url": "https://github.com/RodrigoTomeES/getmcp/issues"
-  },
-  "engines": {
-    "node": ">=22.0.0"
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "dependencies": {
     "zod": "^3.24.0",
@@ -55,5 +52,8 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }

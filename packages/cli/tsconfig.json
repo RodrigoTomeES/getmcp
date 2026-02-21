@@ -5,9 +5,5 @@
     "rootDir": "./src"
   },
   "include": ["src/**/*"],
-  "references": [
-    { "path": "../core" },
-    { "path": "../generators" },
-    { "path": "../registry" }
-  ]
+  "references": [{ "path": "../core" }, { "path": "../generators" }, { "path": "../registry" }]
 }

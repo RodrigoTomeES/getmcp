@@ -58,10 +58,7 @@ export class InvalidAppError extends CliError {
   readonly appId: string;
 
   constructor(appId: string, validIds: string[]) {
-    super(
-      `Unknown app: "${appId}"`,
-      `Valid app IDs: ${validIds.join(", ")}`,
-    );
+    super(`Unknown app: "${appId}"`, `Valid app IDs: ${validIds.join(", ")}`);
     this.name = "InvalidAppError";
     this.appId = appId;
   }

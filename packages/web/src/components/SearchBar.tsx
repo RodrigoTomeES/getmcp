@@ -9,30 +9,24 @@ export function SearchBar({
   categories,
 }: {
   servers: RegistryEntryType[];
-  categories: RegistryEntryType['categories'];
+  categories: RegistryEntryType["categories"];
 }) {
   const [query, setQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<RegistryEntryType['categories'][number] | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<
+    RegistryEntryType["categories"][number] | null
+  >(null);
 
   const filtered = useMemo(() => {
     let result = servers;
 
     if (selectedCategory) {
-      result = result.filter((s) =>
-        s.categories?.includes(selectedCategory),
-      );
+      result = result.filter((s) => s.categories?.includes(selectedCategory));
     }
 
     if (query.trim()) {
       const q = query.toLowerCase();
       result = result.filter((s) => {
-        const searchable = [
-          s.id,
-          s.name,
-          s.description,
-          ...(s.categories ?? []),
-          s.author ?? "",
-        ]
+        const searchable = [s.id, s.name, s.description, ...(s.categories ?? []), s.author ?? ""]
           .join(" ")
           .toLowerCase();
         return searchable.includes(q);
@@ -86,9 +80,7 @@ export function SearchBar({
         {categories.map((cat) => (
           <button
             key={cat}
-            onClick={() =>
-              setSelectedCategory(selectedCategory === cat ? null : cat)
-            }
+            onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
             aria-pressed={selectedCategory === cat}
             className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
               selectedCategory === cat
@@ -102,7 +94,11 @@ export function SearchBar({
       </div>
 
       {/* Results count */}
-      <p className="text-sm text-[var(--color-text-secondary)] mb-4" role="status" aria-live="polite">
+      <p
+        className="text-sm text-[var(--color-text-secondary)] mb-4"
+        role="status"
+        aria-live="polite"
+      >
         {filtered.length} server{filtered.length !== 1 ? "s" : ""}
         {query && ` matching "${query}"`}
         {selectedCategory && ` in ${selectedCategory}`}

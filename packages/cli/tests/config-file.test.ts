@@ -194,11 +194,7 @@ describe("removeServerFromConfig", () => {
 
   it("returns null if server not found", () => {
     const f = tmpFile("remove2.json");
-    fs.writeFileSync(
-      f,
-      JSON.stringify({ mcpServers: { slack: { command: "npx" } } }),
-      "utf-8",
-    );
+    fs.writeFileSync(f, JSON.stringify({ mcpServers: { slack: { command: "npx" } } }), "utf-8");
     const result = removeServerFromConfig(f, "nonexistent");
     expect(result).toBeNull();
   });
@@ -216,41 +212,25 @@ describe("removeServerFromConfig", () => {
 describe("listServersInConfig", () => {
   it("lists servers under mcpServers key", () => {
     const f = tmpFile("list.json");
-    fs.writeFileSync(
-      f,
-      JSON.stringify({ mcpServers: { github: {}, slack: {} } }),
-      "utf-8",
-    );
+    fs.writeFileSync(f, JSON.stringify({ mcpServers: { github: {}, slack: {} } }), "utf-8");
     expect(listServersInConfig(f)).toEqual(["github", "slack"]);
   });
 
   it("lists servers under 'servers' key (VS Code)", () => {
     const f = tmpFile("list2.json");
-    fs.writeFileSync(
-      f,
-      JSON.stringify({ servers: { github: {}, test: {} } }),
-      "utf-8",
-    );
+    fs.writeFileSync(f, JSON.stringify({ servers: { github: {}, test: {} } }), "utf-8");
     expect(listServersInConfig(f)).toEqual(["github", "test"]);
   });
 
   it("lists servers under 'context_servers' key (Zed)", () => {
     const f = tmpFile("list3.json");
-    fs.writeFileSync(
-      f,
-      JSON.stringify({ context_servers: { myserver: {} } }),
-      "utf-8",
-    );
+    fs.writeFileSync(f, JSON.stringify({ context_servers: { myserver: {} } }), "utf-8");
     expect(listServersInConfig(f)).toEqual(["myserver"]);
   });
 
   it("lists servers under 'mcp' key (OpenCode)", () => {
     const f = tmpFile("list4.json");
-    fs.writeFileSync(
-      f,
-      JSON.stringify({ mcp: { server1: {}, server2: {} } }),
-      "utf-8",
-    );
+    fs.writeFileSync(f, JSON.stringify({ mcp: { server1: {}, server2: {} } }), "utf-8");
     expect(listServersInConfig(f)).toEqual(["server1", "server2"]);
   });
 
@@ -276,11 +256,7 @@ describe("listServersInConfig", () => {
 
   it("lists servers under 'extensions' key (Goose)", () => {
     const f = tmpFile("list7.yaml");
-    fs.writeFileSync(
-      f,
-      `extensions:\n  github:\n    cmd: npx\n  slack:\n    cmd: npx\n`,
-      "utf-8",
-    );
+    fs.writeFileSync(f, `extensions:\n  github:\n    cmd: npx\n  slack:\n    cmd: npx\n`, "utf-8");
     expect(listServersInConfig(f)).toEqual(["github", "slack"]);
   });
 });
@@ -292,11 +268,7 @@ describe("listServersInConfig", () => {
 describe("readConfigFile (YAML)", () => {
   it("reads and parses a valid YAML file", () => {
     const f = tmpFile("config.yaml");
-    fs.writeFileSync(
-      f,
-      `extensions:\n  github:\n    cmd: npx\n    enabled: true\n`,
-      "utf-8",
-    );
+    fs.writeFileSync(f, `extensions:\n  github:\n    cmd: npx\n    enabled: true\n`, "utf-8");
     const result = readConfigFile(f);
     expect(result).toEqual({
       extensions: { github: { cmd: "npx", enabled: true } },
@@ -305,11 +277,7 @@ describe("readConfigFile (YAML)", () => {
 
   it("reads .yml extension as YAML", () => {
     const f = tmpFile("config.yml");
-    fs.writeFileSync(
-      f,
-      `extensions:\n  myserver:\n    cmd: node\n`,
-      "utf-8",
-    );
+    fs.writeFileSync(f, `extensions:\n  myserver:\n    cmd: node\n`, "utf-8");
     const result = readConfigFile(f);
     expect(result).toEqual({
       extensions: { myserver: { cmd: "node" } },
@@ -383,7 +351,9 @@ describe("writeConfigFile (YAML)", () => {
 
   it("produces content that can be read back", () => {
     const f = tmpFile("roundtrip.yaml");
-    const original = { extensions: { github: { cmd: "npx", args: ["-y", "server"], enabled: true } } };
+    const original = {
+      extensions: { github: { cmd: "npx", args: ["-y", "server"], enabled: true } },
+    };
     writeConfigFile(f, original);
     const result = readConfigFile(f);
     expect(result).toEqual(original);
@@ -393,11 +363,7 @@ describe("writeConfigFile (YAML)", () => {
 describe("mergeServerIntoConfig (YAML)", () => {
   it("merges into an existing Goose YAML config", () => {
     const f = tmpFile("merge.yaml");
-    fs.writeFileSync(
-      f,
-      `extensions:\n  existing:\n    cmd: node\n    enabled: true\n`,
-      "utf-8",
-    );
+    fs.writeFileSync(f, `extensions:\n  existing:\n    cmd: node\n    enabled: true\n`, "utf-8");
     const result = mergeServerIntoConfig(f, {
       extensions: { github: { cmd: "npx", enabled: true } },
     });
@@ -419,11 +385,7 @@ describe("mergeServerIntoConfig (YAML)", () => {
 describe("removeServerFromConfig (YAML)", () => {
   it("removes a server from a Goose YAML config", () => {
     const f = tmpFile("remove.yaml");
-    fs.writeFileSync(
-      f,
-      `extensions:\n  github:\n    cmd: npx\n  slack:\n    cmd: npx\n`,
-      "utf-8",
-    );
+    fs.writeFileSync(f, `extensions:\n  github:\n    cmd: npx\n  slack:\n    cmd: npx\n`, "utf-8");
     const result = removeServerFromConfig(f, "github");
     expect(result).not.toBeNull();
     expect((result!.extensions as Record<string, unknown>).github).toBeUndefined();
@@ -432,11 +394,7 @@ describe("removeServerFromConfig (YAML)", () => {
 
   it("returns null if server not found in YAML", () => {
     const f = tmpFile("remove2.yaml");
-    fs.writeFileSync(
-      f,
-      `extensions:\n  slack:\n    cmd: npx\n`,
-      "utf-8",
-    );
+    fs.writeFileSync(f, `extensions:\n  slack:\n    cmd: npx\n`, "utf-8");
     expect(removeServerFromConfig(f, "nonexistent")).toBeNull();
   });
 });
@@ -530,11 +488,7 @@ describe("writeConfigFile (TOML)", () => {
 describe("mergeServerIntoConfig (TOML)", () => {
   it("merges into an existing Codex TOML config", () => {
     const f = tmpFile("merge.toml");
-    fs.writeFileSync(
-      f,
-      `[mcp_servers.existing]\ncommand = "node"\n`,
-      "utf-8",
-    );
+    fs.writeFileSync(f, `[mcp_servers.existing]\ncommand = "node"\n`, "utf-8");
     const result = mergeServerIntoConfig(f, {
       mcp_servers: { github: { command: "npx" } },
     });
@@ -569,11 +523,7 @@ describe("removeServerFromConfig (TOML)", () => {
 
   it("returns null if server not found in TOML", () => {
     const f = tmpFile("remove2.toml");
-    fs.writeFileSync(
-      f,
-      `[mcp_servers.slack]\ncommand = "npx"\n`,
-      "utf-8",
-    );
+    fs.writeFileSync(f, `[mcp_servers.slack]\ncommand = "npx"\n`, "utf-8");
     expect(removeServerFromConfig(f, "nonexistent")).toBeNull();
   });
 });
@@ -660,7 +610,13 @@ describe("round-trip YAML", () => {
     const f = tmpFile("roundtrip.yaml");
     const config = {
       extensions: {
-        github: { name: "github", cmd: "npx", args: ["-y", "server"], enabled: true, type: "stdio" },
+        github: {
+          name: "github",
+          cmd: "npx",
+          args: ["-y", "server"],
+          enabled: true,
+          type: "stdio",
+        },
         remote: { name: "remote", uri: "https://mcp.example.com", enabled: true, type: "sse" },
       },
     };

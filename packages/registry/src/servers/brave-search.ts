@@ -3,8 +3,7 @@ import type { RegistryEntryType } from "@getmcp/core";
 export const braveSearch: RegistryEntryType = {
   id: "brave-search",
   name: "Brave Search",
-  description:
-    "Web and local search capabilities using the Brave Search API",
+  description: "Web and local search capabilities using the Brave Search API",
   config: {
     command: "npx",
     args: ["-y", "@modelcontextprotocol/server-brave-search"],

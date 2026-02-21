@@ -67,40 +67,27 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
           <h1 className="text-3xl font-bold">{server.name}</h1>
           <span
             className={`text-xs px-2 py-0.5 rounded-full font-medium mt-2 ${
-              isRemote
-                ? "bg-purple-500/10 text-purple-400"
-                : "bg-green-500/10 text-green-400"
+              isRemote ? "bg-purple-500/10 text-purple-400" : "bg-green-500/10 text-green-400"
             }`}
           >
             {transport}
           </span>
         </div>
-        <p className="text-lg text-[var(--color-text-secondary)]">
-          {server.description}
-        </p>
+        <p className="text-lg text-[var(--color-text-secondary)]">{server.description}</p>
       </div>
 
       {/* Metadata grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-        {server.author && (
-          <MetaItem label="Author" value={server.author} />
-        )}
-        {server.runtime && (
-          <MetaItem label="Runtime" value={server.runtime} />
-        )}
-        {server.package && (
-          <MetaItem label="Package" value={server.package} mono />
-        )}
+        {server.author && <MetaItem label="Author" value={server.author} />}
+        {server.runtime && <MetaItem label="Runtime" value={server.runtime} />}
+        {server.package && <MetaItem label="Package" value={server.package} mono />}
         {isRemote && "url" in server.config && (
           <MetaItem label="URL" value={server.config.url} mono />
         )}
         {!isRemote && "command" in server.config && (
           <MetaItem
             label="Command"
-            value={[
-              server.config.command,
-              ...(server.config.args ?? []),
-            ].join(" ")}
+            value={[server.config.command, ...(server.config.args ?? [])].join(" ")}
             mono
           />
         )}
@@ -176,20 +163,10 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
   );
 }
 
-function MetaItem({
-  label,
-  value,
-  mono,
-}: {
-  label: string;
-  value: string;
-  mono?: boolean;
-}) {
+function MetaItem({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-3">
-      <p className="text-xs text-[var(--color-text-secondary)] mb-1">
-        {label}
-      </p>
+      <p className="text-xs text-[var(--color-text-secondary)] mb-1">{label}</p>
       <p className={`text-sm ${mono ? "font-mono" : ""}`}>{value}</p>
     </div>
   );

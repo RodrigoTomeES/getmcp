@@ -98,18 +98,13 @@ export interface ConfigGenerator {
    * Generate the app-specific config object for a single server.
    * Returns the full config structure including the root key.
    */
-  generate(
-    serverName: string,
-    config: LooseServerConfig,
-  ): Record<string, unknown>;
+  generate(serverName: string, config: LooseServerConfig): Record<string, unknown>;
 
   /**
    * Generate the app-specific config for multiple servers.
    * Returns the full config structure including the root key.
    */
-  generateAll(
-    servers: Record<string, LooseServerConfig>,
-  ): Record<string, unknown>;
+  generateAll(servers: Record<string, LooseServerConfig>): Record<string, unknown>;
 
   /**
    * Serialize the config object to a string (JSON, YAML, etc.)

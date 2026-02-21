@@ -39,8 +39,8 @@ export async function checkCommand(): Promise<void> {
     if (!registryEntry) {
       p.log.warn(
         `${serverId}: no longer in registry\n` +
-        `  Installed in: ${installation.apps.join(", ")}\n` +
-        `  Installed at: ${installation.installedAt}`,
+          `  Installed in: ${installation.apps.join(", ")}\n` +
+          `  Installed at: ${installation.installedAt}`,
       );
       issues++;
       continue;
@@ -72,14 +72,13 @@ export async function checkCommand(): Promise<void> {
     if (missingFrom.length > 0) {
       p.log.warn(
         `${registryEntry.name} (${serverId}):\n` +
-        `  Present in: ${presentIn.length > 0 ? presentIn.join(", ") : "(none)"}\n` +
-        `  Missing from: ${missingFrom.join(", ")}`,
+          `  Present in: ${presentIn.length > 0 ? presentIn.join(", ") : "(none)"}\n` +
+          `  Missing from: ${missingFrom.join(", ")}`,
       );
       issues++;
     } else {
       p.log.success(
-        `${registryEntry.name} (${serverId}): OK\n` +
-        `  Configured in: ${presentIn.join(", ")}`,
+        `${registryEntry.name} (${serverId}): OK\n` + `  Configured in: ${presentIn.join(", ")}`,
       );
     }
   }

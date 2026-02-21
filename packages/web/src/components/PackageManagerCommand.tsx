@@ -10,11 +10,7 @@ import {
 } from "@/lib/package-manager";
 import { useClipboard } from "@/hooks/use-clipboard";
 
-export function PackageManagerCommand({
-  serverId,
-}: {
-  serverId?: string;
-}) {
+export function PackageManagerCommand({ serverId }: { serverId?: string }) {
   const [selectedPm, setSelectedPm] = useState<PackageManager>(DEFAULT_PM);
   const { copied, copy } = useClipboard();
 
@@ -40,8 +36,6 @@ export function PackageManagerCommand({
   };
 
   const command = getCommand(selectedPm, serverId);
-
-
 
   return (
     <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-code-bg)] overflow-hidden mb-8">

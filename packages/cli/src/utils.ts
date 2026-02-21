@@ -42,7 +42,11 @@ export interface CliFlags {
   version: boolean;
 }
 
-export function parseFlags(argv: string[]): { command?: string; serverId?: string; flags: CliFlags } {
+export function parseFlags(argv: string[]): {
+  command?: string;
+  serverId?: string;
+  flags: CliFlags;
+} {
   const flags: CliFlags = {
     yes: false,
     apps: [],

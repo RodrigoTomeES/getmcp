@@ -38,11 +38,11 @@ import {
   getServerCount,
 } from "@getmcp/registry";
 
-getAllServers();              // All 12 server entries, sorted by ID
-getServerIds();              // ["brave-search", "context7", "fetch", ...]
+getAllServers(); // All 12 server entries, sorted by ID
+getServerIds(); // ["brave-search", "context7", "fetch", ...]
 getServersByCategory("web"); // Servers tagged with "web"
-getCategories();             // All unique categories
-getServerCount();            // 12
+getCategories(); // All unique categories
+getServerCount(); // 12
 ```
 
 ### Access individual server definitions
@@ -56,33 +56,33 @@ console.log(github.config);
 
 ## Included Servers
 
-| ID | Name | Transport | Categories |
-|----|------|-----------|------------|
-| `brave-search` | Brave Search | stdio | search, web |
-| `context7` | Context7 | remote | documentation, search, developer-tools |
-| `fetch` | Fetch | stdio | web, utilities |
-| `filesystem` | Filesystem | stdio | filesystem, utilities |
-| `github` | GitHub | stdio | developer-tools, git, version-control |
-| `google-maps` | Google Maps | stdio | maps, location, utilities |
-| `memory` | Memory | stdio | memory, knowledge-graph |
-| `postgres` | PostgreSQL | stdio | database, sql |
-| `puppeteer` | Puppeteer | stdio | browser, automation, web-scraping |
-| `sentry` | Sentry | remote | monitoring, error-tracking, developer-tools |
-| `sequential-thinking` | Sequential Thinking | stdio | reasoning, utilities |
-| `slack` | Slack | stdio | communication, messaging |
+| ID                    | Name                | Transport | Categories                                  |
+| --------------------- | ------------------- | --------- | ------------------------------------------- |
+| `brave-search`        | Brave Search        | stdio     | search, web                                 |
+| `context7`            | Context7            | remote    | documentation, search, developer-tools      |
+| `fetch`               | Fetch               | stdio     | web, utilities                              |
+| `filesystem`          | Filesystem          | stdio     | filesystem, utilities                       |
+| `github`              | GitHub              | stdio     | developer-tools, git, version-control       |
+| `google-maps`         | Google Maps         | stdio     | maps, location, utilities                   |
+| `memory`              | Memory              | stdio     | memory, knowledge-graph                     |
+| `postgres`            | PostgreSQL          | stdio     | database, sql                               |
+| `puppeteer`           | Puppeteer           | stdio     | browser, automation, web-scraping           |
+| `sentry`              | Sentry              | remote    | monitoring, error-tracking, developer-tools |
+| `sequential-thinking` | Sequential Thinking | stdio     | reasoning, utilities                        |
+| `slack`               | Slack               | stdio     | communication, messaging                    |
 
 ## API
 
-| Export | Description |
-|--------|-------------|
-| `getServer(id)` | Get server entry by ID (returns `undefined` if not found) |
-| `getServerOrThrow(id)` | Get server entry by ID (throws if not found) |
-| `getAllServers()` | Get all server entries sorted by ID |
-| `getServerIds()` | Get all server IDs sorted |
-| `searchServers(query)` | Full-text search across id, name, description, categories |
-| `getServersByCategory(cat)` | Filter servers by category |
-| `getCategories()` | Get all unique categories |
-| `getServerCount()` | Total number of registered servers |
+| Export                      | Description                                               |
+| --------------------------- | --------------------------------------------------------- |
+| `getServer(id)`             | Get server entry by ID (returns `undefined` if not found) |
+| `getServerOrThrow(id)`      | Get server entry by ID (throws if not found)              |
+| `getAllServers()`           | Get all server entries sorted by ID                       |
+| `getServerIds()`            | Get all server IDs sorted                                 |
+| `searchServers(query)`      | Full-text search across id, name, description, categories |
+| `getServersByCategory(cat)` | Filter servers by category                                |
+| `getCategories()`           | Get all unique categories                                 |
+| `getServerCount()`          | Total number of registered servers                        |
 
 ## License
 

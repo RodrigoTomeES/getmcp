@@ -59,7 +59,8 @@ export function ConfigViewer({
 
       {/* Config path hint */}
       <p className="text-xs text-[var(--color-text-secondary)] mb-2">
-        Config file: <code className="text-[var(--color-accent)]">
+        Config file:{" "}
+        <code className="text-[var(--color-accent)]">
           {generator.app.configPaths.darwin ??
             generator.app.configPaths.win32 ??
             generator.app.configPaths.linux ??
@@ -118,8 +119,7 @@ export function ConfigViewer({
         <p className="text-xs text-amber-500 mt-3">
           Codex uses TOML configuration. Save as{" "}
           <code className="font-mono">~/.codex/config.toml</code> or{" "}
-          <code className="font-mono">.codex/config.toml</code> for
-          project-scoped config.
+          <code className="font-mono">.codex/config.toml</code> for project-scoped config.
         </p>
       )}
 

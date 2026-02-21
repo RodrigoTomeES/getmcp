@@ -2,14 +2,14 @@
 
 ### Server Details
 
-| Field | Value |
-|-------|-------|
-| **ID** | `server-id` |
-| **Name** | Server Name |
-| **Transport** | stdio / http / streamable-http / sse |
-| **Runtime** | node / python / docker / binary |
-| **Package** | npm or PyPI package name |
-| **Repository** | https://github.com/... |
+| Field          | Value                                |
+| -------------- | ------------------------------------ |
+| **ID**         | `server-id`                          |
+| **Name**       | Server Name                          |
+| **Transport**  | stdio / http / streamable-http / sse |
+| **Runtime**    | node / python / docker / binary      |
+| **Package**    | npm or PyPI package name             |
+| **Repository** | https://github.com/...               |
 
 ### Description
 

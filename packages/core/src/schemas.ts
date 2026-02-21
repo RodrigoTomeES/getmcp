@@ -15,12 +15,7 @@ import { z } from "zod";
 // Transport types
 // ---------------------------------------------------------------------------
 
-export const TransportType = z.enum([
-  "stdio",
-  "http",
-  "streamable-http",
-  "sse",
-]);
+export const TransportType = z.enum(["stdio", "http", "streamable-http", "sse"]);
 
 // ---------------------------------------------------------------------------
 // Canonical server configs (FastMCP-compatible)
@@ -62,9 +57,7 @@ export const RemoteServerConfig = z.object({
   url: z.string().url(),
 
   /** Transport type — inferred from URL if not provided */
-  transport: z
-    .enum(["http", "streamable-http", "sse"])
-    .optional(),
+  transport: z.enum(["http", "streamable-http", "sse"]).optional(),
 
   /** HTTP headers to include with requests */
   headers: z.record(z.string(), z.string()).optional().default({}),
@@ -92,10 +85,7 @@ export const ServerConfig = z.discriminatedUnion("transport", [
  * an explicit transport field. Uses the presence of `command` vs `url` to
  * determine the type.
  */
-export const LooseServerConfig = z.union([
-  StdioServerConfig,
-  RemoteServerConfig,
-]);
+export const LooseServerConfig = z.union([StdioServerConfig, RemoteServerConfig]);
 
 // ---------------------------------------------------------------------------
 // Canonical MCP config (FastMCP-compatible root format)
@@ -151,7 +141,10 @@ export const Runtime = z.enum(["node", "python", "docker", "binary"]);
  */
 export const RegistryEntry = z.object({
   /** Unique identifier (e.g. "github-mcp-server") */
-  id: z.string().min(1).regex(/^[a-z0-9-]+$/, "ID must be lowercase alphanumeric with hyphens"),
+  id: z
+    .string()
+    .min(1)
+    .regex(/^[a-z0-9-]+$/, "ID must be lowercase alphanumeric with hyphens"),
 
   /** Display name (e.g. "GitHub MCP Server") */
   name: z.string().min(1),

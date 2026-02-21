@@ -122,8 +122,8 @@ Improvements to the continuous integration pipeline and build process.
 - [ ] **Add type checking step to CI** — The CI runs `build` and `test` but does not run `tsc --noEmit`. Type-only errors can slip through if the build succeeds. Add a `lint` step.
   - File: `.github/workflows/ci.yml`
 
-- [ ] **Add ESLint and Prettier** — No code quality or formatting tools are configured. Add ESLint with TypeScript rules and Prettier for consistent formatting across all packages.
-  - Root: `package.json`, new `.eslintrc.*` and `.prettierrc`
+- [x] **Add linting and formatting** — Configured oxlint (linting) and oxfmt (formatting) with lefthook pre-commit hook. Replaces the originally planned ESLint + Prettier with faster Rust-based alternatives.
+  - Files: `.oxlintrc.json`, `.oxfmtrc.json`, `lefthook.yml`
 
 - [ ] **Add Windows and macOS CI runners** — Tests only run on `ubuntu-latest`. Platform-specific path logic (`%AppData%`, `%UserProfile%`, `%LocalAppData%`) is never tested on Windows or macOS.
   - File: `.github/workflows/ci.yml` (line 11)

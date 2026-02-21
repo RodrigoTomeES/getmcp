@@ -88,11 +88,7 @@ describe("readPreferences", () => {
 
   it("parses valid preferences", () => {
     const f = tmpFile("valid.json");
-    fs.writeFileSync(
-      f,
-      JSON.stringify({ selectedApps: ["vscode", "cursor"] }),
-      "utf-8",
-    );
+    fs.writeFileSync(f, JSON.stringify({ selectedApps: ["vscode", "cursor"] }), "utf-8");
     expect(readPreferences(f)).toEqual({
       selectedApps: ["vscode", "cursor"],
     });
@@ -100,11 +96,7 @@ describe("readPreferences", () => {
 
   it("preserves unknown keys in the preferences object", () => {
     const f = tmpFile("extra.json");
-    fs.writeFileSync(
-      f,
-      JSON.stringify({ selectedApps: ["vscode"], futureKey: true }),
-      "utf-8",
-    );
+    fs.writeFileSync(f, JSON.stringify({ selectedApps: ["vscode"], futureKey: true }), "utf-8");
     const result = readPreferences(f);
     expect(result.selectedApps).toEqual(["vscode"]);
   });
@@ -175,11 +167,7 @@ describe("getSavedSelectedApps", () => {
   it("returns the saved app IDs", () => {
     const f = tmpFile("prefs.json");
     saveSelectedApps(["vscode", "cursor", "claude-desktop"], f);
-    expect(getSavedSelectedApps(f)).toEqual([
-      "vscode",
-      "cursor",
-      "claude-desktop",
-    ]);
+    expect(getSavedSelectedApps(f)).toEqual(["vscode", "cursor", "claude-desktop"]);
   });
 
   it("returns null for corrupt file (graceful fallback)", () => {
