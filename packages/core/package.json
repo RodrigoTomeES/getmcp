@@ -9,15 +9,18 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./registry-entry.schema.json": "./registry-entry.schema.json"
   },
   "files": [
     "dist",
+    "registry-entry.schema.json",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc",
+    "generate-schema": "npx tsx scripts/generate-schema.ts",
+    "build": "npm run generate-schema && tsc",
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
@@ -47,7 +50,8 @@
     "access": "public"
   },
   "dependencies": {
-    "zod": "^3.24.0"
+    "zod": "^3.24.0",
+    "zod-to-json-schema": "^3.25.1"
   },
   "devDependencies": {
     "@types/node": "^24.0.0"
