@@ -6,6 +6,7 @@ dist/
 out/
 .next/
 *.tsbuildinfo
+next-env.d.ts
 
 # Environment variables
 .env
