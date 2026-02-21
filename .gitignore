@@ -28,3 +28,6 @@ npm-debug.log*
 
 # Coverage
 coverage/
+
+# Claude
+.claude/settings.local.json
