@@ -51,6 +51,7 @@ export function SearchBar({
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
@@ -62,6 +63,7 @@ export function SearchBar({
         <input
           type="text"
           placeholder="Search servers..."
+          aria-label="Search servers"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] placeholder-[var(--color-text-secondary)] focus:outline-none focus:border-[var(--color-accent)] transition-colors"
@@ -69,9 +71,10 @@ export function SearchBar({
       </div>
 
       {/* Category filters */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-6" role="group" aria-label="Filter by category">
         <button
           onClick={() => setSelectedCategory(null)}
+          aria-pressed={!selectedCategory}
           className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
             !selectedCategory
               ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
@@ -86,6 +89,7 @@ export function SearchBar({
             onClick={() =>
               setSelectedCategory(selectedCategory === cat ? null : cat)
             }
+            aria-pressed={selectedCategory === cat}
             className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
               selectedCategory === cat
                 ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
@@ -98,7 +102,7 @@ export function SearchBar({
       </div>
 
       {/* Results count */}
-      <p className="text-sm text-[var(--color-text-secondary)] mb-4">
+      <p className="text-sm text-[var(--color-text-secondary)] mb-4" role="status" aria-live="polite">
         {filtered.length} server{filtered.length !== 1 ? "s" : ""}
         {query && ` matching "${query}"`}
         {selectedCategory && ` in ${selectedCategory}`}

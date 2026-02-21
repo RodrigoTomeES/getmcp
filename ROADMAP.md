@@ -142,26 +142,26 @@ Improvements to the continuous integration pipeline and build process.
 
 Enhancements to the Next.js web directory.
 
-- [ ] **Replace `<a>` with Next.js `<Link>`** — Internal links use plain HTML anchors, losing client-side navigation benefits (prefetching, no full page reload).
+- [x] **Replace `<a>` with Next.js `<Link>`** — Internal links now use `<Link>` for client-side navigation with prefetching. External links (GitHub, repository, homepage, docs) remain as `<a>` tags with `target="_blank"`.
   - Files: `packages/web/src/app/layout.tsx`, `packages/web/src/components/ServerCard.tsx`, `packages/web/src/app/servers/[id]/page.tsx`
 
-- [ ] **Replace `<img>` with Next.js `<Image>`** — The logo uses a plain `<img>` tag, missing automatic image optimization.
-  - File: `packages/web/src/app/layout.tsx` (lines 33-38)
+- [x] **Replace `<img>` with Next.js `<Image>`** — The logo now uses `<Image>` from `next/image` for automatic image optimization.
+  - File: `packages/web/src/app/layout.tsx`
 
-- [ ] **Add sitemap and robots.txt** — Create `sitemap.ts` and `robots.ts` files for SEO. Especially important since server detail pages are statically generated and should be crawlable.
-  - Directory: `packages/web/src/app/`
+- [x] **Add sitemap and robots.txt** — Created `sitemap.ts` (generates entries for homepage + all server detail pages) and `robots.ts` (allows all crawlers, references sitemap) using the Next.js Metadata API.
+  - Files: `packages/web/src/app/sitemap.ts`, `packages/web/src/app/robots.ts`
 
-- [ ] **Add custom 404 page** — Create a `not-found.tsx` page instead of relying on the default Next.js 404.
-  - File: `packages/web/src/app/not-found.tsx` (new)
+- [x] **Add custom 404 page** — Created a styled `not-found.tsx` with a "Browse servers" link back to the homepage, consistent with the site's design.
+  - File: `packages/web/src/app/not-found.tsx`
 
-- [ ] **Add loading states** — Create `loading.tsx` files for routes to provide navigation loading indicators.
-  - Directory: `packages/web/src/app/`
+- [x] **Add loading states** — Created skeleton loading states for both the homepage and server detail page routes, matching the layout structure of each page.
+  - Files: `packages/web/src/app/loading.tsx`, `packages/web/src/app/servers/[id]/loading.tsx`
 
-- [ ] **Add ARIA labels and keyboard navigation** — Category filter buttons lack `aria-pressed` and `aria-label`. The search input has no `aria-label` (only `placeholder`). Add proper accessibility attributes.
-  - File: `packages/web/src/components/SearchBar.tsx` (lines 73-97)
+- [x] **Add ARIA labels and keyboard navigation** — Added `aria-label` to search input, `aria-hidden` to decorative search icon SVG, `role="group"` + `aria-label` to category filter container, `aria-pressed` to all filter buttons, and `role="status"` + `aria-live="polite"` to the results count for screen reader announcements.
+  - File: `packages/web/src/components/SearchBar.tsx`
 
-- [ ] **Replace deprecated clipboard fallback** — `document.execCommand("copy")` is deprecated. Replace with a modern `navigator.clipboard.writeText()` approach with a proper fallback.
-  - Files: `packages/web/src/components/ConfigViewer.tsx` (lines 46-52), `PackageManagerCommand.tsx` (lines 50-56)
+- [x] **Replace deprecated clipboard fallback** — Extracted duplicated clipboard logic into a reusable `useClipboard()` hook. Both `ConfigViewer` and `PackageManagerCommand` now use the shared hook. The fallback textarea approach is improved (visually hidden with `position: fixed; opacity: 0` instead of briefly visible).
+  - Files: `packages/web/src/hooks/use-clipboard.ts` (new), `packages/web/src/components/ConfigViewer.tsx`, `packages/web/src/components/PackageManagerCommand.tsx`
 
 - [ ] **Add light mode / theme toggle** — The site is dark-mode only with hardcoded dark colors. Add light theme support or respect `prefers-color-scheme` media query.
   - File: `packages/web/src/app/globals.css`

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getServer, getAllServers } from "@getmcp/registry";
 import type { RegistryEntryType } from "@getmcp/core";
@@ -53,9 +54,9 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
     <div className="max-w-4xl mx-auto px-6 py-10">
       {/* Breadcrumb */}
       <nav className="text-sm text-[var(--color-text-secondary)] mb-6">
-        <a href="/" className="hover:text-[var(--color-text)] transition-colors">
+        <Link href="/" className="hover:text-[var(--color-text)] transition-colors">
           Servers
-        </a>
+        </Link>
         <span className="mx-2">/</span>
         <span className="text-[var(--color-text)]">{server.name}</span>
       </nav>

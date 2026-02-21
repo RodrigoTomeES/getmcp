@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { AppIdType, LooseServerConfigType } from "@getmcp/core";
 import { generators } from "@getmcp/generators";
+import { useClipboard } from "@/hooks/use-clipboard";
 
 const APP_LABELS: Record<AppIdType, string> = {
   "claude-desktop": "Claude Desktop",
@@ -29,29 +30,11 @@ export function ConfigViewer({
   config: LooseServerConfigType;
 }) {
   const [selectedApp, setSelectedApp] = useState<AppIdType>("claude-desktop");
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useClipboard();
 
   const generator = generators[selectedApp];
   const generated = generator.generate(serverName, config);
   const serialized = generator.serialize(generated);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(serialized);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback for non-HTTPS
-      const textarea = document.createElement("textarea");
-      textarea.value = serialized;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textarea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
 
   return (
     <div>
@@ -91,7 +74,7 @@ export function ConfigViewer({
             {generator.app.configFormat.toUpperCase()}
           </span>
           <button
-            onClick={handleCopy}
+            onClick={() => copy(serialized)}
             className="text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors shrink-0 p-1"
             aria-label="Copy configuration"
           >

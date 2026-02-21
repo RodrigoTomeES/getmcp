@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import Image from "next/image";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -29,10 +31,10 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col">
         <header className="border-b border-[var(--color-border)] px-6 py-4">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
-            <a href="/" className="flex items-center gap-2">
-              <img
+            <Link href="/" className="flex items-center gap-2">
+              <Image
                 src="/icon.svg"
-                alt="getmcp"
+                alt="getmcp logo"
                 width={32}
                 height={32}
                 className="h-6 w-auto"
@@ -43,14 +45,14 @@ export default function RootLayout({
               <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-accent)] text-white font-medium">
                 beta
               </span>
-            </a>
+            </Link>
             <nav className="flex items-center gap-6 text-sm text-[var(--color-text-secondary)]">
-              <a
+              <Link
                 href="/"
                 className="hover:text-[var(--color-text)] transition-colors"
               >
                 Servers
-              </a>
+              </Link>
               <a
                 href="https://github.com/RodrigoTomeES/getmcp"
                 target="_blank"

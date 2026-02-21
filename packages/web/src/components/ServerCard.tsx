@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { RegistryEntryType } from "@getmcp/core";
 
 export function ServerCard({ server }: { server: RegistryEntryType }) {
@@ -6,7 +7,7 @@ export function ServerCard({ server }: { server: RegistryEntryType }) {
   const envCount = server.requiredEnvVars.length;
 
   return (
-    <a
+    <Link
       href={`/servers/${server.id}`}
       className="block rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-5 hover:bg-[var(--color-surface-hover)] hover:border-[var(--color-accent)] transition-all"
     >
@@ -48,6 +49,6 @@ export function ServerCard({ server }: { server: RegistryEntryType }) {
           by {server.author}
         </p>
       )}
-    </a>
+    </Link>
   );
 }

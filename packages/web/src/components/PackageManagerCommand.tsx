@@ -8,6 +8,7 @@ import {
   DEFAULT_PM,
   getCommand,
 } from "@/lib/package-manager";
+import { useClipboard } from "@/hooks/use-clipboard";
 
 export function PackageManagerCommand({
   serverId,
@@ -15,7 +16,7 @@ export function PackageManagerCommand({
   serverId?: string;
 }) {
   const [selectedPm, setSelectedPm] = useState<PackageManager>(DEFAULT_PM);
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useClipboard();
 
   // Hydrate from localStorage on mount
   useEffect(() => {
@@ -40,23 +41,7 @@ export function PackageManagerCommand({
 
   const command = getCommand(selectedPm, serverId);
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(command);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback for non-HTTPS
-      const textarea = document.createElement("textarea");
-      textarea.value = command;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textarea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
+
 
   return (
     <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-code-bg)] overflow-hidden mb-8">
@@ -96,7 +81,7 @@ export function PackageManagerCommand({
 
         {/* Copy button */}
         <button
-          onClick={handleCopy}
+          onClick={() => copy(command)}
           className="text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors shrink-0 p-1"
           aria-label="Copy command"
         >
