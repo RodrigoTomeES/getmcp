@@ -1,0 +1,93 @@
+name: Validate Server Submission
+
+on:
+  pull_request:
+    paths:
+      - "packages/registry/src/servers/**"
+
+jobs:
+  validate:
+    name: Validate Registry
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build packages
+        run: npm run build
+
+      - name: Run core tests
+        run: npx vitest run packages/core
+
+      - name: Run registry tests
+        run: npx vitest run packages/registry
+
+      - name: Validate all entries against Zod schema
+        run: |
+          node --input-type=module -e "
+            import { getAllServers } from '@getmcp/registry';
+            import { RegistryEntry } from '@getmcp/core';
+
+            const servers = getAllServers();
+            let errors = 0;
+
+            for (const server of servers) {
+              const result = RegistryEntry.safeParse(server);
+              if (!result.success) {
+                console.error('FAIL:', server.id, result.error.message);
+                errors++;
+              }
+            }
+
+            if (errors > 0) {
+              console.error(errors + ' server(s) failed validation');
+              process.exit(1);
+            }
+
+            console.log('All ' + servers.length + ' servers pass Zod validation');
+          "
+
+      - name: Check for duplicate IDs
+        run: |
+          node --input-type=module -e "
+            import { getAllServers } from '@getmcp/registry';
+
+            const servers = getAllServers();
+            const ids = servers.map(s => s.id);
+            const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
+
+            if (dupes.length > 0) {
+              console.error('Duplicate server IDs found:', dupes.join(', '));
+              process.exit(1);
+            }
+
+            console.log('No duplicate IDs among ' + ids.length + ' servers');
+          "
+
+  label-pr:
+    name: Label PR
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Add server-submission label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['server-submission'],
+            });
