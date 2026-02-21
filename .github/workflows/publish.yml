@@ -174,7 +174,7 @@ jobs:
           if npm view "@getmcp/core@$VERSION" version 2>/dev/null; then
             echo "@getmcp/core@$VERSION already published, skipping"
           else
-            npm publish --workspace=@getmcp/core --provenance --access public
+            npm publish --workspace=@getmcp/core --access public
           fi
 
       - name: Publish @getmcp/generators
@@ -184,7 +184,7 @@ jobs:
           if npm view "@getmcp/generators@$VERSION" version 2>/dev/null; then
             echo "@getmcp/generators@$VERSION already published, skipping"
           else
-            npm publish --workspace=@getmcp/generators --provenance --access public
+            npm publish --workspace=@getmcp/generators --access public
           fi
 
       - name: Publish @getmcp/registry
@@ -194,7 +194,7 @@ jobs:
           if npm view "@getmcp/registry@$VERSION" version 2>/dev/null; then
             echo "@getmcp/registry@$VERSION already published, skipping"
           else
-            npm publish --workspace=@getmcp/registry --provenance --access public
+            npm publish --workspace=@getmcp/registry --access public
           fi
 
       - name: Publish @getmcp/cli
@@ -204,7 +204,7 @@ jobs:
           if npm view "@getmcp/cli@$VERSION" version 2>/dev/null; then
             echo "@getmcp/cli@$VERSION already published, skipping"
           else
-            npm publish --workspace=@getmcp/cli --provenance --access public
+            npm publish --workspace=@getmcp/cli --access public
           fi
 
       - name: Create GitHub Release
