@@ -30,16 +30,30 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: npm ci
+      - name: Build all packages
+        run: npm run build
+      - name: Run tests
+        run: npm run test
 
       - name: Determine version bump
         id: version
         run: |
           # 1. Tag push — skip bump, extract version from tag
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             TAG_VERSION="${GITHUB_REF#refs/tags/v}"
             echo "bump=skip" >> "$GITHUB_OUTPUT"
             echo "version=$TAG_VERSION" >> "$GITHUB_OUTPUT"
@@ -95,18 +109,6 @@ jobs:
           echo "No releasable commits found — skipping publish"
           exit 0
 
-      - name: Setup Node.js
-        if: steps.version.outputs.bump != 'none'
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: npm
-          registry-url: https://registry.npmjs.org
-
-      - name: Install dependencies
-        if: steps.version.outputs.bump != 'none'
-        run: npm ci
-
       - name: Validate tag matches package versions
         if: steps.version.outputs.bump == 'skip'
         run: |
@@ -147,7 +149,8 @@ jobs:
           git add -A
           git commit -m "chore(release): v${NEW_VERSION} [skip ci]"
           git tag "v${NEW_VERSION}"
-          git push --follow-tags
+          git push
+          git push --tags
 
       - name: Resolve publish version
         if: steps.version.outputs.bump != 'none'
@@ -158,14 +161,6 @@ jobs:
           else
             echo "version=${{ steps.bump.outputs.version }}" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Build all packages
-        if: steps.version.outputs.bump != 'none'
-        run: npm run build
-
-      - name: Run tests
-        if: steps.version.outputs.bump != 'none'
-        run: npm run test
 
       - name: Publish @getmcp/core
         if: steps.version.outputs.bump != 'none'
