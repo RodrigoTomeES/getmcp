@@ -242,4 +242,5 @@ jobs:
           gh release create "$TAG" \
             --title "$TAG" \
             --notes "$BODY" \
+            --target "$(git rev-parse HEAD)" \
             --latest
