@@ -132,6 +132,8 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 | File                          | Purpose                                                                                         |
 | ----------------------------- | ----------------------------------------------------------------------------------------------- |
 | `app/page.tsx`                | Homepage with hero section and search                                                           |
+| `app/docs/page.tsx`           | Documentation page with getting started, supported apps, library usage, and more                |
+| `app/docs/loading.tsx`        | Loading skeleton for the docs page                                                              |
 | `app/servers/[id]/page.tsx`   | Dynamic server detail page (statically generated from registry)                                 |
 | `components/ConfigViewer.tsx` | Client component: tab selector for all 12 apps, shows generated config snippet with copy button |
 | `components/SearchBar.tsx`    | Search and filter component                                                                     |

@@ -44,6 +44,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/" className="hover:text-[var(--color-text)] transition-colors">
                 Servers
               </Link>
+              <Link href="/docs" className="hover:text-[var(--color-text)] transition-colors">
+                Docs
+              </Link>
               <a
                 href="https://github.com/RodrigoTomeES/getmcp"
                 target="_blank"
