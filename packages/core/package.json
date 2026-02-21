@@ -1,6 +1,6 @@
 {
   "name": "@getmcp/core",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Core types, schemas, and validation for getmcp canonical configuration format",
   "keywords": [
     "ai",
