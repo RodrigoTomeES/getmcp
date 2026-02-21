@@ -190,6 +190,10 @@ The CLI supports JSON, JSONC, YAML, and TOML config files natively. Format is au
 
 See [`ROADMAP.md`](./ROADMAP.md) for planned improvements and open tasks. Contributions are welcome.
 
+## Credits
+
+This CLI is inspired by [vercel-labs/skills](https://github.com/vercel-labs/skills).
+
 ## License
 
 MIT
