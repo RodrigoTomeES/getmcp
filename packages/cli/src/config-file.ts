@@ -14,6 +14,7 @@ import YAML from "yaml";
 import * as TOML from "smol-toml";
 
 import { detectConfigFormat, type ConfigFormat } from "./format.js";
+import { ConfigParseError } from "./errors.js";
 
 /**
  * Strip JSONC comments (single-line `//` and multi-line `/* ... *​/`)
@@ -107,8 +108,11 @@ function parseContent(
       default:
         return JSON.parse(raw);
     }
-  } catch {
-    throw new Error(`Failed to parse config file: ${filePath}`);
+  } catch (err) {
+    throw new ConfigParseError(
+      filePath,
+      err instanceof Error ? err.message : undefined,
+    );
   }
 }
 
