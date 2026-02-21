@@ -2,12 +2,26 @@ name: Publish to npm
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main]
+    tags: ["v*"]
+    paths-ignore: ["**/*.md"]
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version bump type"
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
 
 permissions:
+  contents: write
   id-token: write
-  contents: read
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
 
 jobs:
   publish:
@@ -17,8 +31,72 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine version bump
+        id: version
+        run: |
+          # 1. Tag push — skip bump, extract version from tag
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+            echo "bump=skip" >> "$GITHUB_OUTPUT"
+            echo "version=$TAG_VERSION" >> "$GITHUB_OUTPUT"
+            echo "Tag push detected: v$TAG_VERSION — skipping bump"
+            exit 0
+          fi
+
+          # 2. Manual dispatch — use selected bump type
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "bump=${{ inputs.bump }}" >> "$GITHUB_OUTPUT"
+            echo "Manual dispatch: ${{ inputs.bump }} bump"
+            exit 0
+          fi
+
+          # 3. Release commit guard — prevent infinite loop
+          HEAD_MSG=$(git log -1 --format=%s)
+          if [[ "$HEAD_MSG" == chore\(release\):* ]]; then
+            echo "bump=none" >> "$GITHUB_OUTPUT"
+            echo "Release commit detected — skipping"
+            exit 0
+          fi
+
+          # 4. Conventional commit scan since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [[ -n "$LAST_TAG" ]]; then
+            RANGE="$LAST_TAG..HEAD"
+          else
+            RANGE="HEAD"
+          fi
+
+          COMMITS=$(git log "$RANGE" --format=%s 2>/dev/null || git log --format=%s)
+          echo "Scanning commits since ${LAST_TAG:-beginning}:"
+          echo "$COMMITS"
+
+          BUMP="none"
+          while IFS= read -r msg; do
+            if [[ "$msg" =~ ^feat(\(.+\))?!?: ]]; then
+              BUMP="minor"
+              break
+            elif [[ "$msg" =~ ^(fix|perf|refactor|build|test|style|chore)(\(.+\))?!?: ]]; then
+              if [[ "$BUMP" == "none" ]]; then
+                BUMP="patch"
+              fi
+            fi
+          done <<< "$COMMITS"
+
+          echo "bump=$BUMP" >> "$GITHUB_OUTPUT"
+          echo "Detected bump: $BUMP"
+
+      - name: Exit if no release needed
+        if: steps.version.outputs.bump == 'none'
+        run: |
+          echo "No releasable commits found — skipping publish"
+          exit 0
 
       - name: Setup Node.js
+        if: steps.version.outputs.bump != 'none'
         uses: actions/setup-node@v4
         with:
           node-version: "24"
@@ -26,11 +104,13 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
+        if: steps.version.outputs.bump != 'none'
         run: npm ci
 
       - name: Validate tag matches package versions
+        if: steps.version.outputs.bump == 'skip'
         run: |
-          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          TAG_VERSION="${{ steps.version.outputs.version }}"
           echo "Tag version: $TAG_VERSION"
 
           for pkg in core generators registry cli; do
@@ -42,20 +122,124 @@ jobs:
             echo "packages/$pkg/package.json: $PKG_VERSION ✓"
           done
 
+      - name: Bump versions
+        if: steps.version.outputs.bump != 'none' && steps.version.outputs.bump != 'skip'
+        id: bump
+        run: |
+          BUMP="${{ steps.version.outputs.bump }}"
+          echo "Bumping all workspace packages: $BUMP"
+
+          npm version "$BUMP" --no-git-tag-version --workspaces
+          npm install --package-lock-only
+
+          NEW_VERSION=$(node -p "require('./packages/core/package.json').version")
+          echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "New version: $NEW_VERSION"
+
+      - name: Commit, tag, and push version bump
+        if: steps.version.outputs.bump != 'none' && steps.version.outputs.bump != 'skip'
+        run: |
+          NEW_VERSION="${{ steps.bump.outputs.version }}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+          git commit -m "chore(release): v${NEW_VERSION} [skip ci]"
+          git tag "v${NEW_VERSION}"
+          git push --follow-tags
+
+      - name: Resolve publish version
+        if: steps.version.outputs.bump != 'none'
+        id: publish-version
+        run: |
+          if [[ "${{ steps.version.outputs.bump }}" == "skip" ]]; then
+            echo "version=${{ steps.version.outputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${{ steps.bump.outputs.version }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build all packages
+        if: steps.version.outputs.bump != 'none'
         run: npm run build
 
       - name: Run tests
+        if: steps.version.outputs.bump != 'none'
         run: npm run test
 
       - name: Publish @getmcp/core
-        run: npm publish --workspace=@getmcp/core
+        if: steps.version.outputs.bump != 'none'
+        run: |
+          VERSION="${{ steps.publish-version.outputs.version }}"
+          if npm view "@getmcp/core@$VERSION" version 2>/dev/null; then
+            echo "@getmcp/core@$VERSION already published, skipping"
+          else
+            npm publish --workspace=@getmcp/core --provenance --access public
+          fi
 
       - name: Publish @getmcp/generators
-        run: npm publish --workspace=@getmcp/generators
+        if: steps.version.outputs.bump != 'none'
+        run: |
+          VERSION="${{ steps.publish-version.outputs.version }}"
+          if npm view "@getmcp/generators@$VERSION" version 2>/dev/null; then
+            echo "@getmcp/generators@$VERSION already published, skipping"
+          else
+            npm publish --workspace=@getmcp/generators --provenance --access public
+          fi
 
       - name: Publish @getmcp/registry
-        run: npm publish --workspace=@getmcp/registry
+        if: steps.version.outputs.bump != 'none'
+        run: |
+          VERSION="${{ steps.publish-version.outputs.version }}"
+          if npm view "@getmcp/registry@$VERSION" version 2>/dev/null; then
+            echo "@getmcp/registry@$VERSION already published, skipping"
+          else
+            npm publish --workspace=@getmcp/registry --provenance --access public
+          fi
 
       - name: Publish @getmcp/cli
-        run: npm publish --workspace=@getmcp/cli
+        if: steps.version.outputs.bump != 'none'
+        run: |
+          VERSION="${{ steps.publish-version.outputs.version }}"
+          if npm view "@getmcp/cli@$VERSION" version 2>/dev/null; then
+            echo "@getmcp/cli@$VERSION already published, skipping"
+          else
+            npm publish --workspace=@getmcp/cli --provenance --access public
+          fi
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.bump != 'none'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.publish-version.outputs.version }}"
+          TAG="v${VERSION}"
+
+          # Determine previous tag for changelog range
+          PREV_TAG=$(git describe --tags --abbrev=0 "$TAG^" 2>/dev/null || echo "")
+
+          # Gather changelog from merged PRs or commit log
+          if [[ -n "$PREV_TAG" ]]; then
+            CHANGELOG=$(gh pr list --state merged --search "merged:>=$(git log -1 --format=%cI "$PREV_TAG")" --json title,number,author --template '{{range .}}- {{.title}} (#{{.number}}) @{{.author.login}}{{"\n"}}{{end}}' 2>/dev/null || echo "")
+          fi
+
+          if [[ -z "$CHANGELOG" ]]; then
+            # Fallback to commit log
+            if [[ -n "$PREV_TAG" ]]; then
+              CHANGELOG=$(git log "$PREV_TAG..$TAG" --format="- %s" 2>/dev/null || git log --format="- %s" -20)
+            else
+              CHANGELOG=$(git log "$TAG" --format="- %s" -20)
+            fi
+          fi
+
+          # Build release body from template
+          export VERSION CHANGELOG
+          CONTRIBUTORS=$(git log "${PREV_TAG:+$PREV_TAG..}$TAG" --format="%aN" 2>/dev/null | sort -u | sed 's/^/- /' || echo "- github-actions[bot]")
+          export CONTRIBUTORS
+
+          BODY=$(envsubst < .github/RELEASE_TEMPLATE.md)
+
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --notes "$BODY" \
+            --latest

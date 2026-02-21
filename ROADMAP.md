@@ -131,7 +131,8 @@ Improvements to the continuous integration pipeline and build process.
 - [ ] **Add Dependabot configuration** — No `.github/dependabot.yml` exists. Add automated dependency update checks for npm packages and GitHub Actions.
   - File: `.github/dependabot.yml` (new)
 
-- [ ] **Publish packages to npm** — Publish `@getmcp/cli` to npm so users can run `npx @getmcp/cli add github`. Also publish `@getmcp/core` and `@getmcp/generators` for library consumers.
+- [x] **Publish packages to npm** — Auto-release workflow detects version bumps from conventional commits, bumps all workspace packages in sync, publishes to npm via OIDC trusted publishing, and creates a GitHub Release with changelog. Supports 3 trigger paths: push to main (auto-detect), tag push (legacy/fallback), and manual dispatch.
+  - Files: `.github/workflows/publish.yml`, `.github/RELEASE_TEMPLATE.md`
 
 > **Important — npm Publishing Authentication:**
 > This project uses [npm trusted publishing with OIDC](https://docs.npmjs.com/trusted-publishers) instead of long-lived npm tokens. The `permissions: id-token: write` in `.github/workflows/publish.yml` enables this. **Never** add `NODE_AUTH_TOKEN`, `NPM_TOKEN`, or any npm access token secret to the publish workflow. The npm CLI automatically detects the OIDC environment and authenticates using short-lived, workflow-specific credentials. See the [npm trusted publishing docs](https://docs.npmjs.com/trusted-publishers) and the Publishing section in `CLAUDE.md` for details.
