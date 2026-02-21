@@ -25,7 +25,7 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22) with 5 
 | `packages/core` | `@getmcp/core` | Zod schemas, TypeScript types, utility functions (type guards, transport inference) |
 | `packages/generators` | `@getmcp/generators` | 11 config generators (one per AI app), each transforms canonical format to app-native format |
 | `packages/registry` | `@getmcp/registry` | Catalog of MCP server definitions with search/filter API |
-| `packages/cli` | `@getmcp/cli` | CLI tool: `add`, `remove`, `list` commands with app auto-detection and config merging |
+| `packages/cli` | `@getmcp/cli` | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `init` commands with app auto-detection, config merging, and installation tracking via `getmcp-lock.json` |
 | `packages/web` | `@getmcp/web` | Next.js (App Router) web directory for browsing servers and generating config snippets |
 
 **Tech stack**: TypeScript 5.7+, Zod 3.24+, Vitest 3.0+, Next.js 15.3+ (web), Tailwind CSS 4.0+ (web), `@inquirer/prompts` (CLI).
@@ -59,7 +59,7 @@ A `Map<string, RegistryEntry>` of server definitions. Each entry contains metada
 
 ### CLI
 
-The CLI auto-detects installed AI apps by checking platform-specific config paths, prompts for required environment variables, generates app-specific configs, and **merges** them into existing config files (never overwrites). It handles JSON, JSONC, and YAML formats.
+The CLI auto-detects installed AI apps by checking platform-specific config paths, prompts for required environment variables, generates app-specific configs, and **merges** them into existing config files (never overwrites). It handles JSON, JSONC, YAML, and TOML formats. Installations are tracked in a project-level `getmcp-lock.json` file, enabling `check` and `update` workflows.
 
 ### Design Principles
 
@@ -110,13 +110,21 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 
 | File | Purpose |
 |------|---------|
-| `bin.ts` | Entry point; parses argv, dispatches to `add`/`remove`/`list` |
+| `bin.ts` | Entry point; parses argv, dispatches to commands via `resolveAlias()` |
 | `detect.ts` | `resolvePath()`, `getConfigPath()`, `detectApps()`, `detectInstalledApps()` |
 | `format.ts` | `detectConfigFormat()` — infers config file format (json/jsonc/yaml/toml) from file extension |
 | `config-file.ts` | Multi-format config file I/O: `readConfigFile()`, `writeConfigFile()`, `mergeServerIntoConfig()`, `removeServerFromConfig()`, `listServersInConfig()`, `stripJsoncComments()`. Auto-detects format (JSON, JSONC, YAML, TOML) from file extension. |
+| `lock.ts` | Installation tracking via `./getmcp-lock.json`: `readLockFile()`, `writeLockFile()`, `trackInstallation()`, `trackRemoval()`, `getTrackedServers()` |
+| `errors.ts` | Error types (`CliError`, `ConfigParseError`, `AppNotDetectedError`, `InvalidAppError`, `ServerNotFoundError`, `NonInteractiveError`) and `formatError()` utility |
+| `utils.ts` | `parseFlags()` for CLI flag parsing, `resolveAlias()` for command alias resolution, `shortenPath()` for display |
+| `preferences.ts` | Global user preferences at `~/.config/getmcp/preferences.json` (remembers selected apps across invocations) |
 | `commands/add.ts` | Interactive add workflow: pick server, prompt env vars, detect apps, generate + merge configs |
-| `commands/remove.ts` | Interactive remove workflow |
+| `commands/remove.ts` | Interactive remove workflow with `--dry-run` and `--yes` support |
 | `commands/list.ts` | List/search/filter servers |
+| `commands/find.ts` | Interactive fuzzy server search with inline add flow (aliases: `search`, `s`, `f`) |
+| `commands/check.ts` | Validate tracked installations against registry and app configs |
+| `commands/update.ts` | Re-generate and merge configs for all tracked installations |
+| `commands/init.ts` | Interactive wizard to scaffold a new server registry entry |
 
 ### `@getmcp/web` (`packages/web/src/`)
 
@@ -163,20 +171,21 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 
 1. Create `packages/cli/src/commands/<command>.ts`
 2. Wire it into `packages/cli/src/bin.ts` argument dispatch
-3. Add tests in `packages/cli/tests/`
+3. Add command aliases in `packages/cli/src/utils.ts` (`COMMAND_ALIASES` map) if the command should have shorthand names
+4. Add tests in `packages/cli/tests/`
 
 ---
 
 ## Testing
 
-- **139 tests** across 6 test files
+- **331 tests** across 11 test files
 - Run all tests: `npx vitest` (from repo root)
 - Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc.
 - Test locations:
   - `packages/core/tests/` — schema validation, type guards, transport inference
-  - `packages/generators/tests/` — all 11 generators (stdio + remote + multi-server + serialization)
+  - `packages/generators/tests/` — all 12 generators (stdio + remote + multi-server + serialization)
   - `packages/registry/tests/` — entry validation, lookup, search, categories, content integrity
-  - `packages/cli/tests/` — path resolution, app detection, config read/write/merge/remove
+  - `packages/cli/tests/` — path resolution, app detection, config read/write/merge/remove, lock file, errors, preferences, utils
 
 ---
 

@@ -82,11 +82,11 @@ Critical gaps in test coverage.
 
 Features that improve the developer experience.
 
-- [ ] **Add `--app` flag for non-interactive usage** — Allow targeting specific apps without interactive prompts (e.g., `getmcp add github --app=vscode`). Essential for CI/CD and scripting.
-  - File: `packages/cli/src/bin.ts`, `packages/cli/src/commands/add.ts`
+- [x] **Add `--app` flag for non-interactive usage** — Allows targeting specific apps without interactive prompts (e.g., `getmcp add github --app=vscode`). Supports repeatable `--app` flags for multiple apps.
+  - Files: `packages/cli/src/utils.ts` (flag parsing), `packages/cli/src/commands/add.ts`, `packages/cli/src/bin.ts`
 
-- [ ] **Add `--dry-run` option** — Preview what changes would be made to config files without actually writing them. Show diffs of what would change.
-  - File: `packages/cli/src/commands/add.ts`
+- [x] **Add `--dry-run` option** — Previews what changes would be made to config files without actually writing them. Shows generated config per app.
+  - Files: `packages/cli/src/commands/add.ts`, `packages/cli/src/commands/remove.ts`, `packages/cli/src/commands/update.ts`
 
 - [ ] **Add `--json` / `--quiet` output mode** — Provide machine-readable JSON output for `getmcp list` and other commands. Useful for scripting and piping.
   - File: `packages/cli/src/commands/list.ts`
@@ -103,8 +103,8 @@ Features that improve the developer experience.
 - [ ] **Add error recovery / rollback** — If writing to one app's config file succeeds but another fails, the user ends up in a partial state. Add rollback capability or at least warn the user which apps succeeded vs failed.
   - File: `packages/cli/src/commands/add.ts` (lines 127-139)
 
-- [ ] **Implement `getmcp update` command** — Update a server's config (e.g., after env var changes or registry updates).
-  - Spec: `SPECIFICATION.md` (lines 566-569)
+- [x] **Implement `getmcp update` command** — Re-generates and merges configs for all tracked installations using the current registry definitions. Supports `--yes`, `--app`, `--all-apps`, and `--dry-run` flags.
+  - File: `packages/cli/src/commands/update.ts`
 
 - [ ] **Implement `getmcp sync` command** — Sync all app configs to match a canonical source file.
   - Spec: `SPECIFICATION.md` (lines 566-569)
@@ -112,8 +112,8 @@ Features that improve the developer experience.
 - [ ] **Implement `getmcp doctor` command** — Diagnose config issues across all installed apps (missing files, invalid JSON, orphaned servers, version mismatches).
   - Spec: `SPECIFICATION.md` (lines 566-569)
 
-- [ ] **Implement `getmcp init` command** — Generate a `.getmcp.json` project file for sharing MCP server configs across a team.
-  - Spec: `SPECIFICATION.md` (lines 566-569)
+- [x] **Implement `getmcp init` command** — Interactive wizard that scaffolds a new MCP server registry entry (TypeScript file) with all required metadata.
+  - File: `packages/cli/src/commands/init.ts`
 
 ---
 
@@ -181,7 +181,7 @@ Refactoring and hygiene improvements.
 - [ ] **Add Zod validation at registry registration** — The `register()` function does `_registry.set(entry.id, entry)` without Zod validation. Invalid entries are only caught by tests, not at runtime.
   - File: `packages/registry/src/index.ts` (lines 92-94)
 
-- [ ] **Update stale numbers in SPECIFICATION.md** — References to "10 apps", "179 tests", "6 test files" are outdated. Update to reflect the current state (12 apps, 257+ tests, 8+ test files).
+- [x] **Update stale numbers in SPECIFICATION.md** — Updated all references to reflect the current state (12 apps, 331 tests, 11 test files).
   - File: `SPECIFICATION.md`
 
 - [ ] **Implement platform override handling** — `RegistryEntry` schema supports `windows`/`linux`/`macos` override fields but no generator or CLI code uses them. The CLI should apply platform-specific `command`/`args`/`env` overrides when generating configs (e.g., `cmd /c npx` on Windows).

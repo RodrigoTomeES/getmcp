@@ -28,7 +28,7 @@ getmcp is a tool that solves a fundamental problem in the AI tooling ecosystem: 
 getmcp provides:
 
 - **A canonical configuration format** aligned with [FastMCP](https://github.com/jlowin/fastmcp)'s standard
-- **Config generators** that transform the canonical format into 10 app-specific formats
+- **Config generators** that transform the canonical format into 12 app-specific formats
 - **A registry** of popular MCP server definitions
 - **A CLI tool** for one-command installation into any detected AI app
 - **(Planned) A web directory** for browsing and discovering MCP servers
@@ -101,8 +101,8 @@ getmcp/
         utils.ts                   # Type guards + transport inference
         index.ts                   # Public API barrel
       tests/
-        schemas.test.ts            # 19 tests
-        utils.test.ts              # 11 tests
+        schemas.test.ts            # Schema validation tests
+        utils.test.ts              # Type guard and transport inference tests
 
     generators/                    # @getmcp/generators (v0.1.0)
       src/
@@ -117,9 +117,11 @@ getmcp/
         windsurf.ts                # Generator for Windsurf
         opencode.ts                # Generator for OpenCode
         zed.ts                     # Generator for Zed
+        pycharm.ts                 # Generator for PyCharm
+        codex.ts                   # Generator for Codex (TOML)
         index.ts                   # Generator registry + public API
       tests/
-        generators.test.ts         # 45 tests
+        generators.test.ts         # 69 tests
 
     registry/                      # @getmcp/registry (v0.1.0)
       src/
@@ -138,21 +140,35 @@ getmcp/
           google-maps.ts           # Google Maps
         index.ts                   # Registry API (search, filter, lookup)
       tests/
-        registry.test.ts           # 37 tests
+        registry.test.ts           # 60 tests
 
     cli/                           # @getmcp/cli (v0.1.0)
       src/
         bin.ts                     # CLI entry point (getmcp command)
         detect.ts                  # App auto-detection
         config-file.ts             # Config read/write/merge operations
+        lock.ts                    # Installation tracking via getmcp-lock.json
+        errors.ts                  # Error types and formatting
+        utils.ts                   # Flag parsing, alias resolution, path shortening
+        preferences.ts             # Global user preferences persistence
+        format.ts                  # Config format detection from file extension
         commands/
           add.ts                   # getmcp add [server-id]
           remove.ts                # getmcp remove <server-name>
           list.ts                  # getmcp list [options]
+          find.ts                  # getmcp find [query] (aliases: search, s, f)
+          check.ts                 # getmcp check
+          update.ts                # getmcp update [options]
+          init.ts                  # getmcp init
         index.ts                   # Public API barrel
       tests/
-        detect.test.ts             # 7 tests
-        config-file.test.ts        # 20 tests
+        detect.test.ts             # 9 tests
+        config-file.test.ts        # 60 tests
+        lock.test.ts               # 17 tests
+        errors.test.ts             # 18 tests
+        utils.test.ts              # 50 tests (parseFlags + resolveAlias + shortenPath)
+        preferences.test.ts        # 21 tests
+        format.test.ts             # 8 tests
 ```
 
 ### Dependency Graph
@@ -486,6 +502,47 @@ Interactive installation workflow:
 | `--search=<query>` | Search the registry |
 | `--category=<cat>` | Filter by category |
 
+#### `getmcp find [query]`
+
+Interactive fuzzy search through the registry. After selecting a server, jumps directly into the `add` flow.
+
+- **Aliases**: `search`, `s`, `f`
+- If a query argument is provided, results are filtered immediately
+- If no query, prompts for a search term (or shows all servers if left empty)
+- Displays transport type, env var count, and categories alongside each result
+
+#### `getmcp check`
+
+Compares the lock file against the current registry and app configs to detect drift:
+
+1. Reads all tracked installations from `getmcp-lock.json`
+2. For each tracked server, verifies it still exists in the registry
+3. For each tracked app, verifies the server is still present in the app's config file
+4. Reports issues: servers removed from registry, servers removed from app configs, apps no longer detected
+
+#### `getmcp update [options]`
+
+Re-generates and merges configs for all tracked installations using the current registry definitions.
+
+| Option | Description |
+|--------|-------------|
+| `--yes`, `-y` | Skip confirmation prompts |
+| `--app <id>` | Only update configs for a specific app (repeatable) |
+| `--all-apps` | Update across all detected apps |
+| `--dry-run` | Preview generated configs without writing files |
+
+#### `getmcp init`
+
+Interactive wizard to scaffold a new MCP server registry entry. Prompts for:
+
+1. Server ID, display name, description
+2. Transport type (stdio, http, streamable-http, sse)
+3. Command and args (stdio) or URL (remote)
+4. Required environment variables
+5. Categories, runtime, repository, author
+
+Generates a TypeScript file at `packages/registry/src/servers/<id>.ts` ready for registration.
+
 ### App Auto-Detection
 
 The CLI detects installed apps by resolving platform-specific config paths:
@@ -522,6 +579,46 @@ listServersInConfig(filePath: string): string[]
 ```
 
 `listServersInConfig` scans all known root keys (`mcpServers`, `servers`, `extensions`, `mcp`, `context_servers`) to find server entries regardless of which app's format the file uses.
+
+### Installation Tracking
+
+The CLI tracks installations via a project-level lock file at `./getmcp-lock.json`. This file is auto-created by `add` and `remove`, and can be committed to version control for team sharing (similar to `package-lock.json`).
+
+#### Lock File Schema
+
+```typescript
+interface LockFile {
+  version: 1;
+  installations: Record<string, LockInstallation>;
+}
+
+interface LockInstallation {
+  apps: AppIdType[];       // App IDs this server is installed in
+  installedAt: string;     // ISO timestamp of initial installation
+  updatedAt: string;       // ISO timestamp of last update
+  envVars: string[];       // Env var names that were set (values NOT stored for security)
+}
+```
+
+#### Lock File Operations
+
+```typescript
+getLockFilePath(): string                                          // Resolves to ./getmcp-lock.json
+readLockFile(filePath?: string): LockFile                          // Read lock file (returns empty default if missing)
+writeLockFile(lock: LockFile, filePath?: string): void             // Write lock file
+trackInstallation(serverId, appIds, envVarNames, filePath?): void  // Record an installation (merges apps/envVars if existing)
+trackRemoval(serverId, appIds, filePath?): void                    // Record a removal (deletes entry if no apps remain)
+getTrackedServers(filePath?: string): LockFile                     // Get all tracked installations
+```
+
+#### Usage by Commands
+
+| Command | Lock File Interaction |
+|---------|----------------------|
+| `add` | Calls `trackInstallation()` after successfully writing configs |
+| `remove` | Calls `trackRemoval()` after successfully removing configs |
+| `check` | Reads lock file and compares against registry and app configs |
+| `update` | Reads lock file, re-generates configs for all tracked servers |
 
 ---
 
@@ -563,10 +660,8 @@ A Next.js website that serves as a public directory for MCP servers. Think "npm 
 
 ### Additional CLI Commands
 
-- `getmcp update` — update a server's config (e.g., after env var changes)
 - `getmcp sync` — sync all app configs to match a canonical source
-- `getmcp doctor` — diagnose config issues across apps
-- `getmcp init` — generate a `.getmcp.json` project file
+- `getmcp doctor` — diagnose config issues across apps (missing files, invalid JSON, orphaned servers, version mismatches)
 
 ### Registry Enhancements
 
@@ -911,11 +1006,11 @@ Detailed documentation of every app's MCP config format, gathered from official 
 
 | Package | Test Files | Tests | Description |
 |---------|-----------|-------|-------------|
-| `@getmcp/core` | 2 | 30 | Schema validation, type guards, transport inference |
-| `@getmcp/generators` | 1 | 63 | All 12 generators (stdio + remote), multi-server, serialization |
-| `@getmcp/registry` | 1 | 59 | Entry validation, lookup, search, categories, content integrity |
-| `@getmcp/cli` | 2 | 27 | Path resolution, app detection, config read/write/merge/remove |
-| **Total** | **6** | **179** | |
+| `@getmcp/core` | 2 | 69 | Schema validation, type guards, transport inference |
+| `@getmcp/generators` | 1 | 69 | All 12 generators (stdio + remote), multi-server, serialization |
+| `@getmcp/registry` | 1 | 60 | Entry validation, lookup, search, categories, content integrity |
+| `@getmcp/cli` | 7 | 133 | Path resolution, app detection, config read/write/merge/remove, lock file, errors, preferences, utils |
+| **Total** | **11** | **331** | |
 
 ---
 
