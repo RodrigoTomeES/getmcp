@@ -103,6 +103,7 @@ getmcp/
       tests/
         schemas.test.ts            # Schema validation tests
         utils.test.ts              # Type guard and transport inference tests
+        json-schema.test.ts        # JSON Schema generation tests
 
     generators/                    # @getmcp/generators (v0.1.0)
       src/
@@ -293,6 +294,22 @@ interface ConfigGenerator {
   generate(serverName: string, config: LooseServerConfig): Record<string, unknown>;
   generateAll(servers: Record<string, LooseServerConfig>): Record<string, unknown>;
   serialize(config: Record<string, unknown>): string;
+}
+```
+
+### AppMetadata
+
+Each generator's `app` property describes the target AI application:
+
+```typescript
+interface AppMetadata {
+  id: AppId;
+  name: string;
+  description: string;
+  configPaths: { win32?: string; darwin?: string; linux?: string };
+  configFormat: "json" | "jsonc" | "yaml" | "toml";
+  docsUrl: string;
+  scope: "project" | "global";
 }
 ```
 
@@ -916,11 +933,11 @@ Detailed documentation of every app's MCP config format, gathered from official 
 
 | Package | Test Files | Tests | Description |
 |---------|-----------|-------|-------------|
-| `@getmcp/core` | 2 | 69 | Schema validation, type guards, transport inference |
+| `@getmcp/core` | 3 | 34 | Schema validation, type guards, transport inference, JSON Schema |
 | `@getmcp/generators` | 1 | 69 | All 12 generators (stdio + remote), multi-server, serialization |
 | `@getmcp/registry` | 1 | 60 | Entry validation, lookup, search, categories, content integrity |
-| `@getmcp/cli` | 7 | 133 | Path resolution, app detection, config read/write/merge/remove, lock file, errors, preferences, utils |
-| **Total** | **11** | **331** | |
+| `@getmcp/cli` | 7 | 172 | Path resolution, app detection, config read/write/merge/remove, lock file, errors, preferences, utils |
+| **Total** | **12** | **335** | |
 
 ---
 

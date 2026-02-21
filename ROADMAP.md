@@ -212,10 +212,12 @@ Longer-term roadmap items from the specification.
 
 ### Registry Enhancements
 
-- [ ] **JSON Schema for server definitions** — Publish a JSON Schema for external validation of registry entries.
-- [ ] **Version tracking per server** — Track and display server package versions in the registry.
-- [ ] **Server compatibility matrix** — Document which servers work with which apps and surface in the web directory.
-- [ ] **Community submission workflow** — Automated processing of server submission PRs (builds on the existing issue template).
+- [x] **JSON Schema for server definitions** — Published a JSON Schema (`packages/core/registry-entry.schema.json`) generated from the Zod schema via `zod-to-json-schema`. Available as a runtime function (`getRegistryEntryJsonSchema()`) and as a static file via subpath export.
+  - Files: `packages/core/src/json-schema.ts`, `packages/core/scripts/generate-schema.ts`, `packages/core/registry-entry.schema.json`
+- [ ] **Version tracking per server** — Track and display server package versions
+- [ ] **Server compatibility matrix** — Surface which servers work with which apps
+- [x] **Community submission workflow** — Created `CONTRIBUTING.md` guide, `.github/PULL_REQUEST_TEMPLATE/server-submission.md` PR template, and `.github/workflows/validate-server.yml` GitHub Action that validates registry entries and auto-labels server submission PRs.
+  - Files: `CONTRIBUTING.md`, `.github/PULL_REQUEST_TEMPLATE/server-submission.md`, `.github/workflows/validate-server.yml`
 
 ### Web Directory Stretch Goals
 

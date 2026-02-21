@@ -68,7 +68,7 @@ getmcp remove github --dry-run
 
 ### `getmcp list`
 
-Browse the server registry.
+Browse the server registry. Shows server name, description, transport type, and categories.
 
 ```bash
 # List all available servers
@@ -86,7 +86,7 @@ getmcp list --installed
 
 ### `getmcp find [query]`
 
-Interactive fuzzy search through the registry. After selecting a server, jumps directly into the `add` flow.
+Interactive fuzzy search through the registry. Shows transport type, env var count, and categories in the selection hint. After selecting a server, jumps directly into the `add` flow.
 
 ```bash
 # Interactive search prompt
