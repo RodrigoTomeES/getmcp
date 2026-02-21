@@ -13,7 +13,7 @@
 5. [Config Generators](#5-config-generators)
 6. [Registry](#6-registry)
 7. [CLI Tool](#7-cli-tool)
-8. [Phase 3: Web Directory (Planned)](#8-phase-3-web-directory-planned)
+8. [Web Directory](#8-web-directory)
 9. [Future Plans](#9-future-plans)
 10. [Research Appendix: Config Formats Per App](#10-research-appendix-config-formats-per-app)
 
@@ -31,7 +31,7 @@ getmcp provides:
 - **Config generators** that transform the canonical format into 12 app-specific formats
 - **A registry** of popular MCP server definitions
 - **A CLI tool** for one-command installation into any detected AI app
-- **(Planned) A web directory** for browsing and discovering MCP servers
+- **A web directory** for browsing and discovering MCP servers
 
 ### Inspiration
 
@@ -463,7 +463,7 @@ export const myServer: RegistryEntryType = {
 
 ## 7. CLI Tool
 
-### Installation (Planned)
+### Installation
 
 ```bash
 npx @getmcp/cli add github
@@ -622,117 +622,27 @@ getTrackedServers(filePath?: string): LockFile                     // Get all tr
 
 ---
 
-## 8. Phase 3: Web Directory (Planned)
+## 8. Web Directory
 
 ### Overview
 
 A Next.js website that serves as a public directory for MCP servers. Think "npm registry for MCP servers" with one-click config generation.
 
-### Planned Features
-
-- **Browse & Search**: explore all registered servers with filtering by category, transport type, runtime
-- **Server Detail Pages**: description, setup instructions, required env vars, links to docs/repo
-- **Config Generator UI**: select an app, see the exact config snippet to copy-paste
-- **"Copy Config" Button**: one-click copy of app-specific JSON/YAML for any server + app combination
-- **Leaderboard / Popularity**: ranking of servers (stretch goal)
-- **Community Submissions**: form or PR-based flow for adding new servers to the registry (stretch goal)
-
-### Tech Stack (Planned)
-
-- Next.js (App Router)
-- Tailwind CSS
-- The existing `@getmcp/core`, `@getmcp/generators`, and `@getmcp/registry` packages imported directly
-- Static generation for server pages (data comes from the registry)
+**Tech stack**: Next.js 15.3+ (App Router), Tailwind CSS 4.0+, with `@getmcp/core`, `@getmcp/generators`, and `@getmcp/registry` imported directly. Server pages are statically generated from the registry.
 
 ---
 
 ## 9. Future Plans
 
-### Additional Apps to Support
+All planned features, improvements, and future work are tracked in [`ROADMAP.md`](./ROADMAP.md). This includes:
 
-| App | Priority | Status |
-|-----|----------|--------|
-| Amazon Q | Medium | Not yet researched |
-| JetBrains AI | Medium | Not yet researched |
-| LM Studio | Low | Not yet researched |
-| Continue | Low | Not yet researched |
-| Gemini CLI | Medium | Not yet researched |
+- New AI app support (Amazon Q, Gemini CLI, JetBrains AI, LM Studio, Continue)
+- Additional CLI commands (`sync`, `doctor`)
+- Registry enhancements (JSON Schema, version tracking, compatibility matrix)
+- Codex-specific enhancements (extra config fields, OAuth, project-scoped config)
+- npm publishing pipeline
 
-### Additional CLI Commands
-
-- `getmcp sync` — sync all app configs to match a canonical source
-- `getmcp doctor` — diagnose config issues across apps (missing files, invalid JSON, orphaned servers, version mismatches)
-
-### Registry Enhancements
-
-- JSON Schema for server definitions (for external validation)
-- Version tracking per server
-- Compatibility matrix (which servers work with which apps)
-- Community submission workflow (GitHub PR template)
-
-### npm Publishing
-
-- Publish `@getmcp/cli` to npm so users can run `npx @getmcp/cli add github`
-- Publish `@getmcp/core` and `@getmcp/generators` for library consumers
-
-### CLI Multi-Format Config File Support — IMPLEMENTED
-
-The CLI's `config-file.ts` module now supports JSON, JSONC, YAML, and TOML formats. Format is auto-detected from the file extension via `detectConfigFormat()` in `format.ts`.
-
-#### Implementation Details
-
-| Extension(s) | Format | Parser | Serializer |
-|---|---|---|---|
-| `.json`, `.jsonc` | JSON/JSONC | `JSON.parse` (with proper string-aware comment stripping for JSONC) | `JSON.stringify` |
-| `.yaml`, `.yml` | YAML | `yaml` library (`YAML.parse`) | `yaml` library (`YAML.stringify`) |
-| `.toml` | TOML | `smol-toml` library (`TOML.parse`) | `smol-toml` library (`TOML.stringify`) |
-
-All five config operations are format-aware:
-
-- `readConfigFile(filePath)` — auto-detects format from extension, dispatches to correct parser
-- `writeConfigFile(filePath, config)` — auto-detects format from extension, dispatches to correct serializer
-- `mergeServerIntoConfig(filePath, generatedConfig)` — format-agnostic merge logic; format handled at read/write boundaries
-- `removeServerFromConfig(filePath, serverName)` — same approach
-- `listServersInConfig(filePath)` — scans all known root keys including `mcp_servers` (Codex)
-
-The JSONC comment stripping was also fixed to properly handle `//` sequences inside JSON string values (e.g., URLs like `https://example.com`), using a character-by-character state machine that respects string boundaries.
-
-#### Dependencies
-
-- `yaml` (^2.8) — added to both `@getmcp/cli` and `@getmcp/generators`
-- `smol-toml` (^1.6) — added to both `@getmcp/cli` and `@getmcp/generators`
-
-The hand-rolled serializers (`toYaml` in Goose generator, `toToml`/`toTomlValue` in Codex generator) have been replaced with the corresponding library calls for consistency and round-trip correctness.
-
-### Codex Full Integration
-
-The Codex generator (`packages/generators/src/codex.ts`) maps canonical fields to TOML output using the `smol-toml` library. The CLI can now fully read, merge into, and write `~/.codex/config.toml` natively via the multi-format config file support.
-
-#### CLI Read/Write/Merge for TOML — IMPLEMENTED
-
-The CLI's multi-format config file support (see above) enables full `getmcp add` and `getmcp remove` support for Codex's TOML config files.
-
-#### Codex-Specific Config Fields
-
-The canonical format does not include Codex-specific fields. Future work could extend the generator (or add an options/extras mechanism) to support:
-
-- `enabled` (`boolean`) — enable/disable a server without removing it
-- `required` (`boolean`) — fail startup if an enabled server can't initialize
-- `enabled_tools` (`string[]`) — tool allow list
-- `disabled_tools` (`string[]`) — tool deny list (applied after `enabled_tools`)
-- `startup_timeout_sec` (`number`) — server startup timeout in seconds
-- `tool_timeout_sec` (`number`) — per-tool execution timeout in seconds
-- `bearer_token_env_var` (`string`) — env var name for bearer token auth
-- `env_vars` (`string[]`) — env var forwarding allow list
-- `env_http_headers` (`Record<string, string>`) — HTTP headers whose values are env var names
-
-#### OAuth Support
-
-Codex supports OAuth for remote MCP servers via `codex mcp login <server-name>`. Consider adding guidance or CLI integration for OAuth-authenticated servers, including the optional `mcp_oauth_callback_port` top-level config.
-
-#### Project-Scoped Config
-
-Codex supports project-level config at `.codex/config.toml` (trusted projects only). The CLI's `detectApps()` currently only checks global config paths. Add support for detecting and managing project-scoped config files.
+See ROADMAP.md for the complete list with priorities, status, and implementation notes.
 
 ---
 

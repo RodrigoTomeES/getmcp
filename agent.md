@@ -181,8 +181,8 @@ After every code implementation (new feature, new command, new file, bug fix, re
 | File | What to check |
 |------|---------------|
 | `CLAUDE.md` | File map matches actual source files; test counts are accurate; common tasks sections reflect current workflow |
-| `SPECIFICATION.md` | Schemas, command docs, transformation rules, test counts, and monorepo tree match the implementation |
-| `ROADMAP.md` | Newly implemented items are marked `[x]` with a note about the implementing file |
+| `SPECIFICATION.md` | Schemas, command docs, transformation rules, test counts, and monorepo tree match the implementation. **Do not add future plans here** — all roadmap items belong in `ROADMAP.md` only |
+| `ROADMAP.md` | Newly implemented items are marked `[x]` with a note about the implementing file. This is the **single source of truth** for all planned/future work |
 | `packages/cli/README.md` | New commands, flags, supported apps, and API exports are documented |
 
 This is not optional — documentation drift causes confusion and wastes time. Treat it as part of completing the implementation.

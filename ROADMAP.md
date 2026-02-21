@@ -1,6 +1,6 @@
 # getmcp Roadmap
 
-> Last updated: 2026-02-20
+> Last updated: 2026-02-21
 
 This document tracks all planned improvements, bug fixes, and feature work for the getmcp project. Items are organized by priority and category, with checkboxes to track completion.
 
@@ -107,10 +107,8 @@ Features that improve the developer experience.
   - File: `packages/cli/src/commands/update.ts`
 
 - [ ] **Implement `getmcp sync` command** — Sync all app configs to match a canonical source file.
-  - Spec: `SPECIFICATION.md` (lines 566-569)
 
 - [ ] **Implement `getmcp doctor` command** — Diagnose config issues across all installed apps (missing files, invalid JSON, orphaned servers, version mismatches).
-  - Spec: `SPECIFICATION.md` (lines 566-569)
 
 - [x] **Implement `getmcp init` command** — Interactive wizard that scaffolds a new MCP server registry entry (TypeScript file) with all required metadata.
   - File: `packages/cli/src/commands/init.ts`
@@ -132,6 +130,8 @@ Improvements to the continuous integration pipeline and build process.
 
 - [ ] **Add Dependabot configuration** — No `.github/dependabot.yml` exists. Add automated dependency update checks for npm packages and GitHub Actions.
   - File: `.github/dependabot.yml` (new)
+
+- [ ] **Publish packages to npm** — Publish `@getmcp/cli` to npm so users can run `npx @getmcp/cli add github`. Also publish `@getmcp/core` and `@getmcp/generators` for library consumers.
 
 > **Important — npm Publishing Authentication:**
 > This project uses [npm trusted publishing with OIDC](https://docs.npmjs.com/trusted-publishers) instead of long-lived npm tokens. The `permissions: id-token: write` in `.github/workflows/publish.yml` enables this. **Never** add `NODE_AUTH_TOKEN`, `NPM_TOKEN`, or any npm access token secret to the publish workflow. The npm CLI automatically detects the OIDC environment and authenticates using short-lived, workflow-specific credentials. See the [npm trusted publishing docs](https://docs.npmjs.com/trusted-publishers) and the Publishing section in `CLAUDE.md` for details.
@@ -205,13 +205,10 @@ Longer-term roadmap items from the specification.
 
 - [ ] **Codex-specific config fields** — Support additional fields in the Codex generator: `enabled`, `required`, `enabled_tools`, `disabled_tools`, `tool_timeout_sec`, `bearer_token_env_var`, `env_vars`, `env_http_headers`
   - File: `packages/generators/src/codex.ts`
-  - Spec: `SPECIFICATION.md` (lines 620-632)
 
-- [ ] **OAuth support for remote MCP servers** — Integrate with Codex's `codex mcp login` flow. Add guidance or CLI support for OAuth-authenticated servers.
-  - Spec: `SPECIFICATION.md` (lines 634-636)
+- [ ] **OAuth support for remote MCP servers** — Integrate with Codex's `codex mcp login` flow. Add guidance or CLI support for OAuth-authenticated servers, including the optional `mcp_oauth_callback_port` top-level config.
 
 - [ ] **Project-scoped Codex config** — Codex supports `.codex/config.toml` for project-level config. Update `detectApps()` to check for project-scoped Codex configs.
-  - Spec: `SPECIFICATION.md` (lines 638-640)
 
 ### Registry Enhancements
 
