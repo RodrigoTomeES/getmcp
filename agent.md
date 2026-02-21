@@ -256,6 +256,21 @@ Breaking changes must include `!` after the type/scope or a `BREAKING CHANGE:` f
 
 ---
 
+## Installed Skills
+
+Skills are installed under `.agents/skills/` and provide specialized capabilities:
+
+| Skill | Description | Trigger |
+|-------|-------------|---------|
+| `agent-browser` | Browser automation CLI (navigate, snapshot, interact, screenshot, scrape) | User needs to interact with websites, fill forms, take screenshots, test web apps |
+| `vercel-composition-patterns` | React composition patterns (compound components, context providers, state management) | Refactoring components with boolean props, building component libraries, designing reusable APIs |
+| `frontend-design` | Create distinctive, production-grade frontend interfaces with high design quality | Building web components, pages, dashboards, or styling/beautifying any web UI |
+| `web-design-guidelines` | Review UI code for Web Interface Guidelines compliance | "Review my UI", "check accessibility", "audit design", "review UX" |
+| `vercel-react-best-practices` | React/Next.js performance optimization (57 rules across 8 categories) | Writing, reviewing, or refactoring React/Next.js code for performance |
+| `find-skills` | Discover and install agent skills from the ecosystem | "How do I do X", "find a skill for X", extending agent capabilities |
+
+---
+
 ## References
 
 - **[`SPECIFICATION.md`](./SPECIFICATION.md)** — Complete project specification: schemas, transformation rules per app, registry format, CLI behavior, research appendix with every app's config format documented
