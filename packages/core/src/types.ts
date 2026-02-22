@@ -18,6 +18,8 @@ import {
   Runtime,
   RegistryEntry,
   AppId,
+  ManifestServerEntry,
+  ProjectManifest,
 } from "./schemas.js";
 
 // ---------------------------------------------------------------------------
@@ -50,6 +52,8 @@ export type Category = z.infer<typeof Category>;
 export type Runtime = z.infer<typeof Runtime>;
 export type RegistryEntry = z.infer<typeof RegistryEntry>;
 export type AppId = z.infer<typeof AppId>;
+export type ManifestServerEntry = z.infer<typeof ManifestServerEntry>;
+export type ProjectManifest = z.infer<typeof ProjectManifest>;
 
 // ---------------------------------------------------------------------------
 // Generator interface

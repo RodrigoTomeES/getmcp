@@ -23,6 +23,7 @@ import { updateCommand } from "./commands/update.js";
 import { initCommand } from "./commands/init.js";
 import { doctorCommand } from "./commands/doctor.js";
 import { importCommand } from "./commands/import.js";
+import { syncCommand } from "./commands/sync.js";
 import { parseFlags, resolveAlias } from "./utils.js";
 
 const require = createRequire(import.meta.url);
@@ -45,6 +46,7 @@ Usage:
   getmcp init                    Scaffold a new server entry
   getmcp doctor                  Run health diagnostics
   getmcp import                  Import existing servers into tracking
+  getmcp sync                    Sync servers from getmcp.json manifest
 
 Command Aliases:
   add      install, i
@@ -176,6 +178,17 @@ async function main(): Promise<void> {
     case "import": {
       await importCommand({
         yes: flags.yes,
+        json: flags.json,
+      });
+      break;
+    }
+
+    case "sync": {
+      await syncCommand({
+        yes: flags.yes,
+        apps: flags.apps,
+        allApps: flags.allApps,
+        dryRun: flags.dryRun,
         json: flags.json,
       });
       break;

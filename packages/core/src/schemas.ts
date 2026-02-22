@@ -207,3 +207,27 @@ export const AppId = z.enum([
   "bolt-ai",
   "libre-chat",
 ]);
+
+// ---------------------------------------------------------------------------
+// Project manifest (getmcp.json)
+// ---------------------------------------------------------------------------
+
+/**
+ * Per-server entry in a project manifest.
+ * Allows overriding env vars and specifying app targets.
+ */
+export const ManifestServerEntry = z.object({
+  /** Override environment variables for this server */
+  env: z.record(z.string(), z.string()).optional(),
+  /** Restrict to specific apps (defaults to all detected) */
+  apps: z.array(AppId).optional(),
+});
+
+/**
+ * Project manifest schema (getmcp.json).
+ * Teams commit this file to declare which MCP servers a project needs.
+ */
+export const ProjectManifest = z.object({
+  /** Map of server ID to optional overrides */
+  servers: z.record(z.string(), ManifestServerEntry.or(z.object({}))),
+});
