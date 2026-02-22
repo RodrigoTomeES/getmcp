@@ -186,6 +186,7 @@ npx @getmcp/cli list --json`}</CodeBlock>
                 ["VS Code Insiders", "servers", "JSON"],
                 ["BoltAI", "mcpServers", "JSON"],
                 ["LibreChat", "mcpServers", "YAML"],
+                ["Antigravity", "mcpServers", "JSON"],
               ].map(([app, rootKey, format]) => (
                 <tr key={app} className="border-b border-[var(--color-border)] last:border-b-0">
                   <td className="px-4 py-2.5">{app}</td>

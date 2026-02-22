@@ -2,7 +2,7 @@
  * @getmcp/generators
  *
  * Config generators that transform canonical MCP server definitions
- * into app-specific configuration formats for 19 AI applications.
+ * into app-specific configuration formats for 20 AI applications.
  */
 
 // Individual generators
@@ -25,6 +25,7 @@ export { TraeGenerator } from "./trae.js";
 export { VSCodeInsidersGenerator } from "./vscode-insiders.js";
 export { BoltAIGenerator } from "./bolt-ai.js";
 export { LibreChatGenerator } from "./libre-chat.js";
+export { AntigravityGenerator } from "./antigravity.js";
 
 // Base class and utilities
 export { BaseGenerator, deepMerge, toStdioFields, toRemoteFields } from "./base.js";
@@ -57,6 +58,7 @@ import { TraeGenerator } from "./trae.js";
 import { VSCodeInsidersGenerator } from "./vscode-insiders.js";
 import { BoltAIGenerator } from "./bolt-ai.js";
 import { LibreChatGenerator } from "./libre-chat.js";
+import { AntigravityGenerator } from "./antigravity.js";
 
 /**
  * Map of all available generators, keyed by AppId.
@@ -81,6 +83,7 @@ export const generators: Record<AppIdType, ConfigGenerator> = {
   "vscode-insiders": new VSCodeInsidersGenerator(),
   "bolt-ai": new BoltAIGenerator(),
   "libre-chat": new LibreChatGenerator(),
+  antigravity: new AntigravityGenerator(),
 };
 
 /**
