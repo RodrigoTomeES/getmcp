@@ -122,7 +122,7 @@ getmcp/
         codex.ts                   # Generator for Codex (TOML)
         index.ts                   # Generator registry + public API
       tests/
-        generators.test.ts         # 69 tests
+        generators.test.ts         # 117 tests
 
     registry/                      # @getmcp/registry (v0.1.0)
       src/
@@ -166,7 +166,7 @@ getmcp/
           sync.ts                  # getmcp sync (project manifest)
         index.ts                   # Public API barrel
       tests/
-        detect.test.ts             # 9 tests
+        detect.test.ts             # 10 tests
         config-file.test.ts        # 60 tests
         lock.test.ts               # 17 tests
         errors.test.ts             # 18 tests
@@ -313,8 +313,26 @@ interface ConfigGenerator {
   generate(serverName: string, config: LooseServerConfig): Record<string, unknown>;
   generateAll(servers: Record<string, LooseServerConfig>): Record<string, unknown>;
   serialize(config: Record<string, unknown>): string;
+  detectInstalled(): boolean;
 }
 ```
+
+### Installation Detection
+
+Each generator implements `detectInstalled()` to check if the app is present on the current system using `existsSync()` on platform-specific directories. `BaseGenerator` provides a default implementation returning `false`.
+
+Shared path constants are exported from `packages/generators/src/base.ts`:
+
+| Constant       | Value                                | Env Override        |
+| -------------- | ------------------------------------ | ------------------- |
+| `home`         | `os.homedir()`                       | —                   |
+| `configHome`   | `$XDG_CONFIG_HOME` or `~/.config`    | `XDG_CONFIG_HOME`   |
+| `appData`      | `$APPDATA` or `~/AppData/Roaming`    | `APPDATA`           |
+| `localAppData` | `$LOCALAPPDATA` or `~/AppData/Local` | `LOCALAPPDATA`      |
+| `claudeHome`   | `$CLAUDE_CONFIG_DIR` or `~/.claude`  | `CLAUDE_CONFIG_DIR` |
+| `codexHome`    | `$CODEX_HOME` or `~/.codex`          | `CODEX_HOME`        |
+
+Apps that cannot be reliably detected (PyCharm, LibreChat) use the default `false`.
 
 ### AppMetadata
 

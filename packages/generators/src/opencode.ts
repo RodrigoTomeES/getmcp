@@ -25,9 +25,11 @@
  *   - Env var syntax: {env:VAR} (no $ prefix)
  */
 
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator } from "./base.js";
+import { BaseGenerator, configHome } from "./base.js";
 
 export class OpenCodeGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -95,5 +97,9 @@ export class OpenCodeGenerator extends BaseGenerator {
       $schema: "https://opencode.ai/config.json",
       mcp,
     };
+  }
+
+  override detectInstalled(): boolean {
+    return existsSync(join(configHome, "opencode"));
   }
 }

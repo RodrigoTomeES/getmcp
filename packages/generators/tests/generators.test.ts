@@ -1062,6 +1062,35 @@ describe("serialize → parse round-trip", () => {
 });
 
 // ---------------------------------------------------------------------------
+// detectInstalled()
+// ---------------------------------------------------------------------------
+
+describe("detectInstalled", () => {
+  it("all generators have detectInstalled() method", () => {
+    for (const [appId, gen] of Object.entries(generators)) {
+      expect(typeof gen.detectInstalled, `${appId} missing detectInstalled`).toBe("function");
+    }
+  });
+
+  it("detectInstalled() returns a boolean for all generators", () => {
+    for (const [appId, gen] of Object.entries(generators)) {
+      const result = gen.detectInstalled();
+      expect(typeof result, `${appId} detectInstalled() should return boolean`).toBe("boolean");
+    }
+  });
+
+  it("pycharm returns false (not overridden)", () => {
+    const gen = new PyCharmGenerator();
+    expect(gen.detectInstalled()).toBe(false);
+  });
+
+  it("libre-chat returns false (not overridden)", () => {
+    const gen = new LibreChatGenerator();
+    expect(gen.detectInstalled()).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // deepMerge edge cases
 // ---------------------------------------------------------------------------
 

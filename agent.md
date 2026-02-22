@@ -49,7 +49,7 @@ Transport is auto-inferred: URLs with `/sse` default to SSE, others to HTTP.
 
 ### Generators
 
-Each generator implements the `ConfigGenerator` interface (defined in `packages/core/src/types.ts`) and extends `BaseGenerator` (in `packages/generators/src/base.ts`). A generator transforms the canonical format into one app's native format — renaming fields, changing root keys, adding app-specific fields, or switching file formats (e.g., YAML for Goose).
+Each generator implements the `ConfigGenerator` interface (defined in `packages/core/src/types.ts`) and extends `BaseGenerator` (in `packages/generators/src/base.ts`). A generator transforms the canonical format into one app's native format — renaming fields, changing root keys, adding app-specific fields, or switching file formats (e.g., YAML for Goose). Each generator also implements `detectInstalled()` which checks if the app is installed on the current system using platform-specific heuristics (e.g., `existsSync()` on known config directories). Shared path constants (`home`, `configHome`, `appData`, `claudeHome`, `codexHome`) are exported from `base.ts` and support env var overrides (`XDG_CONFIG_HOME`, `APPDATA`, `CLAUDE_CONFIG_DIR`, `CODEX_HOME`).
 
 > See `SPECIFICATION.md` Section 5 for all transformation rules per app.
 
@@ -65,7 +65,7 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 
 1. **Never overwrite** — always merge into existing config files
 2. **Canonical format** — one source of truth, generators handle transformations
-3. **Auto-detect** — find installed apps by checking known config paths per OS
+3. **Auto-detect** — each generator's `detectInstalled()` checks if the app exists on the current system
 4. **Platform-aware** — resolves `~`, `%AppData%`, `%UserProfile%`, `%LocalAppData%`
 5. **Schema-validated** — all data flows through Zod schemas at runtime
 
@@ -84,22 +84,22 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 
 ### `@getmcp/generators` (`packages/generators/src/`)
 
-| File                | Purpose                                                                                                                   |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `base.ts`           | `BaseGenerator` abstract class with `generate()`, `generateAll()`, `serialize()`, `deepMerge()`, field extraction helpers |
-| `claude-desktop.ts` | Passthrough — canonical IS the native format                                                                              |
-| `claude-code.ts`    | Near-passthrough; renames `transport` to `type` for remote                                                                |
-| `vscode.ts`         | Root key `servers`; adds `type` field on every server; maps `streamable-http` to `http`                                   |
-| `cursor.ts`         | Passthrough (same as Claude Desktop)                                                                                      |
-| `cline.ts`          | Adds `alwaysAllow: []` and `disabled: false`                                                                              |
-| `roo-code.ts`       | Adds `alwaysAllow: []`, `disabled: false`; maps `http` to `streamable-http`                                               |
-| `goose.ts`          | YAML output; root key `extensions`; renames `command` to `cmd`, `env` to `envs`; timeout ms to seconds                    |
-| `windsurf.ts`       | Remote uses `serverUrl` instead of `url`                                                                                  |
-| `opencode.ts`       | Root key `mcp`; merges `command`+`args` into array; renames `env` to `environment`                                        |
-| `zed.ts`            | Root key `context_servers`                                                                                                |
-| `pycharm.ts`        | Passthrough; project-level config at `.ai/mcp/mcp.json` (requires JetBrains AI Assistant plugin)                          |
-| `antigravity.ts`    | Passthrough; Google Antigravity IDE (`mcpServers` root key, JSON)                                                         |
-| `index.ts`          | Generator registry: maps `AppId` to generator instances; exports `generateConfig()`, `getGenerator()`, `getAppIds()`      |
+| File                | Purpose                                                                                                                                                                                                                                            |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `base.ts`           | `BaseGenerator` abstract class with `generate()`, `generateAll()`, `serialize()`, `detectInstalled()`, `deepMerge()`, field extraction helpers, shared path constants (`home`, `configHome`, `appData`, `localAppData`, `claudeHome`, `codexHome`) |
+| `claude-desktop.ts` | Passthrough — canonical IS the native format                                                                                                                                                                                                       |
+| `claude-code.ts`    | Near-passthrough; renames `transport` to `type` for remote                                                                                                                                                                                         |
+| `vscode.ts`         | Root key `servers`; adds `type` field on every server; maps `streamable-http` to `http`                                                                                                                                                            |
+| `cursor.ts`         | Passthrough (same as Claude Desktop)                                                                                                                                                                                                               |
+| `cline.ts`          | Adds `alwaysAllow: []` and `disabled: false`                                                                                                                                                                                                       |
+| `roo-code.ts`       | Adds `alwaysAllow: []`, `disabled: false`; maps `http` to `streamable-http`                                                                                                                                                                        |
+| `goose.ts`          | YAML output; root key `extensions`; renames `command` to `cmd`, `env` to `envs`; timeout ms to seconds                                                                                                                                             |
+| `windsurf.ts`       | Remote uses `serverUrl` instead of `url`                                                                                                                                                                                                           |
+| `opencode.ts`       | Root key `mcp`; merges `command`+`args` into array; renames `env` to `environment`                                                                                                                                                                 |
+| `zed.ts`            | Root key `context_servers`                                                                                                                                                                                                                         |
+| `pycharm.ts`        | Passthrough; project-level config at `.ai/mcp/mcp.json` (requires JetBrains AI Assistant plugin)                                                                                                                                                   |
+| `antigravity.ts`    | Passthrough; Google Antigravity IDE (`mcpServers` root key, JSON)                                                                                                                                                                                  |
+| `index.ts`          | Generator registry: maps `AppId` to generator instances; exports `generateConfig()`, `getGenerator()`, `getAppIds()`                                                                                                                               |
 
 ### `@getmcp/registry` (`packages/registry/src/`)
 
@@ -113,7 +113,7 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 | File                 | Purpose                                                                                                                                                                                                                                           |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `bin.ts`             | Entry point; parses argv, dispatches to commands via `resolveAlias()`                                                                                                                                                                             |
-| `detect.ts`          | `resolvePath()`, `getConfigPath()`, `detectApps()`, `detectInstalledApps()`                                                                                                                                                                       |
+| `detect.ts`          | `resolvePath()`, `getConfigPath()`, `detectApps()` (delegates to `generator.detectInstalled()`), `detectInstalledApps()`                                                                                                                          |
 | `format.ts`          | `detectConfigFormat()` — infers config file format (json/jsonc/yaml/toml) from file extension                                                                                                                                                     |
 | `config-file.ts`     | Multi-format config file I/O: `readConfigFile()`, `writeConfigFile()`, `mergeServerIntoConfig()`, `removeServerFromConfig()`, `listServersInConfig()`, `stripJsoncComments()`. Auto-detects format (JSON, JSONC, YAML, TOML) from file extension. |
 | `lock.ts`            | Installation tracking via `./getmcp-lock.json`: `readLockFile()`, `writeLockFile()`, `trackInstallation()`, `trackRemoval()`, `getTrackedServers()`                                                                                               |
@@ -198,12 +198,12 @@ This is not optional — documentation drift causes confusion and wastes time. T
 
 ## Testing
 
-- **503 tests** across 17 test files
+- **508 tests** across 17 test files
 - Run all tests: `npx vitest` (from repo root)
 - Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc.
 - Test locations:
   - `packages/core/tests/` — schema validation, type guards, transport inference, JSON Schema, ProjectManifest
-  - `packages/generators/tests/` — all 20 generators (stdio + remote + multi-server + serialization)
+  - `packages/generators/tests/` — all 20 generators (stdio + remote + multi-server + serialization + detectInstalled)
   - `packages/registry/tests/` — entry validation, lookup, search, categories, content integrity
   - `packages/cli/tests/` — path resolution, app detection, config read/write/merge/remove, lock file, errors, preferences, utils, bin flags
   - `packages/cli/tests/commands/` — list (JSON/quiet output), doctor, import, sync command tests

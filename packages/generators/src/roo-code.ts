@@ -12,9 +12,11 @@
  *   - Windows requires "cmd /c npx" wrapper
  */
 
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig, inferTransport } from "@getmcp/core";
-import { BaseGenerator, toStdioFields } from "./base.js";
+import { BaseGenerator, toStdioFields, home, appData, configHome } from "./base.js";
 
 export class RooCodeGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -64,5 +66,19 @@ export class RooCodeGenerator extends BaseGenerator {
         [serverName]: serverConfig,
       },
     };
+  }
+
+  override detectInstalled(): boolean {
+    const extId = "rooveterinaryinc.roo-cline";
+    switch (process.platform) {
+      case "darwin":
+        return existsSync(
+          join(home, "Library", "Application Support", "Code", "User", "globalStorage", extId),
+        );
+      case "win32":
+        return existsSync(join(appData, "Code", "User", "globalStorage", extId));
+      default:
+        return existsSync(join(configHome, "Code", "User", "globalStorage", extId));
+    }
   }
 }

@@ -11,9 +11,11 @@
  *   - Very similar to Claude Desktop for stdio
  */
 
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields } from "./base.js";
+import { BaseGenerator, toStdioFields, home } from "./base.js";
 
 export class WindsurfGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -53,5 +55,9 @@ export class WindsurfGenerator extends BaseGenerator {
         [serverName]: serverConfig,
       },
     };
+  }
+
+  override detectInstalled(): boolean {
+    return existsSync(join(home, ".codeium", "windsurf"));
   }
 }

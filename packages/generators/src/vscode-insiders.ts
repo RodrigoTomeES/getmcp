@@ -7,9 +7,11 @@
  * Uses the same format as VS Code — root key "servers" with explicit "type" field.
  */
 
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig, inferTransport } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields } from "./base.js";
+import { BaseGenerator, toStdioFields, toRemoteFields, home, appData, configHome } from "./base.js";
 
 export class VSCodeInsidersGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -54,5 +56,16 @@ export class VSCodeInsidersGenerator extends BaseGenerator {
         [serverName]: serverConfig,
       },
     };
+  }
+
+  override detectInstalled(): boolean {
+    switch (process.platform) {
+      case "darwin":
+        return existsSync(join(home, "Library", "Application Support", "Code - Insiders"));
+      case "win32":
+        return existsSync(join(appData, "Code - Insiders"));
+      default:
+        return existsSync(join(configHome, "Code - Insiders"));
+    }
   }
 }

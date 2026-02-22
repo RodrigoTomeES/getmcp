@@ -8,9 +8,11 @@
  * Supports stdio and SSE transports.
  */
 
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields } from "./base.js";
+import { BaseGenerator, toStdioFields, toRemoteFields, home } from "./base.js";
 
 export class CursorGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -43,5 +45,9 @@ export class CursorGenerator extends BaseGenerator {
         [serverName]: serverConfig,
       },
     };
+  }
+
+  override detectInstalled(): boolean {
+    return existsSync(join(home, ".cursor"));
   }
 }

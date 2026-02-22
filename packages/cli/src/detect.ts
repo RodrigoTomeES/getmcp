@@ -1,11 +1,10 @@
 /**
  * App auto-detection.
  *
- * Checks if AI applications are installed by looking for their
- * config files (or parent directories) on the current platform.
+ * Resolves platform-specific config paths and delegates installation
+ * detection to each generator's `detectInstalled()` method.
  */
 
-import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
 import { generators } from "@getmcp/generators";
@@ -60,8 +59,8 @@ export interface DetectedApp {
 }
 
 /**
- * Detect which AI apps are installed by checking for config files.
- * Returns all apps with their resolved config paths and existence status.
+ * Detect which AI apps are available by resolving config paths and
+ * checking installation status via each generator's `detectInstalled()`.
  */
 export function detectApps(): DetectedApp[] {
   const results: DetectedApp[] = [];
@@ -70,16 +69,11 @@ export function detectApps(): DetectedApp[] {
     const configPath = getConfigPath(generator.app);
     if (!configPath) continue;
 
-    // Check if the config file itself exists, or its parent directory exists
-    // (some apps create the config file on first MCP server addition)
-    const fileExists = fs.existsSync(configPath);
-    const parentExists = fs.existsSync(path.dirname(configPath));
-
     results.push({
       id: generator.app.id,
       name: generator.app.name,
       configPath,
-      exists: fileExists || parentExists,
+      exists: generator.detectInstalled(),
       scope: generator.app.scope,
     });
   }

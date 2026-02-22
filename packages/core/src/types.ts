@@ -114,4 +114,10 @@ export interface ConfigGenerator {
    * Serialize the config object to a string (JSON, YAML, etc.)
    */
   serialize(config: Record<string, unknown>): string;
+
+  /**
+   * Check if this app is installed on the current system.
+   * Uses platform-specific heuristics (e.g., checking for config directories).
+   */
+  detectInstalled(): boolean;
 }
