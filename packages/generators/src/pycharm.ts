@@ -18,9 +18,8 @@
  * Important: PyCharm must be closed and reopened for config changes to take effect.
  */
 
-import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
-import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields } from "./base.js";
+import type { AppMetadata } from "@getmcp/core";
+import { BaseGenerator } from "./base.js";
 
 export class PyCharmGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -32,22 +31,4 @@ export class PyCharmGenerator extends BaseGenerator {
     configFormat: "json",
     docsUrl: "https://www.jetbrains.com/help/ai-assistant/mcp.html",
   };
-
-  generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
-    let serverConfig: Record<string, unknown>;
-
-    if (isStdioConfig(config)) {
-      serverConfig = toStdioFields(config);
-    } else if (isRemoteConfig(config)) {
-      serverConfig = toRemoteFields(config);
-    } else {
-      throw new Error("Invalid config: must have either 'command' or 'url'");
-    }
-
-    return {
-      mcpServers: {
-        [serverName]: serverConfig,
-      },
-    };
-  }
 }

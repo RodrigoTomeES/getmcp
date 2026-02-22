@@ -28,7 +28,7 @@
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, configHome, safeExistsSync } from "./base.js";
+import { BaseGenerator, INVALID_CONFIG_ERROR, configHome, safeExistsSync } from "./base.js";
 
 export class OpenCodeGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -71,7 +71,7 @@ export class OpenCodeGenerator extends BaseGenerator {
         ...(config.description ? { description: config.description } : {}),
       };
     } else {
-      throw new Error("Invalid config: must have either 'command' or 'url'");
+      throw new Error(INVALID_CONFIG_ERROR);
     }
 
     return {

@@ -9,9 +9,8 @@
  */
 
 import { join } from "node:path";
-import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
-import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields, home, safeExistsSync } from "./base.js";
+import type { AppMetadata } from "@getmcp/core";
+import { BaseGenerator, home, safeExistsSync } from "./base.js";
 
 export class BoltAIGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -25,24 +24,6 @@ export class BoltAIGenerator extends BaseGenerator {
     configFormat: "json",
     docsUrl: "https://docs.boltai.com/docs/mcp/overview",
   };
-
-  generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
-    let serverConfig: Record<string, unknown>;
-
-    if (isStdioConfig(config)) {
-      serverConfig = toStdioFields(config);
-    } else if (isRemoteConfig(config)) {
-      serverConfig = toRemoteFields(config);
-    } else {
-      throw new Error("Invalid config: must have either 'command' or 'url'");
-    }
-
-    return {
-      mcpServers: {
-        [serverName]: serverConfig,
-      },
-    };
-  }
 
   override detectInstalled(): boolean {
     if (process.platform !== "darwin") return false;

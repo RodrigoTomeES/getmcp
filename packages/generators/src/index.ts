@@ -30,6 +30,7 @@ export { AntigravityGenerator } from "./antigravity.js";
 // Base class and utilities
 export {
   BaseGenerator,
+  INVALID_CONFIG_ERROR,
   deepMerge,
   toStdioFields,
   toRemoteFields,
