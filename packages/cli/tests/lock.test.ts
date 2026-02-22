@@ -68,6 +68,22 @@ describe("readLockFile", () => {
     fs.writeFileSync(f, JSON.stringify(lock), "utf-8");
     expect(readLockFile(f)).toEqual(lock);
   });
+
+  it("returns empty lock for structurally invalid data (Zod validation)", () => {
+    const f = tmpFile("bad-structure.json");
+    // version is correct but installations has wrong shape
+    const bad = {
+      version: 1,
+      installations: {
+        github: {
+          apps: "not-an-array",
+          installedAt: 12345,
+        },
+      },
+    };
+    fs.writeFileSync(f, JSON.stringify(bad), "utf-8");
+    expect(readLockFile(f)).toEqual({ version: 1, installations: {} });
+  });
 });
 
 // ---------------------------------------------------------------------------

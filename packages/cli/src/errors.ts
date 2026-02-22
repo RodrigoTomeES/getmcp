@@ -1,17 +1,25 @@
 /**
  * Custom error classes with actionable remediation messages.
  */
+export type CliErrorCode =
+  | "CONFIG_PARSE_ERROR"
+  | "APP_NOT_DETECTED"
+  | "INVALID_APP"
+  | "SERVER_NOT_FOUND"
+  | "NON_INTERACTIVE";
 
 /**
  * Base class for CLI errors that include remediation steps.
  */
 export class CliError extends Error {
   readonly remediation: string;
+  readonly code?: CliErrorCode;
 
-  constructor(message: string, remediation: string) {
+  constructor(message: string, remediation: string, code?: CliErrorCode) {
     super(message);
     this.name = "CliError";
     this.remediation = remediation;
+    this.code = code;
   }
 
   format(): string {
@@ -32,6 +40,7 @@ export class ConfigParseError extends CliError {
     super(
       msg,
       `Check the file for syntax errors, or delete it and re-run the command to create a fresh config.`,
+      "CONFIG_PARSE_ERROR",
     );
     this.name = "ConfigParseError";
     this.filePath = filePath;
@@ -46,6 +55,7 @@ export class AppNotDetectedError extends CliError {
     super(
       "No AI applications detected on this system.",
       `Make sure at least one supported app is installed, or use --app <id> to specify a target manually.`,
+      "APP_NOT_DETECTED",
     );
     this.name = "AppNotDetectedError";
   }
@@ -58,7 +68,7 @@ export class InvalidAppError extends CliError {
   readonly appId: string;
 
   constructor(appId: string, validIds: string[]) {
-    super(`Unknown app: "${appId}"`, `Valid app IDs: ${validIds.join(", ")}`);
+    super(`Unknown app: "${appId}"`, `Valid app IDs: ${validIds.join(", ")}`, "INVALID_APP");
     this.name = "InvalidAppError";
     this.appId = appId;
   }
@@ -74,6 +84,7 @@ export class ServerNotFoundError extends CliError {
     super(
       `Server "${serverId}" not found in registry.`,
       `Run "getmcp list" to see available servers, or "getmcp find" to search interactively.`,
+      "SERVER_NOT_FOUND",
     );
     this.name = "ServerNotFoundError";
     this.serverId = serverId;
@@ -88,6 +99,7 @@ export class NonInteractiveError extends CliError {
     super(
       `Cannot prompt for input in non-interactive mode: ${detail}`,
       `Provide the required values via flags. Run "getmcp --help" for usage.`,
+      "NON_INTERACTIVE",
     );
     this.name = "NonInteractiveError";
   }
