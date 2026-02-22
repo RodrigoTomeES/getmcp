@@ -10,12 +10,13 @@ import * as path from "node:path";
 import * as p from "@clack/prompts";
 import { ProjectManifest } from "@getmcp/core";
 import { getServer } from "@getmcp/registry";
-import { getGenerator, getAppIds } from "@getmcp/generators";
+import { getGenerator, getAppIds, generators } from "@getmcp/generators";
 import type { LooseServerConfigType, AppIdType } from "@getmcp/core";
 import { detectApps, resolveAppForScope, type DetectedApp } from "../detect.js";
 import { mergeServerIntoConfig, writeConfigFile } from "../config-file.js";
 import { trackInstallation } from "../lock.js";
-import { shortenPath } from "../utils.js";
+import { getSavedSelectedApps, saveSelectedApps } from "../preferences.js";
+import { shortenPath, isNonInteractive as checkNonInteractive } from "../utils.js";
 import { InvalidAppError, formatError } from "../errors.js";
 
 export interface SyncOptions {
@@ -80,6 +81,12 @@ export async function syncCommand(options: SyncOptions = {}): Promise<void> {
     return;
   }
 
+  const isNonInteractive = checkNonInteractive(options);
+
+  if (!options.json) {
+    p.intro("getmcp sync");
+  }
+
   // Resolve target apps
   const allApps = detectApps();
   const detected = allApps.filter((app) => app.exists);
@@ -93,7 +100,6 @@ export async function syncCommand(options: SyncOptions = {}): Promise<void> {
     for (const appId of options.apps) {
       if (!validIds.includes(appId as AppIdType)) {
         if (!options.json) {
-          p.intro("getmcp sync");
           p.log.error(new InvalidAppError(appId, validIds).format());
         }
         process.exit(1);
@@ -101,12 +107,63 @@ export async function syncCommand(options: SyncOptions = {}): Promise<void> {
       const app = allApps.find((a) => a.id === appId);
       if (app) defaultApps.push(app);
     }
-  } else {
+  } else if (isNonInteractive) {
     defaultApps = detected;
+  } else {
+    const notDetectedProjectScoped = allApps.filter(
+      (app) => !app.exists && generators[app.id].app.configPaths !== null,
+    );
+
+    if (detected.length === 0 && notDetectedProjectScoped.length === 0) {
+      p.log.warn("No AI applications detected on this system.");
+      p.outro("Done");
+      return;
+    }
+
+    const savedApps = getSavedSelectedApps();
+    const hasSavedPreferences = savedApps !== null;
+
+    const choices = [
+      ...detected.map((app) => ({
+        label: app.name,
+        value: app,
+        hint: shortenPath(app.configPath),
+      })),
+      ...notDetectedProjectScoped.map((app) => ({
+        label: app.name,
+        value: app,
+        hint: `${shortenPath(app.configPath)} (not detected)`,
+      })),
+    ];
+
+    const initialValues = choices
+      .filter((c) => (hasSavedPreferences ? savedApps.includes(c.value.id) : c.value.exists))
+      .map((c) => c.value);
+
+    const initialIds = new Set(initialValues.map((v) => v.id));
+    choices.sort((a, b) => {
+      const aSelected = initialIds.has(a.value.id) ? 0 : 1;
+      const bSelected = initialIds.has(b.value.id) ? 0 : 1;
+      return aSelected - bSelected;
+    });
+
+    const selected = await p.multiselect({
+      message: "Select apps to sync:",
+      options: choices,
+      initialValues,
+      required: true,
+    });
+
+    if (p.isCancel(selected)) {
+      p.cancel("Operation cancelled.");
+      process.exit(0);
+    }
+
+    defaultApps = selected;
+    saveSelectedApps(defaultApps.map((app) => app.id));
   }
 
   if (!options.json) {
-    p.intro("getmcp sync");
     p.log.info(`Syncing ${serverIds.length} server(s) from getmcp.json`);
   }
 

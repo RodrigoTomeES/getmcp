@@ -103,7 +103,7 @@ Features that improve the developer experience.
 - [x] **Implement `getmcp update` command** — Re-generates and merges configs for all tracked installations using the current registry definitions. Supports `--yes`, `--app`, `--all-apps`, and `--dry-run` flags.
   - File: `packages/cli/src/commands/update.ts`
 
-- [x] **Implement `getmcp sync` command** — Reads `getmcp.json` project manifest and installs all declared servers into detected apps. Supports env overrides and per-server app targeting.
+- [x] **Implement `getmcp sync` command** — Reads `getmcp.json` project manifest and installs all declared servers into detected apps. Supports env overrides and per-server app targeting. Interactive multiselect prompt (matching `add` command UX) shown when running without `--app`/`--all-apps`/`--yes` flags; includes saved preferences and non-detected project-scoped apps.
   - Files: `packages/cli/src/commands/sync.ts`, `packages/core/src/schemas.ts` (`ManifestServerEntry`, `ProjectManifest`)
 
 - [x] **Implement `getmcp doctor` command** — Health diagnostics: installed apps, config parsing, registry status, orphaned servers, env vars, runtime dependencies (node, npx, uvx). Supports `--json` output.
