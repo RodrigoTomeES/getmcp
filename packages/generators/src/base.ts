@@ -8,6 +8,24 @@ import { join } from "node:path";
 import type { ConfigGenerator, AppMetadata, LooseServerConfigType } from "@getmcp/core";
 
 // ---------------------------------------------------------------------------
+// Lazy node:fs — avoids static import that breaks client-side bundlers
+// ---------------------------------------------------------------------------
+
+let _existsSync: (p: string) => boolean = () => false;
+try {
+  // process.getBuiltinModule (Node.js 22.3+) loads built-in modules without
+  // triggering bundler module resolution, making it safe for browser builds.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fs = (process as any).getBuiltinModule?.("node:fs") as
+    | { existsSync: (p: string) => boolean }
+    | undefined;
+  if (fs) _existsSync = fs.existsSync;
+} catch {
+  // Not available in browser environments
+}
+export { _existsSync as safeExistsSync };
+
+// ---------------------------------------------------------------------------
 // Shared path constants for detectInstalled() implementations
 // ---------------------------------------------------------------------------
 

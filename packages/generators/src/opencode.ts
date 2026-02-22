@@ -25,25 +25,20 @@
  *   - Env var syntax: {env:VAR} (no $ prefix)
  */
 
-import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, configHome } from "./base.js";
+import { BaseGenerator, configHome, safeExistsSync } from "./base.js";
 
 export class OpenCodeGenerator extends BaseGenerator {
   app: AppMetadata = {
     id: "opencode",
     name: "OpenCode",
     description: "Open-source AI coding agent by Anomaly",
-    configPaths: {
-      darwin: "opencode.json",
-      win32: "opencode.json",
-      linux: "opencode.json",
-    },
+    configPaths: "opencode.json",
+    globalConfigPaths: null,
     configFormat: "jsonc",
     docsUrl: "https://opencode.ai/docs/mcp-servers/",
-    scope: "project",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
@@ -100,6 +95,6 @@ export class OpenCodeGenerator extends BaseGenerator {
   }
 
   override detectInstalled(): boolean {
-    return existsSync(join(configHome, "opencode"));
+    return safeExistsSync(join(configHome, "opencode"));
   }
 }

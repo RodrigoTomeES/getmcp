@@ -24,6 +24,8 @@ export interface LockInstallation {
   updatedAt: string;
   /** Env var names that were set (values NOT stored for security) */
   envVars: string[];
+  /** Installation scope (missing = "project" for backwards compat) */
+  scope?: "project" | "global";
 }
 
 export interface LockFile {
@@ -97,6 +99,7 @@ export function trackInstallation(
   appIds: AppIdType[],
   envVarNames: string[],
   filePath?: string,
+  scope?: "project" | "global",
 ): void {
   const lock = readLockFile(filePath);
   const now = new Date().toISOString();
@@ -110,12 +113,14 @@ export function trackInstallation(
     // Merge env var names
     const allEnv = new Set([...existing.envVars, ...envVarNames]);
     existing.envVars = [...allEnv];
+    if (scope) existing.scope = scope;
   } else {
     lock.installations[serverId] = {
       apps: appIds,
       installedAt: now,
       updatedAt: now,
       envVars: envVarNames,
+      ...(scope ? { scope } : {}),
     };
   }
 

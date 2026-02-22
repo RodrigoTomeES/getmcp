@@ -13,9 +13,13 @@ vi.mock("@clack/prompts", () => ({
 }));
 
 // Mock detectApps to avoid filesystem access
-vi.mock("../../src/detect.js", () => ({
-  detectApps: vi.fn(() => []),
-}));
+vi.mock("../../src/detect.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../src/detect.js")>();
+  return {
+    ...actual,
+    detectApps: vi.fn(() => []),
+  };
+});
 
 // Mock config-file to avoid filesystem access
 vi.mock("../../src/config-file.js", () => ({
@@ -74,7 +78,7 @@ describe("syncCommand", () => {
         name: "Claude Desktop",
         configPath: path.join(tmpDir, "config.json"),
         exists: true,
-        scope: "global",
+        supportsBothScopes: false,
       },
     ]);
 
@@ -108,7 +112,7 @@ describe("syncCommand", () => {
         name: "Claude Desktop",
         configPath: path.join(tmpDir, "config.json"),
         exists: true,
-        scope: "global",
+        supportsBothScopes: false,
       },
     ]);
 

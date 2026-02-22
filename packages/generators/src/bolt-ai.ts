@@ -8,23 +8,22 @@
  * macOS-only application.
  */
 
-import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields, home } from "./base.js";
+import { BaseGenerator, toStdioFields, toRemoteFields, home, safeExistsSync } from "./base.js";
 
 export class BoltAIGenerator extends BaseGenerator {
   app: AppMetadata = {
     id: "bolt-ai",
     name: "BoltAI",
     description: "Native macOS AI chat client",
-    configPaths: {
+    configPaths: null,
+    globalConfigPaths: {
       darwin: "~/Library/Application Support/BoltAI/mcp_config.json",
     },
     configFormat: "json",
     docsUrl: "https://docs.boltai.com/docs/mcp/overview",
-    scope: "global",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
@@ -47,6 +46,6 @@ export class BoltAIGenerator extends BaseGenerator {
 
   override detectInstalled(): boolean {
     if (process.platform !== "darwin") return false;
-    return existsSync(join(home, "Library", "Application Support", "BoltAI"));
+    return safeExistsSync(join(home, "Library", "Application Support", "BoltAI"));
   }
 }

@@ -18,7 +18,8 @@ import { getAllServers, getServer, searchServers } from "@getmcp/registry";
 import { getGenerator, getAppIds } from "@getmcp/generators";
 import { isStdioConfig } from "@getmcp/core";
 import type { LooseServerConfigType, RegistryEntryType, AppIdType } from "@getmcp/core";
-import { detectApps, type DetectedApp } from "../detect.js";
+import { generators } from "@getmcp/generators";
+import { detectApps, resolveAppForScope, type DetectedApp } from "../detect.js";
 import { mergeServerIntoConfig, writeConfigFile } from "../config-file.js";
 import { getSavedSelectedApps, saveSelectedApps } from "../preferences.js";
 import { trackInstallation } from "../lock.js";
@@ -40,6 +41,8 @@ export interface AddOptions {
   fromNpm?: string;
   fromPypi?: string;
   fromUrl?: string;
+  global?: boolean;
+  project?: boolean;
 }
 
 export async function addCommand(serverIdArg?: string, options: AddOptions = {}): Promise<void> {
@@ -157,7 +160,9 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
   // Step 3: Detect apps and build selection list
   const allApps = detectApps();
   const detected = allApps.filter((app) => app.exists);
-  const notDetectedProjectScoped = allApps.filter((app) => !app.exists && app.scope === "project");
+  const notDetectedProjectScoped = allApps.filter(
+    (app) => !app.exists && generators[app.id].app.configPaths !== null,
+  );
 
   // Step 4: Select target apps
   let selectedApps: DetectedApp[];
@@ -250,6 +255,34 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
 
     // Save selected apps for next run
     saveSelectedApps(selectedApps.map((app) => app.id));
+  }
+
+  // Step 4.5: Scope selection for dual-scope apps
+  const dualScopeApps = selectedApps.filter((a) => a.supportsBothScopes);
+  if (dualScopeApps.length > 0) {
+    let chosenScope: "project" | "global";
+    if (options.global) {
+      chosenScope = "global";
+    } else if (options.project) {
+      chosenScope = "project";
+    } else if (isNonInteractive) {
+      chosenScope = "project";
+    } else {
+      const scopeChoice = await p.select({
+        message: "Install globally or per-project?",
+        options: [
+          { label: "Project", hint: "config in current directory", value: "project" as const },
+          { label: "Global", hint: "config in home directory", value: "global" as const },
+        ],
+        initialValue: "project" as const,
+      });
+      if (p.isCancel(scopeChoice)) {
+        p.cancel("Operation cancelled.");
+        process.exit(0);
+      }
+      chosenScope = scopeChoice;
+    }
+    selectedApps = selectedApps.map((app) => resolveAppForScope(app, chosenScope));
   }
 
   // Step 5+6: Generate and merge for each selected app
@@ -431,6 +464,34 @@ async function addUnverifiedServer(options: AddOptions): Promise<void> {
     p.log.error(new AppNotDetectedError().format());
     p.outro("Done");
     return;
+  }
+
+  // Scope selection for dual-scope apps
+  const dualScopeApps = selectedApps.filter((a) => a.supportsBothScopes);
+  if (dualScopeApps.length > 0) {
+    let chosenScope: "project" | "global";
+    if (options.global) {
+      chosenScope = "global";
+    } else if (options.project) {
+      chosenScope = "project";
+    } else if (isNonInteractive) {
+      chosenScope = "project";
+    } else {
+      const scopeChoice = await p.select({
+        message: "Install globally or per-project?",
+        options: [
+          { label: "Project", hint: "config in current directory", value: "project" as const },
+          { label: "Global", hint: "config in home directory", value: "global" as const },
+        ],
+        initialValue: "project" as const,
+      });
+      if (p.isCancel(scopeChoice)) {
+        p.cancel("Operation cancelled.");
+        process.exit(0);
+      }
+      chosenScope = scopeChoice;
+    }
+    selectedApps = selectedApps.map((app) => resolveAppForScope(app, chosenScope));
   }
 
   // Generate and merge

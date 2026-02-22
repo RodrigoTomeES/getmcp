@@ -27,14 +27,10 @@ export class PyCharmGenerator extends BaseGenerator {
     id: "pycharm",
     name: "PyCharm",
     description: "JetBrains PyCharm IDE with AI Assistant MCP integration",
-    configPaths: {
-      darwin: ".ai/mcp/mcp.json",
-      win32: ".ai/mcp/mcp.json",
-      linux: ".ai/mcp/mcp.json",
-    },
+    configPaths: ".ai/mcp/mcp.json",
+    globalConfigPaths: null,
     configFormat: "json",
     docsUrl: "https://www.jetbrains.com/help/ai-assistant/mcp.html",
-    scope: "project",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {

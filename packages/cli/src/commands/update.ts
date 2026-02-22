@@ -20,6 +20,8 @@ export interface UpdateOptions {
   apps?: string[];
   allApps?: boolean;
   dryRun?: boolean;
+  global?: boolean;
+  project?: boolean;
 }
 
 export async function updateCommand(options: UpdateOptions = {}): Promise<void> {

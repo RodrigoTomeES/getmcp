@@ -64,6 +64,8 @@ Options:
   --dry-run         Preview changes without writing files
   --json            Output machine-readable JSON
   --quiet, -q       Minimal output (one item per line)
+  --global, -g      Install to global config (for dual-scope apps)
+  --project         Install to project config (for dual-scope apps)
   --from-npm <pkg>  Install unverified npm package as MCP server
   --from-pypi <pkg> Install unverified PyPI package as MCP server
   --from-url <url>  Install unverified remote URL as MCP server
@@ -117,6 +119,8 @@ async function main(): Promise<void> {
         fromNpm: flags.fromNpm,
         fromPypi: flags.fromPypi,
         fromUrl: flags.fromUrl,
+        global: flags.global,
+        project: flags.project,
       });
       break;
     }
@@ -126,6 +130,8 @@ async function main(): Promise<void> {
         yes: flags.yes,
         apps: flags.apps,
         dryRun: flags.dryRun,
+        global: flags.global,
+        project: flags.project,
       });
       break;
     }
@@ -159,6 +165,8 @@ async function main(): Promise<void> {
         apps: flags.apps,
         allApps: flags.allApps,
         dryRun: flags.dryRun,
+        global: flags.global,
+        project: flags.project,
       });
       break;
     }
@@ -190,6 +198,8 @@ async function main(): Promise<void> {
         allApps: flags.allApps,
         dryRun: flags.dryRun,
         json: flags.json,
+        global: flags.global,
+        project: flags.project,
       });
       break;
     }

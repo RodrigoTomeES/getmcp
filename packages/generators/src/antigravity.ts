@@ -7,25 +7,24 @@
  * Near-passthrough — Antigravity uses the same canonical mcpServers format.
  */
 
-import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields, home } from "./base.js";
+import { BaseGenerator, toStdioFields, toRemoteFields, home, safeExistsSync } from "./base.js";
 
 export class AntigravityGenerator extends BaseGenerator {
   app: AppMetadata = {
     id: "antigravity",
     name: "Antigravity",
     description: "Google's AI-first IDE",
-    configPaths: {
+    configPaths: null,
+    globalConfigPaths: {
       darwin: "~/.gemini/antigravity/mcp_config.json",
       win32: "%UserProfile%\\.gemini\\antigravity\\mcp_config.json",
       linux: "~/.gemini/antigravity/mcp_config.json",
     },
     configFormat: "json",
     docsUrl: "https://antigravity.google/docs/mcp",
-    scope: "global",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
@@ -47,6 +46,6 @@ export class AntigravityGenerator extends BaseGenerator {
   }
 
   override detectInstalled(): boolean {
-    return existsSync(join(home, ".gemini", "antigravity"));
+    return safeExistsSync(join(home, ".gemini", "antigravity"));
   }
 }

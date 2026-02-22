@@ -22,6 +22,8 @@ export interface RemoveOptions {
   yes?: boolean;
   apps?: string[];
   dryRun?: boolean;
+  global?: boolean;
+  project?: boolean;
 }
 
 export async function removeCommand(

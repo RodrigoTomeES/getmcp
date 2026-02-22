@@ -11,25 +11,28 @@
  *   - Supports "envFile" for .env loading
  */
 
-import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig, inferTransport } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields, home, appData, configHome } from "./base.js";
+import {
+  BaseGenerator,
+  toStdioFields,
+  toRemoteFields,
+  home,
+  appData,
+  configHome,
+  safeExistsSync,
+} from "./base.js";
 
 export class VSCodeGenerator extends BaseGenerator {
   app: AppMetadata = {
     id: "vscode",
     name: "VS Code / GitHub Copilot",
     description: "Visual Studio Code with GitHub Copilot MCP integration",
-    configPaths: {
-      darwin: ".vscode/mcp.json",
-      win32: ".vscode/mcp.json",
-      linux: ".vscode/mcp.json",
-    },
+    configPaths: ".vscode/mcp.json",
+    globalConfigPaths: null,
     configFormat: "json",
     docsUrl: "https://code.visualstudio.com/docs/copilot/chat/mcp-servers",
-    scope: "project",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
@@ -65,11 +68,11 @@ export class VSCodeGenerator extends BaseGenerator {
   override detectInstalled(): boolean {
     switch (process.platform) {
       case "darwin":
-        return existsSync(join(home, "Library", "Application Support", "Code"));
+        return safeExistsSync(join(home, "Library", "Application Support", "Code"));
       case "win32":
-        return existsSync(join(appData, "Code"));
+        return safeExistsSync(join(appData, "Code"));
       default:
-        return existsSync(join(configHome, "Code"));
+        return safeExistsSync(join(configHome, "Code"));
     }
   }
 }

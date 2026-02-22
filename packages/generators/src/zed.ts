@@ -20,25 +20,24 @@
  *   - Also installable via Zed extensions
  */
 
-import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, configHome, appData } from "./base.js";
+import { BaseGenerator, toStdioFields, configHome, appData, safeExistsSync } from "./base.js";
 
 export class ZedGenerator extends BaseGenerator {
   app: AppMetadata = {
     id: "zed",
     name: "Zed",
     description: "High-performance code editor by Zed Industries",
-    configPaths: {
+    configPaths: null,
+    globalConfigPaths: {
       darwin: "~/.config/zed/settings.json",
       win32: "%AppData%\\Zed\\settings.json",
       linux: "~/.config/zed/settings.json",
     },
     configFormat: "json",
     docsUrl: "https://zed.dev/docs/ai/mcp",
-    scope: "global",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
@@ -68,9 +67,9 @@ export class ZedGenerator extends BaseGenerator {
   override detectInstalled(): boolean {
     switch (process.platform) {
       case "win32":
-        return existsSync(join(appData, "Zed"));
+        return safeExistsSync(join(appData, "Zed"));
       default:
-        return existsSync(join(configHome, "zed"));
+        return safeExistsSync(join(configHome, "zed"));
     }
   }
 }

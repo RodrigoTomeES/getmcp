@@ -60,6 +60,15 @@ export type ProjectManifest = z.infer<typeof ProjectManifest>;
 // ---------------------------------------------------------------------------
 
 /**
+ * Platform-specific paths for global config files.
+ */
+export type PlatformPaths = {
+  win32?: string;
+  darwin?: string;
+  linux?: string;
+};
+
+/**
  * Metadata about a target application.
  * Used by the CLI for auto-detection and display.
  */
@@ -73,21 +82,38 @@ export interface AppMetadata {
   /** Brief description of the app */
   description: string;
 
-  /** Config file path pattern (with platform placeholders) */
-  configPaths: {
-    win32?: string;
-    darwin?: string;
-    linux?: string;
-  };
+  /**
+   * Project-scoped config path (relative to project root, same on all platforms).
+   * null if the app doesn't support project-scoped config.
+   */
+  configPaths: string | null;
+
+  /**
+   * Global config paths (platform-specific, may use ~ or %AppData%).
+   * null if the app doesn't support global config.
+   */
+  globalConfigPaths: PlatformPaths | null;
 
   /** Config file format */
   configFormat: "json" | "jsonc" | "yaml" | "toml";
 
   /** URL to the app's MCP documentation */
   docsUrl: string;
+}
 
-  /** Whether the config is project-scoped or global */
-  scope: "project" | "global";
+/**
+ * Check if an app supports both project and global scopes.
+ */
+export function supportsBothScopes(app: AppMetadata): boolean {
+  return app.configPaths !== null && app.globalConfigPaths !== null;
+}
+
+/**
+ * Get the default scope for an app.
+ * Project-capable apps default to project, otherwise global.
+ */
+export function getDefaultScope(app: AppMetadata): "project" | "global" {
+  return app.configPaths !== null ? "project" : "global";
 }
 
 /**

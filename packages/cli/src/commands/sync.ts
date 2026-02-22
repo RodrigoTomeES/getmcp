@@ -12,7 +12,7 @@ import { ProjectManifest } from "@getmcp/core";
 import { getServer } from "@getmcp/registry";
 import { getGenerator, getAppIds } from "@getmcp/generators";
 import type { LooseServerConfigType, AppIdType } from "@getmcp/core";
-import { detectApps, type DetectedApp } from "../detect.js";
+import { detectApps, resolveAppForScope, type DetectedApp } from "../detect.js";
 import { mergeServerIntoConfig, writeConfigFile } from "../config-file.js";
 import { trackInstallation } from "../lock.js";
 import { shortenPath } from "../utils.js";
@@ -24,6 +24,8 @@ export interface SyncOptions {
   allApps?: boolean;
   dryRun?: boolean;
   json?: boolean;
+  global?: boolean;
+  project?: boolean;
   /** Override manifest path (for testing) */
   manifestPath?: string;
 }
@@ -146,6 +148,14 @@ export async function syncCommand(options: SyncOptions = {}): Promise<void> {
     } else {
       targetApps = defaultApps;
     }
+
+    // Resolve scope for dual-scope apps
+    const serverScope =
+      (serverOverrides && "scope" in serverOverrides && serverOverrides.scope) ||
+      (options.global ? "global" : "project");
+    targetApps = targetApps.map((app) =>
+      resolveAppForScope(app, serverScope as "project" | "global"),
+    );
 
     const configuredApps: string[] = [];
 

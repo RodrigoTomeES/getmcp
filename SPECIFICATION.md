@@ -122,7 +122,7 @@ getmcp/
         codex.ts                   # Generator for Codex (TOML)
         index.ts                   # Generator registry + public API
       tests/
-        generators.test.ts         # 117 tests
+        generators.test.ts         # 119 tests
 
     registry/                      # @getmcp/registry (v0.1.0)
       src/
@@ -166,7 +166,7 @@ getmcp/
           sync.ts                  # getmcp sync (project manifest)
         index.ts                   # Public API barrel
       tests/
-        detect.test.ts             # 10 tests
+        detect.test.ts             # 12 tests
         config-file.test.ts        # 60 tests
         lock.test.ts               # 17 tests
         errors.test.ts             # 18 tests
@@ -343,12 +343,21 @@ interface AppMetadata {
   id: AppId;
   name: string;
   description: string;
-  configPaths: { win32?: string; darwin?: string; linux?: string };
+  /** Project-scoped config path (relative, same on all platforms). null if no project scope. */
+  configPaths: string | null;
+  /** Global config paths (platform-specific). null if no global scope. */
+  globalConfigPaths: PlatformPaths | null;
   configFormat: "json" | "jsonc" | "yaml" | "toml";
   docsUrl: string;
-  scope: "project" | "global";
 }
 ```
+
+**Scope utilities** (exported from `@getmcp/core`):
+
+- `supportsBothScopes(app: AppMetadata): boolean` — returns `true` when an app has both `configPaths` and `globalConfigPaths` set (i.e., supports both project and global scopes).
+- `getDefaultScope(app: AppMetadata): "project" | "global"` — returns `"project"` when the app has a project-scoped path, otherwise `"global"`.
+
+**Dual-scope apps** (support both project and global config): Claude Code, Cursor, Codex. All other apps are either project-only or global-only.
 
 ### Generator Transformation Rules
 
@@ -554,9 +563,15 @@ Interactive installation workflow:
 3. Prompts for required environment variables
 4. Auto-detects installed AI apps on the system
 5. User selects which apps to configure (all pre-selected)
-6. Generates app-specific config for each selected app
-7. Merges into existing config files (preserves all existing servers)
-8. Reports success per app
+6. For dual-scope apps (Claude Code, Cursor, Codex): prompts for project vs global scope (or uses `--global`/`--project` flag)
+7. Generates app-specific config for each selected app
+8. Merges into existing config files (preserves all existing servers)
+9. Reports success per app
+
+| Flag        | Short | Description                                             |
+| ----------- | ----- | ------------------------------------------------------- |
+| `--global`  | `-g`  | Install to global config for dual-scope apps            |
+| `--project` |       | Install to project config for dual-scope apps (default) |
 
 #### `getmcp remove <server-name>`
 
@@ -672,12 +687,13 @@ getmcp sync -y --all-apps
   "servers": {
     "github": {},
     "brave-search": { "env": { "BRAVE_API_KEY": "my-key" } },
-    "memory": { "apps": ["claude-desktop", "vscode"] }
+    "memory": { "apps": ["claude-desktop", "vscode"] },
+    "filesystem": { "scope": "global" }
   }
 }
 ```
 
-Each server entry can optionally specify `env` overrides and `apps` restrictions.
+Each server entry can optionally specify `env` overrides, `apps` restrictions, and `scope` (`"project"` or `"global"`) for dual-scope apps.
 
 ### App Auto-Detection
 
@@ -694,6 +710,32 @@ An app is considered "detected" if either:
 
 - Its config file exists, OR
 - Its config file's parent directory exists (the app is installed but hasn't been configured yet)
+
+#### DetectedApp Interface
+
+```typescript
+interface DetectedApp {
+  id: AppIdType;
+  name: string;
+  configPath: string; // Resolved default config path
+  exists: boolean; // Whether the app is installed
+  supportsBothScopes: boolean; // true for Claude Code, Cursor, Codex
+  globalConfigPath?: string; // Present only for dual-scope apps
+}
+```
+
+For dual-scope apps, `configPath` defaults to the project-scoped path. When the user selects global scope (via `--global` flag or interactive prompt), the CLI uses `resolveAppForScope()` to swap to the `globalConfigPath`.
+
+### Scope Selection
+
+Three apps support both project and global config scopes: **Claude Code**, **Cursor**, and **Codex**.
+
+| Flag        | Short | Effect                                                  |
+| ----------- | ----- | ------------------------------------------------------- |
+| `--global`  | `-g`  | Install to global config for dual-scope apps            |
+| `--project` |       | Install to project config for dual-scope apps (default) |
+
+When neither flag is provided and dual-scope apps are selected, the CLI prompts the user to choose a scope interactively. Single-scope apps ignore these flags.
 
 ### Config Merging Strategy
 
@@ -1059,8 +1101,8 @@ Detailed documentation of every app's MCP config format, gathered from official 
 | `@getmcp/core`       | 3          | 39      | Schema validation, type guards, transport inference, JSON Schema, ProjectManifest                                    |
 | `@getmcp/generators` | 1          | 119     | All 20 generators (stdio + remote), multi-server, serialization                                                      |
 | `@getmcp/registry`   | 1          | 60      | Entry validation, lookup, search, categories, content integrity                                                      |
-| `@getmcp/cli`        | 12         | 285     | Path resolution, app detection, config I/O, lock file, errors, preferences, utils, flags, doctor, import, sync, list |
-| **Total**            | **17**     | **503** |                                                                                                                      |
+| `@getmcp/cli`        | 12         | 297     | Path resolution, app detection, config I/O, lock file, errors, preferences, utils, flags, doctor, import, sync, list |
+| **Total**            | **17**     | **515** |                                                                                                                      |
 
 ---
 

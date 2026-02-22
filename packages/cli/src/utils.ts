@@ -43,6 +43,8 @@ export interface CliFlags {
   fromNpm?: string;
   fromPypi?: string;
   fromUrl?: string;
+  global: boolean;
+  project: boolean;
   help: boolean;
   version: boolean;
 }
@@ -60,6 +62,8 @@ export function parseFlags(argv: string[]): {
     installed: false,
     json: false,
     quiet: false,
+    global: false,
+    project: false,
     help: false,
     version: false,
   };
@@ -107,6 +111,10 @@ export function parseFlags(argv: string[]): {
       flags.json = true;
     } else if (arg === "--quiet" || arg === "-q") {
       flags.quiet = true;
+    } else if (arg === "--global" || arg === "-g") {
+      flags.global = true;
+    } else if (arg === "--project") {
+      flags.project = true;
     } else if (arg === "--help" || arg === "-h") {
       flags.help = true;
     } else if (arg === "--version" || arg === "-v") {

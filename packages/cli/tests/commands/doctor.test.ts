@@ -100,7 +100,7 @@ describe("doctorCommand", () => {
         name: "Claude Desktop",
         configPath: "/tmp/nonexistent-config.json",
         exists: true,
-        scope: "global",
+        supportsBothScopes: false,
       },
     ]);
 
