@@ -10,9 +10,9 @@
   Universal installer and configuration tool for MCP (Model Context Protocol) servers across all AI applications.
 </p>
 
-**The problem:** Every AI app uses a different config format for MCP servers. Claude Desktop uses `mcpServers`, VS Code uses `servers`, Goose uses YAML with `cmd`/`envs`, Codex uses TOML with `mcp_servers`... there are 12 apps, 6 root keys, and 4 formats.
+**The problem:** Every AI app uses a different config format for MCP servers. Claude Desktop uses `mcpServers`, VS Code uses `servers`, Goose uses YAML with `cmd`/`envs`, Codex uses TOML with `mcp_servers`... there are 19 apps, 6 root keys, and 4 formats.
 
-**The solution:** One canonical format, config generators for every app, a registry of popular servers, and a CLI that auto-detects your apps and writes the correct config.
+**The solution:** One canonical format, config generators for every app, a registry of 105+ servers, and a CLI that auto-detects your apps and writes the correct config.
 
 > Browse the full server catalog at [getmcp.es](https://getmcp.es)
 
@@ -32,6 +32,19 @@ npx @getmcp/cli list --search=database
 npx @getmcp/cli remove github
 ```
 
+## Why getmcp?
+
+| Feature              | getmcp                      | Smithery      | mcpm.sh     |
+| -------------------- | --------------------------- | ------------- | ----------- |
+| Supported apps       | **19**                      | 19            | 14          |
+| Registry servers     | **105+**                    | 100K+ (cloud) | 379         |
+| Runtime dependency   | **None** (write & done)     | Cloud proxy   | Local proxy |
+| Config formats       | **JSON, JSONC, YAML, TOML** | JSON only     | JSON only   |
+| License              | **MIT**                     | AGPL          | MIT         |
+| Library-first design | **Yes** (npm packages)      | No            | No          |
+| Multi-app install    | **Yes** (one command)       | No            | No          |
+| Offline/local-first  | **Yes**                     | No            | Partial     |
+
 ## How It Works
 
 ```
@@ -40,7 +53,7 @@ npx @getmcp/cli remove github
                            |
     +----------+-----------+-----------+----------+
     |          |           |           |          |
- Claude     VS Code     Goose      Codex    + 8 more
+ Claude     VS Code     Goose      Codex   + 15 more
  Desktop   (servers)   (YAML)     (TOML)     apps
 (mcpServers)          (extensions)(mcp_servers)
 ```
@@ -56,6 +69,7 @@ npx @getmcp/cli remove github
 | Claude Desktop    | `mcpServers`      | JSON   |
 | Claude Code       | `mcpServers`      | JSON   |
 | VS Code / Copilot | `servers`         | JSON   |
+| VS Code Insiders  | `servers`         | JSON   |
 | Cursor            | `mcpServers`      | JSON   |
 | Cline             | `mcpServers`      | JSON   |
 | Roo Code          | `mcpServers`      | JSON   |
@@ -65,10 +79,16 @@ npx @getmcp/cli remove github
 | Zed               | `context_servers` | JSON   |
 | PyCharm           | `mcpServers`      | JSON   |
 | Codex             | `mcp_servers`     | TOML   |
+| Gemini CLI        | `mcpServers`      | JSON   |
+| Continue          | `mcpServers`      | JSON   |
+| Amazon Q          | `mcpServers`      | JSON   |
+| Trae              | `mcpServers`      | JSON   |
+| BoltAI            | `mcpServers`      | JSON   |
+| LibreChat         | `mcpServers`      | YAML   |
 
 ## Registry
 
-35 MCP servers included out of the box. Here are some highlights:
+105+ MCP servers included out of the box. Here are some highlights:
 
 | Server       | Transport | Description                                                  |
 | ------------ | --------- | ------------------------------------------------------------ |
@@ -96,13 +116,13 @@ npx @getmcp/cli list
 
 ## Packages
 
-| Package                                     | Description                            | npm                                                                                                         |
-| ------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| [`@getmcp/cli`](packages/cli)               | CLI tool for installing MCP servers    | [![npm](https://img.shields.io/npm/v/@getmcp/cli)](https://www.npmjs.com/package/@getmcp/cli)               |
-| [`@getmcp/core`](packages/core)             | Zod schemas, types, and utilities      | [![npm](https://img.shields.io/npm/v/@getmcp/core)](https://www.npmjs.com/package/@getmcp/core)             |
-| [`@getmcp/generators`](packages/generators) | Config generators for 12 apps          | [![npm](https://img.shields.io/npm/v/@getmcp/generators)](https://www.npmjs.com/package/@getmcp/generators) |
-| [`@getmcp/registry`](packages/registry)     | Registry of MCP server definitions     | [![npm](https://img.shields.io/npm/v/@getmcp/registry)](https://www.npmjs.com/package/@getmcp/registry)     |
-| [`@getmcp/web`](packages/web)               | Web directory (Next.js, not published) | --                                                                                                          |
+| Package                                     | Description                             | npm                                                                                                         |
+| ------------------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| [`@getmcp/cli`](packages/cli)               | CLI tool for installing MCP servers     | [![npm](https://img.shields.io/npm/v/@getmcp/cli)](https://www.npmjs.com/package/@getmcp/cli)               |
+| [`@getmcp/core`](packages/core)             | Zod schemas, types, and utilities       | [![npm](https://img.shields.io/npm/v/@getmcp/core)](https://www.npmjs.com/package/@getmcp/core)             |
+| [`@getmcp/generators`](packages/generators) | Config generators for 19 apps           | [![npm](https://img.shields.io/npm/v/@getmcp/generators)](https://www.npmjs.com/package/@getmcp/generators) |
+| [`@getmcp/registry`](packages/registry)     | Registry of 105+ MCP server definitions | [![npm](https://img.shields.io/npm/v/@getmcp/registry)](https://www.npmjs.com/package/@getmcp/registry)     |
+| [`@getmcp/web`](packages/web)               | Web directory (Next.js, not published)  | --                                                                                                          |
 
 ## Library Usage
 
@@ -157,7 +177,7 @@ npm install
 # Build all packages
 npm run build
 
-# Run all tests (257 tests)
+# Run all tests (489+ tests)
 npm run test
 
 # Build and test a specific package
@@ -178,9 +198,9 @@ npm run website
 getmcp/
   packages/
     core/          # Zod schemas, TS types, utility functions
-    generators/    # 12 config generators (one per app)
-    registry/      # 35 MCP server definitions
-    cli/           # add/remove/list commands, app detection
+    generators/    # 19 config generators (one per app)
+    registry/      # 105+ MCP server definitions
+    cli/           # add/remove/list/doctor/import commands, app detection
     web/           # Next.js web directory at getmcp.es
 ```
 
