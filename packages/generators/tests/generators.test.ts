@@ -563,9 +563,8 @@ describe("PyCharmGenerator", () => {
   });
 
   it("has project-level configPaths", () => {
-    expect(gen.app.configPaths.win32).toBe(".ai/mcp/mcp.json");
-    expect(gen.app.configPaths.darwin).toBe(".ai/mcp/mcp.json");
-    expect(gen.app.configPaths.linux).toBe(".ai/mcp/mcp.json");
+    expect(gen.app.configPaths).toBe(".ai/mcp/mcp.json");
+    expect(gen.app.globalConfigPaths).toBeNull();
   });
 
   it("serializes to valid JSON", () => {
@@ -674,9 +673,11 @@ describe("CodexGenerator", () => {
   });
 
   it("has correct config paths", () => {
-    expect(gen.app.configPaths.darwin).toBe("~/.codex/config.toml");
-    expect(gen.app.configPaths.linux).toBe("~/.codex/config.toml");
-    expect(gen.app.configPaths.win32).toBe("%UserProfile%\\.codex\\config.toml");
+    expect(gen.app.configPaths).toBe(".codex/config.toml");
+    expect(gen.app.globalConfigPaths).not.toBeNull();
+    expect(gen.app.globalConfigPaths!.darwin).toBe("~/.codex/config.toml");
+    expect(gen.app.globalConfigPaths!.linux).toBe("~/.codex/config.toml");
+    expect(gen.app.globalConfigPaths!.win32).toBe("%UserProfile%\\.codex\\config.toml");
   });
 });
 
@@ -756,7 +757,8 @@ describe("TraeGenerator", () => {
   });
 
   it("is project-scoped", () => {
-    expect(gen.app.scope).toBe("project");
+    expect(gen.app.configPaths).not.toBeNull();
+    expect(gen.app.globalConfigPaths).toBeNull();
   });
 });
 
@@ -786,7 +788,7 @@ describe("VSCodeInsidersGenerator", () => {
   });
 
   it("uses .vscode-insiders config path", () => {
-    expect(gen.app.configPaths.darwin).toBe(".vscode-insiders/mcp.json");
+    expect(gen.app.configPaths).toBe(".vscode-insiders/mcp.json");
   });
 });
 
@@ -805,9 +807,11 @@ describe("BoltAIGenerator", () => {
   });
 
   it("is macOS only", () => {
-    expect(gen.app.configPaths.darwin).toBeDefined();
-    expect(gen.app.configPaths.win32).toBeUndefined();
-    expect(gen.app.configPaths.linux).toBeUndefined();
+    expect(gen.app.configPaths).toBeNull();
+    expect(gen.app.globalConfigPaths).not.toBeNull();
+    expect(gen.app.globalConfigPaths!.darwin).toBeDefined();
+    expect(gen.app.globalConfigPaths!.win32).toBeUndefined();
+    expect(gen.app.globalConfigPaths!.linux).toBeUndefined();
   });
 });
 

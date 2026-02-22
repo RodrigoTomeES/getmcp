@@ -8,25 +8,24 @@
  * Supports stdio and SSE transports.
  */
 
-import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields, home } from "./base.js";
+import { BaseGenerator, toStdioFields, toRemoteFields, home, safeExistsSync } from "./base.js";
 
 export class CursorGenerator extends BaseGenerator {
   app: AppMetadata = {
     id: "cursor",
     name: "Cursor",
     description: "Cursor AI-powered code editor",
-    configPaths: {
-      darwin: ".cursor/mcp.json",
-      win32: ".cursor/mcp.json",
-      linux: ".cursor/mcp.json",
+    configPaths: ".cursor/mcp.json",
+    globalConfigPaths: {
+      darwin: "~/.cursor/mcp.json",
+      win32: "%UserProfile%\\.cursor\\mcp.json",
+      linux: "~/.cursor/mcp.json",
     },
     configFormat: "json",
     docsUrl: "https://docs.cursor.com/context/model-context-protocol",
-    scope: "project",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
@@ -48,6 +47,6 @@ export class CursorGenerator extends BaseGenerator {
   }
 
   override detectInstalled(): boolean {
-    return existsSync(join(home, ".cursor"));
+    return safeExistsSync(join(home, ".cursor"));
   }
 }

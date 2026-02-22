@@ -7,25 +7,24 @@
  * Near-passthrough — Gemini CLI uses the same canonical mcpServers format.
  */
 
-import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields, home } from "./base.js";
+import { BaseGenerator, toStdioFields, toRemoteFields, home, safeExistsSync } from "./base.js";
 
 export class GeminiCliGenerator extends BaseGenerator {
   app: AppMetadata = {
     id: "gemini-cli",
     name: "Gemini CLI",
     description: "Google's Gemini CLI agent",
-    configPaths: {
+    configPaths: null,
+    globalConfigPaths: {
       darwin: "~/.gemini/settings.json",
       win32: "%UserProfile%\\.gemini\\settings.json",
       linux: "~/.gemini/settings.json",
     },
     configFormat: "json",
     docsUrl: "https://github.com/google-gemini/gemini-cli",
-    scope: "global",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
@@ -47,6 +46,6 @@ export class GeminiCliGenerator extends BaseGenerator {
   }
 
   override detectInstalled(): boolean {
-    return existsSync(join(home, ".gemini"));
+    return safeExistsSync(join(home, ".gemini"));
   }
 }

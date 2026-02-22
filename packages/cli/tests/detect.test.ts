@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
 import * as os from "node:os";
 import * as path from "node:path";
-import { resolvePath, detectApps } from "../src/detect.js";
+import { resolvePath, detectApps, resolveAppForScope } from "../src/detect.js";
 import { generators } from "@getmcp/generators";
+import { supportsBothScopes } from "@getmcp/core";
 
 describe("resolvePath", () => {
   it("expands ~ to home directory", () => {
@@ -41,7 +42,7 @@ describe("detectApps", () => {
       expect(app.name).toBeDefined();
       expect(app.configPath).toBeDefined();
       expect(typeof app.exists).toBe("boolean");
-      expect(["project", "global"]).toContain(app.scope);
+      expect(typeof app.supportsBothScopes).toBe("boolean");
     }
   });
 
@@ -53,22 +54,24 @@ describe("detectApps", () => {
     expect(ids).toContain("opencode"); // opencode.json - relative
   });
 
-  it("project-scoped apps have scope 'project'", () => {
+  it("dual-scope apps have supportsBothScopes true", () => {
     const apps = detectApps();
-    const projectIds = ["claude-code", "vscode", "cursor", "opencode", "pycharm"];
+    const dualScopeIds = ["claude-code", "cursor", "codex"];
     for (const app of apps) {
-      if (projectIds.includes(app.id)) {
-        expect(app.scope).toBe("project");
+      if (dualScopeIds.includes(app.id)) {
+        expect(app.supportsBothScopes).toBe(true);
+        expect(app.globalConfigPath).toBeDefined();
       }
     }
   });
 
-  it("global-scoped apps have scope 'global'", () => {
+  it("single-scope apps have supportsBothScopes false", () => {
     const apps = detectApps();
-    const globalIds = ["claude-desktop", "cline", "roo-code", "goose", "windsurf", "zed", "codex"];
+    const singleScopeIds = ["claude-desktop", "vscode", "cline", "goose", "opencode"];
     for (const app of apps) {
-      if (globalIds.includes(app.id)) {
-        expect(app.scope).toBe("global");
+      if (singleScopeIds.includes(app.id)) {
+        expect(app.supportsBothScopes).toBe(false);
+        expect(app.globalConfigPath).toBeUndefined();
       }
     }
   });
@@ -79,5 +82,53 @@ describe("detectApps", () => {
       const generator = generators[app.id];
       expect(app.exists).toBe(generator.detectInstalled());
     }
+  });
+
+  it("supportsBothScopes matches core utility", () => {
+    const apps = detectApps();
+    for (const app of apps) {
+      const generator = generators[app.id];
+      expect(app.supportsBothScopes).toBe(supportsBothScopes(generator.app));
+    }
+  });
+});
+
+describe("resolveAppForScope", () => {
+  it("returns unchanged app for single-scope apps", () => {
+    const app = {
+      id: "vscode" as const,
+      name: "VS Code",
+      configPath: ".vscode/mcp.json",
+      exists: true,
+      supportsBothScopes: false,
+    };
+    const resolved = resolveAppForScope(app, "global");
+    expect(resolved).toBe(app); // same reference, unchanged
+  });
+
+  it("swaps configPath for dual-scope app with global scope", () => {
+    const app = {
+      id: "claude-code" as const,
+      name: "Claude Code",
+      configPath: ".mcp.json",
+      exists: true,
+      supportsBothScopes: true,
+      globalConfigPath: "/home/user/.claude.json",
+    };
+    const resolved = resolveAppForScope(app, "global");
+    expect(resolved.configPath).toBe("/home/user/.claude.json");
+  });
+
+  it("keeps default configPath for dual-scope app with project scope", () => {
+    const app = {
+      id: "claude-code" as const,
+      name: "Claude Code",
+      configPath: ".mcp.json",
+      exists: true,
+      supportsBothScopes: true,
+      globalConfigPath: "/home/user/.claude.json",
+    };
+    const resolved = resolveAppForScope(app, "project");
+    expect(resolved.configPath).toBe(".mcp.json");
   });
 });

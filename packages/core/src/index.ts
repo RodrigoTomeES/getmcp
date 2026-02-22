@@ -37,12 +37,14 @@ export type {
   AppId as AppIdType,
   ManifestServerEntry as ManifestServerEntryType,
   ProjectManifest as ProjectManifestType,
+  PlatformPaths,
   AppMetadata,
   ConfigGenerator,
 } from "./types.js";
 
 // Utilities
 export { isStdioConfig, isRemoteConfig, inferTransport } from "./utils.js";
+export { supportsBothScopes, getDefaultScope } from "./types.js";
 
 // JSON Schema
 export { getRegistryEntryJsonSchema } from "./json-schema.js";

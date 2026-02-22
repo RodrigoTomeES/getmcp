@@ -21,26 +21,25 @@
  *   - Extra fields: "enabled", "timeout" (in seconds), "name" (display name)
  */
 
-import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig, inferTransport } from "@getmcp/core";
 import YAML from "yaml";
-import { BaseGenerator, configHome, appData } from "./base.js";
+import { BaseGenerator, configHome, appData, safeExistsSync } from "./base.js";
 
 export class GooseGenerator extends BaseGenerator {
   app: AppMetadata = {
     id: "goose",
     name: "Goose",
     description: "Block's autonomous AI coding agent",
-    configPaths: {
+    configPaths: null,
+    globalConfigPaths: {
       darwin: "~/.config/goose/config.yaml",
       win32: "%AppData%\\goose\\config.yaml",
       linux: "~/.config/goose/config.yaml",
     },
     configFormat: "yaml",
     docsUrl: "https://block.github.io/goose/docs/getting-started/using-extensions",
-    scope: "global",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
@@ -89,6 +88,6 @@ export class GooseGenerator extends BaseGenerator {
   }
 
   override detectInstalled(): boolean {
-    return existsSync(join(configHome, "goose")) || existsSync(join(appData, "goose"));
+    return safeExistsSync(join(configHome, "goose")) || safeExistsSync(join(appData, "goose"));
   }
 }

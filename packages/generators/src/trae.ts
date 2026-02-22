@@ -8,25 +8,20 @@
  * Project-scoped configuration.
  */
 
-import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields, home } from "./base.js";
+import { BaseGenerator, toStdioFields, toRemoteFields, home, safeExistsSync } from "./base.js";
 
 export class TraeGenerator extends BaseGenerator {
   app: AppMetadata = {
     id: "trae",
     name: "Trae",
     description: "ByteDance's AI-powered IDE",
-    configPaths: {
-      darwin: ".trae/mcp.json",
-      win32: ".trae/mcp.json",
-      linux: ".trae/mcp.json",
-    },
+    configPaths: ".trae/mcp.json",
+    globalConfigPaths: null,
     configFormat: "json",
     docsUrl: "https://docs.trae.ai/ide/model-context-protocol-mcp",
-    scope: "project",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
@@ -48,6 +43,6 @@ export class TraeGenerator extends BaseGenerator {
   }
 
   override detectInstalled(): boolean {
-    return existsSync(join(home, ".trae"));
+    return safeExistsSync(join(home, ".trae"));
   }
 }

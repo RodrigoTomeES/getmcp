@@ -222,6 +222,8 @@ export const ManifestServerEntry = z.object({
   env: z.record(z.string(), z.string()).optional(),
   /** Restrict to specific apps (defaults to all detected) */
   apps: z.array(AppId).optional(),
+  /** Override installation scope (project or global) */
+  scope: z.enum(["project", "global"]).optional(),
 });
 
 /**

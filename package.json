@@ -16,7 +16,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "lint": "npm run lint --workspaces --if-present",
-    "@getmcp": "npx tsx packages/cli/src/bin.ts"
+    "getmcp": "npx tsx packages/cli/src/bin.ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

@@ -25,14 +25,10 @@ export class LibreChatGenerator extends BaseGenerator {
     id: "libre-chat",
     name: "LibreChat",
     description: "Open-source AI chat platform with multi-provider support",
-    configPaths: {
-      darwin: "librechat.yaml",
-      win32: "librechat.yaml",
-      linux: "librechat.yaml",
-    },
+    configPaths: "librechat.yaml",
+    globalConfigPaths: null,
     configFormat: "yaml",
     docsUrl: "https://www.librechat.ai/docs/configuration/mcp_servers",
-    scope: "project",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {

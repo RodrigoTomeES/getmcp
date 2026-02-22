@@ -12,18 +12,18 @@
  *   - Windows requires "cmd /c npx" wrapper
  */
 
-import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig, inferTransport } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, home, appData, configHome } from "./base.js";
+import { BaseGenerator, toStdioFields, home, appData, configHome, safeExistsSync } from "./base.js";
 
 export class RooCodeGenerator extends BaseGenerator {
   app: AppMetadata = {
     id: "roo-code",
     name: "Roo Code",
     description: "AI coding assistant VS Code extension (formerly Roo Cline)",
-    configPaths: {
+    configPaths: null,
+    globalConfigPaths: {
       darwin:
         "~/Library/Application Support/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/mcp_settings.json",
       win32:
@@ -33,7 +33,6 @@ export class RooCodeGenerator extends BaseGenerator {
     },
     configFormat: "json",
     docsUrl: "https://docs.roocode.com/features/mcp/using-mcp-in-roo",
-    scope: "global",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
@@ -72,13 +71,13 @@ export class RooCodeGenerator extends BaseGenerator {
     const extId = "rooveterinaryinc.roo-cline";
     switch (process.platform) {
       case "darwin":
-        return existsSync(
+        return safeExistsSync(
           join(home, "Library", "Application Support", "Code", "User", "globalStorage", extId),
         );
       case "win32":
-        return existsSync(join(appData, "Code", "User", "globalStorage", extId));
+        return safeExistsSync(join(appData, "Code", "User", "globalStorage", extId));
       default:
-        return existsSync(join(configHome, "Code", "User", "globalStorage", extId));
+        return safeExistsSync(join(configHome, "Code", "User", "globalStorage", extId));
     }
   }
 }

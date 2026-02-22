@@ -12,7 +12,7 @@ export { findCommand } from "./commands/find.js";
 export { checkCommand } from "./commands/check.js";
 export { updateCommand } from "./commands/update.js";
 export { initCommand } from "./commands/init.js";
-export { detectApps, detectInstalledApps } from "./detect.js";
+export { detectApps, detectInstalledApps, resolveAppForScope } from "./detect.js";
 export {
   readConfigFile,
   writeConfigFile,

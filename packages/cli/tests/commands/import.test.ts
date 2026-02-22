@@ -69,7 +69,7 @@ describe("importCommand", () => {
         name: "Claude Desktop",
         configPath: "/tmp/config.json",
         exists: true,
-        scope: "global",
+        supportsBothScopes: false,
       },
     ]);
 
@@ -111,7 +111,7 @@ describe("importCommand", () => {
         name: "Claude Desktop",
         configPath: "/tmp/config.json",
         exists: true,
-        scope: "global",
+        supportsBothScopes: false,
       },
     ]);
 
@@ -134,7 +134,7 @@ describe("importCommand", () => {
         name: "Claude Desktop",
         configPath: "/tmp/config.json",
         exists: true,
-        scope: "global",
+        supportsBothScopes: false,
       },
     ]);
 

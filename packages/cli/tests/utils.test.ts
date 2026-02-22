@@ -133,6 +133,23 @@ describe("parseFlags", () => {
     expect(result.flags.yes).toBe(false);
   });
 
+  it("parses --global flag", () => {
+    const result = parseFlags(["add", "github", "--global"]);
+    expect(result.flags.global).toBe(true);
+    expect(result.flags.project).toBe(false);
+  });
+
+  it("parses -g short flag for global", () => {
+    const result = parseFlags(["add", "github", "-g"]);
+    expect(result.flags.global).toBe(true);
+  });
+
+  it("parses --project flag", () => {
+    const result = parseFlags(["add", "github", "--project"]);
+    expect(result.flags.project).toBe(true);
+    expect(result.flags.global).toBe(false);
+  });
+
   it("ignores unknown flags", () => {
     const result = parseFlags(["add", "--unknown"]);
     expect(result.command).toBe("add");

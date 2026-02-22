@@ -9,18 +9,18 @@
  *   - SSE servers use "url" + "headers" instead of "command"/"args"
  */
 
-import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, home, appData, configHome } from "./base.js";
+import { BaseGenerator, toStdioFields, home, appData, configHome, safeExistsSync } from "./base.js";
 
 export class ClineGenerator extends BaseGenerator {
   app: AppMetadata = {
     id: "cline",
     name: "Cline",
     description: "AI coding assistant VS Code extension",
-    configPaths: {
+    configPaths: null,
+    globalConfigPaths: {
       darwin:
         "~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json",
       win32:
@@ -30,7 +30,6 @@ export class ClineGenerator extends BaseGenerator {
     },
     configFormat: "json",
     docsUrl: "https://docs.cline.bot/mcp-servers/configuring-mcp-servers",
-    scope: "global",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
@@ -67,13 +66,13 @@ export class ClineGenerator extends BaseGenerator {
     const extId = "saoudrizwan.claude-dev";
     switch (process.platform) {
       case "darwin":
-        return existsSync(
+        return safeExistsSync(
           join(home, "Library", "Application Support", "Code", "User", "globalStorage", extId),
         );
       case "win32":
-        return existsSync(join(appData, "Code", "User", "globalStorage", extId));
+        return safeExistsSync(join(appData, "Code", "User", "globalStorage", extId));
       default:
-        return existsSync(join(configHome, "Code", "User", "globalStorage", extId));
+        return safeExistsSync(join(configHome, "Code", "User", "globalStorage", extId));
     }
   }
 }

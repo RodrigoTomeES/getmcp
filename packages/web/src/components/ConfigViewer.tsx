@@ -69,10 +69,13 @@ export function ConfigViewer({
       <p className="text-xs text-[var(--color-text-secondary)] mb-2">
         Config file:{" "}
         <code className="text-[var(--color-accent)]">
-          {generator.app.configPaths.darwin ??
-            generator.app.configPaths.win32 ??
-            generator.app.configPaths.linux ??
-            "—"}
+          {generator.app.configPaths !== null && generator.app.globalConfigPaths !== null
+            ? `${generator.app.configPaths} (project) or ${generator.app.globalConfigPaths?.darwin ?? "—"} (global)`
+            : (generator.app.configPaths ??
+              generator.app.globalConfigPaths?.darwin ??
+              generator.app.globalConfigPaths?.win32 ??
+              generator.app.globalConfigPaths?.linux ??
+              "—")}
         </code>
       </p>
 

@@ -115,6 +115,9 @@ Features that improve the developer experience.
 - [x] **Add `detectInstalled()` to generators** — Each generator now has a `detectInstalled()` method that checks if the app is installed using `existsSync()` on platform-specific directories. Replaces the old `detectApps()` logic that derived "installed" from config path parent directory existence. Shared path constants (`home`, `configHome`, `appData`, `claudeHome`, `codexHome`) in `base.ts` support env var overrides.
   - Files: `packages/core/src/types.ts`, `packages/generators/src/base.ts`, all 20 generator files, `packages/cli/src/detect.ts`
 
+- [x] **Scope selection (global vs project)** — Added support for dual-scope MCP installations. Apps like Claude Code, Cursor, and Codex can install servers either globally or at the project level. Redesigned `AppMetadata` to use `configPaths: string | null` (project-scoped) + `globalConfigPaths: PlatformPaths | null` (global-scoped), replacing the old `scope` + platform-specific `configPaths` layout. Added `--global`/`-g` and `--project` CLI flags, interactive scope prompt for dual-scope apps, optional `scope` override in `ManifestServerEntry`, and scope tracking in the lock file.
+  - Files: `packages/core/src/types.ts`, `packages/core/src/schemas.ts`, `packages/generators/src/base.ts`, `packages/cli/src/commands/add.ts`, `packages/cli/src/lock.ts`, `packages/cli/src/utils.ts`
+
 ---
 
 ## 5. Medium — CI / Build
@@ -227,7 +230,8 @@ Longer-term roadmap items from the specification.
 
 - [ ] **OAuth support for remote MCP servers** — Integrate with Codex's `codex mcp login` flow. Add guidance or CLI support for OAuth-authenticated servers, including the optional `mcp_oauth_callback_port` top-level config.
 
-- [ ] **Project-scoped Codex config** — Codex supports `.codex/config.toml` for project-level config. Update `detectApps()` to check for project-scoped Codex configs.
+- [x] **Project-scoped Codex config** — Codex supports `.codex/config.toml` for project-level config. Implemented as part of the broader scope selection feature (see Section 4).
+  - Files: `packages/generators/src/codex.ts`, `packages/cli/src/detect.ts`
 
 ### Registry Enhancements
 

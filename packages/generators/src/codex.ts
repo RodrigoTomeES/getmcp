@@ -25,25 +25,24 @@
  *   - No explicit "transport" field (Codex auto-detects)
  */
 
-import { existsSync } from "node:fs";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
 import * as TOML from "smol-toml";
-import { BaseGenerator, codexHome } from "./base.js";
+import { BaseGenerator, codexHome, safeExistsSync } from "./base.js";
 
 export class CodexGenerator extends BaseGenerator {
   app: AppMetadata = {
     id: "codex",
     name: "Codex",
     description: "OpenAI's AI coding agent",
-    configPaths: {
+    configPaths: ".codex/config.toml",
+    globalConfigPaths: {
       darwin: "~/.codex/config.toml",
       win32: "%UserProfile%\\.codex\\config.toml",
       linux: "~/.codex/config.toml",
     },
     configFormat: "toml",
     docsUrl: "https://developers.openai.com/codex/mcp/",
-    scope: "global",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
@@ -86,6 +85,6 @@ export class CodexGenerator extends BaseGenerator {
   }
 
   override detectInstalled(): boolean {
-    return existsSync(codexHome);
+    return safeExistsSync(codexHome);
   }
 }

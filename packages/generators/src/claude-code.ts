@@ -12,24 +12,29 @@
  * optional transport type for remote servers.
  */
 
-import { existsSync } from "node:fs";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields, claudeHome } from "./base.js";
+import {
+  BaseGenerator,
+  toStdioFields,
+  toRemoteFields,
+  claudeHome,
+  safeExistsSync,
+} from "./base.js";
 
 export class ClaudeCodeGenerator extends BaseGenerator {
   app: AppMetadata = {
     id: "claude-code",
     name: "Claude Code",
     description: "Anthropic's CLI-based coding agent",
-    configPaths: {
-      darwin: ".mcp.json",
-      win32: ".mcp.json",
-      linux: ".mcp.json",
+    configPaths: ".mcp.json",
+    globalConfigPaths: {
+      darwin: "~/.claude.json",
+      win32: "%UserProfile%\\.claude.json",
+      linux: "~/.claude.json",
     },
     configFormat: "json",
     docsUrl: "https://docs.anthropic.com/en/docs/claude-code/mcp",
-    scope: "project",
   };
 
   generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
@@ -56,6 +61,6 @@ export class ClaudeCodeGenerator extends BaseGenerator {
   }
 
   override detectInstalled(): boolean {
-    return existsSync(claudeHome);
+    return safeExistsSync(claudeHome);
   }
 }
