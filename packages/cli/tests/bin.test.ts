@@ -61,6 +61,27 @@ describe("parseFlags (bin-level)", () => {
     expect(result.flags.json).toBe(true);
     expect(result.flags.quiet).toBe(true);
   });
+
+  it("parses --from-npm with = syntax", () => {
+    const result = parseFlags(["add", "--from-npm=@some/pkg"]);
+    expect(result.command).toBe("add");
+    expect(result.flags.fromNpm).toBe("@some/pkg");
+  });
+
+  it("parses --from-npm with space syntax", () => {
+    const result = parseFlags(["add", "--from-npm", "@some/pkg"]);
+    expect(result.flags.fromNpm).toBe("@some/pkg");
+  });
+
+  it("parses --from-pypi", () => {
+    const result = parseFlags(["add", "--from-pypi=some-pkg"]);
+    expect(result.flags.fromPypi).toBe("some-pkg");
+  });
+
+  it("parses --from-url", () => {
+    const result = parseFlags(["add", "--from-url=https://mcp.example.com/sse"]);
+    expect(result.flags.fromUrl).toBe("https://mcp.example.com/sse");
+  });
 });
 
 // ---------------------------------------------------------------------------
