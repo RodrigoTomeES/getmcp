@@ -43,6 +43,15 @@ describe("shortenPath", () => {
     const result = shortenPath(fakePath);
     expect(result).toBe(fakePath);
   });
+
+  it("uses forward slashes for CWD-relative paths", () => {
+    const cwd = process.cwd();
+    const filePath = path.join(cwd, "sub", "dir", "config.json");
+    const result = shortenPath(filePath);
+    // Should not contain backslashes (Windows path separators)
+    expect(result).not.toMatch(/\\/);
+    expect(result).toMatch(/^\.\//);
+  });
 });
 
 // ---------------------------------------------------------------------------

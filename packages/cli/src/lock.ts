@@ -9,6 +9,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { z } from "zod";
 import type { AppIdType } from "@getmcp/core";
 
 // ---------------------------------------------------------------------------
@@ -32,6 +33,25 @@ export interface LockFile {
   version: 1;
   installations: Record<string, LockInstallation>;
 }
+
+// ---------------------------------------------------------------------------
+// Validation schema
+// ---------------------------------------------------------------------------
+
+const LockInstallationSchema = z.object({
+  apps: z.array(z.string()),
+  installedAt: z.string(),
+  updatedAt: z.string(),
+  envVars: z.array(z.string()),
+  scope: z.enum(["project", "global"]).optional(),
+});
+
+const LockFileSchema = z.object({
+  version: z.literal(1),
+  installations: z.record(LockInstallationSchema),
+});
+
+export { LockFileSchema };
 
 // ---------------------------------------------------------------------------
 // Path resolution
@@ -63,11 +83,12 @@ export function readLockFile(filePath?: string): LockFile {
     if (!raw.trim()) return { version: 1, installations: {} };
     const parsed = JSON.parse(raw);
 
-    if (typeof parsed !== "object" || parsed === null || parsed.version !== 1) {
+    const result = LockFileSchema.safeParse(parsed);
+    if (!result.success) {
       return { version: 1, installations: {} };
     }
 
-    return parsed as LockFile;
+    return result.data as LockFile;
   } catch {
     return { version: 1, installations: {} };
   }

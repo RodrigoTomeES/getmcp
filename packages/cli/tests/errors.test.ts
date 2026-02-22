@@ -31,6 +31,16 @@ describe("CliError", () => {
     const err = new CliError("test", "hint");
     expect(err).toBeInstanceOf(Error);
   });
+
+  it("stores optional error code", () => {
+    const err = new CliError("fail", "hint", "SERVER_NOT_FOUND");
+    expect(err.code).toBe("SERVER_NOT_FOUND");
+  });
+
+  it("code is undefined when not provided", () => {
+    const err = new CliError("fail", "hint");
+    expect(err.code).toBeUndefined();
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -53,6 +63,11 @@ describe("ConfigParseError", () => {
     const err = new ConfigParseError("/path/config.json");
     expect(err.remediation).toContain("syntax errors");
   });
+
+  it("has CONFIG_PARSE_ERROR code", () => {
+    const err = new ConfigParseError("/path/config.json");
+    expect(err.code).toBe("CONFIG_PARSE_ERROR");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -68,6 +83,11 @@ describe("AppNotDetectedError", () => {
   it("suggests --app flag in remediation", () => {
     const err = new AppNotDetectedError();
     expect(err.remediation).toContain("--app");
+  });
+
+  it("has APP_NOT_DETECTED code", () => {
+    const err = new AppNotDetectedError();
+    expect(err.code).toBe("APP_NOT_DETECTED");
   });
 });
 
@@ -87,6 +107,11 @@ describe("InvalidAppError", () => {
     expect(err.remediation).toContain("claude-desktop");
     expect(err.remediation).toContain("vscode");
   });
+
+  it("has INVALID_APP code", () => {
+    const err = new InvalidAppError("foobar", ["claude-desktop"]);
+    expect(err.code).toBe("INVALID_APP");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -105,6 +130,11 @@ describe("ServerNotFoundError", () => {
     expect(err.remediation).toContain("getmcp list");
     expect(err.remediation).toContain("getmcp find");
   });
+
+  it("has SERVER_NOT_FOUND code", () => {
+    const err = new ServerNotFoundError("test");
+    expect(err.code).toBe("SERVER_NOT_FOUND");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -120,6 +150,11 @@ describe("NonInteractiveError", () => {
   it("suggests --help in remediation", () => {
     const err = new NonInteractiveError("something");
     expect(err.remediation).toContain("getmcp --help");
+  });
+
+  it("has NON_INTERACTIVE code", () => {
+    const err = new NonInteractiveError("test");
+    expect(err.code).toBe("NON_INTERACTIVE");
   });
 });
 
