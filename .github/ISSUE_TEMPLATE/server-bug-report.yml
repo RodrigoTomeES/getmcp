@@ -15,41 +15,111 @@ body:
       label: MCP Server
       description: Which MCP server is affected?
       options:
+        - Airtable
+        - Anthropic
+        - Apify
+        - Asana
+        - AWS
         - AWS Documentation
+        - Azure
+        - BigQuery
+        - Bitbucket
         - Brave Search
         - Browser Tools
+        - Browserbase
         - Chrome DevTools
         - Claude Context
+        - ClickUp
+        - Cloudflare
+        - Confluence
         - Context7
+        - Crawl4AI
+        - Datadog
         - Desktop Commander
+        - DigitalOcean
+        - Discord
+        - Docker
+        - DynamoDB
+        - Elasticsearch
+        - Email
+        - EverArt
+        - Everything
+        - Exa
         - Fetch
         - Figma
         - Filesystem
         - Firecrawl
-        - GenAI Toolbox for Databases
-        - GitMCP
         - GitHub
+        - GitHub Copilot
+        - GitLab
+        - GitMCP
+        - Google Cloud
         - Google Maps
+        - Grafana
+        - HashiCorp Vault
+        - Hugging Face
         - IDA Pro
+        - Jira
+        - Kubernetes
+        - LangChain
+        - Linear
+        - LlamaIndex
+        - MCP Toolbox for Databases
         - Memory
         - MindsDB
+        - MongoDB
+        - MySQL
         - n8n
+        - Neo4j
+        - Neon
         - "Next.js DevTools MCP"
+        - Notion
+        - npm Registry
+        - Obsidian
+        - OpenAI
         - OpenAI Docs
+        - PagerDuty
         - PDF Math Translate
+        - Perplexity
+        - Pinecone
         - Playwright
         - PostgreSQL
+        - Prometheus
         - Puppeteer
+        - Raycast
+        - ReadMe
+        - Redis
+        - Replicate
         - Repomix
         - Scrapling
         - Sentry
         - Sequential Thinking
         - "shadcn/ui"
+        - Shopify
         - Slack
+        - Snowflake
+        - Snyk
+        - SonarQube
+        - SQLite
+        - Stripe
         - Supabase
+        - "Swagger/OpenAPI"
+        - Tavily
+        - Telegram
+        - Terraform
+        - Time
+        - Todoist
+        - Together AI
+        - Trello
         - TrendRadar
+        - Twilio
+        - "Twitter/X"
         - Unity
+        - Vercel
+        - Weaviate
         - Xiaohongshu
+        - YouTube
+        - ZenRows
     validations:
       required: true
 
@@ -59,18 +129,26 @@ body:
       label: AI Application
       description: Which AI application are you using the server with?
       options:
-        - Claude Desktop
+        - Amazon Q
+        - Antigravity
+        - Bolt AI
         - Claude Code
-        - VS Code / GitHub Copilot
-        - Cursor
+        - Claude Desktop
         - Cline
-        - Roo Code
-        - Goose
-        - Windsurf
-        - OpenCode
-        - Zed
-        - PyCharm
         - Codex
+        - Continue
+        - Cursor
+        - Gemini CLI
+        - Goose
+        - LibreChat
+        - OpenCode
+        - PyCharm
+        - Roo Code
+        - Trae
+        - VS Code / GitHub Copilot
+        - VS Code Insiders
+        - Windsurf
+        - Zed
     validations:
       required: true
 
