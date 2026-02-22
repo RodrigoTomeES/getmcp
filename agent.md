@@ -20,13 +20,13 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22) with 5 
 @getmcp/web -----> @getmcp/core + @getmcp/generators + @getmcp/registry
 ```
 
-| Package               | npm Name             | Purpose                                                                                                                                                                 |
-| --------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/core`       | `@getmcp/core`       | Zod schemas, TypeScript types, utility functions (type guards, transport inference), JSON Schema generation                                                             |
-| `packages/generators` | `@getmcp/generators` | 11 config generators (one per AI app), each transforms canonical format to app-native format                                                                            |
-| `packages/registry`   | `@getmcp/registry`   | Catalog of MCP server definitions with search/filter API                                                                                                                |
-| `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `init` commands with app auto-detection, config merging, and installation tracking via `getmcp-lock.json` |
-| `packages/web`        | `@getmcp/web`        | Next.js (App Router) web directory for browsing servers and generating config snippets                                                                                  |
+| Package               | npm Name             | Purpose                                                                                                                                                                                             |
+| --------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/core`       | `@getmcp/core`       | Zod schemas, TypeScript types, utility functions (type guards, transport inference), JSON Schema generation                                                                                         |
+| `packages/generators` | `@getmcp/generators` | 19 config generators (one per AI app), each transforms canonical format to app-native format                                                                                                        |
+| `packages/registry`   | `@getmcp/registry`   | Catalog of MCP server definitions with search/filter API                                                                                                                                            |
+| `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `init`, `doctor`, `import`, `sync` commands with app auto-detection, config merging, and installation tracking via `getmcp-lock.json` |
+| `packages/web`        | `@getmcp/web`        | Next.js (App Router) web directory for browsing servers and generating config snippets                                                                                                              |
 
 **Tech stack**: TypeScript 5.7+, Zod 3.24+, Vitest 3.0+, Next.js 15.3+ (web), Tailwind CSS 4.0+ (web), `@inquirer/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
 
@@ -75,12 +75,12 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 
 ### `@getmcp/core` (`packages/core/src/`)
 
-| File             | Purpose                                                                                                                    |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `schemas.ts`     | All Zod schemas: `StdioServerConfig`, `RemoteServerConfig`, `ServerConfig`, `CanonicalMCPConfig`, `RegistryEntry`, `AppId` |
-| `types.ts`       | TypeScript types inferred from Zod; `ConfigGenerator` and `AppMetadata` interfaces                                         |
-| `utils.ts`       | Type guards (`isStdioConfig`, `isRemoteConfig`) and `inferTransport()`                                                     |
-| `json-schema.ts` | Runtime JSON Schema generation: `getRegistryEntryJsonSchema()`                                                             |
+| File             | Purpose                                                                                                                                                              |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `schemas.ts`     | All Zod schemas: `StdioServerConfig`, `RemoteServerConfig`, `ServerConfig`, `CanonicalMCPConfig`, `RegistryEntry`, `AppId`, `ManifestServerEntry`, `ProjectManifest` |
+| `types.ts`       | TypeScript types inferred from Zod; `ConfigGenerator` and `AppMetadata` interfaces                                                                                   |
+| `utils.ts`       | Type guards (`isStdioConfig`, `isRemoteConfig`) and `inferTransport()`                                                                                               |
+| `json-schema.ts` | Runtime JSON Schema generation: `getRegistryEntryJsonSchema()`                                                                                                       |
 
 ### `@getmcp/generators` (`packages/generators/src/`)
 
@@ -102,10 +102,10 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 
 ### `@getmcp/registry` (`packages/registry/src/`)
 
-| File           | Purpose                                                                                                           |
-| -------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `index.ts`     | Registry engine: `getServer()`, `getAllServers()`, `searchServers()`, `getServersByCategory()`, `getCategories()` |
-| `servers/*.ts` | Individual server definitions (one file per server), each exports a `RegistryEntryType`                           |
+| File           | Purpose                                                                                                                                    |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `index.ts`     | Registry engine: `getServer()`, `getAllServers()`, `searchServers()`, `getServersByCategory()`, `getCategories()`, `findServerByCommand()` |
+| `servers/*.ts` | Individual server definitions (one file per server), each exports a `RegistryEntryType`                                                    |
 
 ### `@getmcp/cli` (`packages/cli/src/`)
 
@@ -126,6 +126,9 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 | `commands/check.ts`  | Validate tracked installations against registry and app configs                                                                                                                                                                                   |
 | `commands/update.ts` | Re-generate and merge configs for all tracked installations                                                                                                                                                                                       |
 | `commands/init.ts`   | Interactive wizard to scaffold a new server registry entry                                                                                                                                                                                        |
+| `commands/doctor.ts` | Health diagnostics: installed apps, config parsing, registry status, orphaned servers, env vars, runtime dependencies                                                                                                                             |
+| `commands/import.ts` | Scan app configs for existing servers and adopt them into getmcp tracking                                                                                                                                                                         |
+| `commands/sync.ts`   | Read `getmcp.json` manifest and install all declared servers into detected apps                                                                                                                                                                   |
 
 ### `@getmcp/web` (`packages/web/src/`)
 
@@ -135,7 +138,7 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 | `app/docs/page.tsx`           | Documentation page with getting started, supported apps, library usage, and more                |
 | `app/docs/loading.tsx`        | Loading skeleton for the docs page                                                              |
 | `app/servers/[id]/page.tsx`   | Dynamic server detail page (statically generated from registry)                                 |
-| `components/ConfigViewer.tsx` | Client component: tab selector for all 12 apps, shows generated config snippet with copy button |
+| `components/ConfigViewer.tsx` | Client component: tab selector for all 19 apps, shows generated config snippet with copy button |
 | `components/SearchBar.tsx`    | Search and filter component                                                                     |
 | `components/ServerCard.tsx`   | Server listing card                                                                             |
 
@@ -194,14 +197,15 @@ This is not optional — documentation drift causes confusion and wastes time. T
 
 ## Testing
 
-- **335 tests** across 12 test files
+- **499 tests** across 17 test files
 - Run all tests: `npx vitest` (from repo root)
 - Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc.
 - Test locations:
-  - `packages/core/tests/` — schema validation, type guards, transport inference, JSON Schema
-  - `packages/generators/tests/` — all 12 generators (stdio + remote + multi-server + serialization)
+  - `packages/core/tests/` — schema validation, type guards, transport inference, JSON Schema, ProjectManifest
+  - `packages/generators/tests/` — all 19 generators (stdio + remote + multi-server + serialization)
   - `packages/registry/tests/` — entry validation, lookup, search, categories, content integrity
-  - `packages/cli/tests/` — path resolution, app detection, config read/write/merge/remove, lock file, errors, preferences, utils
+  - `packages/cli/tests/` — path resolution, app detection, config read/write/merge/remove, lock file, errors, preferences, utils, bin flags
+  - `packages/cli/tests/commands/` — list (JSON/quiet output), doctor, import, sync command tests
 
 ---
 
