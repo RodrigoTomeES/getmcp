@@ -1,0 +1,23 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const openai: RegistryEntryType = {
+  id: "openai",
+  name: "OpenAI",
+  description:
+    "OpenAI API integration — interact with GPT models, DALL-E, and other OpenAI services",
+  config: {
+    command: "npx",
+    args: ["-y", "mcp-openai"],
+    env: {
+      OPENAI_API_KEY: "",
+    },
+    transport: "stdio",
+  },
+  package: "mcp-openai",
+  runtime: "node",
+  repository: "https://github.com/nicholasgriffintn/mcp-openai",
+  homepage: "https://openai.com",
+  author: "Nicholas Griffin",
+  categories: ["ai"],
+  requiredEnvVars: ["OPENAI_API_KEY"],
+};

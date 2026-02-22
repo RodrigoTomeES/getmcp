@@ -1,0 +1,21 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const time: RegistryEntryType = {
+  id: "time",
+  name: "Time",
+  description:
+    "Time and timezone utilities — get current time, convert between timezones, and format dates",
+  config: {
+    command: "uvx",
+    args: ["mcp-server-time"],
+    env: {},
+    transport: "stdio",
+  },
+  package: "mcp-server-time",
+  runtime: "python",
+  repository: "https://github.com/modelcontextprotocol/servers",
+  homepage: "https://github.com/modelcontextprotocol/servers/tree/main/src/time",
+  author: "Anthropic",
+  categories: ["utilities"],
+  requiredEnvVars: [],
+};

@@ -43,6 +43,47 @@ import { nextDevtools } from "./servers/next-devtools.js";
 import { supabase } from "./servers/supabase.js";
 import { openaiDocs } from "./servers/openai-docs.js";
 import { shadcn } from "./servers/shadcn.js";
+// Batch 1: Developer Tools
+import { gitlab } from "./servers/gitlab.js";
+import { linear } from "./servers/linear.js";
+import { jira } from "./servers/jira.js";
+import { notion } from "./servers/notion.js";
+import { todoist } from "./servers/todoist.js";
+import { obsidian } from "./servers/obsidian.js";
+import { terraform } from "./servers/terraform.js";
+import { kubernetes } from "./servers/kubernetes.js";
+import { dockerMcp } from "./servers/docker.js";
+import { vercel } from "./servers/vercel.js";
+// Batch 1: Data/Database
+import { mysql } from "./servers/mysql.js";
+import { sqlite } from "./servers/sqlite.js";
+import { mongodb } from "./servers/mongodb.js";
+import { redis } from "./servers/redis.js";
+import { elasticsearch } from "./servers/elasticsearch.js";
+// Batch 1: AI/Search
+import { tavily } from "./servers/tavily.js";
+import { exa } from "./servers/exa.js";
+import { perplexity } from "./servers/perplexity.js";
+import { anthropic } from "./servers/anthropic.js";
+import { openai } from "./servers/openai.js";
+// Batch 1: Cloud
+import { aws } from "./servers/aws.js";
+import { cloudflare } from "./servers/cloudflare.js";
+import { gcp } from "./servers/gcp.js";
+import { azure } from "./servers/azure.js";
+import { digitalocean } from "./servers/digitalocean.js";
+// Batch 1: Communication
+import { discord } from "./servers/discord.js";
+import { telegram } from "./servers/telegram.js";
+import { email } from "./servers/email.js";
+// Batch 1: Web/Utilities
+import { stripe } from "./servers/stripe.js";
+import { twilio } from "./servers/twilio.js";
+import { airtable } from "./servers/airtable.js";
+import { shopify } from "./servers/shopify.js";
+import { youtube } from "./servers/youtube.js";
+import { twitter } from "./servers/twitter.js";
+import { time } from "./servers/time.js";
 
 // Re-export individual servers for direct access
 export {
@@ -81,6 +122,42 @@ export {
   supabase,
   openaiDocs,
   shadcn,
+  // Batch 1
+  gitlab,
+  linear,
+  jira,
+  notion,
+  todoist,
+  obsidian,
+  terraform,
+  kubernetes,
+  dockerMcp,
+  vercel,
+  mysql,
+  sqlite,
+  mongodb,
+  redis,
+  elasticsearch,
+  tavily,
+  exa,
+  perplexity,
+  anthropic,
+  openai,
+  aws,
+  cloudflare,
+  gcp,
+  azure,
+  digitalocean,
+  discord,
+  telegram,
+  email,
+  stripe,
+  twilio,
+  airtable,
+  shopify,
+  youtube,
+  twitter,
+  time,
 };
 
 // ---------------------------------------------------------------------------
@@ -129,6 +206,42 @@ register(nextDevtools);
 register(supabase);
 register(openaiDocs);
 register(shadcn);
+// Batch 1
+register(gitlab);
+register(linear);
+register(jira);
+register(notion);
+register(todoist);
+register(obsidian);
+register(terraform);
+register(kubernetes);
+register(dockerMcp);
+register(vercel);
+register(mysql);
+register(sqlite);
+register(mongodb);
+register(redis);
+register(elasticsearch);
+register(tavily);
+register(exa);
+register(perplexity);
+register(anthropic);
+register(openai);
+register(aws);
+register(cloudflare);
+register(gcp);
+register(azure);
+register(digitalocean);
+register(discord);
+register(telegram);
+register(email);
+register(stripe);
+register(twilio);
+register(airtable);
+register(shopify);
+register(youtube);
+register(twitter);
+register(time);
 
 // ---------------------------------------------------------------------------
 // Public API

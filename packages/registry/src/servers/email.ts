@@ -1,0 +1,26 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const email: RegistryEntryType = {
+  id: "email",
+  name: "Email",
+  description:
+    "Email integration — send emails via SMTP with support for HTML content and attachments",
+  config: {
+    command: "npx",
+    args: ["-y", "mcp-server-email"],
+    env: {
+      SMTP_HOST: "",
+      SMTP_PORT: "587",
+      SMTP_USER: "",
+      SMTP_PASS: "",
+    },
+    transport: "stdio",
+  },
+  package: "mcp-server-email",
+  runtime: "node",
+  repository: "https://github.com/nicholasgriffintn/mcp-server-email",
+  homepage: "https://github.com/nicholasgriffintn/mcp-server-email",
+  author: "Nicholas Griffin",
+  categories: ["communication"],
+  requiredEnvVars: ["SMTP_HOST", "SMTP_USER", "SMTP_PASS"],
+};

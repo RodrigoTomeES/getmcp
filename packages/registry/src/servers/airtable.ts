@@ -1,0 +1,23 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const airtable: RegistryEntryType = {
+  id: "airtable",
+  name: "Airtable",
+  description:
+    "Airtable database integration — read, create, update, and delete records in Airtable bases",
+  config: {
+    command: "npx",
+    args: ["-y", "airtable-mcp-server"],
+    env: {
+      AIRTABLE_API_KEY: "",
+    },
+    transport: "stdio",
+  },
+  package: "airtable-mcp-server",
+  runtime: "node",
+  repository: "https://github.com/felores/airtable-mcp",
+  homepage: "https://github.com/felores/airtable-mcp",
+  author: "felores",
+  categories: ["data", "automation"],
+  requiredEnvVars: ["AIRTABLE_API_KEY"],
+};
