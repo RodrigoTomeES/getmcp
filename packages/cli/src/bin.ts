@@ -62,6 +62,9 @@ Options:
   --dry-run         Preview changes without writing files
   --json            Output machine-readable JSON
   --quiet, -q       Minimal output (one item per line)
+  --from-npm <pkg>  Install unverified npm package as MCP server
+  --from-pypi <pkg> Install unverified PyPI package as MCP server
+  --from-url <url>  Install unverified remote URL as MCP server
 
 Examples:
   getmcp add                                   # Interactive server selection
@@ -109,6 +112,9 @@ async function main(): Promise<void> {
         allApps: flags.allApps,
         dryRun: flags.dryRun,
         json: flags.json,
+        fromNpm: flags.fromNpm,
+        fromPypi: flags.fromPypi,
+        fromUrl: flags.fromUrl,
       });
       break;
     }

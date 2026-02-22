@@ -37,12 +37,20 @@ export interface AddOptions {
   allApps?: boolean;
   dryRun?: boolean;
   json?: boolean;
+  fromNpm?: string;
+  fromPypi?: string;
+  fromUrl?: string;
 }
 
 export async function addCommand(serverIdArg?: string, options: AddOptions = {}): Promise<void> {
   const isNonInteractive = options.yes || !process.stdin.isTTY;
 
   p.intro("getmcp add");
+
+  // Handle --from-npm / --from-pypi / --from-url (unverified packages)
+  if (options.fromNpm || options.fromPypi || options.fromUrl) {
+    return addUnverifiedServer(options);
+  }
 
   // Step 1: Select server
   let entry: RegistryEntryType;
@@ -336,6 +344,157 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
         "  PyCharm must be closed and reopened for changes to take effect.",
     );
   }
+}
+
+async function addUnverifiedServer(options: AddOptions): Promise<void> {
+  const isNonInteractive = options.yes || !process.stdin.isTTY;
+
+  let serverName: string;
+  let config: LooseServerConfigType;
+
+  if (options.fromUrl) {
+    // Remote server from URL
+    const url = options.fromUrl;
+    serverName = new URL(url).hostname.replace(/\./g, "-");
+    config = { url } as LooseServerConfigType;
+    p.log.warn("Unverified remote server — not from the getmcp registry.");
+  } else if (options.fromNpm) {
+    // npm package
+    const pkg = options.fromNpm;
+    serverName = pkg.replace(/^@/, "").replace(/\//g, "-");
+    config = {
+      command: "npx",
+      args: ["-y", pkg],
+    } as LooseServerConfigType;
+    p.log.warn(`Unverified npm package: ${pkg} — not from the getmcp registry.`);
+  } else if (options.fromPypi) {
+    // PyPI package
+    const pkg = options.fromPypi;
+    serverName = pkg.replace(/\//g, "-");
+    config = {
+      command: "uvx",
+      args: [pkg],
+    } as LooseServerConfigType;
+    p.log.warn(`Unverified PyPI package: ${pkg} — not from the getmcp registry.`);
+  } else {
+    return;
+  }
+
+  p.log.info(`Server name: ${serverName}`);
+
+  // Detect apps and select
+  const allApps = detectApps();
+  const detected = allApps.filter((app) => app.exists);
+
+  let selectedApps: DetectedApp[];
+
+  if (options.allApps) {
+    selectedApps = detected;
+  } else if (options.apps && options.apps.length > 0) {
+    const validIds = getAppIds();
+    selectedApps = [];
+    for (const appId of options.apps) {
+      if (!validIds.includes(appId as AppIdType)) {
+        p.log.error(new InvalidAppError(appId, validIds).format());
+        process.exit(1);
+      }
+      const app = allApps.find((a) => a.id === appId);
+      if (app) selectedApps.push(app);
+    }
+  } else if (isNonInteractive) {
+    selectedApps = detected;
+  } else {
+    if (detected.length === 0) {
+      p.log.warn("No AI applications detected.");
+      p.outro("Done");
+      return;
+    }
+    const selected = await p.multiselect({
+      message: "Select apps to configure:",
+      options: detected.map((app) => ({
+        label: app.name,
+        value: app,
+        hint: shortenPath(app.configPath),
+      })),
+      initialValues: detected,
+      required: true,
+    });
+
+    if (p.isCancel(selected)) {
+      p.cancel("Operation cancelled.");
+      process.exit(0);
+    }
+    selectedApps = selected;
+  }
+
+  if (selectedApps.length === 0) {
+    p.log.error(new AppNotDetectedError().format());
+    p.outro("Done");
+    return;
+  }
+
+  // Generate and merge
+  if (options.dryRun) {
+    p.log.step("Dry run — showing what would be written:\n");
+  }
+
+  const results: { app: DetectedApp; ok: boolean; error?: string }[] = [];
+
+  for (const app of selectedApps) {
+    try {
+      const generator = getGenerator(app.id);
+      const generatedConfig = generator.generate(serverName, config);
+
+      if (options.dryRun) {
+        const serialized = generator.serialize(generatedConfig);
+        p.note(`File: ${shortenPath(app.configPath)}\n\n${serialized}`, app.name);
+        results.push({ app, ok: true });
+      } else {
+        const merged = mergeServerIntoConfig(app.configPath, generatedConfig);
+        writeConfigFile(app.configPath, merged);
+        results.push({ app, ok: true });
+      }
+    } catch (err) {
+      results.push({ app, ok: false, error: formatError(err) });
+    }
+  }
+
+  // Track (with source info)
+  if (!options.dryRun) {
+    const successApps = results.filter((r) => r.ok).map((r) => r.app.id);
+    if (successApps.length > 0) {
+      trackInstallation(serverName, successApps, []);
+    }
+  }
+
+  if (options.json) {
+    const output = {
+      server: serverName,
+      name: serverName,
+      source: options.fromNpm ? "npm" : options.fromPypi ? "pypi" : "url",
+      dryRun: options.dryRun ?? false,
+      apps: results.map((r) => ({
+        id: r.app.id,
+        name: r.app.name,
+        configPath: r.app.configPath,
+        ok: r.ok,
+        ...(r.error ? { error: r.error } : {}),
+      })),
+    };
+    console.log(JSON.stringify(output, null, 2));
+    return;
+  }
+
+  for (const r of results) {
+    if (r.ok) {
+      p.log.success(`${r.app.name}: ${shortenPath(r.app.configPath)}`);
+    } else {
+      p.log.error(`${r.app.name}: ${r.error}`);
+    }
+  }
+
+  const action = options.dryRun ? "would be configured" : "has been configured";
+  p.outro(`"${serverName}" ${action}.`);
 }
 
 function printManualConfig(entry: RegistryEntryType, config: LooseServerConfigType): void {

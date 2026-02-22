@@ -40,6 +40,9 @@ export interface CliFlags {
   category?: string;
   json: boolean;
   quiet: boolean;
+  fromNpm?: string;
+  fromPypi?: string;
+  fromUrl?: string;
   help: boolean;
   version: boolean;
 }
@@ -85,6 +88,21 @@ export function parseFlags(argv: string[]): {
       flags.search = arg.slice("--search=".length);
     } else if (arg.startsWith("--category=")) {
       flags.category = arg.slice("--category=".length);
+    } else if (arg.startsWith("--from-npm=")) {
+      flags.fromNpm = arg.slice("--from-npm=".length);
+    } else if (arg === "--from-npm" && i + 1 < argv.length) {
+      i++;
+      flags.fromNpm = argv[i];
+    } else if (arg.startsWith("--from-pypi=")) {
+      flags.fromPypi = arg.slice("--from-pypi=".length);
+    } else if (arg === "--from-pypi" && i + 1 < argv.length) {
+      i++;
+      flags.fromPypi = argv[i];
+    } else if (arg.startsWith("--from-url=")) {
+      flags.fromUrl = arg.slice("--from-url=".length);
+    } else if (arg === "--from-url" && i + 1 < argv.length) {
+      i++;
+      flags.fromUrl = argv[i];
     } else if (arg === "--json") {
       flags.json = true;
     } else if (arg === "--quiet" || arg === "-q") {
