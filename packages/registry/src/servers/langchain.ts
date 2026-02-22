@@ -1,0 +1,21 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const langchain: RegistryEntryType = {
+  id: "langchain",
+  name: "LangChain",
+  description:
+    "LangChain framework tools — run chains, manage prompts, and interact with LangChain components",
+  config: {
+    command: "npx",
+    args: ["-y", "mcp-langchain"],
+    env: {},
+    transport: "stdio",
+  },
+  package: "mcp-langchain",
+  runtime: "node",
+  repository: "https://github.com/nicholasgriffintn/mcp-langchain",
+  homepage: "https://www.langchain.com",
+  author: "Nicholas Griffin",
+  categories: ["ai", "developer-tools"],
+  requiredEnvVars: [],
+};

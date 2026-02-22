@@ -80,6 +80,44 @@ import {
   youtube,
   twitter,
   time,
+  // Batch 2
+  bitbucket,
+  asana,
+  clickup,
+  trello,
+  snowflake,
+  pinecone,
+  neo4j,
+  neon,
+  dynamodb,
+  confluence,
+  snyk,
+  vault,
+  // Batch 3
+  crawl4ai,
+  browserbase,
+  apify,
+  huggingface,
+  replicate,
+  datadog,
+  grafana,
+  pagerduty,
+  raycast,
+  npmRegistry,
+  bigquery,
+  weaviate,
+  // Batch 4
+  sonarqube,
+  langchain,
+  llamaindex,
+  togetherAi,
+  prometheus,
+  readme,
+  swagger,
+  zenrows,
+  everart,
+  everything,
+  githubCopilot,
 } from "../src/index.js";
 
 // ---------------------------------------------------------------------------
@@ -159,6 +197,44 @@ describe("registry entries validate against schema", () => {
     youtube,
     twitter,
     time,
+    // Batch 2
+    bitbucket,
+    asana,
+    clickup,
+    trello,
+    snowflake,
+    pinecone,
+    neo4j,
+    neon,
+    dynamodb,
+    confluence,
+    snyk,
+    vault,
+    // Batch 3
+    crawl4ai,
+    browserbase,
+    apify,
+    huggingface,
+    replicate,
+    datadog,
+    grafana,
+    pagerduty,
+    raycast,
+    npmRegistry,
+    bigquery,
+    weaviate,
+    // Batch 4
+    sonarqube,
+    langchain,
+    llamaindex,
+    togetherAi,
+    prometheus,
+    readme,
+    swagger,
+    zenrows,
+    everart,
+    everything,
+    githubCopilot,
   ];
 
   for (const server of allServers) {
@@ -209,7 +285,7 @@ describe("getServerOrThrow", () => {
 describe("getServerIds", () => {
   it("returns all IDs sorted alphabetically", () => {
     const ids = getServerIds();
-    expect(ids.length).toBe(70);
+    expect(ids.length).toBe(105);
     // Verify sorted
     const sorted = [...ids].sort();
     expect(ids).toEqual(sorted);
@@ -231,7 +307,7 @@ describe("getServerIds", () => {
 describe("getAllServers", () => {
   it("returns all server entries", () => {
     const servers = getAllServers();
-    expect(servers.length).toBe(70);
+    expect(servers.length).toBe(105);
   });
 
   it("entries are sorted by ID", () => {
@@ -244,7 +320,7 @@ describe("getAllServers", () => {
 
 describe("getServerCount", () => {
   it("returns the correct count", () => {
-    expect(getServerCount()).toBe(70);
+    expect(getServerCount()).toBe(105);
   });
 });
 
@@ -254,8 +330,8 @@ describe("getServerCount", () => {
 
 describe("searchServers", () => {
   it("returns all servers for empty query", () => {
-    expect(searchServers("").length).toBe(70);
-    expect(searchServers("  ").length).toBe(70);
+    expect(searchServers("").length).toBe(105);
+    expect(searchServers("  ").length).toBe(105);
   });
 
   it("finds servers by name", () => {

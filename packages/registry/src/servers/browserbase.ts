@@ -1,0 +1,24 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const browserbase: RegistryEntryType = {
+  id: "browserbase",
+  name: "Browserbase",
+  description:
+    "Cloud browser automation — run headless browsers in the cloud for web scraping and testing",
+  config: {
+    command: "npx",
+    args: ["-y", "@browserbasehq/mcp-server-browserbase"],
+    env: {
+      BROWSERBASE_API_KEY: "",
+      BROWSERBASE_PROJECT_ID: "",
+    },
+    transport: "stdio",
+  },
+  package: "@browserbasehq/mcp-server-browserbase",
+  runtime: "node",
+  repository: "https://github.com/browserbase/mcp-server-browserbase",
+  homepage: "https://browserbase.com",
+  author: "Browserbase",
+  categories: ["web", "automation"],
+  requiredEnvVars: ["BROWSERBASE_API_KEY", "BROWSERBASE_PROJECT_ID"],
+};

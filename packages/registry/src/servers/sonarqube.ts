@@ -1,0 +1,24 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const sonarqube: RegistryEntryType = {
+  id: "sonarqube",
+  name: "SonarQube",
+  description:
+    "SonarQube code quality — analyze code quality, track bugs, vulnerabilities, and code smells",
+  config: {
+    command: "npx",
+    args: ["-y", "mcp-sonarqube"],
+    env: {
+      SONARQUBE_URL: "",
+      SONARQUBE_TOKEN: "",
+    },
+    transport: "stdio",
+  },
+  package: "mcp-sonarqube",
+  runtime: "node",
+  repository: "https://github.com/nicholasgriffintn/mcp-sonarqube",
+  homepage: "https://www.sonarsource.com/products/sonarqube",
+  author: "Nicholas Griffin",
+  categories: ["security", "developer-tools"],
+  requiredEnvVars: ["SONARQUBE_URL", "SONARQUBE_TOKEN"],
+};
