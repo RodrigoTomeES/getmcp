@@ -9,6 +9,8 @@ vi.mock("@clack/prompts", () => ({
   outro: vi.fn(),
   cancel: vi.fn(),
   note: vi.fn(),
+  multiselect: vi.fn(),
+  isCancel: vi.fn(() => false),
   log: { warn: vi.fn(), info: vi.fn(), error: vi.fn(), success: vi.fn(), step: vi.fn() },
 }));
 
@@ -30,6 +32,12 @@ vi.mock("../../src/config-file.js", () => ({
 // Mock lock file
 vi.mock("../../src/lock.js", () => ({
   trackInstallation: vi.fn(),
+}));
+
+// Mock preferences
+vi.mock("../../src/preferences.js", () => ({
+  getSavedSelectedApps: vi.fn(() => null),
+  saveSelectedApps: vi.fn(),
 }));
 
 let consoleSpy: ReturnType<typeof vi.spyOn>;
@@ -125,5 +133,62 @@ describe("syncCommand", () => {
     );
     expect(result.ok).toBe(false);
     expect(result.error).toContain("Not found in registry");
+  });
+
+  it("shows multiselect prompt when running interactively", async () => {
+    const manifestPath = path.join(tmpDir, "getmcp.json");
+    fs.writeFileSync(manifestPath, JSON.stringify({ servers: { github: {} } }));
+
+    const detectedApp = {
+      id: "claude-desktop",
+      name: "Claude Desktop",
+      configPath: path.join(tmpDir, "config.json"),
+      exists: true,
+      supportsBothScopes: false,
+    };
+
+    const { detectApps } = await import("../../src/detect.js");
+    (detectApps as ReturnType<typeof vi.fn>).mockReturnValue([detectedApp]);
+
+    const prompts = await import("@clack/prompts");
+    (prompts.multiselect as ReturnType<typeof vi.fn>).mockResolvedValue([detectedApp]);
+
+    const originalIsTTY = process.stdin.isTTY;
+    process.stdin.isTTY = true;
+
+    try {
+      await syncCommand({ manifestPath });
+
+      expect(prompts.multiselect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Select apps to sync:",
+          required: true,
+        }),
+      );
+    } finally {
+      process.stdin.isTTY = originalIsTTY;
+    }
+  });
+
+  it("skips multiselect in non-interactive mode (--yes)", async () => {
+    const manifestPath = path.join(tmpDir, "getmcp.json");
+    fs.writeFileSync(manifestPath, JSON.stringify({ servers: { github: {} } }));
+
+    const { detectApps } = await import("../../src/detect.js");
+    (detectApps as ReturnType<typeof vi.fn>).mockReturnValue([
+      {
+        id: "claude-desktop",
+        name: "Claude Desktop",
+        configPath: path.join(tmpDir, "config.json"),
+        exists: true,
+        supportsBothScopes: false,
+      },
+    ]);
+
+    const prompts = await import("@clack/prompts");
+
+    await syncCommand({ yes: true, manifestPath });
+
+    expect(prompts.multiselect).not.toHaveBeenCalled();
   });
 });
