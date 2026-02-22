@@ -43,12 +43,12 @@ const LockInstallationSchema = z.object({
   installedAt: z.string(),
   updatedAt: z.string(),
   envVars: z.array(z.string()),
-  scopes: z.record(z.enum(["project", "global"])).optional(),
+  scopes: z.record(z.string(), z.enum(["project", "global"])).optional(),
 });
 
 const LockFileSchema = z.object({
   version: z.literal(1),
-  installations: z.record(LockInstallationSchema),
+  installations: z.record(z.string(), LockInstallationSchema),
 });
 
 export { LockFileSchema };

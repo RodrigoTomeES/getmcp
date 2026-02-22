@@ -235,7 +235,7 @@ Longer-term roadmap items from the specification.
 
 ### Registry Enhancements
 
-- [x] **JSON Schema for server definitions** — Published a JSON Schema (`packages/core/registry-entry.schema.json`) generated from the Zod schema via `zod-to-json-schema`. Available as a runtime function (`getRegistryEntryJsonSchema()`) and as a static file via subpath export.
+- [x] **JSON Schema for server definitions** — Published a JSON Schema (`packages/core/registry-entry.schema.json`) generated from the Zod schema via Zod v4's built-in `z.toJSONSchema()`. Available as a runtime function (`getRegistryEntryJsonSchema()`) and as a static file via subpath export.
   - Files: `packages/core/src/json-schema.ts`, `packages/core/scripts/generate-schema.ts`, `packages/core/registry-entry.schema.json`
 - [ ] **Version tracking per server** — Track and display server package versions
 - [ ] **Server compatibility matrix** — Surface which servers work with which apps

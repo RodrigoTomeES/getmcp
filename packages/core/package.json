@@ -47,8 +47,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "zod": "^3.24.0",
-    "zod-to-json-schema": "^3.25.1"
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0"

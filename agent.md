@@ -28,7 +28,7 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22) with 5 
 | `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `init`, `doctor`, `import`, `sync` commands with app auto-detection, config merging, and installation tracking via `getmcp-lock.json` |
 | `packages/web`        | `@getmcp/web`        | Next.js (App Router) web directory for browsing servers and generating config snippets                                                                                                              |
 
-**Tech stack**: TypeScript 5.7+, Zod 3.24+, Vitest 3.0+, Next.js 15.3+ (web), Tailwind CSS 4.0+ (web), `@inquirer/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
+**Tech stack**: TypeScript 5.7+, Zod 4.0+, Vitest 3.0+, Next.js 15.3+ (web), Tailwind CSS 4.0+ (web), `@inquirer/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
 
 > See `SPECIFICATION.md` Section 3 for the full architecture breakdown.
 
@@ -80,7 +80,7 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 | `schemas.ts`     | All Zod schemas: `StdioServerConfig`, `RemoteServerConfig`, `ServerConfig`, `CanonicalMCPConfig`, `RegistryEntry`, `AppId`, `ManifestServerEntry`, `ProjectManifest`                                                                                                                                 |
 | `types.ts`       | TypeScript types inferred from Zod; `ConfigGenerator` and `AppMetadata` interfaces (`configPaths: string \| null` for project-scoped, `globalConfigPaths: PlatformPaths \| null` for global-scoped); exported `PlatformPaths` type and `supportsBothScopes()`, `getDefaultScope()` utility functions |
 | `utils.ts`       | Type guards (`isStdioConfig`, `isRemoteConfig`) and `inferTransport()`                                                                                                                                                                                                                               |
-| `json-schema.ts` | Runtime JSON Schema generation: `getRegistryEntryJsonSchema()`                                                                                                                                                                                                                                       |
+| `json-schema.ts` | Runtime JSON Schema generation via Zod v4 built-in `z.toJSONSchema()`: `getRegistryEntryJsonSchema()`                                                                                                                                                                                                |
 
 ### `@getmcp/generators` (`packages/generators/src/`)
 
