@@ -53,6 +53,7 @@ export class GooseGenerator extends BaseGenerator {
         ...(config.env && Object.keys(config.env).length > 0 ? { envs: config.env } : {}),
         type: "stdio",
         ...(config.timeout ? { timeout: Math.ceil(config.timeout / 1000) } : {}),
+        ...(config.description ? { description: config.description } : {}),
       };
     } else if (isRemoteConfig(config)) {
       const transport = inferTransport(config);
@@ -61,10 +62,11 @@ export class GooseGenerator extends BaseGenerator {
         uri: config.url,
         enabled: true,
         ...(config.headers && Object.keys(config.headers).length > 0
-          ? { envs: config.headers }
+          ? { headers: config.headers }
           : {}),
         type: transport,
         ...(config.timeout ? { timeout: Math.ceil(config.timeout / 1000) } : {}),
+        ...(config.description ? { description: config.description } : {}),
       };
     } else {
       throw new Error("Invalid config: must have either 'command' or 'url'");

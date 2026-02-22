@@ -10,7 +10,6 @@ export const context7: RegistryEntryType = {
     transport: "http",
     headers: {},
   },
-  runtime: "node",
   homepage: "https://context7.com",
   author: "Upstash",
   categories: ["documentation", "search", "developer-tools"],
