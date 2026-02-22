@@ -36,6 +36,7 @@ export interface AddOptions {
   apps?: string[];
   allApps?: boolean;
   dryRun?: boolean;
+  json?: boolean;
 }
 
 export async function addCommand(serverIdArg?: string, options: AddOptions = {}): Promise<void> {
@@ -280,20 +281,38 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
 
   spin.stop("Configuration complete.");
 
+  // Track installation (unless dry-run)
+  if (!options.dryRun) {
+    const successApps = results.filter((r) => r.ok).map((r) => r.app.id);
+    if (successApps.length > 0) {
+      trackInstallation(entry.id, successApps, entry.requiredEnvVars);
+    }
+  }
+
+  // JSON output mode
+  if (options.json) {
+    const output = {
+      server: entry.id,
+      name: entry.name,
+      dryRun: options.dryRun ?? false,
+      apps: results.map((r) => ({
+        id: r.app.id,
+        name: r.app.name,
+        configPath: r.app.configPath,
+        ok: r.ok,
+        ...(r.error ? { error: r.error } : {}),
+      })),
+    };
+    console.log(JSON.stringify(output, null, 2));
+    return;
+  }
+
   // Show results summary
   for (const r of results) {
     if (r.ok) {
       p.log.success(`${r.app.name}: ${shortenPath(r.app.configPath)}`);
     } else {
       p.log.error(`${r.app.name}: ${r.error}`);
-    }
-  }
-
-  // Track installation (unless dry-run)
-  if (!options.dryRun) {
-    const successApps = results.filter((r) => r.ok).map((r) => r.app.id);
-    if (successApps.length > 0) {
-      trackInstallation(entry.id, successApps, entry.requiredEnvVars);
     }
   }
 

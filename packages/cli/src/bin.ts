@@ -55,6 +55,8 @@ Options:
   --app <id>        Target specific app (repeatable)
   --all-apps        Target all detected apps
   --dry-run         Preview changes without writing files
+  --json            Output machine-readable JSON
+  --quiet, -q       Minimal output (one item per line)
 
 Examples:
   getmcp add                                   # Interactive server selection
@@ -101,6 +103,7 @@ async function main(): Promise<void> {
         apps: flags.apps,
         allApps: flags.allApps,
         dryRun: flags.dryRun,
+        json: flags.json,
       });
       break;
     }
@@ -119,6 +122,8 @@ async function main(): Promise<void> {
         installed: flags.installed,
         search: flags.search,
         category: flags.category,
+        json: flags.json,
+        quiet: flags.quiet,
       });
       break;
     }
@@ -129,7 +134,9 @@ async function main(): Promise<void> {
     }
 
     case "check": {
-      await checkCommand();
+      await checkCommand({
+        json: flags.json,
+      });
       break;
     }
 

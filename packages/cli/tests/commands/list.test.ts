@@ -92,4 +92,68 @@ describe("listCommand", () => {
     const warningArg = (log.warn as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(warningArg).toContain("No AI applications detected");
   });
+
+  // --json mode
+  it("outputs valid JSON with --json flag", async () => {
+    await listCommand({ json: true });
+
+    expect(consoleSpy).toHaveBeenCalled();
+    const output = consoleSpy.mock.calls.map((c) => c.join(" ")).join("\n");
+    const parsed = JSON.parse(output);
+    expect(Array.isArray(parsed)).toBe(true);
+    expect(parsed.length).toBeGreaterThan(0);
+    expect(parsed[0]).toHaveProperty("id");
+    expect(parsed[0]).toHaveProperty("name");
+    expect(parsed[0]).toHaveProperty("description");
+    expect(parsed[0]).toHaveProperty("transport");
+  });
+
+  it("outputs JSON for search results with --json", async () => {
+    await listCommand({ search: "github", json: true });
+
+    const output = consoleSpy.mock.calls.map((c) => c.join(" ")).join("\n");
+    const parsed = JSON.parse(output);
+    expect(Array.isArray(parsed)).toBe(true);
+    // Should include github server
+    expect(parsed.some((s: { id: string }) => s.id.includes("github"))).toBe(true);
+  });
+
+  it("outputs JSON for category filter with --json", async () => {
+    await listCommand({ category: "search", json: true });
+
+    const output = consoleSpy.mock.calls.map((c) => c.join(" ")).join("\n");
+    const parsed = JSON.parse(output);
+    expect(Array.isArray(parsed)).toBe(true);
+  });
+
+  it("outputs JSON for installed with --json", async () => {
+    await listCommand({ installed: true, json: true });
+
+    const output = consoleSpy.mock.calls.map((c) => c.join(" ")).join("\n");
+    const parsed = JSON.parse(output);
+    expect(Array.isArray(parsed)).toBe(true);
+    // detectInstalledApps returns [], so empty array
+    expect(parsed).toEqual([]);
+  });
+
+  // --quiet mode
+  it("outputs one ID per line with --quiet flag", async () => {
+    await listCommand({ quiet: true });
+
+    expect(consoleSpy).toHaveBeenCalled();
+    const calls = consoleSpy.mock.calls.map((c) => c[0]);
+    // Each call should be a server ID (no spaces, no description)
+    for (const line of calls) {
+      expect(line).toMatch(/^[a-z0-9-]+$/);
+    }
+    expect(calls.length).toBeGreaterThan(0);
+  });
+
+  it("outputs one ID per line for search with --quiet", async () => {
+    await listCommand({ search: "github", quiet: true });
+
+    const calls = consoleSpy.mock.calls.map((c) => c[0]);
+    expect(calls.length).toBeGreaterThan(0);
+    expect(calls.some((id: string) => id.includes("github"))).toBe(true);
+  });
 });

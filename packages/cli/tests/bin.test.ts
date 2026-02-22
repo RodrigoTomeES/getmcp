@@ -37,6 +37,30 @@ describe("parseFlags (bin-level)", () => {
     expect(result.command).toBeUndefined();
     expect(result.flags.version).toBe(true);
   });
+
+  it("parses --json flag", () => {
+    const result = parseFlags(["list", "--json"]);
+    expect(result.command).toBe("list");
+    expect(result.flags.json).toBe(true);
+  });
+
+  it("parses --quiet flag", () => {
+    const result = parseFlags(["list", "--quiet"]);
+    expect(result.command).toBe("list");
+    expect(result.flags.quiet).toBe(true);
+  });
+
+  it("parses -q shorthand for --quiet", () => {
+    const result = parseFlags(["list", "-q"]);
+    expect(result.command).toBe("list");
+    expect(result.flags.quiet).toBe(true);
+  });
+
+  it("parses --json and --quiet together", () => {
+    const result = parseFlags(["list", "--json", "-q"]);
+    expect(result.flags.json).toBe(true);
+    expect(result.flags.quiet).toBe(true);
+  });
 });
 
 // ---------------------------------------------------------------------------
