@@ -240,6 +240,13 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
       .filter((c) => (hasSavedPreferences ? savedApps.includes(c.value.id) : c.value.exists))
       .map((c) => c.value);
 
+    const initialIds = new Set(initialValues.map((v) => v.id));
+    choices.sort((a, b) => {
+      const aSelected = initialIds.has(a.value.id) ? 0 : 1;
+      const bSelected = initialIds.has(b.value.id) ? 0 : 1;
+      return aSelected - bSelected;
+    });
+
     const selected = await p.multiselect({
       message: "Select apps to configure:",
       options: choices,
