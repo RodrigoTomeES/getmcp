@@ -145,6 +145,7 @@ const COMMAND_ALIASES: Record<string, string> = {
   doctor: "doctor",
   dr: "doctor",
   import: "import",
+  sync: "sync",
 };
 
 export function resolveAlias(command: string): string | undefined {

@@ -18,6 +18,8 @@ export {
   Runtime,
   RegistryEntry,
   AppId,
+  ManifestServerEntry,
+  ProjectManifest,
 } from "./schemas.js";
 
 // TypeScript types (compile-time)
@@ -33,6 +35,8 @@ export type {
   Runtime as RuntimeType,
   RegistryEntry as RegistryEntryType,
   AppId as AppIdType,
+  ManifestServerEntry as ManifestServerEntryType,
+  ProjectManifest as ProjectManifestType,
   AppMetadata,
   ConfigGenerator,
 } from "./types.js";

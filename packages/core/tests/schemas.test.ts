@@ -6,6 +6,7 @@ import {
   CanonicalMCPConfig,
   RegistryEntry,
   AppId,
+  ProjectManifest,
 } from "../src/schemas.js";
 
 // ---------------------------------------------------------------------------
@@ -221,5 +222,46 @@ describe("AppId", () => {
 
   it("rejects unknown app IDs", () => {
     expect(() => AppId.parse("unknown-app")).toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// ProjectManifest
+// ---------------------------------------------------------------------------
+
+describe("ProjectManifest", () => {
+  it("parses a valid manifest with empty overrides", () => {
+    const result = ProjectManifest.parse({
+      servers: { github: {}, memory: {} },
+    });
+    expect(Object.keys(result.servers)).toEqual(["github", "memory"]);
+  });
+
+  it("parses a manifest with env overrides", () => {
+    const result = ProjectManifest.parse({
+      servers: {
+        github: { env: { GITHUB_TOKEN: "abc" } },
+      },
+    });
+    expect(result.servers.github).toHaveProperty("env");
+  });
+
+  it("parses a manifest with app restrictions", () => {
+    const result = ProjectManifest.parse({
+      servers: {
+        github: { apps: ["claude-desktop", "vscode"] },
+      },
+    });
+    const entry = result.servers.github as { apps?: string[] };
+    expect(entry.apps).toEqual(["claude-desktop", "vscode"]);
+  });
+
+  it("parses an empty manifest", () => {
+    const result = ProjectManifest.parse({ servers: {} });
+    expect(result.servers).toEqual({});
+  });
+
+  it("rejects manifest without servers key", () => {
+    expect(() => ProjectManifest.parse({})).toThrow();
   });
 });
