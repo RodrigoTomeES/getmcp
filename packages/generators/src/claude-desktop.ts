@@ -8,9 +8,11 @@
  * This is essentially a passthrough — the canonical format IS the Claude Desktop format.
  */
 
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields } from "./base.js";
+import { BaseGenerator, toStdioFields, toRemoteFields, home, appData, configHome } from "./base.js";
 
 export class ClaudeDesktopGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -43,5 +45,16 @@ export class ClaudeDesktopGenerator extends BaseGenerator {
         [serverName]: serverConfig,
       },
     };
+  }
+
+  override detectInstalled(): boolean {
+    switch (process.platform) {
+      case "darwin":
+        return existsSync(join(home, "Library", "Application Support", "Claude"));
+      case "win32":
+        return existsSync(join(appData, "Claude"));
+      default:
+        return existsSync(join(configHome, "Claude"));
+    }
   }
 }

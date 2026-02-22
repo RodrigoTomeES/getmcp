@@ -3,7 +3,20 @@
  * Provides common functionality for all app-specific generators.
  */
 
+import { homedir } from "node:os";
+import { join } from "node:path";
 import type { ConfigGenerator, AppMetadata, LooseServerConfigType } from "@getmcp/core";
+
+// ---------------------------------------------------------------------------
+// Shared path constants for detectInstalled() implementations
+// ---------------------------------------------------------------------------
+
+export const home = homedir();
+export const configHome = process.env.XDG_CONFIG_HOME?.trim() || join(home, ".config");
+export const appData = process.env.APPDATA?.trim() || join(home, "AppData", "Roaming");
+export const localAppData = process.env.LOCALAPPDATA?.trim() || join(home, "AppData", "Local");
+export const claudeHome = process.env.CLAUDE_CONFIG_DIR?.trim() || join(home, ".claude");
+export const codexHome = process.env.CODEX_HOME?.trim() || join(home, ".codex");
 
 export abstract class BaseGenerator implements ConfigGenerator {
   abstract app: AppMetadata;
@@ -23,6 +36,10 @@ export abstract class BaseGenerator implements ConfigGenerator {
 
   serialize(config: Record<string, unknown>): string {
     return JSON.stringify(config, null, 2);
+  }
+
+  detectInstalled(): boolean {
+    return false;
   }
 }
 

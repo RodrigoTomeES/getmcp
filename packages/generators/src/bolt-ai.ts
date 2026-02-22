@@ -8,9 +8,11 @@
  * macOS-only application.
  */
 
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields } from "./base.js";
+import { BaseGenerator, toStdioFields, toRemoteFields, home } from "./base.js";
 
 export class BoltAIGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -41,5 +43,10 @@ export class BoltAIGenerator extends BaseGenerator {
         [serverName]: serverConfig,
       },
     };
+  }
+
+  override detectInstalled(): boolean {
+    if (process.platform !== "darwin") return false;
+    return existsSync(join(home, "Library", "Application Support", "BoltAI"));
   }
 }

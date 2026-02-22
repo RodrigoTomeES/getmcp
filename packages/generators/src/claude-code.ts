@@ -12,9 +12,10 @@
  * optional transport type for remote servers.
  */
 
+import { existsSync } from "node:fs";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields } from "./base.js";
+import { BaseGenerator, toStdioFields, toRemoteFields, claudeHome } from "./base.js";
 
 export class ClaudeCodeGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -52,5 +53,9 @@ export class ClaudeCodeGenerator extends BaseGenerator {
         [serverName]: serverConfig,
       },
     };
+  }
+
+  override detectInstalled(): boolean {
+    return existsSync(claudeHome);
   }
 }

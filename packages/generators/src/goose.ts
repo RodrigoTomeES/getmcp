@@ -21,10 +21,12 @@
  *   - Extra fields: "enabled", "timeout" (in seconds), "name" (display name)
  */
 
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig, inferTransport } from "@getmcp/core";
 import YAML from "yaml";
-import { BaseGenerator } from "./base.js";
+import { BaseGenerator, configHome, appData } from "./base.js";
 
 export class GooseGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -84,5 +86,9 @@ export class GooseGenerator extends BaseGenerator {
    */
   override serialize(config: Record<string, unknown>): string {
     return YAML.stringify(config, { indent: 2 });
+  }
+
+  override detectInstalled(): boolean {
+    return existsSync(join(configHome, "goose")) || existsSync(join(appData, "goose"));
   }
 }

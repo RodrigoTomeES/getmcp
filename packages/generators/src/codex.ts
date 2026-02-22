@@ -25,10 +25,11 @@
  *   - No explicit "transport" field (Codex auto-detects)
  */
 
+import { existsSync } from "node:fs";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
 import * as TOML from "smol-toml";
-import { BaseGenerator } from "./base.js";
+import { BaseGenerator, codexHome } from "./base.js";
 
 export class CodexGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -82,5 +83,9 @@ export class CodexGenerator extends BaseGenerator {
    */
   override serialize(config: Record<string, unknown>): string {
     return TOML.stringify(config as TOML.TomlPrimitive);
+  }
+
+  override detectInstalled(): boolean {
+    return existsSync(codexHome);
   }
 }

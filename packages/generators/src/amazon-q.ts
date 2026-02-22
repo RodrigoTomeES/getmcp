@@ -7,9 +7,11 @@
  * Near-passthrough — Amazon Q uses the same canonical mcpServers format.
  */
 
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, toRemoteFields } from "./base.js";
+import { BaseGenerator, toStdioFields, toRemoteFields, home } from "./base.js";
 
 export class AmazonQGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -42,5 +44,9 @@ export class AmazonQGenerator extends BaseGenerator {
         [serverName]: serverConfig,
       },
     };
+  }
+
+  override detectInstalled(): boolean {
+    return existsSync(join(home, ".aws", "amazonq"));
   }
 }

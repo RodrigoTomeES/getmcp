@@ -28,7 +28,18 @@ export { LibreChatGenerator } from "./libre-chat.js";
 export { AntigravityGenerator } from "./antigravity.js";
 
 // Base class and utilities
-export { BaseGenerator, deepMerge, toStdioFields, toRemoteFields } from "./base.js";
+export {
+  BaseGenerator,
+  deepMerge,
+  toStdioFields,
+  toRemoteFields,
+  home,
+  configHome,
+  appData,
+  localAppData,
+  claudeHome,
+  codexHome,
+} from "./base.js";
 
 // Re-export core types used by generators
 export type { ConfigGenerator, AppMetadata, LooseServerConfigType } from "@getmcp/core";

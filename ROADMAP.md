@@ -112,6 +112,9 @@ Features that improve the developer experience.
 - [x] **Implement `getmcp init` command** — Interactive wizard that scaffolds a new MCP server registry entry (TypeScript file) with all required metadata.
   - File: `packages/cli/src/commands/init.ts`
 
+- [x] **Add `detectInstalled()` to generators** — Each generator now has a `detectInstalled()` method that checks if the app is installed using `existsSync()` on platform-specific directories. Replaces the old `detectApps()` logic that derived "installed" from config path parent directory existence. Shared path constants (`home`, `configHome`, `appData`, `claudeHome`, `codexHome`) in `base.ts` support env var overrides.
+  - Files: `packages/core/src/types.ts`, `packages/generators/src/base.ts`, all 20 generator files, `packages/cli/src/detect.ts`
+
 ---
 
 ## 5. Medium — CI / Build

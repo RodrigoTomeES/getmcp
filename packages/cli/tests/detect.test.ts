@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import * as os from "node:os";
 import * as path from "node:path";
 import { resolvePath, detectApps } from "../src/detect.js";
+import { generators } from "@getmcp/generators";
 
 describe("resolvePath", () => {
   it("expands ~ to home directory", () => {
@@ -69,6 +70,14 @@ describe("detectApps", () => {
       if (globalIds.includes(app.id)) {
         expect(app.scope).toBe("global");
       }
+    }
+  });
+
+  it("exists field reflects generator.detectInstalled()", () => {
+    const apps = detectApps();
+    for (const app of apps) {
+      const generator = generators[app.id];
+      expect(app.exists).toBe(generator.detectInstalled());
     }
   });
 });

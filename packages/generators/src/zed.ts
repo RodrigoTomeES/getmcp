@@ -20,9 +20,11 @@
  *   - Also installable via Zed extensions
  */
 
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import { BaseGenerator, toStdioFields } from "./base.js";
+import { BaseGenerator, toStdioFields, configHome, appData } from "./base.js";
 
 export class ZedGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -61,5 +63,14 @@ export class ZedGenerator extends BaseGenerator {
         [serverName]: serverConfig,
       },
     };
+  }
+
+  override detectInstalled(): boolean {
+    switch (process.platform) {
+      case "win32":
+        return existsSync(join(appData, "Zed"));
+      default:
+        return existsSync(join(configHome, "zed"));
+    }
   }
 }
