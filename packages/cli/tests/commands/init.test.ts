@@ -1,0 +1,141 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
+import { initCommand } from "../../src/commands/init.js";
+
+vi.mock("@clack/prompts", () => ({
+  intro: vi.fn(),
+  outro: vi.fn(),
+  cancel: vi.fn(),
+  note: vi.fn(),
+  log: { warn: vi.fn(), info: vi.fn(), error: vi.fn(), success: vi.fn() },
+  text: vi.fn(),
+  select: vi.fn(),
+  multiselect: vi.fn(() => []),
+  confirm: vi.fn(() => true),
+  isCancel: vi.fn(() => false),
+}));
+
+let exitSpy: ReturnType<typeof vi.spyOn>;
+let tmpDir: string;
+let cwdSpy: ReturnType<typeof vi.spyOn>;
+
+beforeEach(() => {
+  exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {}) as never);
+  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "getmcp-init-test-"));
+  // initCommand uses path.resolve("packages/registry/src/servers")
+  // which resolves relative to cwd, so override cwd
+  cwdSpy = vi.spyOn(process, "cwd").mockReturnValue(tmpDir);
+});
+
+afterEach(() => {
+  exitSpy.mockRestore();
+  cwdSpy.mockRestore();
+  vi.clearAllMocks();
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+// ---------------------------------------------------------------------------
+// initCommand
+// ---------------------------------------------------------------------------
+
+describe("initCommand", () => {
+  it("scaffolds a stdio server entry from prompted values", async () => {
+    const p = await import("@clack/prompts");
+
+    // Mock prompt responses in sequence
+    const textMock = p.text as ReturnType<typeof vi.fn>;
+    textMock
+      .mockResolvedValueOnce("my-server") // id
+      .mockResolvedValueOnce("My Server") // name
+      .mockResolvedValueOnce("A test server") // description
+      .mockResolvedValueOnce("npx") // command
+      .mockResolvedValueOnce("-y my-server") // args
+      .mockResolvedValueOnce("API_KEY") // env vars
+      .mockResolvedValueOnce("https://github.com/user/repo") // repository
+      .mockResolvedValueOnce("Author"); // author
+
+    (p.select as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce("stdio") // transport
+      .mockResolvedValueOnce("node"); // runtime
+
+    (p.multiselect as ReturnType<typeof vi.fn>).mockResolvedValueOnce(["developer-tools"]);
+
+    // Create the expected directory structure
+    const registryDir = path.join(tmpDir, "packages", "registry", "src", "servers");
+    fs.mkdirSync(registryDir, { recursive: true });
+
+    await initCommand();
+
+    const outputFile = path.join(registryDir, "my-server.ts");
+    expect(fs.existsSync(outputFile)).toBe(true);
+
+    const content = fs.readFileSync(outputFile, "utf-8");
+    expect(content).toContain('id: "my-server"');
+    expect(content).toContain('name: "My Server"');
+    expect(content).toContain('command: "npx"');
+    expect(content).toContain("API_KEY");
+  });
+
+  it("scaffolds a remote server entry", async () => {
+    const p = await import("@clack/prompts");
+
+    const textMock = p.text as ReturnType<typeof vi.fn>;
+    textMock
+      .mockResolvedValueOnce("remote-server") // id
+      .mockResolvedValueOnce("Remote Server") // name
+      .mockResolvedValueOnce("A remote server") // description
+      .mockResolvedValueOnce("https://example.com/mcp") // url
+      .mockResolvedValueOnce("") // repository
+      .mockResolvedValueOnce(""); // author
+
+    (p.select as ReturnType<typeof vi.fn>).mockResolvedValueOnce("http"); // transport
+
+    (p.multiselect as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
+
+    const registryDir = path.join(tmpDir, "packages", "registry", "src", "servers");
+    fs.mkdirSync(registryDir, { recursive: true });
+
+    await initCommand();
+
+    const outputFile = path.join(registryDir, "remote-server.ts");
+    expect(fs.existsSync(outputFile)).toBe(true);
+
+    const content = fs.readFileSync(outputFile, "utf-8");
+    expect(content).toContain('id: "remote-server"');
+    expect(content).toContain('url: "https://example.com/mcp"');
+    expect(content).toContain('transport: "http"');
+  });
+
+  it("warns and prompts overwrite when file already exists", async () => {
+    const p = await import("@clack/prompts");
+
+    const textMock = p.text as ReturnType<typeof vi.fn>;
+    textMock
+      .mockResolvedValueOnce("existing-server") // id
+      .mockResolvedValueOnce("Existing Server") // name
+      .mockResolvedValueOnce("Already exists") // description
+      .mockResolvedValueOnce("https://example.com/mcp") // url
+      .mockResolvedValueOnce("") // repository
+      .mockResolvedValueOnce(""); // author
+
+    (p.select as ReturnType<typeof vi.fn>).mockResolvedValueOnce("http");
+    (p.multiselect as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
+    (p.confirm as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce(true) // overwrite
+      .mockResolvedValueOnce(true); // create file
+
+    const registryDir = path.join(tmpDir, "packages", "registry", "src", "servers");
+    fs.mkdirSync(registryDir, { recursive: true });
+    fs.writeFileSync(path.join(registryDir, "existing-server.ts"), "old content");
+
+    await initCommand();
+
+    expect(p.log.warn).toHaveBeenCalledWith(expect.stringContaining("File already exists"));
+
+    // File should be overwritten
+    const content = fs.readFileSync(path.join(registryDir, "existing-server.ts"), "utf-8");
+    expect(content).toContain('id: "existing-server"');
+  });
+});
