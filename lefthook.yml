@@ -8,6 +8,7 @@ pre-commit:
 
     - name: oxfmt
       glob: "*.{js,ts,jsx,tsx,json,css,md,yaml,yml,toml}"
+      exclude: "*-lock.*"
       run: npx oxfmt {staged_files}
       stage_fixed: true
 
