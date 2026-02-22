@@ -6,6 +6,14 @@ import * as os from "node:os";
 import * as path from "node:path";
 
 /**
+ * Check if the CLI is running in non-interactive mode.
+ * Non-interactive when --yes is passed or stdin is not a TTY.
+ */
+export function isNonInteractive(opts: { yes?: boolean }): boolean {
+  return !!opts.yes || !process.stdin.isTTY;
+}
+
+/**
  * Shorten a file path for display by replacing the home directory with `~`
  * and the current working directory with `.`.
  */
@@ -16,7 +24,7 @@ export function shortenPath(filePath: string): string {
 
   // Replace CWD first (more specific), then HOME
   if (normalized.startsWith(cwd + path.sep) || normalized === cwd) {
-    return "." + normalized.slice(cwd.length);
+    return "." + normalized.slice(cwd.length).replace(/\\/g, "/");
   }
 
   if (normalized.startsWith(home + path.sep) || normalized === home) {
