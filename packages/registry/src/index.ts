@@ -5,6 +5,7 @@
  * Provides lookup, search, and listing functions.
  */
 
+import { RegistryEntry } from "@getmcp/core";
 import type { RegistryEntryType } from "@getmcp/core";
 
 // Server definitions
@@ -245,6 +246,7 @@ export {
 const _registry: Map<string, RegistryEntryType> = new Map();
 
 function register(entry: RegistryEntryType): void {
+  RegistryEntry.parse(entry);
   _registry.set(entry.id, entry);
 }
 
