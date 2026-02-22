@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getAppIds } from "@getmcp/generators";
 
 export const metadata: Metadata = {
   title: "Documentation — getmcp",
@@ -20,6 +21,8 @@ export const metadata: Metadata = {
 };
 
 export default function DocsPage() {
+  const appCount = getAppIds().length;
+
   return (
     <div className="max-w-3xl mx-auto px-6 py-16">
       {/* Hero */}
@@ -57,7 +60,7 @@ export default function DocsPage() {
             <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--color-text)]">
               mcp_servers
             </code>
-            ... there are 12 apps, 6 root keys, and 4 formats.
+            ... there are {appCount} apps, 6 root keys, and 4 formats.
           </p>
           <p>
             <span className="text-[var(--color-text)] font-medium">getmcp</span> solves this with
@@ -90,7 +93,22 @@ npx @getmcp/cli find
 npx @getmcp/cli remove github
 
 # Check installation status
-npx @getmcp/cli check`}</CodeBlock>
+npx @getmcp/cli check
+
+# Update all tracked installations
+npx @getmcp/cli update
+
+# Diagnose config issues
+npx @getmcp/cli doctor
+
+# Adopt existing server configs into tracking
+npx @getmcp/cli import
+
+# Sync from project manifest (getmcp.json)
+npx @getmcp/cli sync
+
+# Machine-readable JSON output
+npx @getmcp/cli list --json`}</CodeBlock>
           <p>
             The CLI auto-detects which AI applications you have installed, prompts for any required
             environment variables, and merges the config into each app{"'"}s config file. It never
@@ -99,11 +117,44 @@ npx @getmcp/cli check`}</CodeBlock>
         </div>
       </section>
 
+      {/* Project manifests */}
+      <section className="mb-16">
+        <h2 className="text-2xl font-bold mb-4">Project manifests</h2>
+        <div className="space-y-4 text-[var(--color-text-secondary)] leading-relaxed">
+          <p>
+            Teams can share MCP server configurations via a{" "}
+            <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--color-text)]">
+              getmcp.json
+            </code>{" "}
+            manifest file in the project root:
+          </p>
+          <CodeBlock>{`{
+  "servers": {
+    "github": {},
+    "postgres": {
+      "env": {
+        "DATABASE_URL": "postgresql://localhost:5432/mydb"
+      }
+    }
+  }
+}`}</CodeBlock>
+          <p>
+            Then any team member can install all declared servers into their detected apps with:
+          </p>
+          <CodeBlock>{`npx @getmcp/cli sync`}</CodeBlock>
+          <p>
+            The sync command reads the manifest, resolves each server from the registry, merges any
+            local overrides (like environment variables), and writes the correct config for every
+            detected app.
+          </p>
+        </div>
+      </section>
+
       {/* Supported apps */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-4">Supported apps</h2>
         <p className="text-[var(--color-text-secondary)] leading-relaxed mb-4">
-          getmcp generates config for 12 AI applications, each with its own format:
+          getmcp generates config for {appCount} AI applications, each with its own format:
         </p>
         <div className="overflow-x-auto rounded-lg border border-[var(--color-border)]">
           <table className="w-full text-sm">
@@ -128,6 +179,13 @@ npx @getmcp/cli check`}</CodeBlock>
                 ["Zed", "context_servers", "JSON"],
                 ["PyCharm", "mcpServers", "JSON"],
                 ["Codex", "mcp_servers", "TOML"],
+                ["Gemini CLI", "mcpServers", "JSON"],
+                ["Continue", "mcpServers", "JSON"],
+                ["Amazon Q", "mcpServers", "JSON"],
+                ["Trae", "mcpServers", "JSON"],
+                ["VS Code Insiders", "servers", "JSON"],
+                ["BoltAI", "mcpServers", "JSON"],
+                ["LibreChat", "mcpServers", "YAML"],
               ].map(([app, rootKey, format]) => (
                 <tr key={app} className="border-b border-[var(--color-border)] last:border-b-0">
                   <td className="px-4 py-2.5">{app}</td>
@@ -167,7 +225,7 @@ npx @getmcp/cli check`}</CodeBlock>
         |
 +-------+-------+-------+-------+
 |       |       |       |       |
-Claude  VS Code Goose  Codex  + 8 more
+Claude  VS Code Goose  Codex  + ${appCount - 4} more
 Desktop (servers)(YAML) (TOML)   apps`}</CodeBlock>
           <p>There are two types of server configs:</p>
           <ul className="list-disc list-inside space-y-2 ml-1">
@@ -321,7 +379,7 @@ export const myServer: RegistryEntryType = {
             <Link href="/" className="text-[var(--color-accent)] hover:underline">
               web directory
             </Link>
-            , CLI search, and all 12 config generators. Open a pull request on{" "}
+            , CLI search, and all {appCount} config generators. Open a pull request on{" "}
             <a
               href="https://github.com/RodrigoTomeES/getmcp"
               target="_blank"
