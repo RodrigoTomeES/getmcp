@@ -180,7 +180,17 @@ export async function importCommand(options: ImportOptions = {}): Promise<void> 
   // Track selected servers
   for (const s of toImport) {
     const serverId = s.registryId ?? s.name;
-    trackInstallation(serverId, s.apps as import("@getmcp/core").AppIdType[], []);
+    const scopes: Record<string, "project" | "global"> = {};
+    for (const appId of s.apps) {
+      scopes[appId] = "project";
+    }
+    trackInstallation(
+      serverId,
+      s.apps as import("@getmcp/core").AppIdType[],
+      [],
+      undefined,
+      scopes,
+    );
     p.log.success(`Imported: ${s.registryName ?? s.name} (${serverId})`);
   }
 

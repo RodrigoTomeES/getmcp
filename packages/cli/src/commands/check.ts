@@ -9,7 +9,7 @@
 import * as p from "@clack/prompts";
 import { getServer } from "@getmcp/registry";
 import { getTrackedServers } from "../lock.js";
-import { detectInstalledApps } from "../detect.js";
+import { detectApps, resolveAppForScope } from "../detect.js";
 import { listServersInConfig } from "../config-file.js";
 import { shortenPath } from "../utils.js";
 
@@ -21,9 +21,9 @@ export async function checkCommand(options: CheckOptions = {}): Promise<void> {
   const lock = getTrackedServers();
   const entries = Object.entries(lock.installations);
 
-  const installedApps = detectInstalledApps();
-  const installedAppIds = new Set(installedApps.map((a) => a.id));
-  const appConfigMap = new Map(installedApps.map((a) => [a.id, a]));
+  const allDetectedApps = detectApps();
+  const installedAppIds = new Set(allDetectedApps.filter((a) => a.exists).map((a) => a.id));
+  const appConfigMap = new Map(allDetectedApps.map((a) => [a.id, a]));
 
   if (options.json) {
     const results = entries.map(([serverId, installation]) => {
@@ -31,18 +31,21 @@ export async function checkCommand(options: CheckOptions = {}): Promise<void> {
       const inRegistry = !!registryEntry;
 
       const appStatuses = installation.apps.map((appId) => {
+        const appScope = installation.scopes?.[appId] ?? "project";
         if (!installedAppIds.has(appId)) {
-          return { app: appId, status: "app-not-detected" as const };
+          return { app: appId, scope: appScope, status: "app-not-detected" as const };
         }
         const app = appConfigMap.get(appId)!;
+        const resolvedApp = appScope === "global" ? resolveAppForScope(app, "global") : app;
         try {
-          const servers = listServersInConfig(app.configPath);
+          const servers = listServersInConfig(resolvedApp.configPath);
           return {
             app: appId,
+            scope: appScope,
             status: servers.includes(serverId) ? ("present" as const) : ("missing" as const),
           };
         } catch {
-          return { app: appId, status: "unreadable" as const };
+          return { app: appId, scope: appScope, status: "unreadable" as const };
         }
       });
 
@@ -95,10 +98,12 @@ export async function checkCommand(options: CheckOptions = {}): Promise<void> {
       }
 
       const app = appConfigMap.get(appId)!;
+      const appScope = installation.scopes?.[appId] ?? "project";
+      const resolvedApp = appScope === "global" ? resolveAppForScope(app, "global") : app;
       try {
-        const servers = listServersInConfig(app.configPath);
+        const servers = listServersInConfig(resolvedApp.configPath);
         if (servers.includes(serverId)) {
-          presentIn.push(`${app.name} (${shortenPath(app.configPath)})`);
+          presentIn.push(`${app.name} (${shortenPath(resolvedApp.configPath)})`);
         } else {
           missingFrom.push(`${app.name} (removed from config)`);
         }

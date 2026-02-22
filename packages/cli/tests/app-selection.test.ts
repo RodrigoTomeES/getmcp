@@ -142,7 +142,7 @@ describe("resolveAppsFromFlags", () => {
 // ---------------------------------------------------------------------------
 
 describe("resolveScope", () => {
-  it("returns apps unchanged when none are dual-scope", async () => {
+  it("returns apps unchanged and scope 'project' when none are dual-scope", async () => {
     const apps = [
       {
         id: "claude-desktop" as const,
@@ -154,10 +154,11 @@ describe("resolveScope", () => {
     ];
 
     const result = await resolveScope(apps, {}, true);
-    expect(result).toEqual(apps);
+    expect(result.apps).toEqual(apps);
+    expect(result.scope).toBe("project");
   });
 
-  it("uses --global flag for dual-scope apps", async () => {
+  it("uses --global flag for dual-scope apps and returns scope 'global'", async () => {
     const apps = [
       {
         id: "claude-code" as const,
@@ -170,7 +171,8 @@ describe("resolveScope", () => {
     ];
 
     const result = await resolveScope(apps, { global: true }, true);
-    expect(result[0].configPath).toBe("/home/.claude.json");
+    expect(result.apps[0].configPath).toBe("/home/.claude.json");
+    expect(result.scope).toBe("global");
   });
 
   it("defaults to project scope in non-interactive mode", async () => {
@@ -186,10 +188,11 @@ describe("resolveScope", () => {
     ];
 
     const result = await resolveScope(apps, {}, true);
-    expect(result[0].configPath).toBe(".mcp.json");
+    expect(result.apps[0].configPath).toBe(".mcp.json");
+    expect(result.scope).toBe("project");
   });
 
-  it("uses --project flag for dual-scope apps", async () => {
+  it("uses --project flag for dual-scope apps and returns scope 'project'", async () => {
     const apps = [
       {
         id: "claude-code" as const,
@@ -202,6 +205,7 @@ describe("resolveScope", () => {
     ];
 
     const result = await resolveScope(apps, { project: true }, true);
-    expect(result[0].configPath).toBe(".mcp.json");
+    expect(result.apps[0].configPath).toBe(".mcp.json");
+    expect(result.scope).toBe("project");
   });
 });

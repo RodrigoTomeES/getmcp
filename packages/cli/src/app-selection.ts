@@ -86,9 +86,9 @@ export async function resolveScope(
   apps: DetectedApp[],
   flags: AppSelectionFlags,
   isNonInteractive: boolean,
-): Promise<DetectedApp[]> {
+): Promise<{ apps: DetectedApp[]; scope: "project" | "global" }> {
   const dualScopeApps = apps.filter((a) => a.supportsBothScopes);
-  if (dualScopeApps.length === 0) return apps;
+  if (dualScopeApps.length === 0) return { apps, scope: "project" };
 
   let chosenScope: "project" | "global";
   if (flags.global) {
@@ -113,5 +113,5 @@ export async function resolveScope(
     chosenScope = scopeChoice;
   }
 
-  return apps.map((app) => resolveAppForScope(app, chosenScope));
+  return { apps: apps.map((app) => resolveAppForScope(app, chosenScope)), scope: chosenScope };
 }

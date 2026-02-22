@@ -166,19 +166,26 @@ getmcp/
           sync.ts                  # getmcp sync (project manifest)
         index.ts                   # Public API barrel
       tests/
-        detect.test.ts             # 12 tests
+        detect.test.ts             # 14 tests
         config-file.test.ts        # 60 tests
-        lock.test.ts               # 17 tests
-        errors.test.ts             # 18 tests
-        utils.test.ts              # 50 tests (parseFlags + resolveAlias + shortenPath)
+        lock.test.ts               # 23 tests (includes per-app scope tracking tests)
+        errors.test.ts             # 25 tests
+        utils.test.ts              # 43 tests (parseFlags + resolveAlias + shortenPath)
         preferences.test.ts        # 21 tests
         format.test.ts             # 8 tests
-        bin.test.ts                # flag parsing and alias tests
+        bin.test.ts                # 22 tests (flag parsing and alias tests)
+        app-selection.test.ts      # 9 tests (resolveAppsFromFlags + resolveScope)
         commands/
-          list.test.ts             # JSON/quiet output modes
-          doctor.test.ts           # doctor command tests
-          import.test.ts           # import command tests
-          sync.test.ts             # sync command tests
+          add.test.ts              # 13 tests
+          remove.test.ts           # 9 tests
+          list.test.ts             # 12 tests (JSON/quiet output modes)
+          find.test.ts             # 3 tests
+          check.test.ts            # 10 tests (includes per-app scope verification)
+          update.test.ts           # 7 tests
+          doctor.test.ts           # 5 tests
+          import.test.ts           # 5 tests
+          init.test.ts             # 3 tests
+          sync.test.ts             # 7 tests
 ```
 
 ### Dependency Graph
@@ -606,8 +613,9 @@ Compares the lock file against the current registry and app configs to detect dr
 
 1. Reads all tracked installations from `getmcp-lock.json`
 2. For each tracked server, verifies it still exists in the registry
-3. For each tracked app, verifies the server is still present in the app's config file
-4. Reports issues: servers removed from registry, servers removed from app configs, apps no longer detected
+3. For each tracked app, resolves the correct config path using the per-app scope from `scopes` (global-scoped apps check the global config path, project-scoped apps check the project config path)
+4. Verifies the server is still present in each app's resolved config file
+5. Reports issues: servers removed from registry, servers removed from app configs, apps no longer detected
 
 #### `getmcp update [options]`
 
@@ -776,28 +784,33 @@ interface LockInstallation {
   installedAt: string; // ISO timestamp of initial installation
   updatedAt: string; // ISO timestamp of last update
   envVars: string[]; // Env var names that were set (values NOT stored for security)
+  scopes?: Record<string, "project" | "global">; // Per-app installation scope (missing = "project")
 }
 ```
+
+The `scopes` field tracks the installation scope for each app independently. This is necessary because a single server can be installed at different scopes for different apps (e.g., `claude-desktop` is always project-scoped, while `claude-code` may be installed globally). When `scopes` is absent or an app has no entry, the scope defaults to `"project"` for backwards compatibility.
 
 #### Lock File Operations
 
 ```typescript
-getLockFilePath(): string                                          // Resolves to ./getmcp-lock.json
-readLockFile(filePath?: string): LockFile                          // Read lock file (returns empty default if missing)
-writeLockFile(lock: LockFile, filePath?: string): void             // Write lock file
-trackInstallation(serverId, appIds, envVarNames, filePath?): void  // Record an installation (merges apps/envVars if existing)
-trackRemoval(serverId, appIds, filePath?): void                    // Record a removal (deletes entry if no apps remain)
-getTrackedServers(filePath?: string): LockFile                     // Get all tracked installations
+getLockFilePath(): string                                                       // Resolves to ./getmcp-lock.json
+readLockFile(filePath?: string): LockFile                                       // Read lock file (returns empty default if missing)
+writeLockFile(lock: LockFile, filePath?: string): void                          // Write lock file
+trackInstallation(serverId, appIds, envVarNames, filePath?, scopes?): void      // Record an installation (merges apps/envVars/scopes if existing)
+trackRemoval(serverId, appIds, filePath?): void                                 // Record a removal (cleans up scopes, deletes entry if no apps remain)
+getTrackedServers(filePath?: string): LockFile                                  // Get all tracked installations
 ```
 
 #### Usage by Commands
 
-| Command  | Lock File Interaction                                          |
-| -------- | -------------------------------------------------------------- |
-| `add`    | Calls `trackInstallation()` after successfully writing configs |
-| `remove` | Calls `trackRemoval()` after successfully removing configs     |
-| `check`  | Reads lock file and compares against registry and app configs  |
-| `update` | Reads lock file, re-generates configs for all tracked servers  |
+| Command  | Lock File Interaction                                                                    |
+| -------- | ---------------------------------------------------------------------------------------- |
+| `add`    | Calls `trackInstallation()` with per-app scopes after successfully writing configs       |
+| `remove` | Calls `trackRemoval()` after successfully removing configs (cleans up per-app scopes)    |
+| `check`  | Reads lock file, uses per-app scopes to resolve correct config paths for verification    |
+| `update` | Reads lock file, re-generates configs for all tracked servers, preserves existing scopes |
+| `import` | Calls `trackInstallation()` with `"project"` scope for all discovered apps               |
+| `sync`   | Calls `trackInstallation()` with per-app scopes derived from manifest or CLI flags       |
 
 ---
 

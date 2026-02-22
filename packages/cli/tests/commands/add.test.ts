@@ -91,7 +91,13 @@ describe("addCommand", () => {
 
     expect(mergeServerIntoConfig).toHaveBeenCalled();
     expect(writeConfigFile).toHaveBeenCalled();
-    expect(trackInstallation).toHaveBeenCalledWith("github", ["claude-desktop"], expect.any(Array));
+    expect(trackInstallation).toHaveBeenCalledWith(
+      "github",
+      ["claude-desktop"],
+      expect.any(Array),
+      undefined,
+      { "claude-desktop": "project" },
+    );
   });
 
   it("exits with NonInteractiveError when no server ID given in non-interactive mode", async () => {

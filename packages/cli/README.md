@@ -222,10 +222,11 @@ When you install or remove servers, getmcp records the action in a `getmcp-lock.
 
 - Tracks which servers are installed to which apps
 - Records which environment variable names were set (values are **not** stored for security)
+- Tracks the installation scope (project or global) **per app** — so a server installed globally for Claude Code and at project level for Claude Desktop is tracked correctly
 - Stores installation and last-update timestamps
 - Can be **committed to version control** for team sharing (like `package-lock.json`)
 
-The lock file enables the `check` and `update` commands — `check` compares your lock file against actual app configs to detect drift, and `update` re-applies configs from the registry.
+The lock file enables the `check` and `update` commands — `check` compares your lock file against actual app configs to detect drift (using per-app scopes to resolve the correct config path), and `update` re-applies configs from the registry.
 
 ## Supported Apps
 

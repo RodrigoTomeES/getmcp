@@ -25,8 +25,8 @@ export interface LockInstallation {
   updatedAt: string;
   /** Env var names that were set (values NOT stored for security) */
   envVars: string[];
-  /** Installation scope (missing = "project" for backwards compat) */
-  scope?: "project" | "global";
+  /** Per-app installation scope (missing entry = "project" for backwards compat) */
+  scopes?: Partial<Record<string, "project" | "global">>;
 }
 
 export interface LockFile {
@@ -43,7 +43,7 @@ const LockInstallationSchema = z.object({
   installedAt: z.string(),
   updatedAt: z.string(),
   envVars: z.array(z.string()),
-  scope: z.enum(["project", "global"]).optional(),
+  scopes: z.record(z.enum(["project", "global"])).optional(),
 });
 
 const LockFileSchema = z.object({
@@ -114,13 +114,15 @@ export function writeLockFile(lock: LockFile, filePath?: string): void {
 
 /**
  * Record an installation of a server to one or more apps.
+ *
+ * @param scopes - Per-app scope map. Only apps with non-"project" scope need entries.
  */
 export function trackInstallation(
   serverId: string,
   appIds: AppIdType[],
   envVarNames: string[],
   filePath?: string,
-  scope?: "project" | "global",
+  scopes?: Partial<Record<string, "project" | "global">>,
 ): void {
   const lock = readLockFile(filePath);
   const now = new Date().toISOString();
@@ -134,14 +136,17 @@ export function trackInstallation(
     // Merge env var names
     const allEnv = new Set([...existing.envVars, ...envVarNames]);
     existing.envVars = [...allEnv];
-    if (scope) existing.scope = scope;
+    // Merge per-app scopes
+    if (scopes) {
+      existing.scopes = { ...existing.scopes, ...scopes };
+    }
   } else {
     lock.installations[serverId] = {
       apps: appIds,
       installedAt: now,
       updatedAt: now,
       envVars: envVarNames,
-      ...(scope ? { scope } : {}),
+      ...(scopes && Object.keys(scopes).length > 0 ? { scopes } : {}),
     };
   }
 
@@ -161,6 +166,16 @@ export function trackRemoval(serverId: string, appIds: AppIdType[], filePath?: s
   const removeSet = new Set(appIds);
   existing.apps = existing.apps.filter((a) => !removeSet.has(a));
   existing.updatedAt = new Date().toISOString();
+
+  // Clean up scopes for removed apps
+  if (existing.scopes) {
+    for (const appId of appIds) {
+      delete existing.scopes[appId];
+    }
+    if (Object.keys(existing.scopes).length === 0) {
+      delete existing.scopes;
+    }
+  }
 
   if (existing.apps.length === 0) {
     delete lock.installations[serverId];

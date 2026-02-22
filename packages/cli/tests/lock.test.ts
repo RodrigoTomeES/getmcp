@@ -178,6 +178,55 @@ describe("trackInstallation", () => {
     const lock = readLockFile(f);
     expect(Object.keys(lock.installations)).toEqual(["github", "slack"]);
   });
+
+  it("persists per-app scopes to lock file", () => {
+    const f = tmpFile("lock.json");
+    trackInstallation("github", ["claude-code"], ["GITHUB_TOKEN"], f, { "claude-code": "global" });
+
+    const lock = readLockFile(f);
+    expect(lock.installations.github.scopes).toEqual({ "claude-code": "global" });
+  });
+
+  it("merges per-app scopes on re-installation", () => {
+    const f = tmpFile("lock.json");
+    trackInstallation("github", ["claude-code"], [], f, { "claude-code": "global" });
+    trackInstallation("github", ["claude-desktop"], [], f, { "claude-desktop": "project" });
+
+    const lock = readLockFile(f);
+    expect(lock.installations.github.scopes).toEqual({
+      "claude-code": "global",
+      "claude-desktop": "project",
+    });
+  });
+
+  it("updates scope for existing app on re-installation", () => {
+    const f = tmpFile("lock.json");
+    trackInstallation("github", ["claude-code"], [], f, { "claude-code": "project" });
+    trackInstallation("github", ["claude-code"], [], f, { "claude-code": "global" });
+
+    const lock = readLockFile(f);
+    expect(lock.installations.github.scopes).toEqual({ "claude-code": "global" });
+  });
+
+  it("omits scopes field when not provided (backwards compat)", () => {
+    const f = tmpFile("lock.json");
+    trackInstallation("github", ["claude-desktop"], [], f);
+
+    const lock = readLockFile(f);
+    expect(lock.installations.github.scopes).toBeUndefined();
+  });
+
+  it("cleans up scopes on removal", () => {
+    const f = tmpFile("lock.json");
+    trackInstallation("github", ["claude-code", "claude-desktop"], [], f, {
+      "claude-code": "global",
+      "claude-desktop": "project",
+    });
+    trackRemoval("github", ["claude-code"], f);
+
+    const lock = readLockFile(f);
+    expect(lock.installations.github.scopes).toEqual({ "claude-desktop": "project" });
+  });
 });
 
 // ---------------------------------------------------------------------------

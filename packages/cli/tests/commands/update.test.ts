@@ -146,7 +146,13 @@ describe("updateCommand", () => {
 
     await updateCommand({ yes: true });
 
-    expect(trackInstallation).toHaveBeenCalledWith("github", ["claude-desktop"], ["GITHUB_TOKEN"]);
+    expect(trackInstallation).toHaveBeenCalledWith(
+      "github",
+      ["claude-desktop"],
+      ["GITHUB_TOKEN"],
+      undefined,
+      undefined,
+    );
   });
 
   it("skips writes in --dry-run mode", async () => {
