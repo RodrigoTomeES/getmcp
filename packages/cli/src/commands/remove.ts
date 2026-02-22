@@ -15,13 +15,14 @@ import * as p from "@clack/prompts";
 import { detectInstalledApps, type DetectedApp } from "../detect.js";
 import { removeServerFromConfig, writeConfigFile, listServersInConfig } from "../config-file.js";
 import { trackRemoval } from "../lock.js";
-import { shortenPath } from "../utils.js";
+import { shortenPath, isNonInteractive as checkNonInteractive } from "../utils.js";
 import { formatError } from "../errors.js";
 
 export interface RemoveOptions {
   yes?: boolean;
   apps?: string[];
   dryRun?: boolean;
+  json?: boolean;
   global?: boolean;
   project?: boolean;
 }
@@ -30,7 +31,7 @@ export async function removeCommand(
   serverName?: string,
   options: RemoveOptions = {},
 ): Promise<void> {
-  const isNonInteractive = options.yes || !process.stdin.isTTY;
+  const isNonInteractive = checkNonInteractive(options);
 
   p.intro("getmcp remove");
 
@@ -130,35 +131,47 @@ export async function removeCommand(
     p.log.step("Dry run — no files will be modified:");
   }
 
-  const removedApps: DetectedApp[] = [];
+  const results: { id: string; name: string; removed: boolean }[] = [];
 
   for (const app of selectedApps) {
     try {
       const updated = removeServerFromConfig(app.configPath, serverName);
       if (updated) {
         if (options.dryRun) {
-          p.log.info(
-            `${app.name}: would remove "${serverName}" from ${shortenPath(app.configPath)}`,
-          );
+          if (!options.json) {
+            p.log.info(
+              `${app.name}: would remove "${serverName}" from ${shortenPath(app.configPath)}`,
+            );
+          }
         } else {
           writeConfigFile(app.configPath, updated);
-          p.log.success(`${app.name}: removed`);
+          if (!options.json) p.log.success(`${app.name}: removed`);
         }
-        removedApps.push(app);
+        results.push({ id: app.id, name: app.name, removed: true });
       } else {
-        p.log.warn(`${app.name}: not found (skipped)`);
+        if (!options.json) p.log.warn(`${app.name}: not found (skipped)`);
+        results.push({ id: app.id, name: app.name, removed: false });
       }
     } catch (err) {
-      p.log.error(`${app.name}: ${formatError(err)}`);
+      if (!options.json) p.log.error(`${app.name}: ${formatError(err)}`);
+      results.push({ id: app.id, name: app.name, removed: false });
     }
   }
 
   // Track removal (unless dry-run)
+  const removedApps = results.filter((r) => r.removed);
   if (!options.dryRun && removedApps.length > 0) {
     trackRemoval(
       serverName,
-      removedApps.map((a) => a.id),
+      removedApps.map((a) => a.id as import("@getmcp/core").AppIdType),
     );
+  }
+
+  if (options.json) {
+    console.log(
+      JSON.stringify({ server: serverName, apps: results, dryRun: !!options.dryRun }, null, 2),
+    );
+    return;
   }
 
   const action = options.dryRun ? "would be removed" : "has been removed";

@@ -227,6 +227,18 @@ export function removeServerFromConfig(
 }
 
 /**
+ * Known root keys used by all supported AI apps for MCP server configuration.
+ */
+export const ROOT_KEYS = [
+  "mcpServers",
+  "servers",
+  "extensions",
+  "mcp",
+  "context_servers",
+  "mcp_servers",
+] as const;
+
+/**
  * List all server names found in a config file.
  * Scans known root keys: mcpServers, servers, extensions, mcp,
  * context_servers, mcp_servers.
@@ -234,7 +246,7 @@ export function removeServerFromConfig(
  */
 export function listServersInConfig(filePath: string): string[] {
   const existing = readConfigFile(filePath);
-  const rootKeys = ["mcpServers", "servers", "extensions", "mcp", "context_servers", "mcp_servers"];
+  const rootKeys = ROOT_KEYS;
   const servers: string[] = [];
 
   for (const rootKey of rootKeys) {

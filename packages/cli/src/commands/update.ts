@@ -12,7 +12,7 @@ import type { LooseServerConfigType, AppIdType } from "@getmcp/core";
 import { getTrackedServers, trackInstallation } from "../lock.js";
 import { detectApps } from "../detect.js";
 import { mergeServerIntoConfig, writeConfigFile } from "../config-file.js";
-import { shortenPath } from "../utils.js";
+import { shortenPath, isNonInteractive as checkNonInteractive } from "../utils.js";
 import { formatError } from "../errors.js";
 
 export interface UpdateOptions {
@@ -25,7 +25,7 @@ export interface UpdateOptions {
 }
 
 export async function updateCommand(options: UpdateOptions = {}): Promise<void> {
-  const isNonInteractive = options.yes || !process.stdin.isTTY;
+  const isNonInteractive = checkNonInteractive(options);
 
   p.intro("getmcp update");
 

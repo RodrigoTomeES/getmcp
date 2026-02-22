@@ -20,10 +20,11 @@ import { isStdioConfig } from "@getmcp/core";
 import type { LooseServerConfigType, RegistryEntryType, AppIdType } from "@getmcp/core";
 import { generators } from "@getmcp/generators";
 import { detectApps, resolveAppForScope, type DetectedApp } from "../detect.js";
+import { resolveAppsFromFlags, resolveScope } from "../app-selection.js";
 import { mergeServerIntoConfig, writeConfigFile } from "../config-file.js";
 import { getSavedSelectedApps, saveSelectedApps } from "../preferences.js";
 import { trackInstallation } from "../lock.js";
-import { shortenPath } from "../utils.js";
+import { shortenPath, isNonInteractive as checkNonInteractive } from "../utils.js";
 import {
   ServerNotFoundError,
   AppNotDetectedError,
@@ -46,7 +47,7 @@ export interface AddOptions {
 }
 
 export async function addCommand(serverIdArg?: string, options: AddOptions = {}): Promise<void> {
-  const isNonInteractive = options.yes || !process.stdin.isTTY;
+  const isNonInteractive = checkNonInteractive(options);
 
   p.intro("getmcp add");
 
@@ -380,7 +381,7 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
 }
 
 async function addUnverifiedServer(options: AddOptions): Promise<void> {
-  const isNonInteractive = options.yes || !process.stdin.isTTY;
+  const isNonInteractive = checkNonInteractive(options);
 
   let serverName: string;
   let config: LooseServerConfigType;
@@ -415,28 +416,18 @@ async function addUnverifiedServer(options: AddOptions): Promise<void> {
 
   p.log.info(`Server name: ${serverName}`);
 
-  // Detect apps and select
-  const allApps = detectApps();
-  const detected = allApps.filter((app) => app.exists);
+  // Detect apps and select using shared helper
+  const resolved = resolveAppsFromFlags(options);
 
   let selectedApps: DetectedApp[];
 
-  if (options.allApps) {
-    selectedApps = detected;
-  } else if (options.apps && options.apps.length > 0) {
-    const validIds = getAppIds();
-    selectedApps = [];
-    for (const appId of options.apps) {
-      if (!validIds.includes(appId as AppIdType)) {
-        p.log.error(new InvalidAppError(appId, validIds).format());
-        process.exit(1);
-      }
-      const app = allApps.find((a) => a.id === appId);
-      if (app) selectedApps.push(app);
-    }
-  } else if (isNonInteractive) {
-    selectedApps = detected;
-  } else {
+  if (!resolved) {
+    p.outro("Done");
+    return;
+  }
+
+  if (resolved.apps.length === 0 && !isNonInteractive) {
+    const detected = resolved.allApps.filter((app) => app.exists);
     if (detected.length === 0) {
       p.log.warn("No AI applications detected.");
       p.outro("Done");
@@ -458,41 +449,16 @@ async function addUnverifiedServer(options: AddOptions): Promise<void> {
       process.exit(0);
     }
     selectedApps = selected;
-  }
-
-  if (selectedApps.length === 0) {
+  } else if (resolved.apps.length === 0) {
     p.log.error(new AppNotDetectedError().format());
     p.outro("Done");
     return;
+  } else {
+    selectedApps = resolved.apps;
   }
 
-  // Scope selection for dual-scope apps
-  const dualScopeApps = selectedApps.filter((a) => a.supportsBothScopes);
-  if (dualScopeApps.length > 0) {
-    let chosenScope: "project" | "global";
-    if (options.global) {
-      chosenScope = "global";
-    } else if (options.project) {
-      chosenScope = "project";
-    } else if (isNonInteractive) {
-      chosenScope = "project";
-    } else {
-      const scopeChoice = await p.select({
-        message: "Install globally or per-project?",
-        options: [
-          { label: "Project", hint: "config in current directory", value: "project" as const },
-          { label: "Global", hint: "config in home directory", value: "global" as const },
-        ],
-        initialValue: "project" as const,
-      });
-      if (p.isCancel(scopeChoice)) {
-        p.cancel("Operation cancelled.");
-        process.exit(0);
-      }
-      chosenScope = scopeChoice;
-    }
-    selectedApps = selectedApps.map((app) => resolveAppForScope(app, chosenScope));
-  }
+  // Scope selection using shared helper
+  selectedApps = await resolveScope(selectedApps, options, isNonInteractive);
 
   // Generate and merge
   if (options.dryRun) {

@@ -18,6 +18,7 @@ vi.mock("../../src/detect.js", () => ({
 // Mock config-file to avoid filesystem access
 vi.mock("../../src/config-file.js", () => ({
   readConfigFile: vi.fn(() => ({})),
+  ROOT_KEYS: ["mcpServers", "servers", "extensions", "mcp", "context_servers", "mcp_servers"],
 }));
 
 // Mock lock file

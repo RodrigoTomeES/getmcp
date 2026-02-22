@@ -9,7 +9,7 @@
 import * as p from "@clack/prompts";
 import { getServer, findServerByCommand } from "@getmcp/registry";
 import { detectInstalledApps } from "../detect.js";
-import { readConfigFile } from "../config-file.js";
+import { readConfigFile, ROOT_KEYS } from "../config-file.js";
 import { getTrackedServers, trackInstallation } from "../lock.js";
 
 export interface ImportOptions {
@@ -25,7 +25,7 @@ interface DiscoveredServer {
 }
 
 export async function importCommand(options: ImportOptions = {}): Promise<void> {
-  const isNonInteractive = options.yes || !process.stdin.isTTY;
+  const isNonInteractive = !!options.yes || !process.stdin.isTTY;
   const apps = detectInstalledApps();
 
   if (apps.length === 0) {
@@ -42,7 +42,7 @@ export async function importCommand(options: ImportOptions = {}): Promise<void> 
   // Scan all app configs for server entries
   const discovered = new Map<string, DiscoveredServer>();
   const lock = getTrackedServers();
-  const rootKeys = ["mcpServers", "servers", "extensions", "mcp", "context_servers", "mcp_servers"];
+  const rootKeys = ROOT_KEYS;
 
   for (const app of apps) {
     let config: Record<string, unknown>;
