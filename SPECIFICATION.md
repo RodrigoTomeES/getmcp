@@ -297,7 +297,8 @@ type AppId =
   | "trae"
   | "vscode-insiders"
   | "bolt-ai"
-  | "libre-chat";
+  | "libre-chat"
+  | "antigravity";
 ```
 
 ---
@@ -424,6 +425,13 @@ interface AppMetadata {
 - Supports stdio, streamable-http, and SSE transports
 - Docs: https://www.jetbrains.com/help/ai-assistant/mcp.html
 
+#### Antigravity — `AntigravityGenerator`
+
+- **Passthrough**: canonical format IS the native format
+- Root key: `mcpServers`
+- Config path: `~/.gemini/antigravity/mcp_config.json` (macOS/Linux), `%UserProfile%\.gemini\antigravity\mcp_config.json` (Windows)
+- Omits empty `args` and `env`
+
 ### Transformation Summary Table
 
 | App            | Root Key          | `command`         | `args`   | `env`         | Remote URL     | Extra Fields                               | Format |
@@ -439,6 +447,7 @@ interface AppMetadata {
 | OpenCode       | `mcp`             | `command` (array) | (merged) | `environment` | `url` + `type` | `type`, `enabled`                          | JSONC  |
 | Zed            | `context_servers` | `command`         | `args`   | `env`         | `url`          | —                                          | JSON   |
 | PyCharm        | `mcpServers`      | `command`         | `args`   | `env`         | `url`          | —                                          | JSON   |
+| Antigravity    | `mcpServers`      | `command`         | `args`   | `env`         | `url`          | —                                          | JSON   |
 
 ---
 
@@ -1030,10 +1039,10 @@ Detailed documentation of every app's MCP config format, gathered from official 
 | Package              | Test Files | Tests   | Description                                                                                                          |
 | -------------------- | ---------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
 | `@getmcp/core`       | 3          | 39      | Schema validation, type guards, transport inference, JSON Schema, ProjectManifest                                    |
-| `@getmcp/generators` | 1          | 115     | All 19 generators (stdio + remote), multi-server, serialization                                                      |
+| `@getmcp/generators` | 1          | 119     | All 20 generators (stdio + remote), multi-server, serialization                                                      |
 | `@getmcp/registry`   | 1          | 60      | Entry validation, lookup, search, categories, content integrity                                                      |
 | `@getmcp/cli`        | 12         | 285     | Path resolution, app detection, config I/O, lock file, errors, preferences, utils, flags, doctor, import, sync, list |
-| **Total**            | **17**     | **499** |                                                                                                                      |
+| **Total**            | **17**     | **503** |                                                                                                                      |
 
 ---
 

@@ -206,6 +206,7 @@ export const AppId = z.enum([
   "vscode-insiders",
   "bolt-ai",
   "libre-chat",
+  "antigravity",
 ]);
 
 // ---------------------------------------------------------------------------

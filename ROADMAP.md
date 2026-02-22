@@ -214,6 +214,8 @@ Longer-term roadmap items from the specification.
   - File: `packages/generators/src/bolt-ai.ts`
 - [x] **LibreChat** — Added `libre-chat` generator (YAML format, `mcpServers` root key).
   - File: `packages/generators/src/libre-chat.ts`
+- [x] **Antigravity** — Added `antigravity` generator (passthrough, `mcpServers` root key).
+  - File: `packages/generators/src/antigravity.ts`
 
 ### Codex Enhancements
 

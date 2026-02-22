@@ -23,7 +23,7 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22) with 5 
 | Package               | npm Name             | Purpose                                                                                                                                                                                             |
 | --------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/core`       | `@getmcp/core`       | Zod schemas, TypeScript types, utility functions (type guards, transport inference), JSON Schema generation                                                                                         |
-| `packages/generators` | `@getmcp/generators` | 19 config generators (one per AI app), each transforms canonical format to app-native format                                                                                                        |
+| `packages/generators` | `@getmcp/generators` | 20 config generators (one per AI app), each transforms canonical format to app-native format                                                                                                        |
 | `packages/registry`   | `@getmcp/registry`   | Catalog of MCP server definitions with search/filter API                                                                                                                                            |
 | `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `init`, `doctor`, `import`, `sync` commands with app auto-detection, config merging, and installation tracking via `getmcp-lock.json` |
 | `packages/web`        | `@getmcp/web`        | Next.js (App Router) web directory for browsing servers and generating config snippets                                                                                                              |
@@ -98,6 +98,7 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 | `opencode.ts`       | Root key `mcp`; merges `command`+`args` into array; renames `env` to `environment`                                        |
 | `zed.ts`            | Root key `context_servers`                                                                                                |
 | `pycharm.ts`        | Passthrough; project-level config at `.ai/mcp/mcp.json` (requires JetBrains AI Assistant plugin)                          |
+| `antigravity.ts`    | Passthrough; Google Antigravity IDE (`mcpServers` root key, JSON)                                                         |
 | `index.ts`          | Generator registry: maps `AppId` to generator instances; exports `generateConfig()`, `getGenerator()`, `getAppIds()`      |
 
 ### `@getmcp/registry` (`packages/registry/src/`)
@@ -138,7 +139,7 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 | `app/docs/page.tsx`           | Documentation page with getting started, supported apps, library usage, and more                |
 | `app/docs/loading.tsx`        | Loading skeleton for the docs page                                                              |
 | `app/servers/[id]/page.tsx`   | Dynamic server detail page (statically generated from registry)                                 |
-| `components/ConfigViewer.tsx` | Client component: tab selector for all 19 apps, shows generated config snippet with copy button |
+| `components/ConfigViewer.tsx` | Client component: tab selector for all 20 apps, shows generated config snippet with copy button |
 | `components/SearchBar.tsx`    | Search and filter component                                                                     |
 | `components/ServerCard.tsx`   | Server listing card                                                                             |
 
@@ -197,12 +198,12 @@ This is not optional — documentation drift causes confusion and wastes time. T
 
 ## Testing
 
-- **499 tests** across 17 test files
+- **503 tests** across 17 test files
 - Run all tests: `npx vitest` (from repo root)
 - Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc.
 - Test locations:
   - `packages/core/tests/` — schema validation, type guards, transport inference, JSON Schema, ProjectManifest
-  - `packages/generators/tests/` — all 19 generators (stdio + remote + multi-server + serialization)
+  - `packages/generators/tests/` — all 20 generators (stdio + remote + multi-server + serialization)
   - `packages/registry/tests/` — entry validation, lookup, search, categories, content integrity
   - `packages/cli/tests/` — path resolution, app detection, config read/write/merge/remove, lock file, errors, preferences, utils, bin flags
   - `packages/cli/tests/commands/` — list (JSON/quiet output), doctor, import, sync command tests

@@ -25,6 +25,7 @@ const APP_LABELS: Record<AppIdType, string> = {
   "vscode-insiders": "VS Code Insiders",
   "bolt-ai": "BoltAI",
   "libre-chat": "LibreChat",
+  antigravity: "Antigravity",
 };
 
 const APP_IDS = Object.keys(generators) as AppIdType[];

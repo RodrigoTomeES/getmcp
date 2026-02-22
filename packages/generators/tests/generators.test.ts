@@ -22,6 +22,7 @@ import {
   VSCodeInsidersGenerator,
   BoltAIGenerator,
   LibreChatGenerator,
+  AntigravityGenerator,
   generators,
   getGenerator,
   getAppIds,
@@ -842,17 +843,57 @@ describe("LibreChatGenerator", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Antigravity
+// ---------------------------------------------------------------------------
+
+describe("AntigravityGenerator", () => {
+  const gen = new AntigravityGenerator();
+
+  it("generates mcpServers format for stdio", () => {
+    const result = gen.generate("github", stdioConfig);
+    expect(result).toHaveProperty("mcpServers");
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).github;
+    expect(server.command).toBe("npx");
+    expect(server.args).toEqual(["-y", "@modelcontextprotocol/server-github"]);
+    expect(server.env).toEqual({ GITHUB_PERSONAL_ACCESS_TOKEN: "abc123" });
+  });
+
+  it("generates mcpServers format for remote", () => {
+    const result = gen.generate("remote", remoteConfig);
+    expect(result).toHaveProperty("mcpServers");
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).remote;
+    expect(server.url).toBe("https://mcp.example.com/mcp");
+    expect(server.headers).toEqual({ Authorization: "Bearer token123" });
+  });
+
+  it("omits empty args and env", () => {
+    const result = gen.generate("minimal", { command: "server", transport: "stdio" });
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).minimal;
+    expect(server.command).toBe("server");
+    expect(server.args).toBeUndefined();
+    expect(server.env).toBeUndefined();
+  });
+
+  it("serializes to valid JSON", () => {
+    const result = gen.generate("github", stdioConfig);
+    const serialized = gen.serialize(result);
+    const parsed = JSON.parse(serialized);
+    expect(parsed).toEqual(result);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Registry & utilities
 // ---------------------------------------------------------------------------
 
 describe("generators registry", () => {
-  it("has all 19 generators", () => {
-    expect(Object.keys(generators)).toHaveLength(19);
+  it("has all 20 generators", () => {
+    expect(Object.keys(generators)).toHaveLength(20);
   });
 
-  it("getAppIds returns all 19 IDs", () => {
+  it("getAppIds returns all 20 IDs", () => {
     const ids = getAppIds();
-    expect(ids).toHaveLength(19);
+    expect(ids).toHaveLength(20);
     expect(ids).toContain("claude-desktop");
     expect(ids).toContain("goose");
     expect(ids).toContain("zed");
@@ -865,6 +906,7 @@ describe("generators registry", () => {
     expect(ids).toContain("vscode-insiders");
     expect(ids).toContain("bolt-ai");
     expect(ids).toContain("libre-chat");
+    expect(ids).toContain("antigravity");
   });
 
   it("getGenerator returns correct generator for each app", () => {
@@ -876,9 +918,9 @@ describe("generators registry", () => {
     expect(() => getGenerator("unknown" as any)).toThrow();
   });
 
-  it("generateAllConfigs returns configs for all 19 apps", () => {
+  it("generateAllConfigs returns configs for all 20 apps", () => {
     const configs = generateAllConfigs("github", stdioConfig);
-    expect(Object.keys(configs)).toHaveLength(19);
+    expect(Object.keys(configs)).toHaveLength(20);
     // Each config should be a valid string
     for (const [, configStr] of Object.entries(configs)) {
       expect(typeof configStr).toBe("string");
