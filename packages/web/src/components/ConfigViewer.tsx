@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { AppIdType, LooseServerConfigType } from "@getmcp/core";
 import { generators } from "@getmcp/generators";
 import { useClipboard } from "@/hooks/use-clipboard";
@@ -41,8 +41,10 @@ export function ConfigViewer({
   const { copied, copy } = useClipboard();
 
   const generator = generators[selectedApp];
-  const generated = generator.generate(serverName, config);
-  const serialized = generator.serialize(generated);
+  const serialized = useMemo(() => {
+    const generated = generator.generate(serverName, config);
+    return generator.serialize(generated);
+  }, [selectedApp, serverName, config]);
 
   return (
     <div>
@@ -56,8 +58,8 @@ export function ConfigViewer({
             onClick={() => setSelectedApp(appId)}
             className={`text-xs px-3 py-1.5 rounded-md border transition-colors ${
               selectedApp === appId
-                ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-white"
-                : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
+                ? "border-accent bg-accent text-white"
+                : "border-border text-text-secondary hover:border-text-secondary hover:text-text"
             }`}
           >
             {APP_LABELS[appId]}
@@ -66,9 +68,9 @@ export function ConfigViewer({
       </div>
 
       {/* Config path hint */}
-      <p className="text-xs text-[var(--color-text-secondary)] mb-2">
+      <p className="text-xs text-text-secondary mb-2">
         Config file:{" "}
-        <code className="text-[var(--color-accent)]">
+        <code className="text-accent">
           {generator.app.configPaths !== null && generator.app.globalConfigPaths !== null
             ? `${generator.app.configPaths} (project) or ${generator.app.globalConfigPaths?.darwin ?? "—"} (global)`
             : (generator.app.configPaths ??
@@ -80,14 +82,14 @@ export function ConfigViewer({
       </p>
 
       {/* Code block */}
-      <div className="relative rounded-lg border border-[var(--color-border)] bg-[var(--color-code-bg)] overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--color-border)]">
-          <span className="text-xs text-[var(--color-text-secondary)]">
+      <div className="relative rounded-lg border border-border bg-code-bg overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+          <span className="text-xs text-text-secondary">
             {generator.app.configFormat.toUpperCase()}
           </span>
           <button
             onClick={() => copy(serialized)}
-            className="text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors shrink-0 p-1"
+            className="text-text-secondary hover:text-text transition-colors shrink-0 p-1"
             aria-label="Copy configuration"
           >
             {copied ? (
@@ -99,7 +101,7 @@ export function ConfigViewer({
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="w-4 h-4 text-[var(--color-success)]"
+                className="w-4 h-4 text-success"
               >
                 <polyline points="20 6 9 17 4 12" />
               </svg>
@@ -127,13 +129,13 @@ export function ConfigViewer({
 
       {/* PyCharm-specific warning */}
       {selectedApp === "pycharm" && (
-        <p className="text-xs text-amber-500 mt-3">
+        <p className="text-xs text-warning mt-3">
           Requires the{" "}
           <a
             href="https://plugins.jetbrains.com/plugin/22282-jetbrains-ai-assistant"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline hover:text-amber-400"
+            className="underline text-warning-light"
           >
             JetBrains AI Assistant
           </a>{" "}
@@ -142,12 +144,12 @@ export function ConfigViewer({
       )}
 
       {/* Docs link */}
-      <p className="text-xs text-[var(--color-text-secondary)] mt-3">
+      <p className="text-xs text-text-secondary mt-3">
         <a
           href={generator.app.docsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[var(--color-accent)] hover:underline"
+          className="text-accent hover:underline"
         >
           {APP_LABELS[selectedApp]} MCP documentation
         </a>

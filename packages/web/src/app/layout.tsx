@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col">
-        <header className="border-b border-[var(--color-border)] px-6 py-4">
+        <header className="border-b border-border px-6 py-4">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
               <Image
@@ -36,22 +36,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 className="h-6 w-auto"
               />
               <span className="text-xl font-bold tracking-tight">getmcp</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-accent)] text-white font-medium">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-accent text-white font-medium">
                 beta
               </span>
             </Link>
-            <nav className="flex items-center gap-6 text-sm text-[var(--color-text-secondary)]">
-              <Link href="/" className="hover:text-[var(--color-text)] transition-colors">
+            <nav className="flex items-center gap-6 text-sm text-text-secondary">
+              <Link href="/" className="hover:text-text transition-colors">
                 Servers
               </Link>
-              <Link href="/docs" className="hover:text-[var(--color-text)] transition-colors">
+              <Link href="/docs" className="hover:text-text transition-colors">
                 Docs
               </Link>
               <a
                 href="https://github.com/RodrigoTomeES/getmcp"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-[var(--color-text)] transition-colors"
+                className="hover:text-text transition-colors"
               >
                 GitHub
               </a>
@@ -61,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <main className="flex-1">{children}</main>
 
-        <footer className="border-t border-[var(--color-border)] px-6 py-6 text-center text-sm text-[var(--color-text-secondary)]">
+        <footer className="border-t border-border px-6 py-6 text-center text-sm text-text-secondary">
           <div className="max-w-6xl mx-auto">getmcp — One config format, every AI app.</div>
         </footer>
       </body>

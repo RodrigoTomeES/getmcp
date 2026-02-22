@@ -28,7 +28,7 @@ export default function DocsPage() {
       {/* Hero */}
       <section className="mb-16">
         <h1 className="text-4xl font-bold tracking-tight mb-4">Documentation</h1>
-        <p className="text-lg text-[var(--color-text-secondary)] leading-relaxed">
+        <p className="text-lg text-text-secondary leading-relaxed">
           Learn how to install, configure, and use getmcp to manage MCP servers across all AI
           applications.
         </p>
@@ -37,35 +37,35 @@ export default function DocsPage() {
       {/* What is getmcp? */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-4">What is getmcp?</h2>
-        <div className="space-y-4 text-[var(--color-text-secondary)] leading-relaxed">
+        <div className="space-y-4 text-text-secondary leading-relaxed">
           <p>
             Every AI application uses a different config format for MCP (Model Context Protocol)
             servers. Claude Desktop uses{" "}
-            <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--color-text)]">
+            <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
               mcpServers
             </code>
             , VS Code uses{" "}
-            <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--color-text)]">
+            <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
               servers
             </code>
             , Goose uses YAML with{" "}
-            <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--color-text)]">
+            <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
               cmd
             </code>
             /
-            <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--color-text)]">
+            <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
               envs
             </code>
             , Codex uses TOML with{" "}
-            <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--color-text)]">
+            <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
               mcp_servers
             </code>
             ... there are {appCount} apps, 6 root keys, and 4 formats.
           </p>
           <p>
-            <span className="text-[var(--color-text)] font-medium">getmcp</span> solves this with
-            one canonical format, config generators for every app, a registry of popular servers,
-            and a CLI that auto-detects your apps and writes the correct config.
+            <span className="text-text font-medium">getmcp</span> solves this with one canonical
+            format, config generators for every app, a registry of popular servers, and a CLI that
+            auto-detects your apps and writes the correct config.
           </p>
         </div>
       </section>
@@ -73,7 +73,7 @@ export default function DocsPage() {
       {/* Getting started */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-4">Getting started</h2>
-        <div className="space-y-4 text-[var(--color-text-secondary)] leading-relaxed">
+        <div className="space-y-4 text-text-secondary leading-relaxed">
           <p>Install any MCP server into all your detected AI apps with a single command:</p>
           <CodeBlock>{`npx @getmcp/cli add <server>`}</CodeBlock>
           <p>Here are the most common CLI commands:</p>
@@ -120,10 +120,10 @@ npx @getmcp/cli list --json`}</CodeBlock>
       {/* Project manifests */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-4">Project manifests</h2>
-        <div className="space-y-4 text-[var(--color-text-secondary)] leading-relaxed">
+        <div className="space-y-4 text-text-secondary leading-relaxed">
           <p>
             Teams can share MCP server configurations via a{" "}
-            <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--color-text)]">
+            <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
               getmcp.json
             </code>{" "}
             manifest file in the project root:
@@ -153,19 +153,19 @@ npx @getmcp/cli list --json`}</CodeBlock>
       {/* Supported apps */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-4">Supported apps</h2>
-        <p className="text-[var(--color-text-secondary)] leading-relaxed mb-4">
+        <p className="text-text-secondary leading-relaxed mb-4">
           getmcp generates config for {appCount} AI applications, each with its own format:
         </p>
-        <div className="overflow-x-auto rounded-lg border border-[var(--color-border)]">
+        <div className="overflow-x-auto rounded-lg border border-border">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface)]">
+              <tr className="border-b border-border bg-surface">
                 <th className="text-left px-4 py-3 font-medium">App</th>
                 <th className="text-left px-4 py-3 font-medium">Root Key</th>
                 <th className="text-left px-4 py-3 font-medium">Format</th>
               </tr>
             </thead>
-            <tbody className="text-[var(--color-text-secondary)]">
+            <tbody className="text-text-secondary">
               {[
                 ["Claude Desktop", "mcpServers", "JSON"],
                 ["Claude Code", "mcpServers", "JSON"],
@@ -188,10 +188,10 @@ npx @getmcp/cli list --json`}</CodeBlock>
                 ["LibreChat", "mcpServers", "YAML"],
                 ["Antigravity", "mcpServers", "JSON"],
               ].map(([app, rootKey, format]) => (
-                <tr key={app} className="border-b border-[var(--color-border)] last:border-b-0">
+                <tr key={app} className="border-b border-border last:border-b-0">
                   <td className="px-4 py-2.5">{app}</td>
                   <td className="px-4 py-2.5">
-                    <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-xs font-mono text-[var(--color-text)]">
+                    <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
                       {rootKey}
                     </code>
                   </td>
@@ -206,16 +206,15 @@ npx @getmcp/cli list --json`}</CodeBlock>
       {/* How it works */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-4">How it works</h2>
-        <div className="space-y-4 text-[var(--color-text-secondary)] leading-relaxed">
+        <div className="space-y-4 text-text-secondary leading-relaxed">
           <p>
             Server definitions are stored in a{" "}
-            <span className="text-[var(--color-text)] font-medium">canonical format</span> aligned
-            with{" "}
+            <span className="text-text font-medium">canonical format</span> aligned with{" "}
             <a
               href="https://github.com/jlowin/fastmcp"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[var(--color-accent)] hover:underline"
+              className="text-accent hover:underline"
             >
               FastMCP
             </a>
@@ -231,40 +230,39 @@ Desktop (servers)(YAML) (TOML)   apps`}</CodeBlock>
           <p>There are two types of server configs:</p>
           <ul className="list-disc list-inside space-y-2 ml-1">
             <li>
-              <span className="text-[var(--color-text)] font-medium">Stdio servers</span> — run a
-              local process with{" "}
-              <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-xs font-mono text-[var(--color-text)]">
+              <span className="text-text font-medium">Stdio servers</span> — run a local process
+              with{" "}
+              <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
                 command
               </code>
               ,{" "}
-              <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-xs font-mono text-[var(--color-text)]">
+              <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
                 args
               </code>
               , and{" "}
-              <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-xs font-mono text-[var(--color-text)]">
+              <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
                 env
               </code>
             </li>
             <li>
-              <span className="text-[var(--color-text)] font-medium">Remote servers</span> — connect
-              to a URL with{" "}
-              <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-xs font-mono text-[var(--color-text)]">
+              <span className="text-text font-medium">Remote servers</span> — connect to a URL with{" "}
+              <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
                 url
               </code>{" "}
               and optional{" "}
-              <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-xs font-mono text-[var(--color-text)]">
+              <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
                 transport
               </code>{" "}
               (
-              <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-xs font-mono text-[var(--color-text)]">
+              <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
                 http
               </code>
               ,{" "}
-              <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-xs font-mono text-[var(--color-text)]">
+              <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
                 streamable-http
               </code>
               , or{" "}
-              <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-xs font-mono text-[var(--color-text)]">
+              <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
                 sse
               </code>
               )
@@ -272,7 +270,7 @@ Desktop (servers)(YAML) (TOML)   apps`}</CodeBlock>
           </ul>
           <p>
             Transport is auto-inferred: URLs ending in{" "}
-            <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-xs font-mono text-[var(--color-text)]">
+            <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
               /sse
             </code>{" "}
             default to SSE, others default to HTTP.
@@ -283,15 +281,13 @@ Desktop (servers)(YAML) (TOML)   apps`}</CodeBlock>
       {/* Library usage */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-4">Library usage</h2>
-        <div className="space-y-6 text-[var(--color-text-secondary)] leading-relaxed">
+        <div className="space-y-6 text-text-secondary leading-relaxed">
           <p>
             All packages are available on npm and can be used programmatically in your own projects.
           </p>
 
           <div>
-            <h3 className="text-lg font-semibold text-[var(--color-text)] mb-2">
-              Generate config for any app
-            </h3>
+            <h3 className="text-lg font-semibold text-text mb-2">Generate config for any app</h3>
             <CodeBlock>{`import { generateConfig, generateAllConfigs } from "@getmcp/generators";
 
 // Generate for a specific app
@@ -311,7 +307,7 @@ const all = generateAllConfigs("github", {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-[var(--color-text)] mb-2">
+            <h3 className="text-lg font-semibold text-text mb-2">
               Validate configs with Zod schemas
             </h3>
             <CodeBlock>{`import { StdioServerConfig, CanonicalMCPConfig } from "@getmcp/core";
@@ -321,9 +317,7 @@ StdioServerConfig.parse({ command: "npx", args: ["server"] });
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-[var(--color-text)] mb-2">
-              Search the registry
-            </h3>
+            <h3 className="text-lg font-semibold text-text mb-2">Search the registry</h3>
             <CodeBlock>{`import { searchServers, getServersByCategory } from "@getmcp/registry";
 
 searchServers("database");
@@ -338,19 +332,19 @@ getServersByCategory("web");
       {/* Adding a server */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-4">Adding a server to the registry</h2>
-        <div className="space-y-4 text-[var(--color-text-secondary)] leading-relaxed">
+        <div className="space-y-4 text-text-secondary leading-relaxed">
           <p>Want to add your MCP server to the getmcp registry? Here{"'"}s how:</p>
           <ol className="list-decimal list-inside space-y-2 ml-1">
             <li>
               Create a new file at{" "}
-              <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-xs font-mono text-[var(--color-text)]">
+              <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
                 packages/registry/src/servers/your-server.ts
               </code>
             </li>
             <li>Define a registry entry with your server{"'"}s metadata and config</li>
             <li>
               Register it in{" "}
-              <code className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-xs font-mono text-[var(--color-text)]">
+              <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
                 packages/registry/src/index.ts
               </code>
             </li>
@@ -377,7 +371,7 @@ export const myServer: RegistryEntryType = {
 };`}</CodeBlock>
           <p>
             Once added, your server will automatically appear in the{" "}
-            <Link href="/" className="text-[var(--color-accent)] hover:underline">
+            <Link href="/" className="text-accent hover:underline">
               web directory
             </Link>
             , CLI search, and all {appCount} config generators. Open a pull request on{" "}
@@ -385,7 +379,7 @@ export const myServer: RegistryEntryType = {
               href="https://github.com/RodrigoTomeES/getmcp"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[var(--color-accent)] hover:underline"
+              className="text-accent hover:underline"
             >
               GitHub
             </a>{" "}
@@ -398,11 +392,11 @@ export const myServer: RegistryEntryType = {
       <section className="mb-16">
         <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-6">
           <h2 className="text-xl font-bold text-amber-400 mb-3">Security disclaimer</h2>
-          <div className="space-y-3 text-[var(--color-text-secondary)] leading-relaxed text-sm">
+          <div className="space-y-3 text-text-secondary leading-relaxed text-sm">
             <p>
               MCP servers in the getmcp registry are community-contributed. While we review
               submissions,{" "}
-              <span className="text-[var(--color-text)]">
+              <span className="text-text">
                 getmcp cannot guarantee the quality, security, or reliability
               </span>{" "}
               of any server.
@@ -422,7 +416,7 @@ export const myServer: RegistryEntryType = {
 
 function CodeBlock({ children }: { children: string }) {
   return (
-    <pre className="bg-[var(--color-code-bg)] rounded-lg p-4 font-mono text-sm overflow-x-auto text-[var(--color-text)]">
+    <pre className="bg-code-bg rounded-lg p-4 font-mono text-sm overflow-x-auto text-text">
       <code>{children}</code>
     </pre>
   );
