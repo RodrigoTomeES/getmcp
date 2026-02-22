@@ -18,6 +18,13 @@ const APP_LABELS: Record<AppIdType, string> = {
   zed: "Zed",
   pycharm: "PyCharm",
   codex: "Codex",
+  "gemini-cli": "Gemini CLI",
+  continue: "Continue",
+  "amazon-q": "Amazon Q",
+  trae: "Trae",
+  "vscode-insiders": "VS Code Insiders",
+  "bolt-ai": "BoltAI",
+  "libre-chat": "LibreChat",
 };
 
 const APP_IDS = Object.keys(generators) as AppIdType[];
