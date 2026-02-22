@@ -38,9 +38,9 @@ export function PackageManagerCommand({ serverId }: { serverId?: string }) {
   const command = getCommand(selectedPm, serverId);
 
   return (
-    <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-code-bg)] overflow-hidden mb-8">
+    <div className="rounded-lg border border-border bg-code-bg overflow-hidden mb-8">
       {/* Header: terminal icon + tabs + copy button */}
-      <div className="flex items-center gap-2 px-4 py-2 border-b border-[var(--color-border)]">
+      <div className="flex items-center gap-2 px-4 py-2 border-b border-border">
         {/* Terminal icon */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -50,7 +50,7 @@ export function PackageManagerCommand({ serverId }: { serverId?: string }) {
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="w-4 h-4 text-[var(--color-text-secondary)] shrink-0"
+          className="w-4 h-4 text-text-secondary shrink-0"
         >
           <polyline points="4 17 10 11 4 5" />
           <line x1="12" x2="20" y1="19" y2="19" />
@@ -63,9 +63,7 @@ export function PackageManagerCommand({ serverId }: { serverId?: string }) {
               key={pm}
               onClick={() => handleSelect(pm)}
               className={`text-xs px-2.5 py-1 rounded-md transition-colors ${
-                selectedPm === pm
-                  ? "bg-[var(--color-surface)] text-[var(--color-text)]"
-                  : "text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
+                selectedPm === pm ? "bg-surface text-text" : "text-text-secondary hover:text-text"
               }`}
             >
               {pm}
@@ -76,7 +74,7 @@ export function PackageManagerCommand({ serverId }: { serverId?: string }) {
         {/* Copy button */}
         <button
           onClick={() => copy(command)}
-          className="text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors shrink-0 p-1"
+          className="text-text-secondary hover:text-text transition-colors shrink-0 p-1"
           aria-label="Copy command"
         >
           {copied ? (
@@ -88,7 +86,7 @@ export function PackageManagerCommand({ serverId }: { serverId?: string }) {
               strokeWidth={2}
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="w-4 h-4 text-[var(--color-success)]"
+              className="w-4 h-4 text-success"
             >
               <polyline points="20 6 9 17 4 12" />
             </svg>

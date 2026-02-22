@@ -4,6 +4,9 @@ import { getServer, getAllServers } from "@getmcp/registry";
 import type { RegistryEntryType } from "@getmcp/core";
 import { ConfigViewer } from "@/components/ConfigViewer";
 import { PackageManagerCommand } from "@/components/PackageManagerCommand";
+import { MetaItem } from "@/components/MetaItem";
+
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   return getAllServers().map((server) => ({ id: server.id }));
@@ -53,12 +56,12 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
       {/* Breadcrumb */}
-      <nav className="text-sm text-[var(--color-text-secondary)] mb-6">
-        <Link href="/" className="hover:text-[var(--color-text)] transition-colors">
+      <nav className="text-sm text-text-secondary mb-6">
+        <Link href="/" className="hover:text-text transition-colors">
           Servers
         </Link>
         <span className="mx-2">/</span>
-        <span className="text-[var(--color-text)]">{server.name}</span>
+        <span className="text-text">{server.name}</span>
       </nav>
 
       {/* Header */}
@@ -67,13 +70,15 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
           <h1 className="text-3xl font-bold">{server.name}</h1>
           <span
             className={`text-xs px-2 py-0.5 rounded-full font-medium mt-2 ${
-              isRemote ? "bg-purple-500/10 text-purple-400" : "bg-green-500/10 text-green-400"
+              isRemote
+                ? "bg-transport-remote-bg text-transport-remote"
+                : "bg-transport-stdio-bg text-transport-stdio"
             }`}
           >
             {transport}
           </span>
         </div>
-        <p className="text-lg text-[var(--color-text-secondary)]">{server.description}</p>
+        <p className="text-lg text-text-secondary">{server.description}</p>
       </div>
 
       {/* Metadata grid */}
@@ -96,15 +101,10 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
       {/* Categories */}
       {server.categories && server.categories.length > 0 && (
         <div className="mb-8">
-          <h3 className="text-sm font-medium text-[var(--color-text-secondary)] mb-2">
-            Categories
-          </h3>
+          <h3 className="text-sm font-medium text-text-secondary mb-2">Categories</h3>
           <div className="flex flex-wrap gap-2">
             {server.categories.map((cat) => (
-              <span
-                key={cat}
-                className="text-xs px-3 py-1 rounded-full bg-[var(--color-tag-bg)] text-[var(--color-tag-text)]"
-              >
+              <span key={cat} className="text-xs px-3 py-1 rounded-full bg-tag-bg text-tag-text">
                 {cat}
               </span>
             ))}
@@ -114,14 +114,12 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
 
       {/* Required env vars */}
       {server.requiredEnvVars.length > 0 && (
-        <div className="mb-8 rounded-lg border border-amber-500/20 bg-amber-500/5 p-4">
-          <h3 className="text-sm font-medium text-amber-400 mb-2">
-            Required Environment Variables
-          </h3>
+        <div className="mb-8 rounded-lg border border-warning-border bg-warning-subtle p-4">
+          <h3 className="text-sm font-medium text-warning mb-2">Required Environment Variables</h3>
           <ul className="space-y-1">
             {server.requiredEnvVars.map((envVar) => (
               <li key={envVar} className="text-sm">
-                <code className="text-amber-300 bg-[var(--color-code-bg)] px-1.5 py-0.5 rounded">
+                <code className="text-warning-light bg-code-bg px-1.5 py-0.5 rounded">
                   {envVar}
                 </code>
               </li>
@@ -137,7 +135,7 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
             href={server.repository}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-[var(--color-accent)] hover:underline"
+            className="text-sm text-accent hover:underline"
           >
             Repository
           </a>
@@ -147,7 +145,7 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
             href={server.homepage}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-[var(--color-accent)] hover:underline"
+            className="text-sm text-accent hover:underline"
           >
             Homepage
           </a>
@@ -159,15 +157,6 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
 
       {/* Config generator */}
       <ConfigViewer serverName={server.id} config={server.config} />
-    </div>
-  );
-}
-
-function MetaItem({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-3">
-      <p className="text-xs text-[var(--color-text-secondary)] mb-1">{label}</p>
-      <p className={`text-sm ${mono ? "font-mono" : ""}`}>{value}</p>
     </div>
   );
 }

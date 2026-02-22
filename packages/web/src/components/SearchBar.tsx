@@ -41,7 +41,7 @@ export function SearchBar({
       {/* Search input */}
       <div className="relative mb-4">
         <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-secondary)]"
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -60,7 +60,7 @@ export function SearchBar({
           aria-label="Search servers"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] placeholder-[var(--color-text-secondary)] focus:outline-none focus:border-[var(--color-accent)] transition-colors"
+          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-surface text-text placeholder-text-secondary focus:outline-none focus:border-accent transition-colors"
         />
       </div>
 
@@ -71,8 +71,8 @@ export function SearchBar({
           aria-pressed={!selectedCategory}
           className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
             !selectedCategory
-              ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
-              : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-secondary)]"
+              ? "border-accent bg-accent/10 text-accent"
+              : "border-border text-text-secondary hover:border-text-secondary"
           }`}
         >
           All
@@ -84,8 +84,8 @@ export function SearchBar({
             aria-pressed={selectedCategory === cat}
             className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
               selectedCategory === cat
-                ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
-                : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-secondary)]"
+                ? "border-accent bg-accent/10 text-accent"
+                : "border-border text-text-secondary hover:border-text-secondary"
             }`}
           >
             {cat}
@@ -94,11 +94,7 @@ export function SearchBar({
       </div>
 
       {/* Results count */}
-      <p
-        className="text-sm text-[var(--color-text-secondary)] mb-4"
-        role="status"
-        aria-live="polite"
-      >
+      <p className="text-sm text-text-secondary mb-4" role="status" aria-live="polite">
         {filtered.length} server{filtered.length !== 1 ? "s" : ""}
         {query && ` matching "${query}"`}
         {selectedCategory && ` in ${selectedCategory}`}
@@ -112,7 +108,7 @@ export function SearchBar({
       </div>
 
       {filtered.length === 0 && (
-        <div className="text-center py-12 text-[var(--color-text-secondary)]">
+        <div className="text-center py-12 text-text-secondary">
           <p className="text-lg mb-2">No servers found</p>
           <p className="text-sm">Try adjusting your search or filters.</p>
         </div>
