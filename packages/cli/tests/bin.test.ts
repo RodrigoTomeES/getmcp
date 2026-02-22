@@ -95,4 +95,12 @@ describe("resolveAlias (bin-level)", () => {
   it("returns undefined for empty-like strings", () => {
     expect(resolveAlias("")).toBeUndefined();
   });
+
+  it("maps dr to doctor", () => {
+    expect(resolveAlias("dr")).toBe("doctor");
+  });
+
+  it("maps doctor to doctor", () => {
+    expect(resolveAlias("doctor")).toBe("doctor");
+  });
 });
