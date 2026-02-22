@@ -1,0 +1,23 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const bigquery: RegistryEntryType = {
+  id: "bigquery",
+  name: "BigQuery",
+  description:
+    "Google BigQuery analytics — run SQL queries, manage datasets, and analyze large-scale data",
+  config: {
+    command: "npx",
+    args: ["-y", "mcp-bigquery"],
+    env: {
+      GOOGLE_APPLICATION_CREDENTIALS: "",
+    },
+    transport: "stdio",
+  },
+  package: "mcp-bigquery",
+  runtime: "node",
+  repository: "https://github.com/nicholasgriffintn/mcp-bigquery",
+  homepage: "https://cloud.google.com/bigquery",
+  author: "Nicholas Griffin",
+  categories: ["data", "cloud"],
+  requiredEnvVars: ["GOOGLE_APPLICATION_CREDENTIALS"],
+};

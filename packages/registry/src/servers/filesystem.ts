@@ -7,7 +7,7 @@ export const filesystem: RegistryEntryType = {
     "Secure file operations with configurable access controls. Read, write, move, and search files within allowed directories",
   config: {
     command: "npx",
-    args: ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/allowed/directory"],
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "."],
     env: {},
     transport: "stdio",
   },

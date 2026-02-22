@@ -1,0 +1,23 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const togetherAi: RegistryEntryType = {
+  id: "together-ai",
+  name: "Together AI",
+  description:
+    "Together AI inference platform — run open-source models, manage fine-tuning jobs, and generate embeddings",
+  config: {
+    command: "npx",
+    args: ["-y", "mcp-together-ai"],
+    env: {
+      TOGETHER_API_KEY: "",
+    },
+    transport: "stdio",
+  },
+  package: "mcp-together-ai",
+  runtime: "node",
+  repository: "https://github.com/nicholasgriffintn/mcp-together-ai",
+  homepage: "https://www.together.ai",
+  author: "Nicholas Griffin",
+  categories: ["ai", "cloud"],
+  requiredEnvVars: ["TOGETHER_API_KEY"],
+};

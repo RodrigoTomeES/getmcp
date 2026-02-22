@@ -84,6 +84,46 @@ import { shopify } from "./servers/shopify.js";
 import { youtube } from "./servers/youtube.js";
 import { twitter } from "./servers/twitter.js";
 import { time } from "./servers/time.js";
+// Batch 2: Project Management
+import { bitbucket } from "./servers/bitbucket.js";
+import { asana } from "./servers/asana.js";
+import { clickup } from "./servers/clickup.js";
+import { trello } from "./servers/trello.js";
+// Batch 2: Data/Database
+import { snowflake } from "./servers/snowflake.js";
+import { pinecone } from "./servers/pinecone.js";
+import { neo4j } from "./servers/neo4j.js";
+import { neon } from "./servers/neon.js";
+import { dynamodb } from "./servers/dynamodb.js";
+// Batch 2: Documentation/Security
+import { confluence } from "./servers/confluence.js";
+import { snyk } from "./servers/snyk.js";
+import { vault } from "./servers/vault.js";
+// Batch 3: Web/AI/DevOps/Data
+import { crawl4ai } from "./servers/crawl4ai.js";
+import { browserbase } from "./servers/browserbase.js";
+import { apify } from "./servers/apify.js";
+import { huggingface } from "./servers/huggingface.js";
+import { replicate } from "./servers/replicate.js";
+import { datadog } from "./servers/datadog.js";
+import { grafana } from "./servers/grafana.js";
+import { pagerduty } from "./servers/pagerduty.js";
+import { raycast } from "./servers/raycast.js";
+import { npmRegistry } from "./servers/npm-registry.js";
+import { bigquery } from "./servers/bigquery.js";
+import { weaviate } from "./servers/weaviate.js";
+// Batch 4: Security/AI/DevOps/Documentation/Web
+import { sonarqube } from "./servers/sonarqube.js";
+import { langchain } from "./servers/langchain.js";
+import { llamaindex } from "./servers/llamaindex.js";
+import { togetherAi } from "./servers/together-ai.js";
+import { prometheus } from "./servers/prometheus.js";
+import { readme } from "./servers/readme.js";
+import { swagger } from "./servers/swagger.js";
+import { zenrows } from "./servers/zenrows.js";
+import { everart } from "./servers/everart.js";
+import { everything } from "./servers/everything.js";
+import { githubCopilot } from "./servers/github-copilot.js";
 
 // Re-export individual servers for direct access
 export {
@@ -158,6 +198,44 @@ export {
   youtube,
   twitter,
   time,
+  // Batch 2
+  bitbucket,
+  asana,
+  clickup,
+  trello,
+  snowflake,
+  pinecone,
+  neo4j,
+  neon,
+  dynamodb,
+  confluence,
+  snyk,
+  vault,
+  // Batch 3
+  crawl4ai,
+  browserbase,
+  apify,
+  huggingface,
+  replicate,
+  datadog,
+  grafana,
+  pagerduty,
+  raycast,
+  npmRegistry,
+  bigquery,
+  weaviate,
+  // Batch 4
+  sonarqube,
+  langchain,
+  llamaindex,
+  togetherAi,
+  prometheus,
+  readme,
+  swagger,
+  zenrows,
+  everart,
+  everything,
+  githubCopilot,
 };
 
 // ---------------------------------------------------------------------------
@@ -242,6 +320,44 @@ register(shopify);
 register(youtube);
 register(twitter);
 register(time);
+// Batch 2
+register(bitbucket);
+register(asana);
+register(clickup);
+register(trello);
+register(snowflake);
+register(pinecone);
+register(neo4j);
+register(neon);
+register(dynamodb);
+register(confluence);
+register(snyk);
+register(vault);
+// Batch 3
+register(crawl4ai);
+register(browserbase);
+register(apify);
+register(huggingface);
+register(replicate);
+register(datadog);
+register(grafana);
+register(pagerduty);
+register(raycast);
+register(npmRegistry);
+register(bigquery);
+register(weaviate);
+// Batch 4
+register(sonarqube);
+register(langchain);
+register(llamaindex);
+register(togetherAi);
+register(prometheus);
+register(readme);
+register(swagger);
+register(zenrows);
+register(everart);
+register(everything);
+register(githubCopilot);
 
 // ---------------------------------------------------------------------------
 // Public API

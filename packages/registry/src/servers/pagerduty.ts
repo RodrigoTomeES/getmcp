@@ -1,0 +1,23 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const pagerduty: RegistryEntryType = {
+  id: "pagerduty",
+  name: "PagerDuty",
+  description:
+    "PagerDuty incident management — create, update, and resolve incidents, manage on-call schedules",
+  config: {
+    command: "npx",
+    args: ["-y", "mcp-pagerduty"],
+    env: {
+      PAGERDUTY_API_KEY: "",
+    },
+    transport: "stdio",
+  },
+  package: "mcp-pagerduty",
+  runtime: "node",
+  repository: "https://github.com/nicholasgriffintn/mcp-pagerduty",
+  homepage: "https://www.pagerduty.com",
+  author: "Nicholas Griffin",
+  categories: ["devops", "communication"],
+  requiredEnvVars: ["PAGERDUTY_API_KEY"],
+};
