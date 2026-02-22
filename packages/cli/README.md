@@ -136,6 +136,57 @@ Interactive wizard to scaffold a new MCP server registry entry. Prompts for meta
 getmcp init
 ```
 
+### `getmcp doctor`
+
+Health diagnostics for your MCP setup. Checks installed apps, config file parsing, registry status, orphaned servers, env vars, and runtime dependencies.
+
+```bash
+# Interactive report
+getmcp doctor
+
+# Structured JSON output
+getmcp doctor --json
+```
+
+### `getmcp import`
+
+Scan existing app configs and adopt configured servers into getmcp tracking.
+
+```bash
+# Interactive — select which servers to import
+getmcp import
+
+# Auto-import all matched servers
+getmcp import -y
+```
+
+### `getmcp sync`
+
+Read a `getmcp.json` project manifest and install all declared servers into detected apps. Ideal for team-shared MCP configurations.
+
+```bash
+# Sync all servers from getmcp.json
+getmcp sync -y --all-apps
+
+# Preview what would be written
+getmcp sync --dry-run
+
+# Structured JSON output
+getmcp sync --json
+```
+
+**Manifest format** (`getmcp.json`):
+
+```json
+{
+  "servers": {
+    "github": {},
+    "brave-search": { "env": { "BRAVE_API_KEY": "my-key" } },
+    "memory": { "apps": ["claude-desktop", "vscode"] }
+  }
+}
+```
+
 ## Command Aliases
 
 | Command  | Aliases                |
@@ -144,20 +195,26 @@ getmcp init
 | `remove` | `rm`, `r`, `uninstall` |
 | `list`   | `ls`                   |
 | `find`   | `search`, `s`, `f`     |
+| `doctor` | `dr`                   |
 
 ## Options
 
-| Flag               | Description                                                  |
-| ------------------ | ------------------------------------------------------------ |
-| `--help`, `-h`     | Show help message                                            |
-| `--version`, `-v`  | Show version number                                          |
-| `--yes`, `-y`      | Skip confirmation prompts (use defaults)                     |
-| `--app <id>`       | Target a specific app (repeatable for multiple apps)         |
-| `--all-apps`       | Target all detected apps                                     |
-| `--dry-run`        | Preview changes without writing files                        |
-| `--installed`      | List servers installed in detected apps (for `list` command) |
-| `--search=<query>` | Search the registry (for `list` command)                     |
-| `--category=<cat>` | Filter by category (for `list` command)                      |
+| Flag                | Description                                                           |
+| ------------------- | --------------------------------------------------------------------- |
+| `--help`, `-h`      | Show help message                                                     |
+| `--version`, `-v`   | Show version number                                                   |
+| `--yes`, `-y`       | Skip confirmation prompts (use defaults)                              |
+| `--app <id>`        | Target a specific app (repeatable for multiple apps)                  |
+| `--all-apps`        | Target all detected apps                                              |
+| `--dry-run`         | Preview changes without writing files                                 |
+| `--installed`       | List servers installed in detected apps (for `list` command)          |
+| `--search=<query>`  | Search the registry (for `list` command)                              |
+| `--category=<cat>`  | Filter by category (for `list` command)                               |
+| `--json`            | Output structured JSON (for `list`, `add`, `check`, `doctor`, `sync`) |
+| `--quiet`, `-q`     | Output one server ID per line (for `list` command)                    |
+| `--from-npm <pkg>`  | Install unverified npm package as MCP server (for `add` command)      |
+| `--from-pypi <pkg>` | Install unverified PyPI package as MCP server (for `add` command)     |
+| `--from-url <url>`  | Install unverified remote URL as MCP server (for `add` command)       |
 
 ## Installation Tracking
 
@@ -179,6 +236,7 @@ The CLI auto-detects and generates configs for:
 | Claude Desktop    | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS), `%AppData%\Claude\claude_desktop_config.json` (Windows) | JSON   |
 | Claude Code       | `.mcp.json` (project), `~/.claude.json` (user)                                                                                     | JSON   |
 | VS Code / Copilot | `.vscode/mcp.json`                                                                                                                 | JSON   |
+| VS Code Insiders  | `.vscode-insiders/mcp.json`                                                                                                        | JSON   |
 | Cursor            | `.cursor/mcp.json`                                                                                                                 | JSON   |
 | Cline             | `cline_mcp_settings.json` (VS Code globalStorage)                                                                                  | JSON   |
 | Roo Code          | `mcp_settings.json` (VS Code globalStorage)                                                                                        | JSON   |
@@ -188,6 +246,12 @@ The CLI auto-detects and generates configs for:
 | Zed               | `settings.json` (Zed settings)                                                                                                     | JSON   |
 | PyCharm           | `.ai/mcp/mcp.json` (project-level, requires JetBrains AI Assistant plugin)                                                         | JSON   |
 | Codex             | `~/.codex/config.toml` (global), `.codex/config.toml` (project)                                                                    | TOML   |
+| Gemini CLI        | `~/.gemini/settings.json`                                                                                                          | JSON   |
+| Continue          | `~/.continue/config.json`                                                                                                          | JSON   |
+| Amazon Q          | `~/.aws/amazonq/mcp.json`                                                                                                          | JSON   |
+| Trae              | `.trae/mcp.json` (project-scoped)                                                                                                  | JSON   |
+| Bolt AI           | `~/Library/Application Support/BoltAI/mcp_config.json` (macOS only)                                                                | JSON   |
+| LibreChat         | `librechat.yaml`                                                                                                                   | YAML   |
 
 ## Programmatic API
 

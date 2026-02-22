@@ -28,7 +28,7 @@ getmcp is a tool that solves a fundamental problem in the AI tooling ecosystem: 
 getmcp provides:
 
 - **A canonical configuration format** aligned with [FastMCP](https://github.com/jlowin/fastmcp)'s standard
-- **Config generators** that transform the canonical format into 12 app-specific formats
+- **Config generators** that transform the canonical format into 19 app-specific formats
 - **A registry** of popular MCP server definitions
 - **A CLI tool** for one-command installation into any detected AI app
 - **A web directory** for browsing and discovering MCP servers
@@ -49,7 +49,7 @@ Inspired by [skills.sh](https://skills.sh/) — a platform that provides one-com
 
 ## 2. The Problem: MCP Config Fragmentation
 
-### 11 Apps, 6 Root Keys, 3 Formats
+### 19 Apps, 6 Root Keys, 4 Formats
 
 Every major AI application that supports MCP has chosen a slightly (or drastically) different configuration format. Here is the fragmentation landscape:
 
@@ -161,6 +161,9 @@ getmcp/
           check.ts                 # getmcp check
           update.ts                # getmcp update [options]
           init.ts                  # getmcp init
+          doctor.ts                # getmcp doctor (health diagnostics)
+          import.ts                # getmcp import (adopt existing servers)
+          sync.ts                  # getmcp sync (project manifest)
         index.ts                   # Public API barrel
       tests/
         detect.test.ts             # 9 tests
@@ -170,6 +173,12 @@ getmcp/
         utils.test.ts              # 50 tests (parseFlags + resolveAlias + shortenPath)
         preferences.test.ts        # 21 tests
         format.test.ts             # 8 tests
+        bin.test.ts                # flag parsing and alias tests
+        commands/
+          list.test.ts             # JSON/quiet output modes
+          doctor.test.ts           # doctor command tests
+          import.test.ts           # import command tests
+          sync.test.ts             # sync command tests
 ```
 
 ### Dependency Graph
@@ -280,7 +289,15 @@ type AppId =
   | "windsurf"
   | "opencode"
   | "zed"
-  | "pycharm";
+  | "pycharm"
+  | "codex"
+  | "gemini-cli"
+  | "continue"
+  | "amazon-q"
+  | "trae"
+  | "vscode-insiders"
+  | "bolt-ai"
+  | "libre-chat";
 ```
 
 ---
@@ -427,7 +444,7 @@ interface AppMetadata {
 
 ## 6. Registry
 
-### Built-in Servers (12)
+### Built-in Servers (105)
 
 | #   | ID                    | Name                | Transport     | Runtime | Required Env Vars                  | Categories                                  |
 | --- | --------------------- | ------------------- | ------------- | ------- | ---------------------------------- | ------------------------------------------- |
@@ -455,6 +472,7 @@ searchServers(query: string): RegistryEntry[]
 getServersByCategory(category: string): RegistryEntry[]
 getCategories(): string[]
 getServerCount(): number
+findServerByCommand(command: string, args: string[]): RegistryEntry | undefined
 ```
 
 **Search** matches against: id, name, description, categories, and author (case-insensitive).
@@ -572,6 +590,68 @@ Interactive wizard to scaffold a new MCP server registry entry. Prompts for:
 
 Generates a TypeScript file at `packages/registry/src/servers/<id>.ts` ready for registration.
 
+#### `getmcp doctor`
+
+Health diagnostics for your MCP setup. Checks:
+
+1. Detect all installed apps and report status
+2. Parse each app's config file (detect syntax errors)
+3. Check if configured servers are still in registry
+4. Check for orphaned servers (in config but not in lock file)
+5. Verify required env vars are set
+6. Check runtime dependencies (Node.js, npx, uvx)
+
+| Option   | Description            |
+| -------- | ---------------------- |
+| `--json` | Output structured JSON |
+
+**Aliases**: `dr`
+
+#### `getmcp import`
+
+Scan existing app configs and adopt configured servers into getmcp tracking.
+
+1. Scans all detected apps for configured servers
+2. Cross-references with registry (match by ID, package name, or command)
+3. Shows: matched (in registry) vs unmatched (unknown)
+4. User selects which to adopt
+5. Adds to lock file tracking
+
+| Option        | Description             |
+| ------------- | ----------------------- |
+| `--yes`, `-y` | Auto-import all matched |
+| `--json`      | Output structured JSON  |
+
+#### `getmcp sync`
+
+Read a `getmcp.json` project manifest and install all declared servers.
+
+```bash
+getmcp sync -y --all-apps
+```
+
+| Option        | Description                              |
+| ------------- | ---------------------------------------- |
+| `--yes`, `-y` | Skip confirmation prompts                |
+| `--app <id>`  | Only sync to a specific app (repeatable) |
+| `--all-apps`  | Sync across all detected apps            |
+| `--dry-run`   | Preview changes without writing files    |
+| `--json`      | Output structured JSON                   |
+
+##### ProjectManifest Schema (`getmcp.json`)
+
+```json
+{
+  "servers": {
+    "github": {},
+    "brave-search": { "env": { "BRAVE_API_KEY": "my-key" } },
+    "memory": { "apps": ["claude-desktop", "vscode"] }
+  }
+}
+```
+
+Each server entry can optionally specify `env` overrides and `apps` restrictions.
+
 ### App Auto-Detection
 
 The CLI detects installed apps by resolving platform-specific config paths:
@@ -666,11 +746,10 @@ A Next.js website that serves as a public directory for MCP servers. Think "npm 
 
 All planned features, improvements, and future work are tracked in [`ROADMAP.md`](./ROADMAP.md). This includes:
 
-- New AI app support (Amazon Q, Gemini CLI, JetBrains AI, LM Studio, Continue)
-- Additional CLI commands (`sync`, `doctor`)
-- Registry enhancements (JSON Schema, version tracking, compatibility matrix)
+- New AI app support (JetBrains AI broad support, LM Studio)
+- Registry enhancements (version tracking, compatibility matrix)
 - Codex-specific enhancements (extra config fields, OAuth, project-scoped config)
-- npm publishing pipeline
+- CLI improvements (fuzzy matching in remove, error recovery/rollback)
 
 See ROADMAP.md for the complete list with priorities, status, and implementation notes.
 
@@ -948,13 +1027,13 @@ Detailed documentation of every app's MCP config format, gathered from official 
 
 ## Test Coverage Summary
 
-| Package              | Test Files | Tests   | Description                                                                                           |
-| -------------------- | ---------- | ------- | ----------------------------------------------------------------------------------------------------- |
-| `@getmcp/core`       | 3          | 34      | Schema validation, type guards, transport inference, JSON Schema                                      |
-| `@getmcp/generators` | 1          | 69      | All 12 generators (stdio + remote), multi-server, serialization                                       |
-| `@getmcp/registry`   | 1          | 60      | Entry validation, lookup, search, categories, content integrity                                       |
-| `@getmcp/cli`        | 7          | 172     | Path resolution, app detection, config read/write/merge/remove, lock file, errors, preferences, utils |
-| **Total**            | **12**     | **335** |                                                                                                       |
+| Package              | Test Files | Tests   | Description                                                                                                          |
+| -------------------- | ---------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
+| `@getmcp/core`       | 3          | 39      | Schema validation, type guards, transport inference, JSON Schema, ProjectManifest                                    |
+| `@getmcp/generators` | 1          | 115     | All 19 generators (stdio + remote), multi-server, serialization                                                      |
+| `@getmcp/registry`   | 1          | 60      | Entry validation, lookup, search, categories, content integrity                                                      |
+| `@getmcp/cli`        | 12         | 285     | Path resolution, app detection, config I/O, lock file, errors, preferences, utils, flags, doctor, import, sync, list |
+| **Total**            | **17**     | **499** |                                                                                                                      |
 
 ---
 
