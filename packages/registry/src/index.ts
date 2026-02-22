@@ -450,3 +450,35 @@ export function getCategories(): RegistryEntryType["categories"] {
 export function getServerCount(): number {
   return _registry.size;
 }
+
+/**
+ * Find a registry server that matches a given command+args or package name.
+ * Used by the `import` command to match existing configured servers
+ * back to known registry entries.
+ */
+export function findServerByCommand(
+  command: string,
+  args: string[],
+): RegistryEntryType | undefined {
+  const argsStr = args.join(" ");
+
+  for (const entry of _registry.values()) {
+    const config = entry.config;
+    if (!("command" in config)) continue;
+
+    // Match by package name in args
+    if (entry.package && argsStr.includes(entry.package)) {
+      return entry;
+    }
+
+    // Match by command + args pattern
+    if (config.command === command && config.args) {
+      const entryArgsStr = config.args.join(" ");
+      if (argsStr.includes(entryArgsStr) || entryArgsStr.includes(argsStr)) {
+        return entry;
+      }
+    }
+  }
+
+  return undefined;
+}
