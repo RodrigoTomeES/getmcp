@@ -55,9 +55,9 @@
   },
   "dependencies": {
     "@clack/prompts": "^1.0.1",
-    "@getmcp/core": "^0.1.0",
-    "@getmcp/generators": "^0.1.0",
-    "@getmcp/registry": "^0.1.0",
+    "@getmcp/core": "*",
+    "@getmcp/generators": "*",
+    "@getmcp/registry": "*",
     "smol-toml": "^1.6.0",
     "yaml": "^2.8.2"
   },

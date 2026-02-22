@@ -163,6 +163,9 @@ Enhancements to the Next.js web directory.
 - [x] **Replace deprecated clipboard fallback** — Extracted duplicated clipboard logic into a reusable `useClipboard()` hook. Both `ConfigViewer` and `PackageManagerCommand` now use the shared hook. The fallback textarea approach is improved (visually hidden with `position: fixed; opacity: 0` instead of briefly visible).
   - Files: `packages/web/src/hooks/use-clipboard.ts` (new), `packages/web/src/components/ConfigViewer.tsx`, `packages/web/src/components/PackageManagerCommand.tsx`
 
+- [x] **Update website to reflect all 19 apps and new CLI features** — Made app counts dynamic using `getAppIds().length` on homepage, OG image, and docs page. Added 7 missing apps to docs supported apps table. Added new CLI commands (update, doctor, import, sync, --json) to getting started section. Added "Project manifests" documentation section for `getmcp.json` and the `sync` command. Fixed stale workspace dependency versions (`^0.1.0` → `*`) that caused npm to install old published packages instead of using workspace symlinks.
+  - Files: `packages/web/src/app/page.tsx`, `packages/web/src/app/opengraph-image.tsx`, `packages/web/src/app/docs/page.tsx`, `packages/generators/package.json`, `packages/registry/package.json`, `packages/cli/package.json`
+
 - [ ] **Add light mode / theme toggle** — The site is dark-mode only with hardcoded dark colors. Add light theme support or respect `prefers-color-scheme` media query.
   - File: `packages/web/src/app/globals.css`
 
@@ -172,8 +175,8 @@ Enhancements to the Next.js web directory.
 
 Refactoring and hygiene improvements.
 
-- [ ] **Extract unreachable throw to `BaseGenerator`** — Every generator has an identical unreachable `else { throw new Error("Invalid config: must have either 'command' or 'url'") }` branch, duplicated 12 times. Move this guard into `BaseGenerator` and simplify the generator interface.
-  - Files: all 12 generators in `packages/generators/src/`
+- [ ] **Extract unreachable throw to `BaseGenerator`** — Every generator has an identical unreachable `else { throw new Error("Invalid config: must have either 'command' or 'url'") }` branch, duplicated 19 times. Move this guard into `BaseGenerator` and simplify the generator interface.
+  - Files: all 19 generators in `packages/generators/src/`
 
 - [ ] **Simplify `*Type` export naming in core** — `core/index.ts` exports types with `*Type` suffixes (e.g., `LooseServerConfigType`) to avoid collision with Zod schema names. Consider namespace-based exports or separate entry points for schemas vs types.
   - File: `packages/core/src/index.ts`

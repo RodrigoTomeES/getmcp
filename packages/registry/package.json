@@ -44,7 +44,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@getmcp/core": "^0.1.0"
+    "@getmcp/core": "*"
   },
   "engines": {
     "node": ">=22.0.0"

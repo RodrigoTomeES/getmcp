@@ -49,7 +49,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@getmcp/core": "^0.1.0",
+    "@getmcp/core": "*",
     "smol-toml": "^1.6.0",
     "yaml": "^2.8.2"
   },
