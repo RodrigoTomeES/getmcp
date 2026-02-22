@@ -21,6 +21,7 @@ import { findCommand } from "./commands/find.js";
 import { checkCommand } from "./commands/check.js";
 import { updateCommand } from "./commands/update.js";
 import { initCommand } from "./commands/init.js";
+import { doctorCommand } from "./commands/doctor.js";
 import { parseFlags, resolveAlias } from "./utils.js";
 
 const require = createRequire(import.meta.url);
@@ -41,12 +42,14 @@ Usage:
   getmcp check                   Check for registry updates
   getmcp update                  Update installed servers
   getmcp init                    Scaffold a new server entry
+  getmcp doctor                  Run health diagnostics
 
 Command Aliases:
   add      install, i
   remove   rm, r, uninstall
   list     ls
   find     search, s, f
+  doctor   dr
 
 Options:
   --help, -h        Show this help message
@@ -152,6 +155,13 @@ async function main(): Promise<void> {
 
     case "init": {
       await initCommand();
+      break;
+    }
+
+    case "doctor": {
+      await doctorCommand({
+        json: flags.json,
+      });
       break;
     }
 
