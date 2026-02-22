@@ -242,10 +242,17 @@ export async function syncCommand(options: SyncOptions = {}): Promise<void> {
     }
 
     if (configuredApps.length > 0 && !options.dryRun) {
+      const scopes: Record<string, "project" | "global"> = {};
+      for (const appId of configuredApps) {
+        const app = targetApps.find((a) => a.id === appId);
+        scopes[appId] = app?.supportsBothScopes ? (serverScope as "project" | "global") : "project";
+      }
       trackInstallation(
         registryEntry.id,
         configuredApps as AppIdType[],
         registryEntry.requiredEnvVars,
+        undefined,
+        scopes,
       );
     }
 

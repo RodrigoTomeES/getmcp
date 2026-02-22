@@ -266,9 +266,9 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
   }
 
   // Step 4.5: Scope selection for dual-scope apps
+  let chosenScope: "project" | "global" = "project";
   const dualScopeApps = selectedApps.filter((a) => a.supportsBothScopes);
   if (dualScopeApps.length > 0) {
-    let chosenScope: "project" | "global";
     if (options.global) {
       chosenScope = "global";
     } else if (options.project) {
@@ -332,9 +332,14 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
 
   // Track installation (unless dry-run)
   if (!options.dryRun) {
-    const successApps = results.filter((r) => r.ok).map((r) => r.app.id);
-    if (successApps.length > 0) {
-      trackInstallation(entry.id, successApps, entry.requiredEnvVars);
+    const successResults = results.filter((r) => r.ok);
+    const successAppIds = successResults.map((r) => r.app.id);
+    if (successAppIds.length > 0) {
+      const scopes: Record<string, "project" | "global"> = {};
+      for (const r of successResults) {
+        scopes[r.app.id] = r.app.supportsBothScopes ? chosenScope : "project";
+      }
+      trackInstallation(entry.id, successAppIds, entry.requiredEnvVars, undefined, scopes);
     }
   }
 
@@ -465,7 +470,12 @@ async function addUnverifiedServer(options: AddOptions): Promise<void> {
   }
 
   // Scope selection using shared helper
-  selectedApps = await resolveScope(selectedApps, options, isNonInteractive);
+  const { apps: scopedApps, scope: chosenScope } = await resolveScope(
+    selectedApps,
+    options,
+    isNonInteractive,
+  );
+  selectedApps = scopedApps;
 
   // Generate and merge
   if (options.dryRun) {
@@ -495,9 +505,14 @@ async function addUnverifiedServer(options: AddOptions): Promise<void> {
 
   // Track (with source info)
   if (!options.dryRun) {
-    const successApps = results.filter((r) => r.ok).map((r) => r.app.id);
-    if (successApps.length > 0) {
-      trackInstallation(serverName, successApps, []);
+    const successResults = results.filter((r) => r.ok);
+    const successAppIds = successResults.map((r) => r.app.id);
+    if (successAppIds.length > 0) {
+      const scopes: Record<string, "project" | "global"> = {};
+      for (const r of successResults) {
+        scopes[r.app.id] = r.app.supportsBothScopes ? chosenScope : "project";
+      }
+      trackInstallation(serverName, successAppIds, [], undefined, scopes);
     }
   }
 

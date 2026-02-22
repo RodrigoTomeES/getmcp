@@ -120,7 +120,13 @@ export async function updateCommand(options: UpdateOptions = {}): Promise<void> 
 
     // Update tracking timestamp
     if (!options.dryRun) {
-      trackInstallation(serverId, targetAppIds, installation.envVars);
+      trackInstallation(
+        serverId,
+        targetAppIds,
+        installation.envVars,
+        undefined,
+        installation.scopes,
+      );
     }
   }
 

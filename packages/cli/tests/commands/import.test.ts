@@ -150,6 +150,8 @@ describe("importCommand", () => {
 
     await importCommand({ yes: true });
 
-    expect(trackInstallation).toHaveBeenCalledWith("github", ["claude-desktop"], []);
+    expect(trackInstallation).toHaveBeenCalledWith("github", ["claude-desktop"], [], undefined, {
+      "claude-desktop": "project",
+    });
   });
 });
