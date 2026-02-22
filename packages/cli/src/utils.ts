@@ -38,6 +38,8 @@ export interface CliFlags {
   installed: boolean;
   search?: string;
   category?: string;
+  json: boolean;
+  quiet: boolean;
   help: boolean;
   version: boolean;
 }
@@ -53,6 +55,8 @@ export function parseFlags(argv: string[]): {
     allApps: false,
     dryRun: false,
     installed: false,
+    json: false,
+    quiet: false,
     help: false,
     version: false,
   };
@@ -81,6 +85,10 @@ export function parseFlags(argv: string[]): {
       flags.search = arg.slice("--search=".length);
     } else if (arg.startsWith("--category=")) {
       flags.category = arg.slice("--category=".length);
+    } else if (arg === "--json") {
+      flags.json = true;
+    } else if (arg === "--quiet" || arg === "-q") {
+      flags.quiet = true;
     } else if (arg === "--help" || arg === "-h") {
       flags.help = true;
     } else if (arg === "--version" || arg === "-v") {

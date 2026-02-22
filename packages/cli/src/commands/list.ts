@@ -21,20 +21,47 @@ export async function listCommand(options: {
   installed?: boolean;
   search?: string;
   category?: string;
+  json?: boolean;
+  quiet?: boolean;
 }): Promise<void> {
   if (options.installed) {
-    return listInstalledServers();
+    return listInstalledServers(options);
   }
 
   if (options.category) {
-    return listByCategory(options.category);
+    return listByCategory(options.category, options);
   }
 
-  return listRegistry(options.search);
+  return listRegistry(options.search, options);
 }
 
-async function listRegistry(search?: string): Promise<void> {
+interface OutputOptions {
+  json?: boolean;
+  quiet?: boolean;
+}
+
+async function listRegistry(search?: string, opts: OutputOptions = {}): Promise<void> {
   const servers = search ? searchServers(search) : getAllServers();
+
+  if (opts.json) {
+    const data = servers.map((s) => ({
+      id: s.id,
+      name: s.name,
+      description: s.description,
+      transport: "command" in s.config ? "stdio" : "remote",
+      categories: s.categories ?? [],
+      requiredEnvVars: s.requiredEnvVars,
+    }));
+    console.log(JSON.stringify(data, null, 2));
+    return;
+  }
+
+  if (opts.quiet) {
+    for (const server of servers) {
+      console.log(server.id);
+    }
+    return;
+  }
 
   if (servers.length === 0) {
     p.log.warn(search ? `No servers matching "${search}".` : "No servers in registry.");
@@ -64,8 +91,28 @@ async function listRegistry(search?: string): Promise<void> {
   console.log(lines.join("\n"));
 }
 
-async function listByCategory(category: string): Promise<void> {
+async function listByCategory(category: string, opts: OutputOptions = {}): Promise<void> {
   const servers = getServersByCategory(category);
+
+  if (opts.json) {
+    const data = servers.map((s) => ({
+      id: s.id,
+      name: s.name,
+      description: s.description,
+      transport: "command" in s.config ? "stdio" : "remote",
+      categories: s.categories ?? [],
+      requiredEnvVars: s.requiredEnvVars,
+    }));
+    console.log(JSON.stringify(data, null, 2));
+    return;
+  }
+
+  if (opts.quiet) {
+    for (const server of servers) {
+      console.log(server.id);
+    }
+    return;
+  }
 
   if (servers.length === 0) {
     p.log.warn(`No servers in category "${category}".`);
@@ -85,8 +132,41 @@ async function listByCategory(category: string): Promise<void> {
   console.log(lines.join("\n"));
 }
 
-async function listInstalledServers(): Promise<void> {
+async function listInstalledServers(opts: OutputOptions = {}): Promise<void> {
   const apps = detectInstalledApps();
+
+  if (opts.json) {
+    const data = apps.map((app) => {
+      let servers: string[] = [];
+      try {
+        servers = listServersInConfig(app.configPath);
+      } catch {
+        // config not readable
+      }
+      return {
+        id: app.id,
+        name: app.name,
+        configPath: app.configPath,
+        servers,
+      };
+    });
+    console.log(JSON.stringify(data, null, 2));
+    return;
+  }
+
+  if (opts.quiet) {
+    for (const app of apps) {
+      try {
+        const servers = listServersInConfig(app.configPath);
+        for (const server of servers) {
+          console.log(`${app.id}:${server}`);
+        }
+      } catch {
+        // config not readable
+      }
+    }
+    return;
+  }
 
   if (apps.length === 0) {
     p.log.warn("No AI applications detected on this system.");

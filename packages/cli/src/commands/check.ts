@@ -13,21 +13,59 @@ import { detectInstalledApps } from "../detect.js";
 import { listServersInConfig } from "../config-file.js";
 import { shortenPath } from "../utils.js";
 
-export async function checkCommand(): Promise<void> {
-  p.intro("getmcp check");
+export interface CheckOptions {
+  json?: boolean;
+}
 
+export async function checkCommand(options: CheckOptions = {}): Promise<void> {
   const lock = getTrackedServers();
   const entries = Object.entries(lock.installations);
+
+  const installedApps = detectInstalledApps();
+  const installedAppIds = new Set(installedApps.map((a) => a.id));
+  const appConfigMap = new Map(installedApps.map((a) => [a.id, a]));
+
+  if (options.json) {
+    const results = entries.map(([serverId, installation]) => {
+      const registryEntry = getServer(serverId);
+      const inRegistry = !!registryEntry;
+
+      const appStatuses = installation.apps.map((appId) => {
+        if (!installedAppIds.has(appId)) {
+          return { app: appId, status: "app-not-detected" as const };
+        }
+        const app = appConfigMap.get(appId)!;
+        try {
+          const servers = listServersInConfig(app.configPath);
+          return {
+            app: appId,
+            status: servers.includes(serverId) ? ("present" as const) : ("missing" as const),
+          };
+        } catch {
+          return { app: appId, status: "unreadable" as const };
+        }
+      });
+
+      return {
+        serverId,
+        name: registryEntry?.name ?? serverId,
+        inRegistry,
+        installedAt: installation.installedAt,
+        apps: appStatuses,
+      };
+    });
+
+    console.log(JSON.stringify(results, null, 2));
+    return;
+  }
+
+  p.intro("getmcp check");
 
   if (entries.length === 0) {
     p.log.info("No tracked installations. Use 'getmcp add' to install servers.");
     p.outro("Done");
     return;
   }
-
-  const installedApps = detectInstalledApps();
-  const installedAppIds = new Set(installedApps.map((a) => a.id));
-  const appConfigMap = new Map(installedApps.map((a) => [a.id, a]));
 
   p.log.info(`Tracked installations: ${entries.length}`);
 
