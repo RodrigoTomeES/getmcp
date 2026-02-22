@@ -22,6 +22,7 @@ import { checkCommand } from "./commands/check.js";
 import { updateCommand } from "./commands/update.js";
 import { initCommand } from "./commands/init.js";
 import { doctorCommand } from "./commands/doctor.js";
+import { importCommand } from "./commands/import.js";
 import { parseFlags, resolveAlias } from "./utils.js";
 
 const require = createRequire(import.meta.url);
@@ -43,6 +44,7 @@ Usage:
   getmcp update                  Update installed servers
   getmcp init                    Scaffold a new server entry
   getmcp doctor                  Run health diagnostics
+  getmcp import                  Import existing servers into tracking
 
 Command Aliases:
   add      install, i
@@ -160,6 +162,14 @@ async function main(): Promise<void> {
 
     case "doctor": {
       await doctorCommand({
+        json: flags.json,
+      });
+      break;
+    }
+
+    case "import": {
+      await importCommand({
+        yes: flags.yes,
         json: flags.json,
       });
       break;
