@@ -1,6 +1,6 @@
 {
   "name": "@getmcp/registry",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Registry of popular MCP server definitions in canonical format",
   "keywords": [
     "brave-search-mcp",
