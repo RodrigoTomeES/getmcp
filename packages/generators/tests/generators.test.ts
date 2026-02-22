@@ -15,6 +15,13 @@ import {
   ZedGenerator,
   PyCharmGenerator,
   CodexGenerator,
+  GeminiCliGenerator,
+  ContinueGenerator,
+  AmazonQGenerator,
+  TraeGenerator,
+  VSCodeInsidersGenerator,
+  BoltAIGenerator,
+  LibreChatGenerator,
   generators,
   getGenerator,
   getAppIds,
@@ -670,22 +677,191 @@ describe("CodexGenerator", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Gemini CLI
+// ---------------------------------------------------------------------------
+
+describe("GeminiCliGenerator", () => {
+  const gen = new GeminiCliGenerator();
+
+  it("generates mcpServers format for stdio", () => {
+    const result = gen.generate("github", stdioConfig);
+    expect(result).toHaveProperty("mcpServers");
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).github;
+    expect(server.command).toBe("npx");
+  });
+
+  it("generates remote config", () => {
+    const result = gen.generate("remote", remoteConfig);
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).remote;
+    expect(server.url).toBe("https://mcp.example.com/mcp");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Continue
+// ---------------------------------------------------------------------------
+
+describe("ContinueGenerator", () => {
+  const gen = new ContinueGenerator();
+
+  it("generates mcpServers format for stdio", () => {
+    const result = gen.generate("github", stdioConfig);
+    expect(result).toHaveProperty("mcpServers");
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).github;
+    expect(server.command).toBe("npx");
+  });
+
+  it("generates remote config", () => {
+    const result = gen.generate("remote", remoteConfig);
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).remote;
+    expect(server.url).toBe("https://mcp.example.com/mcp");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Amazon Q Developer
+// ---------------------------------------------------------------------------
+
+describe("AmazonQGenerator", () => {
+  const gen = new AmazonQGenerator();
+
+  it("generates mcpServers format for stdio", () => {
+    const result = gen.generate("github", stdioConfig);
+    expect(result).toHaveProperty("mcpServers");
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).github;
+    expect(server.command).toBe("npx");
+  });
+
+  it("generates remote config", () => {
+    const result = gen.generate("remote", remoteConfig);
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).remote;
+    expect(server.url).toBe("https://mcp.example.com/mcp");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Trae
+// ---------------------------------------------------------------------------
+
+describe("TraeGenerator", () => {
+  const gen = new TraeGenerator();
+
+  it("generates mcpServers format for stdio", () => {
+    const result = gen.generate("github", stdioConfig);
+    expect(result).toHaveProperty("mcpServers");
+  });
+
+  it("is project-scoped", () => {
+    expect(gen.app.scope).toBe("project");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// VS Code Insiders
+// ---------------------------------------------------------------------------
+
+describe("VSCodeInsidersGenerator", () => {
+  const gen = new VSCodeInsidersGenerator();
+
+  it("uses 'servers' root key (same as VS Code)", () => {
+    const result = gen.generate("github", stdioConfig);
+    expect(result).toHaveProperty("servers");
+    expect(result).not.toHaveProperty("mcpServers");
+  });
+
+  it("adds 'type: stdio' for stdio configs", () => {
+    const result = gen.generate("github", stdioConfig);
+    const server = (result.servers as Record<string, Record<string, unknown>>).github;
+    expect(server.type).toBe("stdio");
+  });
+
+  it("adds appropriate type for remote configs", () => {
+    const result = gen.generate("remote", remoteConfig);
+    const server = (result.servers as Record<string, Record<string, unknown>>).remote;
+    expect(server.type).toBe("http");
+  });
+
+  it("uses .vscode-insiders config path", () => {
+    expect(gen.app.configPaths.darwin).toBe(".vscode-insiders/mcp.json");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// BoltAI
+// ---------------------------------------------------------------------------
+
+describe("BoltAIGenerator", () => {
+  const gen = new BoltAIGenerator();
+
+  it("generates mcpServers format for stdio", () => {
+    const result = gen.generate("github", stdioConfig);
+    expect(result).toHaveProperty("mcpServers");
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).github;
+    expect(server.command).toBe("npx");
+  });
+
+  it("is macOS only", () => {
+    expect(gen.app.configPaths.darwin).toBeDefined();
+    expect(gen.app.configPaths.win32).toBeUndefined();
+    expect(gen.app.configPaths.linux).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// LibreChat
+// ---------------------------------------------------------------------------
+
+describe("LibreChatGenerator", () => {
+  const gen = new LibreChatGenerator();
+
+  it("generates mcpServers format for stdio", () => {
+    const result = gen.generate("github", stdioConfig);
+    expect(result).toHaveProperty("mcpServers");
+  });
+
+  it("serializes to YAML format", () => {
+    const result = gen.generate("github", stdioConfig);
+    const yaml = gen.serialize(result);
+    expect(yaml).toContain("mcpServers:");
+    expect(yaml).toContain("command: npx");
+  });
+
+  it("YAML round-trips correctly", () => {
+    const result = gen.generate("github", stdioConfig);
+    const serialized = gen.serialize(result);
+    const parsed = YAML.parse(serialized);
+    expect(parsed).toEqual(result);
+  });
+
+  it("has yaml config format", () => {
+    expect(gen.app.configFormat).toBe("yaml");
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Registry & utilities
 // ---------------------------------------------------------------------------
 
 describe("generators registry", () => {
-  it("has all 12 generators", () => {
-    expect(Object.keys(generators)).toHaveLength(12);
+  it("has all 19 generators", () => {
+    expect(Object.keys(generators)).toHaveLength(19);
   });
 
-  it("getAppIds returns all 12 IDs", () => {
+  it("getAppIds returns all 19 IDs", () => {
     const ids = getAppIds();
-    expect(ids).toHaveLength(12);
+    expect(ids).toHaveLength(19);
     expect(ids).toContain("claude-desktop");
     expect(ids).toContain("goose");
     expect(ids).toContain("zed");
     expect(ids).toContain("pycharm");
     expect(ids).toContain("codex");
+    expect(ids).toContain("gemini-cli");
+    expect(ids).toContain("continue");
+    expect(ids).toContain("amazon-q");
+    expect(ids).toContain("trae");
+    expect(ids).toContain("vscode-insiders");
+    expect(ids).toContain("bolt-ai");
+    expect(ids).toContain("libre-chat");
   });
 
   it("getGenerator returns correct generator for each app", () => {
@@ -697,9 +873,9 @@ describe("generators registry", () => {
     expect(() => getGenerator("unknown" as any)).toThrow();
   });
 
-  it("generateAllConfigs returns configs for all 12 apps", () => {
+  it("generateAllConfigs returns configs for all 19 apps", () => {
     const configs = generateAllConfigs("github", stdioConfig);
-    expect(Object.keys(configs)).toHaveLength(12);
+    expect(Object.keys(configs)).toHaveLength(19);
     // Each config should be a valid string
     for (const [, configStr] of Object.entries(configs)) {
       expect(typeof configStr).toBe("string");

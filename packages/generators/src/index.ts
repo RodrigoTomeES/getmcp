@@ -2,7 +2,7 @@
  * @getmcp/generators
  *
  * Config generators that transform canonical MCP server definitions
- * into app-specific configuration formats for 12 AI applications.
+ * into app-specific configuration formats for 19 AI applications.
  */
 
 // Individual generators
@@ -18,6 +18,13 @@ export { OpenCodeGenerator } from "./opencode.js";
 export { ZedGenerator } from "./zed.js";
 export { PyCharmGenerator } from "./pycharm.js";
 export { CodexGenerator } from "./codex.js";
+export { GeminiCliGenerator } from "./gemini-cli.js";
+export { ContinueGenerator } from "./continue.js";
+export { AmazonQGenerator } from "./amazon-q.js";
+export { TraeGenerator } from "./trae.js";
+export { VSCodeInsidersGenerator } from "./vscode-insiders.js";
+export { BoltAIGenerator } from "./bolt-ai.js";
+export { LibreChatGenerator } from "./libre-chat.js";
 
 // Base class and utilities
 export { BaseGenerator, deepMerge, toStdioFields, toRemoteFields } from "./base.js";
@@ -43,6 +50,13 @@ import { OpenCodeGenerator } from "./opencode.js";
 import { ZedGenerator } from "./zed.js";
 import { PyCharmGenerator } from "./pycharm.js";
 import { CodexGenerator } from "./codex.js";
+import { GeminiCliGenerator } from "./gemini-cli.js";
+import { ContinueGenerator } from "./continue.js";
+import { AmazonQGenerator } from "./amazon-q.js";
+import { TraeGenerator } from "./trae.js";
+import { VSCodeInsidersGenerator } from "./vscode-insiders.js";
+import { BoltAIGenerator } from "./bolt-ai.js";
+import { LibreChatGenerator } from "./libre-chat.js";
 
 /**
  * Map of all available generators, keyed by AppId.
@@ -60,6 +74,13 @@ export const generators: Record<AppIdType, ConfigGenerator> = {
   zed: new ZedGenerator(),
   pycharm: new PyCharmGenerator(),
   codex: new CodexGenerator(),
+  "gemini-cli": new GeminiCliGenerator(),
+  continue: new ContinueGenerator(),
+  "amazon-q": new AmazonQGenerator(),
+  trae: new TraeGenerator(),
+  "vscode-insiders": new VSCodeInsidersGenerator(),
+  "bolt-ai": new BoltAIGenerator(),
+  "libre-chat": new LibreChatGenerator(),
 };
 
 /**

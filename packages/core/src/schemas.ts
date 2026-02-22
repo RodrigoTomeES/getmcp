@@ -199,4 +199,11 @@ export const AppId = z.enum([
   "zed",
   "pycharm",
   "codex",
+  "gemini-cli",
+  "continue",
+  "amazon-q",
+  "trae",
+  "vscode-insiders",
+  "bolt-ai",
+  "libre-chat",
 ]);

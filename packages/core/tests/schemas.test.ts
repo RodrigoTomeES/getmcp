@@ -192,7 +192,7 @@ describe("RegistryEntry", () => {
 // ---------------------------------------------------------------------------
 
 describe("AppId", () => {
-  it("accepts all 12 known app IDs", () => {
+  it("accepts all 19 known app IDs", () => {
     const appIds = [
       "claude-desktop",
       "claude-code",
@@ -206,6 +206,13 @@ describe("AppId", () => {
       "zed",
       "pycharm",
       "codex",
+      "gemini-cli",
+      "continue",
+      "amazon-q",
+      "trae",
+      "vscode-insiders",
+      "bolt-ai",
+      "libre-chat",
     ];
     for (const id of appIds) {
       expect(AppId.parse(id)).toBe(id);
