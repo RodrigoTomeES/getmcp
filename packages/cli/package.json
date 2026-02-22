@@ -1,6 +1,6 @@
 {
   "name": "@getmcp/cli",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "CLI tool to install MCP servers into any AI application with one command",
   "keywords": [
     "ai-tools",
