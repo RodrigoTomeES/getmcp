@@ -26,6 +26,9 @@ import {
   getGenerator,
   getAppIds,
   generateAllConfigs,
+  deepMerge,
+  toStdioFields,
+  toRemoteFields,
 } from "../src/index.js";
 
 // ---------------------------------------------------------------------------
@@ -1013,5 +1016,74 @@ describe("serialize → parse round-trip", () => {
       const parsed = JSON.parse(serialized);
       expect(parsed, `${appId} JSON round-trip failed`).toEqual(result);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// deepMerge edge cases
+// ---------------------------------------------------------------------------
+
+describe("deepMerge", () => {
+  it("merges flat objects", () => {
+    const result = deepMerge({ a: 1 }, { b: 2 });
+    expect(result).toEqual({ a: 1, b: 2 });
+  });
+
+  it("overwrites primitive values", () => {
+    const result = deepMerge({ a: 1 }, { a: 2 });
+    expect(result).toEqual({ a: 2 });
+  });
+
+  it("deep merges nested objects", () => {
+    const result = deepMerge(
+      { mcpServers: { github: { command: "npx" } } },
+      { mcpServers: { slack: { command: "npx" } } },
+    );
+    expect(result).toEqual({
+      mcpServers: { github: { command: "npx" }, slack: { command: "npx" } },
+    });
+  });
+
+  it("replaces arrays (does not merge)", () => {
+    const result = deepMerge({ args: ["a", "b"] }, { args: ["c"] });
+    expect(result).toEqual({ args: ["c"] });
+  });
+
+  it("handles empty target", () => {
+    const result = deepMerge({}, { a: 1 });
+    expect(result).toEqual({ a: 1 });
+  });
+
+  it("handles empty source", () => {
+    const result = deepMerge({ a: 1 }, {});
+    expect(result).toEqual({ a: 1 });
+  });
+
+  it("does not mutate original objects", () => {
+    const target = { a: 1, nested: { b: 2 } };
+    const source = { nested: { c: 3 } };
+    deepMerge(target, source);
+    expect(target).toEqual({ a: 1, nested: { b: 2 } });
+    expect(source).toEqual({ nested: { c: 3 } });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// toStdioFields / toRemoteFields error paths
+// ---------------------------------------------------------------------------
+
+describe("toStdioFields error handling", () => {
+  it("throws for remote config", () => {
+    expect(() => toStdioFields({ url: "https://example.com", headers: {} } as any)).toThrow(
+      "Expected stdio config",
+    );
+  });
+});
+
+describe("toRemoteFields error handling", () => {
+  it("throws for stdio config", () => {
+    expect(() => toRemoteFields({ command: "npx", args: [], env: {} } as any)).toThrow(
+      "Expected remote config",
+    );
   });
 });
