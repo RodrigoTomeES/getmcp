@@ -1,0 +1,23 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const exa: RegistryEntryType = {
+  id: "exa",
+  name: "Exa",
+  description:
+    "AI-powered web search — neural search engine for finding relevant content with semantic understanding",
+  config: {
+    command: "npx",
+    args: ["-y", "exa-mcp-server"],
+    env: {
+      EXA_API_KEY: "",
+    },
+    transport: "stdio",
+  },
+  package: "exa-mcp-server",
+  runtime: "node",
+  repository: "https://github.com/exa-labs/exa-mcp-server",
+  homepage: "https://exa.ai",
+  author: "Exa",
+  categories: ["search", "ai"],
+  requiredEnvVars: ["EXA_API_KEY"],
+};

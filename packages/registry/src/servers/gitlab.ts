@@ -1,0 +1,24 @@
+import type { RegistryEntryType } from "@getmcp/core";
+
+export const gitlab: RegistryEntryType = {
+  id: "gitlab",
+  name: "GitLab",
+  description:
+    "GitLab API integration — repository management, merge requests, issues, CI/CD pipelines, and project management",
+  config: {
+    command: "npx",
+    args: ["-y", "@modelcontextprotocol/server-gitlab"],
+    env: {
+      GITLAB_PERSONAL_ACCESS_TOKEN: "",
+      GITLAB_API_URL: "https://gitlab.com/api/v4",
+    },
+    transport: "stdio",
+  },
+  package: "@modelcontextprotocol/server-gitlab",
+  runtime: "node",
+  repository: "https://github.com/modelcontextprotocol/servers",
+  homepage: "https://github.com/modelcontextprotocol/servers/tree/main/src/gitlab",
+  author: "Anthropic",
+  categories: ["developer-tools", "devops"],
+  requiredEnvVars: ["GITLAB_PERSONAL_ACCESS_TOKEN"],
+};

@@ -44,6 +44,42 @@ import {
   supabase,
   openaiDocs,
   shadcn,
+  // Batch 1
+  gitlab,
+  linear,
+  jira,
+  notion,
+  todoist,
+  obsidian,
+  terraform,
+  kubernetes,
+  dockerMcp,
+  vercel,
+  mysql,
+  sqlite,
+  mongodb,
+  redis,
+  elasticsearch,
+  tavily,
+  exa,
+  perplexity,
+  anthropic,
+  openai,
+  aws,
+  cloudflare,
+  gcp,
+  azure,
+  digitalocean,
+  discord,
+  telegram,
+  email,
+  stripe,
+  twilio,
+  airtable,
+  shopify,
+  youtube,
+  twitter,
+  time,
 } from "../src/index.js";
 
 // ---------------------------------------------------------------------------
@@ -87,6 +123,42 @@ describe("registry entries validate against schema", () => {
     supabase,
     openaiDocs,
     shadcn,
+    // Batch 1
+    gitlab,
+    linear,
+    jira,
+    notion,
+    todoist,
+    obsidian,
+    terraform,
+    kubernetes,
+    dockerMcp,
+    vercel,
+    mysql,
+    sqlite,
+    mongodb,
+    redis,
+    elasticsearch,
+    tavily,
+    exa,
+    perplexity,
+    anthropic,
+    openai,
+    aws,
+    cloudflare,
+    gcp,
+    azure,
+    digitalocean,
+    discord,
+    telegram,
+    email,
+    stripe,
+    twilio,
+    airtable,
+    shopify,
+    youtube,
+    twitter,
+    time,
   ];
 
   for (const server of allServers) {
@@ -137,7 +209,7 @@ describe("getServerOrThrow", () => {
 describe("getServerIds", () => {
   it("returns all IDs sorted alphabetically", () => {
     const ids = getServerIds();
-    expect(ids.length).toBe(35);
+    expect(ids.length).toBe(70);
     // Verify sorted
     const sorted = [...ids].sort();
     expect(ids).toEqual(sorted);
@@ -149,13 +221,17 @@ describe("getServerIds", () => {
     expect(ids).toContain("sentry");
     expect(ids).toContain("context7");
     expect(ids).toContain("fetch");
+    // Batch 1 servers
+    expect(ids).toContain("gitlab");
+    expect(ids).toContain("tavily");
+    expect(ids).toContain("cloudflare");
   });
 });
 
 describe("getAllServers", () => {
   it("returns all server entries", () => {
     const servers = getAllServers();
-    expect(servers.length).toBe(35);
+    expect(servers.length).toBe(70);
   });
 
   it("entries are sorted by ID", () => {
@@ -168,7 +244,7 @@ describe("getAllServers", () => {
 
 describe("getServerCount", () => {
   it("returns the correct count", () => {
-    expect(getServerCount()).toBe(35);
+    expect(getServerCount()).toBe(70);
   });
 });
 
@@ -178,8 +254,8 @@ describe("getServerCount", () => {
 
 describe("searchServers", () => {
   it("returns all servers for empty query", () => {
-    expect(searchServers("").length).toBe(35);
-    expect(searchServers("  ").length).toBe(35);
+    expect(searchServers("").length).toBe(70);
+    expect(searchServers("  ").length).toBe(70);
   });
 
   it("finds servers by name", () => {
@@ -251,6 +327,8 @@ describe("getCategories", () => {
     expect(categories).toContain("developer-tools");
     expect(categories).toContain("data");
     expect(categories).toContain("search");
+    expect(categories).toContain("cloud");
+    expect(categories).toContain("communication");
   });
 });
 
