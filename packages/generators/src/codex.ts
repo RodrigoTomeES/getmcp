@@ -55,6 +55,7 @@ export class CodexGenerator extends BaseGenerator {
         ...(config.env && Object.keys(config.env).length > 0 ? { env: config.env } : {}),
         ...(config.cwd ? { cwd: config.cwd } : {}),
         ...(config.timeout ? { startup_timeout_sec: Math.ceil(config.timeout / 1000) } : {}),
+        ...(config.description ? { description: config.description } : {}),
       };
     } else if (isRemoteConfig(config)) {
       serverConfig = {
@@ -63,6 +64,7 @@ export class CodexGenerator extends BaseGenerator {
           ? { http_headers: config.headers }
           : {}),
         ...(config.timeout ? { startup_timeout_sec: Math.ceil(config.timeout / 1000) } : {}),
+        ...(config.description ? { description: config.description } : {}),
       };
     } else {
       throw new Error("Invalid config: must have either 'command' or 'url'");

@@ -50,6 +50,26 @@ const minimalStdio: LooseServerConfigType = {
   transport: "stdio",
 };
 
+const stdioWithDescription: LooseServerConfigType = {
+  command: "npx",
+  args: ["-y", "@modelcontextprotocol/server-github"],
+  env: { GITHUB_PERSONAL_ACCESS_TOKEN: "abc123" },
+  transport: "stdio",
+  description: "GitHub MCP Server",
+};
+
+const remoteWithTimeout: LooseServerConfigType = {
+  url: "https://mcp.example.com/mcp",
+  headers: { Authorization: "Bearer token123" },
+  timeout: 30000,
+};
+
+const remoteWithDescription: LooseServerConfigType = {
+  url: "https://mcp.example.com/mcp",
+  headers: { Authorization: "Bearer token123" },
+  description: "Remote MCP server",
+};
+
 // ---------------------------------------------------------------------------
 // Claude Desktop
 // ---------------------------------------------------------------------------
@@ -93,6 +113,116 @@ describe("ClaudeDesktopGenerator", () => {
     const result = gen.generate("github", stdioConfig);
     const json = gen.serialize(result);
     expect(() => JSON.parse(json)).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Description preservation (cross-generator)
+// ---------------------------------------------------------------------------
+
+describe("description field preservation", () => {
+  it("toStdioFields includes description", () => {
+    const gen = new ClaudeDesktopGenerator();
+    const result = gen.generate("github", stdioWithDescription);
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).github;
+    expect(server.description).toBe("GitHub MCP Server");
+  });
+
+  it("toRemoteFields includes description", () => {
+    const gen = new ClaudeDesktopGenerator();
+    const result = gen.generate("remote", remoteWithDescription);
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).remote;
+    expect(server.description).toBe("Remote MCP server");
+  });
+
+  it("Goose stdio preserves description", () => {
+    const gen = new GooseGenerator();
+    const result = gen.generate("github", stdioWithDescription);
+    const ext = (result.extensions as Record<string, Record<string, unknown>>).github;
+    expect(ext.description).toBe("GitHub MCP Server");
+  });
+
+  it("Goose remote preserves description", () => {
+    const gen = new GooseGenerator();
+    const result = gen.generate("remote", remoteWithDescription);
+    const ext = (result.extensions as Record<string, Record<string, unknown>>).remote;
+    expect(ext.description).toBe("Remote MCP server");
+  });
+
+  it("OpenCode stdio preserves description", () => {
+    const gen = new OpenCodeGenerator();
+    const result = gen.generate("github", stdioWithDescription);
+    const server = (result.mcp as Record<string, Record<string, unknown>>).github;
+    expect(server.description).toBe("GitHub MCP Server");
+  });
+
+  it("OpenCode remote preserves description", () => {
+    const gen = new OpenCodeGenerator();
+    const result = gen.generate("remote", remoteWithDescription);
+    const server = (result.mcp as Record<string, Record<string, unknown>>).remote;
+    expect(server.description).toBe("Remote MCP server");
+  });
+
+  it("Codex stdio preserves description", () => {
+    const gen = new CodexGenerator();
+    const result = gen.generate("github", stdioWithDescription);
+    const server = (result.mcp_servers as Record<string, Record<string, unknown>>).github;
+    expect(server.description).toBe("GitHub MCP Server");
+  });
+
+  it("Codex remote preserves description", () => {
+    const gen = new CodexGenerator();
+    const result = gen.generate("remote", remoteWithDescription);
+    const server = (result.mcp_servers as Record<string, Record<string, unknown>>).remote;
+    expect(server.description).toBe("Remote MCP server");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Timeout forwarding for remote configs
+// ---------------------------------------------------------------------------
+
+describe("timeout forwarding for remote configs", () => {
+  it("Cline forwards timeout for remote", () => {
+    const gen = new ClineGenerator();
+    const result = gen.generate("remote", remoteWithTimeout);
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).remote;
+    expect(server.timeout).toBe(30000);
+  });
+
+  it("Roo Code forwards timeout for remote", () => {
+    const gen = new RooCodeGenerator();
+    const result = gen.generate("remote", remoteWithTimeout);
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).remote;
+    expect(server.timeout).toBe(30000);
+  });
+
+  it("Windsurf forwards timeout for remote", () => {
+    const gen = new WindsurfGenerator();
+    const result = gen.generate("remote", remoteWithTimeout);
+    const server = (result.mcpServers as Record<string, Record<string, unknown>>).remote;
+    expect(server.timeout).toBe(30000);
+  });
+
+  it("Zed forwards timeout for remote", () => {
+    const gen = new ZedGenerator();
+    const result = gen.generate("remote", remoteWithTimeout);
+    const server = (result.context_servers as Record<string, Record<string, unknown>>).remote;
+    expect(server.timeout).toBe(30000);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Goose remote headers fix
+// ---------------------------------------------------------------------------
+
+describe("Goose remote headers", () => {
+  it("uses headers (not envs) for remote config", () => {
+    const gen = new GooseGenerator();
+    const result = gen.generate("remote", remoteConfig);
+    const ext = (result.extensions as Record<string, Record<string, unknown>>).remote;
+    expect(ext.headers).toEqual({ Authorization: "Bearer token123" });
+    expect(ext.envs).toBeUndefined();
   });
 });
 

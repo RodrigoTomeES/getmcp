@@ -51,6 +51,7 @@ export class RooCodeGenerator extends BaseGenerator {
         ...(config.headers && Object.keys(config.headers).length > 0
           ? { headers: config.headers }
           : {}),
+        ...(config.timeout ? { timeout: config.timeout } : {}),
         alwaysAllow: [],
         disabled: false,
       };

@@ -68,6 +68,7 @@ export function toStdioFields(config: LooseServerConfigType): Record<string, unk
   if (config.env && Object.keys(config.env).length > 0) result.env = config.env;
   if (config.cwd) result.cwd = config.cwd;
   if (config.timeout) result.timeout = config.timeout;
+  if (config.description) result.description = config.description;
   return result;
 }
 
@@ -85,5 +86,6 @@ export function toRemoteFields(config: LooseServerConfigType): Record<string, un
   if (config.transport) result.transport = config.transport;
   if (config.headers && Object.keys(config.headers).length > 0) result.headers = config.headers;
   if (config.timeout) result.timeout = config.timeout;
+  if (config.description) result.description = config.description;
   return result;
 }

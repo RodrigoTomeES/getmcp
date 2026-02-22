@@ -50,6 +50,7 @@ export class ZedGenerator extends BaseGenerator {
         ...(config.headers && Object.keys(config.headers).length > 0
           ? { headers: config.headers }
           : {}),
+        ...(config.timeout ? { timeout: config.timeout } : {}),
       };
     } else {
       throw new Error("Invalid config: must have either 'command' or 'url'");

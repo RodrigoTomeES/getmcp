@@ -60,6 +60,7 @@ export class OpenCodeGenerator extends BaseGenerator {
         enabled: true,
         ...(config.env && Object.keys(config.env).length > 0 ? { environment: config.env } : {}),
         ...(config.timeout ? { timeout: config.timeout } : {}),
+        ...(config.description ? { description: config.description } : {}),
       };
     } else if (isRemoteConfig(config)) {
       serverConfig = {
@@ -70,6 +71,7 @@ export class OpenCodeGenerator extends BaseGenerator {
           ? { headers: config.headers }
           : {}),
         ...(config.timeout ? { timeout: config.timeout } : {}),
+        ...(config.description ? { description: config.description } : {}),
       };
     } else {
       throw new Error("Invalid config: must have either 'command' or 'url'");
