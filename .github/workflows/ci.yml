@@ -8,8 +8,11 @@ on:
 
 jobs:
   build-and-test:
-    name: Build & Test
-    runs-on: ubuntu-latest
+    name: Build & Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - name: Checkout
@@ -26,6 +29,9 @@ jobs:
 
       - name: Build all packages
         run: npm run build
+
+      - name: Type check
+        run: npm run lint
 
       - name: Run tests
         run: npm run test
