@@ -6,17 +6,27 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { ConfigGenerator, AppMetadata, LooseServerConfigType } from "@getmcp/core";
+import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
 
 // ---------------------------------------------------------------------------
 // Lazy node:fs — avoids static import that breaks client-side bundlers
 // ---------------------------------------------------------------------------
 
+// Node.js 22.3+ adds getBuiltinModule to process, not yet in @types/node
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace NodeJS {
+    interface Process {
+      getBuiltinModule?(id: string): Record<string, unknown> | undefined;
+    }
+  }
+}
+
 let _existsSync: (p: string) => boolean = () => false;
 try {
   // process.getBuiltinModule (Node.js 22.3+) loads built-in modules without
   // triggering bundler module resolution, making it safe for browser builds.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const fs = (process as any).getBuiltinModule?.("node:fs") as
+  const fs = process.getBuiltinModule?.("node:fs") as
     | { existsSync: (p: string) => boolean }
     | undefined;
   if (fs) _existsSync = fs.existsSync;
@@ -36,10 +46,47 @@ export const localAppData = process.env.LOCALAPPDATA?.trim() || join(home, "AppD
 export const claudeHome = process.env.CLAUDE_CONFIG_DIR?.trim() || join(home, ".claude");
 export const codexHome = process.env.CODEX_HOME?.trim() || join(home, ".codex");
 
+export const INVALID_CONFIG_ERROR = "Invalid config: must have either 'command' or 'url'";
+
 export abstract class BaseGenerator implements ConfigGenerator {
   abstract app: AppMetadata;
 
-  abstract generate(serverName: string, config: LooseServerConfigType): Record<string, unknown>;
+  /** Root key for the generated config object. Override in subclasses. */
+  protected rootKey = "mcpServers";
+
+  /**
+   * Transform a stdio config into the app-specific format.
+   * Override in subclasses to customize field mappings.
+   */
+  protected transformStdio(config: LooseServerConfigType): Record<string, unknown> {
+    return toStdioFields(config);
+  }
+
+  /**
+   * Transform a remote config into the app-specific format.
+   * Override in subclasses to customize field mappings.
+   */
+  protected transformRemote(config: LooseServerConfigType): Record<string, unknown> {
+    return toRemoteFields(config);
+  }
+
+  generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
+    let serverConfig: Record<string, unknown>;
+
+    if (isStdioConfig(config)) {
+      serverConfig = this.transformStdio(config);
+    } else if (isRemoteConfig(config)) {
+      serverConfig = this.transformRemote(config);
+    } else {
+      throw new Error(INVALID_CONFIG_ERROR);
+    }
+
+    return {
+      [this.rootKey]: {
+        [serverName]: serverConfig,
+      },
+    };
+  }
 
   generateAll(servers: Record<string, LooseServerConfigType>): Record<string, unknown> {
     // Default: merge all individual generates under the same root key.

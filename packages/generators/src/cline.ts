@@ -11,7 +11,6 @@
 
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
-import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
 import { BaseGenerator, toStdioFields, home, appData, configHome, safeExistsSync } from "./base.js";
 
 export class ClineGenerator extends BaseGenerator {
@@ -32,33 +31,26 @@ export class ClineGenerator extends BaseGenerator {
     docsUrl: "https://docs.cline.bot/mcp-servers/configuring-mcp-servers",
   };
 
-  generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
-    let serverConfig: Record<string, unknown>;
-
-    if (isStdioConfig(config)) {
-      serverConfig = {
-        ...toStdioFields(config),
-        alwaysAllow: [],
-        disabled: false,
-      };
-    } else if (isRemoteConfig(config)) {
-      serverConfig = {
-        url: config.url,
-        ...(config.headers && Object.keys(config.headers).length > 0
-          ? { headers: config.headers }
-          : {}),
-        ...(config.timeout ? { timeout: config.timeout } : {}),
-        alwaysAllow: [],
-        disabled: false,
-      };
-    } else {
-      throw new Error("Invalid config: must have either 'command' or 'url'");
-    }
-
+  protected override transformStdio(config: LooseServerConfigType): Record<string, unknown> {
     return {
-      mcpServers: {
-        [serverName]: serverConfig,
-      },
+      ...toStdioFields(config),
+      alwaysAllow: [],
+      disabled: false,
+    };
+  }
+
+  protected override transformRemote(config: LooseServerConfigType): Record<string, unknown> {
+    if (!("url" in config)) {
+      throw new Error("Expected remote config but got stdio config");
+    }
+    return {
+      url: config.url,
+      ...(config.headers && Object.keys(config.headers).length > 0
+        ? { headers: config.headers }
+        : {}),
+      ...(config.timeout ? { timeout: config.timeout } : {}),
+      alwaysAllow: [],
+      disabled: false,
     };
   }
 

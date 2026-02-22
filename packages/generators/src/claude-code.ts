@@ -13,14 +13,7 @@
  */
 
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
-import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
-import {
-  BaseGenerator,
-  toStdioFields,
-  toRemoteFields,
-  claudeHome,
-  safeExistsSync,
-} from "./base.js";
+import { BaseGenerator, toRemoteFields, claudeHome, safeExistsSync } from "./base.js";
 
 export class ClaudeCodeGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -37,27 +30,14 @@ export class ClaudeCodeGenerator extends BaseGenerator {
     docsUrl: "https://docs.anthropic.com/en/docs/claude-code/mcp",
   };
 
-  generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
-    let serverConfig: Record<string, unknown>;
-
-    if (isStdioConfig(config)) {
-      serverConfig = toStdioFields(config);
-    } else if (isRemoteConfig(config)) {
-      serverConfig = toRemoteFields(config);
-      // Claude Code uses "type" to specify transport for remote
-      if (config.transport) {
-        serverConfig.type = config.transport;
-        delete serverConfig.transport;
-      }
-    } else {
-      throw new Error("Invalid config: must have either 'command' or 'url'");
+  protected override transformRemote(config: LooseServerConfigType): Record<string, unknown> {
+    const fields = toRemoteFields(config);
+    // Claude Code uses "type" to specify transport for remote
+    if ("transport" in config && config.transport) {
+      fields.type = config.transport;
+      delete fields.transport;
     }
-
-    return {
-      mcpServers: {
-        [serverName]: serverConfig,
-      },
-    };
+    return fields;
   }
 
   override detectInstalled(): boolean {

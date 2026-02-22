@@ -22,10 +22,11 @@
 
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
-import { isStdioConfig, isRemoteConfig } from "@getmcp/core";
 import { BaseGenerator, toStdioFields, configHome, appData, safeExistsSync } from "./base.js";
 
 export class ZedGenerator extends BaseGenerator {
+  protected override rootKey = "context_servers";
+
   app: AppMetadata = {
     id: "zed",
     name: "Zed",
@@ -40,27 +41,20 @@ export class ZedGenerator extends BaseGenerator {
     docsUrl: "https://zed.dev/docs/ai/mcp",
   };
 
-  generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
-    let serverConfig: Record<string, unknown>;
+  protected override transformStdio(config: LooseServerConfigType): Record<string, unknown> {
+    return toStdioFields(config);
+  }
 
-    if (isStdioConfig(config)) {
-      serverConfig = toStdioFields(config);
-    } else if (isRemoteConfig(config)) {
-      serverConfig = {
-        url: config.url,
-        ...(config.headers && Object.keys(config.headers).length > 0
-          ? { headers: config.headers }
-          : {}),
-        ...(config.timeout ? { timeout: config.timeout } : {}),
-      };
-    } else {
-      throw new Error("Invalid config: must have either 'command' or 'url'");
+  protected override transformRemote(config: LooseServerConfigType): Record<string, unknown> {
+    if (!("url" in config)) {
+      throw new Error("Expected remote config but got stdio config");
     }
-
     return {
-      context_servers: {
-        [serverName]: serverConfig,
-      },
+      url: config.url,
+      ...(config.headers && Object.keys(config.headers).length > 0
+        ? { headers: config.headers }
+        : {}),
+      ...(config.timeout ? { timeout: config.timeout } : {}),
     };
   }
 

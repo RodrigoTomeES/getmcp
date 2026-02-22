@@ -13,7 +13,7 @@
 
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
-import { isStdioConfig, isRemoteConfig, inferTransport } from "@getmcp/core";
+import { inferTransport } from "@getmcp/core";
 import {
   BaseGenerator,
   toStdioFields,
@@ -25,6 +25,8 @@ import {
 } from "./base.js";
 
 export class VSCodeGenerator extends BaseGenerator {
+  protected override rootKey = "servers";
+
   app: AppMetadata = {
     id: "vscode",
     name: "VS Code / GitHub Copilot",
@@ -35,33 +37,23 @@ export class VSCodeGenerator extends BaseGenerator {
     docsUrl: "https://code.visualstudio.com/docs/copilot/chat/mcp-servers",
   };
 
-  generate(serverName: string, config: LooseServerConfigType): Record<string, unknown> {
-    let serverConfig: Record<string, unknown>;
+  protected override transformStdio(config: LooseServerConfigType): Record<string, unknown> {
+    return {
+      type: "stdio",
+      ...toStdioFields(config),
+    };
+  }
 
-    if (isStdioConfig(config)) {
-      serverConfig = {
-        type: "stdio",
-        ...toStdioFields(config),
-      };
-    } else if (isRemoteConfig(config)) {
-      const transport = inferTransport(config);
-      const fields = toRemoteFields(config);
+  protected override transformRemote(config: LooseServerConfigType): Record<string, unknown> {
+    const transport = inferTransport(config as Parameters<typeof inferTransport>[0]);
+    const fields = toRemoteFields(config);
 
-      // VS Code uses "type" not "transport"
-      delete fields.transport;
-
-      serverConfig = {
-        type: transport === "streamable-http" ? "http" : transport,
-        ...fields,
-      };
-    } else {
-      throw new Error("Invalid config: must have either 'command' or 'url'");
-    }
+    // VS Code uses "type" not "transport"
+    delete fields.transport;
 
     return {
-      servers: {
-        [serverName]: serverConfig,
-      },
+      type: transport === "streamable-http" ? "http" : transport,
+      ...fields,
     };
   }
 
