@@ -2,14 +2,18 @@
  * `getmcp init` command.
  *
  * Interactive wizard to scaffold a new MCP server registry entry.
- * Prompts for metadata and generates the TypeScript file.
+ * Prompts for metadata and generates a JSON file.
  */
 
 import * as p from "@clack/prompts";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-export async function initCommand(): Promise<void> {
+export interface InitOptions {
+  output?: string;
+}
+
+export async function initCommand(options: InitOptions = {}): Promise<void> {
   p.intro("getmcp init — Scaffold a new MCP server entry");
 
   // Basic metadata
@@ -73,7 +77,7 @@ export async function initCommand(): Promise<void> {
     process.exit(0);
   }
 
-  let configBlock: string;
+  let config: Record<string, unknown>;
   let envVarNames: string[] = [];
 
   if (transport === "stdio") {
@@ -119,17 +123,11 @@ export async function initCommand(): Promise<void> {
           .filter(Boolean)
       : [];
 
-    const envObj =
-      envVarNames.length > 0
-        ? `\n      env: {\n${envVarNames.map((v) => `        ${v}: "",`).join("\n")}\n      },`
-        : "";
-
-    const argsStr =
-      args.length > 0 ? `\n      args: [${args.map((a) => `"${a}"`).join(", ")}],` : "";
-
-    configBlock = `    config: {
-      command: "${command}",${argsStr}${envObj}
-    },`;
+    config = { command: command as string, transport: "stdio" as const };
+    if (args.length > 0) config.args = args;
+    if (envVarNames.length > 0) {
+      config.env = Object.fromEntries(envVarNames.map((v) => [v, ""]));
+    }
   } else {
     const url = await p.text({
       message: "Server URL:",
@@ -149,10 +147,7 @@ export async function initCommand(): Promise<void> {
       process.exit(0);
     }
 
-    configBlock = `    config: {
-      url: "${url}",
-      transport: "${transport}",
-    },`;
+    config = { url: url as string, transport };
   }
 
   // Categories
@@ -223,35 +218,26 @@ export async function initCommand(): Promise<void> {
     process.exit(0);
   }
 
-  // Generate the TypeScript file
+  // Build the JSON object
   const categoriesArr = categories as string[];
-  const categoriesStr =
-    categoriesArr.length > 0
-      ? `\n    categories: [${categoriesArr.map((c) => `"${c}"`).join(", ")}],`
-      : "";
-  const runtimeStr = runtime ? `\n    runtime: "${runtime}",` : "";
-  const repoStr = repository.trim() ? `\n    repository: "${repository.trim()}",` : "";
-  const authorStr = author.trim() ? `\n    author: "${author.trim()}",` : "";
-  const envVarsStr =
-    envVarNames.length > 0
-      ? `\n    requiredEnvVars: [${envVarNames.map((v) => `"${v}"`).join(", ")}],`
-      : "";
+  const entry: Record<string, unknown> = {
+    $schema: "https://getmcp.es/registry-entry.schema.json",
+    id,
+    name,
+    description,
+    config,
+  };
+  if (runtime) entry.runtime = runtime;
+  if (repository.trim()) entry.repository = repository.trim();
+  if (author.trim()) entry.author = author.trim();
+  if (categoriesArr.length > 0) entry.categories = categoriesArr;
+  if (envVarNames.length > 0) entry.requiredEnvVars = envVarNames;
 
-  const fileContent = `import type { RegistryEntryType } from "@getmcp/core";
-
-const server: RegistryEntryType = {
-    id: "${id}",
-    name: "${name}",
-    description: "${description}",
-${configBlock}${categoriesStr}${runtimeStr}${repoStr}${authorStr}${envVarsStr}
-};
-
-export default server;
-`;
+  const fileContent = JSON.stringify(entry, null, 2) + "\n";
 
   // Determine output path
-  const registryDir = path.resolve("packages/registry/src/servers");
-  const outputPath = path.join(registryDir, `${id}.ts`);
+  const registryDir = options.output ? path.resolve(options.output) : path.resolve(".");
+  const outputPath = path.join(registryDir, `${id}.json`);
 
   if (fs.existsSync(outputPath)) {
     p.log.warn(`File already exists: ${outputPath}`);
@@ -267,7 +253,7 @@ export default server;
   }
 
   // Show preview
-  p.note(fileContent, `${id}.ts`);
+  p.note(fileContent, `${id}.json`);
 
   const confirmed = await p.confirm({
     message: "Create this file?",
@@ -287,12 +273,6 @@ export default server;
   fs.writeFileSync(outputPath, fileContent, "utf-8");
 
   p.log.success(`Created: ${outputPath}`);
-  p.log.info(
-    "Next steps:\n" +
-      `  1. Import and register in packages/registry/src/index.ts\n` +
-      `  2. Add a test in packages/registry/tests/registry.test.ts\n` +
-      `  3. Run: npx vitest packages/registry`,
-  );
 
   p.outro("Server entry scaffolded successfully.");
 }
