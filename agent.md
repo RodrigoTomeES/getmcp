@@ -332,5 +332,6 @@ Skills are installed under `.agents/skills/` and provide specialized capabilitie
 
 - **[`SPECIFICATION.md`](./.agents/docs/SPECIFICATION.md)** — Complete project specification: schemas, transformation rules per app, registry format, CLI behavior, research appendix with every app's config format documented
 - **[`ROADMAP.md`](./.agents/docs/ROADMAP.md)** — Planned improvements and open tasks
+- **[`design-system.md`](./.agents/docs/design-system.md)** — Web package design system: colors, fonts, typography, components, layout patterns, and OG image specs
 - **[`competence.md`](./.agents/docs/competence.md)** — Competence analysis
 - **Repository**: `https://github.com/RodrigoTomeES/getmcp`
