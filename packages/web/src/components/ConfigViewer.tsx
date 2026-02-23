@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import type { AppIdType, LooseServerConfigType } from "@getmcp/core";
 import { generators } from "@getmcp/generators";
-import { useClipboard } from "@/hooks/use-clipboard";
+import { CodeBlock } from "@/components/CodeBlock";
 
 const APP_LABELS: Record<AppIdType, string> = {
   "claude-desktop": "Claude Desktop",
@@ -38,7 +38,6 @@ export function ConfigViewer({
   config: LooseServerConfigType;
 }) {
   const [selectedApp, setSelectedApp] = useState<AppIdType>("claude-desktop");
-  const { copied, copy } = useClipboard();
 
   const generator = generators[selectedApp];
   const serialized = useMemo(() => {
@@ -58,7 +57,7 @@ export function ConfigViewer({
             onClick={() => setSelectedApp(appId)}
             className={`text-xs px-3 py-1.5 rounded-md border transition-colors ${
               selectedApp === appId
-                ? "border-accent bg-accent text-white"
+                ? "border-accent bg-accent text-text"
                 : "border-border text-text-secondary hover:border-text-secondary hover:text-text"
             }`}
           >
@@ -82,50 +81,7 @@ export function ConfigViewer({
       </p>
 
       {/* Code block */}
-      <div className="relative rounded-lg border border-border bg-code-bg overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-2 border-b border-border">
-          <span className="text-xs text-text-secondary">
-            {generator.app.configFormat.toUpperCase()}
-          </span>
-          <button
-            onClick={() => copy(serialized)}
-            className="text-text-secondary hover:text-text transition-colors shrink-0 p-1"
-            aria-label="Copy configuration"
-          >
-            {copied ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-4 h-4 text-success"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-4 h-4"
-              >
-                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-              </svg>
-            )}
-          </button>
-        </div>
-        <pre className="p-4 overflow-x-auto text-sm leading-relaxed">
-          <code>{serialized}</code>
-        </pre>
-      </div>
+      <CodeBlock label={generator.app.configFormat.toUpperCase()}>{serialized}</CodeBlock>
 
       {/* PyCharm-specific warning */}
       {selectedApp === "pycharm" && (
