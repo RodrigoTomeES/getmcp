@@ -58,12 +58,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "command",
-            "args",
-            "env",
-            "transport"
-          ],
+          "required": ["command", "args", "env", "transport"],
           "additionalProperties": false
         },
         {
@@ -75,11 +70,7 @@
             },
             "transport": {
               "type": "string",
-              "enum": [
-                "http",
-                "streamable-http",
-                "sse"
-              ]
+              "enum": ["http", "streamable-http", "sse"]
             },
             "headers": {
               "default": {},
@@ -100,10 +91,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "url",
-            "headers"
-          ],
+          "required": ["url", "headers"],
           "additionalProperties": false
         }
       ]
@@ -113,12 +101,7 @@
     },
     "runtime": {
       "type": "string",
-      "enum": [
-        "node",
-        "python",
-        "docker",
-        "binary"
-      ]
+      "enum": ["node", "python", "docker", "binary"]
     },
     "repository": {
       "type": "string",
@@ -246,13 +229,6 @@
       "additionalProperties": false
     }
   },
-  "required": [
-    "id",
-    "name",
-    "description",
-    "config",
-    "categories",
-    "requiredEnvVars"
-  ],
+  "required": ["id", "name", "description", "config", "categories", "requiredEnvVars"],
   "additionalProperties": false
 }

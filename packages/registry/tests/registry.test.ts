@@ -118,6 +118,7 @@ import {
   everart,
   everything,
   githubCopilot,
+  okmira,
 } from "../src/index.js";
 
 // ---------------------------------------------------------------------------
@@ -235,6 +236,7 @@ describe("registry entries validate against schema", () => {
     everart,
     everything,
     githubCopilot,
+    okmira,
   ];
 
   for (const server of allServers) {
@@ -285,7 +287,7 @@ describe("getServerOrThrow", () => {
 describe("getServerIds", () => {
   it("returns all IDs sorted alphabetically", () => {
     const ids = getServerIds();
-    expect(ids.length).toBe(105);
+    expect(ids.length).toBe(106);
     // Verify sorted
     const sorted = [...ids].sort();
     expect(ids).toEqual(sorted);
@@ -307,7 +309,7 @@ describe("getServerIds", () => {
 describe("getAllServers", () => {
   it("returns all server entries", () => {
     const servers = getAllServers();
-    expect(servers.length).toBe(105);
+    expect(servers.length).toBe(106);
   });
 
   it("entries are sorted by ID", () => {
@@ -320,7 +322,7 @@ describe("getAllServers", () => {
 
 describe("getServerCount", () => {
   it("returns the correct count", () => {
-    expect(getServerCount()).toBe(105);
+    expect(getServerCount()).toBe(106);
   });
 });
 
@@ -330,8 +332,8 @@ describe("getServerCount", () => {
 
 describe("searchServers", () => {
   it("returns all servers for empty query", () => {
-    expect(searchServers("").length).toBe(105);
-    expect(searchServers("  ").length).toBe(105);
+    expect(searchServers("").length).toBe(106);
+    expect(searchServers("  ").length).toBe(106);
   });
 
   it("finds servers by name", () => {

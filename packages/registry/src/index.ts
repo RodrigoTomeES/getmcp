@@ -125,6 +125,7 @@ import { zenrows } from "./servers/zenrows.js";
 import { everart } from "./servers/everart.js";
 import { everything } from "./servers/everything.js";
 import { githubCopilot } from "./servers/github-copilot.js";
+import { okmira } from "./servers/okmira.js";
 
 // Re-export individual servers for direct access
 export {
@@ -237,6 +238,7 @@ export {
   everart,
   everything,
   githubCopilot,
+  okmira,
 };
 
 // ---------------------------------------------------------------------------
@@ -360,6 +362,7 @@ register(zenrows);
 register(everart);
 register(everything);
 register(githubCopilot);
+register(okmira);
 
 // ---------------------------------------------------------------------------
 // Public API
