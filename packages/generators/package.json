@@ -1,6 +1,6 @@
 {
   "name": "@getmcp/generators",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Config generators that transform canonical MCP server definitions to app-specific formats",
   "keywords": [
     "claude-desktop",
