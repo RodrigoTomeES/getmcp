@@ -191,7 +191,7 @@ Refactoring and hygiene improvements.
   - File: `packages/registry/src/index.ts`
 
 - [x] **Update stale numbers in SPECIFICATION.md** — Updated all references to reflect the current state (12 apps, 331 tests, 11 test files).
-  - File: `SPECIFICATION.md`
+  - File: `.agents/docs/SPECIFICATION.md`
 
 - [ ] **Implement platform override handling** — `RegistryEntry` schema supports `windows`/`linux`/`macos` override fields but no generator or CLI code uses them. The CLI should apply platform-specific `command`/`args`/`env` overrides when generating configs (e.g., `cmd /c npx` on Windows).
   - Files: `packages/generators/src/base.ts`, `packages/cli/src/commands/add.ts`
