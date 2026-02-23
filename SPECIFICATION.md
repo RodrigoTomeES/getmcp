@@ -487,7 +487,7 @@ interface AppMetadata {
 
 ## 6. Registry
 
-### Built-in Servers (105)
+### Built-in Servers (106)
 
 | #   | ID                    | Name                | Transport     | Runtime | Required Env Vars                  | Categories                                  |
 | --- | --------------------- | ------------------- | ------------- | ------- | ---------------------------------- | ------------------------------------------- |
