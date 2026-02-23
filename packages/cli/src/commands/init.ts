@@ -215,6 +215,19 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
     process.exit(0);
   }
 
+  const homepage = await p.text({
+    message: "Homepage URL (optional):",
+    placeholder: "https://github.com/user/repo",
+    validate: (val) => {
+      if (val && val.trim()) return validateUrl(val.trim());
+    },
+  });
+
+  if (p.isCancel(homepage)) {
+    p.cancel("Operation cancelled.");
+    process.exit(0);
+  }
+
   const author = await p.text({
     message: "Author (optional):",
     placeholder: "Author Name",
@@ -236,6 +249,7 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
   };
   if (runtime) entry.runtime = runtime;
   if (repository.trim()) entry.repository = repository.trim();
+  if (homepage.trim()) entry.homepage = homepage.trim();
   if (author.trim()) entry.author = author.trim();
   if (categoriesArr.length > 0) entry.categories = categoriesArr;
   if (envVarNames.length > 0) entry.requiredEnvVars = envVarNames;
