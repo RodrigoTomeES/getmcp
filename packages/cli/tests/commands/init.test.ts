@@ -53,6 +53,7 @@ describe("initCommand", () => {
       .mockResolvedValueOnce("-y my-server") // args
       .mockResolvedValueOnce("API_KEY") // env vars
       .mockResolvedValueOnce("https://github.com/user/repo") // repository
+      .mockResolvedValueOnce("https://example.com") // homepage
       .mockResolvedValueOnce("Author"); // author
 
     (p.select as ReturnType<typeof vi.fn>)
@@ -84,6 +85,7 @@ describe("initCommand", () => {
       .mockResolvedValueOnce("A remote server") // description
       .mockResolvedValueOnce("https://example.com/mcp") // url
       .mockResolvedValueOnce("") // repository
+      .mockResolvedValueOnce("") // homepage
       .mockResolvedValueOnce(""); // author
 
     (p.select as ReturnType<typeof vi.fn>).mockResolvedValueOnce("http"); // transport
@@ -111,6 +113,7 @@ describe("initCommand", () => {
       .mockResolvedValueOnce("Already exists") // description
       .mockResolvedValueOnce("https://example.com/mcp") // url
       .mockResolvedValueOnce("") // repository
+      .mockResolvedValueOnce("") // homepage
       .mockResolvedValueOnce(""); // author
 
     (p.select as ReturnType<typeof vi.fn>).mockResolvedValueOnce("http");
@@ -140,6 +143,7 @@ describe("initCommand", () => {
       .mockResolvedValueOnce("A custom server") // description
       .mockResolvedValueOnce("https://example.com/mcp") // url
       .mockResolvedValueOnce("") // repository
+      .mockResolvedValueOnce("") // homepage
       .mockResolvedValueOnce(""); // author
 
     (p.select as ReturnType<typeof vi.fn>).mockResolvedValueOnce("http");
@@ -155,5 +159,65 @@ describe("initCommand", () => {
 
     const content = fs.readFileSync(outputFile, "utf-8");
     expect(content).toContain('"id": "custom-server"');
+  });
+
+  it("validates repository and homepage URLs", async () => {
+    const p = await import("@clack/prompts");
+
+    const textMock = p.text as ReturnType<typeof vi.fn>;
+    textMock
+      .mockResolvedValueOnce("val-server") // id
+      .mockResolvedValueOnce("Val Server") // name
+      .mockResolvedValueOnce("Validation test") // description
+      .mockResolvedValueOnce("https://example.com/mcp") // url
+      .mockResolvedValueOnce("https://github.com/user/repo") // repository
+      .mockResolvedValueOnce("https://example.com") // homepage
+      .mockResolvedValueOnce(""); // author
+
+    (p.select as ReturnType<typeof vi.fn>).mockResolvedValueOnce("http");
+    (p.multiselect as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
+
+    await initCommand();
+
+    // Find the repository prompt call (5th text call, index 4) and homepage (6th, index 5)
+    const repoCfg = textMock.mock.calls[4][0];
+    const homepageCfg = textMock.mock.calls[5][0];
+
+    // Invalid URLs should be rejected
+    expect(repoCfg.validate("not-a-url")).toBe("Must be a valid URL");
+    expect(homepageCfg.validate("not-a-url")).toBe("Must be a valid URL");
+
+    // Valid URLs should pass
+    expect(repoCfg.validate("https://github.com/user/repo")).toBeUndefined();
+    expect(homepageCfg.validate("https://example.com")).toBeUndefined();
+
+    // Empty values should pass (optional fields)
+    expect(repoCfg.validate("")).toBeUndefined();
+    expect(homepageCfg.validate("")).toBeUndefined();
+  });
+
+  it("includes homepage in output when provided", async () => {
+    const p = await import("@clack/prompts");
+
+    const textMock = p.text as ReturnType<typeof vi.fn>;
+    textMock
+      .mockResolvedValueOnce("hp-server") // id
+      .mockResolvedValueOnce("HP Server") // name
+      .mockResolvedValueOnce("Homepage test") // description
+      .mockResolvedValueOnce("https://example.com/mcp") // url
+      .mockResolvedValueOnce("") // repository
+      .mockResolvedValueOnce("https://my-homepage.com") // homepage
+      .mockResolvedValueOnce(""); // author
+
+    (p.select as ReturnType<typeof vi.fn>).mockResolvedValueOnce("http");
+    (p.multiselect as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
+
+    await initCommand();
+
+    const outputFile = path.join(tmpDir, "hp-server.json");
+    expect(fs.existsSync(outputFile)).toBe(true);
+
+    const content = fs.readFileSync(outputFile, "utf-8");
+    expect(content).toContain('"homepage": "https://my-homepage.com"');
   });
 });
