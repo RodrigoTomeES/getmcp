@@ -208,7 +208,7 @@ The CLI supports JSON, JSONC, YAML, and TOML config files natively. Format is au
 
 ## Contributing
 
-See [`ROADMAP.md`](./ROADMAP.md) for planned improvements and open tasks. Contributions are welcome.
+See [`ROADMAP.md`](./.agents/docs/ROADMAP.md) for planned improvements and open tasks. Contributions are welcome.
 
 ## Credits
 
