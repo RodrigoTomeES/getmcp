@@ -24,6 +24,11 @@
   --color-warning-light: color-mix(in srgb, #f59e0b 80%, white);
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-block-start: 6rem;
+}
+
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
@@ -31,4 +36,14 @@ body {
     system-ui,
     -apple-system,
     sans-serif;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
