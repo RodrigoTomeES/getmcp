@@ -211,7 +211,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             display: "flex",
             alignItems: "center",
             gap: "12px",
-            backgroundColor: "#1a1a2e",
+            backgroundColor: "#111111",
             border: "1px solid #262626",
             borderRadius: "10px",
             padding: "14px 20px",

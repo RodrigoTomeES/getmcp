@@ -48,7 +48,7 @@ All colors are defined as CSS custom properties in `globals.css` via Tailwind v4
 | ------------------------ | ---------------------------------------------- | ------------------------------- |
 | `--color-tag-bg`         | `#1e293b`                                      | Category tag background         |
 | `--color-tag-text`       | `#94a3b8`                                      | Category tag text               |
-| `--color-code-bg`        | `#1a1a2e`                                      | Code block background           |
+| `--color-code-bg`        | `#111111`                                      | Code block background           |
 | `--color-warning-bg`     | `color-mix(in srgb, #f59e0b 10%, transparent)` | Warning badge background        |
 | `--color-warning-border` | `color-mix(in srgb, #f59e0b 20%, transparent)` | Warning box border              |
 | `--color-warning-subtle` | `color-mix(in srgb, #f59e0b 5%, transparent)`  | Warning box background          |
@@ -58,7 +58,7 @@ All colors are defined as CSS custom properties in `globals.css` via Tailwind v4
 
 ```
 bg (#0a0a0a)  →  surface (#141414)  →  surface-hover (#1c1c1c)
-                                        code-bg (#1a1a2e)
+                                        code-bg (#111111)
 ```
 
 ---
@@ -391,7 +391,7 @@ Dimensions: **1200 x 630px** (PNG).
 | Description      | Inter Regular 26px, `#a0a0a0`, line-height 1.4     |
 | Category pills   | 14px, `#94a3b8` on `#1e293b`, rounded-full         |
 | Transport badges | Stdio: `#4ade80`, Remote: `#c084fc`                |
-| Code block       | `#1a1a2e` bg, `#ededed` text, `$` prompt `#3b82f6` |
+| Code block       | `#111111` bg, `#ededed` text, `$` prompt `#3b82f6` |
 | Domain           | 20px, `#a0a0a0`, bottom-right                      |
 
 Fonts: `Inter-Bold.ttf` (700), `Inter-Regular.ttf` (400) loaded from `assets/`.
