@@ -24,8 +24,7 @@ let cwdSpy: ReturnType<typeof vi.spyOn>;
 beforeEach(() => {
   exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {}) as never);
   tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "getmcp-init-test-"));
-  // initCommand uses path.resolve("packages/registry/src/servers")
-  // which resolves relative to cwd, so override cwd
+  // initCommand defaults to path.resolve(".") which resolves relative to cwd
   cwdSpy = vi.spyOn(process, "cwd").mockReturnValue(tmpDir);
 });
 
@@ -62,19 +61,16 @@ describe("initCommand", () => {
 
     (p.multiselect as ReturnType<typeof vi.fn>).mockResolvedValueOnce(["developer-tools"]);
 
-    // Create the expected directory structure
-    const registryDir = path.join(tmpDir, "packages", "registry", "src", "servers");
-    fs.mkdirSync(registryDir, { recursive: true });
-
     await initCommand();
 
-    const outputFile = path.join(registryDir, "my-server.ts");
+    const outputFile = path.join(tmpDir, "my-server.json");
     expect(fs.existsSync(outputFile)).toBe(true);
 
     const content = fs.readFileSync(outputFile, "utf-8");
-    expect(content).toContain('id: "my-server"');
-    expect(content).toContain('name: "My Server"');
-    expect(content).toContain('command: "npx"');
+    expect(content).toContain('"$schema": "https://getmcp.es/registry-entry.schema.json"');
+    expect(content).toContain('"id": "my-server"');
+    expect(content).toContain('"name": "My Server"');
+    expect(content).toContain('"command": "npx"');
     expect(content).toContain("API_KEY");
   });
 
@@ -94,18 +90,15 @@ describe("initCommand", () => {
 
     (p.multiselect as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
 
-    const registryDir = path.join(tmpDir, "packages", "registry", "src", "servers");
-    fs.mkdirSync(registryDir, { recursive: true });
-
     await initCommand();
 
-    const outputFile = path.join(registryDir, "remote-server.ts");
+    const outputFile = path.join(tmpDir, "remote-server.json");
     expect(fs.existsSync(outputFile)).toBe(true);
 
     const content = fs.readFileSync(outputFile, "utf-8");
-    expect(content).toContain('id: "remote-server"');
-    expect(content).toContain('url: "https://example.com/mcp"');
-    expect(content).toContain('transport: "http"');
+    expect(content).toContain('"id": "remote-server"');
+    expect(content).toContain('"url": "https://example.com/mcp"');
+    expect(content).toContain('"transport": "http"');
   });
 
   it("warns and prompts overwrite when file already exists", async () => {
@@ -126,16 +119,41 @@ describe("initCommand", () => {
       .mockResolvedValueOnce(true) // overwrite
       .mockResolvedValueOnce(true); // create file
 
-    const registryDir = path.join(tmpDir, "packages", "registry", "src", "servers");
-    fs.mkdirSync(registryDir, { recursive: true });
-    fs.writeFileSync(path.join(registryDir, "existing-server.ts"), "old content");
+    fs.writeFileSync(path.join(tmpDir, "existing-server.json"), "old content");
 
     await initCommand();
 
     expect(p.log.warn).toHaveBeenCalledWith(expect.stringContaining("File already exists"));
 
     // File should be overwritten
-    const content = fs.readFileSync(path.join(registryDir, "existing-server.ts"), "utf-8");
-    expect(content).toContain('id: "existing-server"');
+    const content = fs.readFileSync(path.join(tmpDir, "existing-server.json"), "utf-8");
+    expect(content).toContain('"id": "existing-server"');
+  });
+
+  it("respects --output option", async () => {
+    const p = await import("@clack/prompts");
+
+    const textMock = p.text as ReturnType<typeof vi.fn>;
+    textMock
+      .mockResolvedValueOnce("custom-server") // id
+      .mockResolvedValueOnce("Custom Server") // name
+      .mockResolvedValueOnce("A custom server") // description
+      .mockResolvedValueOnce("https://example.com/mcp") // url
+      .mockResolvedValueOnce("") // repository
+      .mockResolvedValueOnce(""); // author
+
+    (p.select as ReturnType<typeof vi.fn>).mockResolvedValueOnce("http");
+    (p.multiselect as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
+
+    const customDir = path.join(tmpDir, "custom-dir");
+
+    await initCommand({ output: customDir });
+
+    const outputFile = path.join(customDir, "custom-server.json");
+    expect(fs.existsSync(outputFile)).toBe(true);
+    expect(fs.existsSync(customDir)).toBe(true);
+
+    const content = fs.readFileSync(outputFile, "utf-8");
+    expect(content).toContain('"id": "custom-server"');
   });
 });
