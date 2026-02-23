@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAppIds } from "@getmcp/generators";
+import { CodeBlock } from "@/components/CodeBlock";
 
 export const metadata: Metadata = {
   title: "Documentation — getmcp",
@@ -411,13 +412,5 @@ export const myServer: RegistryEntryType = {
         </div>
       </section>
     </div>
-  );
-}
-
-function CodeBlock({ children }: { children: string }) {
-  return (
-    <pre className="bg-code-bg rounded-lg p-4 font-mono text-sm overflow-x-auto text-text">
-      <code>{children}</code>
-    </pre>
   );
 }
