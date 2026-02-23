@@ -1,7 +1,7 @@
 import { getAllServers, getCategories, getServerCount } from "@getmcp/registry";
 import { getAppIds } from "@getmcp/generators";
 import { SearchBar } from "@/components/SearchBar";
-import { PackageManagerCommand } from "@/components/PackageManagerCommand";
+import { AnimatedCommand } from "@/components/AnimatedCommand";
 
 export default function HomePage() {
   const servers = getAllServers();
@@ -10,19 +10,49 @@ export default function HomePage() {
   const appCount = getAppIds().length;
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10">
-      {/* Hero section */}
-      <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold mb-3 tracking-tight">MCP Server Directory</h1>
-        <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-          Browse {count} MCP servers and get the exact configuration for your AI app. One canonical
-          format, generated for <span className="text-text">{appCount} applications</span>.
-        </p>
-      </div>
+    <div className="max-w-6xl mx-auto px-6 py-10 md:py-16">
+      {/* Hero section — two-column layout inspired by skills.sh */}
+      <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-10 lg:gap-14 mb-12 pt-4 md:pt-10 relative">
+        {/* Subtle radial glow */}
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-125 rounded-full pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse, rgba(59,130,246,0.06) 0%, transparent 70%)",
+          }}
+          aria-hidden="true"
+        />
 
-      {/* Install hint */}
-      <div className="max-w-xl mx-auto">
-        <PackageManagerCommand />
+        {/* Left column: ASCII brand + tagline */}
+        <div className="relative text-center lg:text-left py-1">
+          <pre
+            className="font-mono text-[10px] sm:text-[13px] lg:text-[15px] leading-none text-text whitespace-pre select-none"
+            aria-label="getmcp"
+          >
+            {`██████╗ ███████╗████████╗███╗   ███╗ ██████╗██████╗
+██╔════╝ ██╔════╝╚══██╔══╝████╗ ████║██╔════╝██╔══██╗
+██║  ███╗█████╗     ██║   ██╔████╔██║██║     ██████╔╝
+██║   ██║██╔══╝     ██║   ██║╚██╔╝██║██║     ██╔═══╝
+╚██████╔╝███████╗   ██║   ██║ ╚═╝ ██║╚██████╗██║
+ ╚═════╝ ╚══════╝   ╚═╝   ╚═╝     ╚═╝ ╚═════╝╚═╝`}
+          </pre>
+
+          <p className="font-mono text-[13px] lg:text-[17px] uppercase tracking-tight text-text font-medium mt-4">
+            The Universal MCP Installer
+          </p>
+        </div>
+
+        {/* Right column: description + animated CLI */}
+        <div className="relative flex flex-col justify-center text-center lg:text-left">
+          <p className="text-text-secondary text-xl sm:text-2xl lg:text-3xl leading-tight tracking-tight text-balance mb-8">
+            Browse <span className="text-text">{count} MCP servers</span> and install them into{" "}
+            <span className="text-text">{appCount} AI applications</span> with a single command.
+          </p>
+
+          <div>
+            <p className="font-mono text-sm font-medium uppercase text-text mb-3">Try it now</p>
+            <AnimatedCommand />
+          </div>
+        </div>
       </div>
 
       {/* Search + server listing */}
