@@ -1,0 +1,27 @@
+{
+  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "id": "github",
+  "name": "GitHub",
+  "description": "GitHub's official MCP server. Repository management, file operations, issue tracking, pull request management, and code search via the GitHub API",
+  "config": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i",
+      "--rm",
+      "-e",
+      "GITHUB_PERSONAL_ACCESS_TOKEN",
+      "ghcr.io/github/github-mcp-server"
+    ],
+    "env": {
+      "GITHUB_PERSONAL_ACCESS_TOKEN": ""
+    },
+    "transport": "stdio"
+  },
+  "runtime": "docker",
+  "repository": "https://github.com/github/github-mcp-server",
+  "homepage": "https://github.com/github/github-mcp-server",
+  "author": "GitHub",
+  "categories": ["developer-tools", "devops"],
+  "requiredEnvVars": ["GITHUB_PERSONAL_ACCESS_TOKEN"]
+}

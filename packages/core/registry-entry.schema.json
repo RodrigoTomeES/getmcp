@@ -227,6 +227,9 @@
         }
       },
       "additionalProperties": false
+    },
+    "$schema": {
+      "type": "string"
     }
   },
   "required": ["id", "name", "description", "config", "categories", "requiredEnvVars"],

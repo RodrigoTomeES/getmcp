@@ -1,0 +1,19 @@
+{
+  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "id": "sqlite",
+  "name": "SQLite",
+  "description": "SQLite database operations — query, create tables, insert data, and analyze database schemas",
+  "config": {
+    "command": "uvx",
+    "args": ["mcp-server-sqlite", "--db-path", "./database.db"],
+    "env": {},
+    "transport": "stdio"
+  },
+  "package": "mcp-server-sqlite",
+  "runtime": "python",
+  "repository": "https://github.com/modelcontextprotocol/servers",
+  "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/sqlite",
+  "author": "Anthropic",
+  "categories": ["data"],
+  "requiredEnvVars": []
+}

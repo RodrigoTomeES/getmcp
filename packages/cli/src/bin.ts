@@ -64,6 +64,7 @@ Options:
   --dry-run         Preview changes without writing files
   --json            Output machine-readable JSON
   --quiet, -q       Minimal output (one item per line)
+  --output, -o <dir>  Output directory for init (default: current directory)
   --global, -g      Install to global config (for dual-scope apps)
   --project         Install to project config (for dual-scope apps)
   --from-npm <pkg>  Install unverified npm package as MCP server
@@ -172,7 +173,7 @@ async function main(): Promise<void> {
     }
 
     case "init": {
-      await initCommand();
+      await initCommand({ output: flags.output });
       break;
     }
 

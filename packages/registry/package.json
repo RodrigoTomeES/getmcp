@@ -39,7 +39,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "node scripts/validate-servers.js && tsc && node scripts/copy-servers.js",
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },

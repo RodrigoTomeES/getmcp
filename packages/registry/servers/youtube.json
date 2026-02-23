@@ -1,0 +1,19 @@
+{
+  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "id": "youtube",
+  "name": "YouTube",
+  "description": "YouTube data integration — search videos, get video details, retrieve transcripts and channel information",
+  "config": {
+    "command": "npx",
+    "args": ["-y", "mcp-youtube"],
+    "env": {},
+    "transport": "stdio"
+  },
+  "package": "mcp-youtube",
+  "runtime": "node",
+  "repository": "https://github.com/nicekid1/mcp-youtube",
+  "homepage": "https://github.com/nicekid1/mcp-youtube",
+  "author": "nicekid1",
+  "categories": ["web", "search"],
+  "requiredEnvVars": []
+}

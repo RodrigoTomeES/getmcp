@@ -1,0 +1,19 @@
+{
+  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "id": "memory",
+  "name": "Memory",
+  "description": "Knowledge graph-based persistent memory system. Allows AI to remember information across sessions",
+  "config": {
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-memory"],
+    "env": {},
+    "transport": "stdio"
+  },
+  "package": "@modelcontextprotocol/server-memory",
+  "runtime": "node",
+  "repository": "https://github.com/modelcontextprotocol/servers",
+  "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/memory",
+  "author": "Anthropic",
+  "categories": ["utilities"],
+  "requiredEnvVars": []
+}

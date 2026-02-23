@@ -177,7 +177,7 @@ npm install
 # Build all packages
 npm run build
 
-# Run all tests (489+ tests)
+# Run all tests (586+ tests)
 npm run test
 
 # Build and test a specific package
