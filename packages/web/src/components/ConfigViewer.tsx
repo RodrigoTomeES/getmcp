@@ -44,7 +44,7 @@ export function ConfigViewer({
   const serialized = useMemo(() => {
     const generated = generator.generate(serverName, config);
     return generator.serialize(generated);
-  }, [selectedApp, serverName, config]);
+  }, [generator, serverName, config]);
 
   return (
     <div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useSyncExternalStore } from "react";
 import {
   PACKAGE_MANAGERS,
   type PackageManager,
@@ -10,31 +10,43 @@ import {
 } from "@/lib/package-manager";
 import { useClipboard } from "@/hooks/use-clipboard";
 
-export function PackageManagerCommand({ serverId }: { serverId?: string }) {
-  const [selectedPm, setSelectedPm] = useState<PackageManager>(DEFAULT_PM);
-  const { copied, copy } = useClipboard();
+const pmListeners = new Set<() => void>();
 
-  // Hydrate from localStorage on mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored && PACKAGE_MANAGERS.includes(stored as PackageManager)) {
-        setSelectedPm(stored as PackageManager);
-      }
-    } catch {
-      // localStorage unavailable
-    }
-  }, []);
-
-  const handleSelect = (pm: PackageManager) => {
-    setSelectedPm(pm);
-    try {
-      localStorage.setItem(STORAGE_KEY, pm);
-    } catch {
-      // localStorage unavailable
-    }
+function subscribePm(callback: () => void) {
+  pmListeners.add(callback);
+  return () => {
+    pmListeners.delete(callback);
   };
+}
 
+function getPmSnapshot(): PackageManager {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored && PACKAGE_MANAGERS.includes(stored as PackageManager)) {
+      return stored as PackageManager;
+    }
+  } catch {
+    // localStorage unavailable
+  }
+  return DEFAULT_PM;
+}
+
+function getPmServerSnapshot(): PackageManager {
+  return DEFAULT_PM;
+}
+
+function setStoredPm(pm: PackageManager) {
+  try {
+    localStorage.setItem(STORAGE_KEY, pm);
+  } catch {
+    // localStorage unavailable
+  }
+  pmListeners.forEach((l) => l());
+}
+
+export function PackageManagerCommand({ serverId }: { serverId?: string }) {
+  const selectedPm = useSyncExternalStore(subscribePm, getPmSnapshot, getPmServerSnapshot);
+  const { copied, copy } = useClipboard();
   const command = getCommand(selectedPm, serverId);
 
   return (
@@ -61,7 +73,7 @@ export function PackageManagerCommand({ serverId }: { serverId?: string }) {
           {PACKAGE_MANAGERS.map((pm) => (
             <button
               key={pm}
-              onClick={() => handleSelect(pm)}
+              onClick={() => setStoredPm(pm)}
               className={`text-xs px-2.5 py-1 rounded-md transition-colors ${
                 selectedPm === pm ? "bg-surface text-text" : "text-text-secondary hover:text-text"
               }`}

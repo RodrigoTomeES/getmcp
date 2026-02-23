@@ -37,11 +37,11 @@ export default function ServerLoading() {
       {/* Config block skeleton */}
       <div className="rounded-lg border border-border bg-code-bg p-4">
         <div className="h-4 w-24 rounded bg-surface animate-pulse mb-4" />
-        {Array.from({ length: 8 }).map((_, i) => (
+        {[75, 88, 62, 80, 70, 85, 66, 78].map((width) => (
           <div
-            key={i}
+            key={width}
             className="h-3 rounded bg-surface animate-pulse mb-2"
-            style={{ width: `${60 + Math.random() * 30}%` }}
+            style={{ width: `${width}%` }}
           />
         ))}
       </div>
