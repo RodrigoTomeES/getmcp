@@ -390,7 +390,7 @@ export const myServer: RegistryEntryType = {
       </section>
 
       {/* Security */}
-      <section className="mb-16">
+      <section>
         <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-6">
           <h2 className="text-xl font-bold text-amber-400 mb-3">Security disclaimer</h2>
           <div className="space-y-3 text-text-secondary leading-relaxed text-sm">
