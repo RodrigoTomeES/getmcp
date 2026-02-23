@@ -9,6 +9,14 @@ import * as p from "@clack/prompts";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
+function validateUrl(val: string): string | undefined {
+  try {
+    new URL(val);
+  } catch {
+    return "Must be a valid URL";
+  }
+}
+
 export interface InitOptions {
   output?: string;
 }
@@ -134,11 +142,7 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
       placeholder: "https://example.com/mcp",
       validate: (val) => {
         if (!val || !val.trim()) return "URL is required";
-        try {
-          new URL(val);
-        } catch {
-          return "Must be a valid URL";
-        }
+        return validateUrl(val);
       },
     });
 
@@ -201,6 +205,9 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
   const repository = await p.text({
     message: "Repository URL (optional):",
     placeholder: "https://github.com/user/repo",
+    validate: (val) => {
+      if (val && val.trim()) return validateUrl(val.trim());
+    },
   });
 
   if (p.isCancel(repository)) {
