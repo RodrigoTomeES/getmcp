@@ -76,9 +76,9 @@ export default function DocsPage() {
         <h2 className="text-2xl font-bold mb-4">Getting started</h2>
         <div className="space-y-4 text-text-secondary leading-relaxed">
           <p>Install any MCP server into all your detected AI apps with a single command:</p>
-          <CodeBlock>{`npx @getmcp/cli add <server>`}</CodeBlock>
+          <CodeBlock label="CLI">{`npx @getmcp/cli add <server>`}</CodeBlock>
           <p>Here are the most common CLI commands:</p>
-          <CodeBlock>{`# Install a server into all detected AI apps
+          <CodeBlock label="CLI">{`# Install a server into all detected AI apps
 npx @getmcp/cli add github
 
 # Browse available servers
@@ -129,7 +129,7 @@ npx @getmcp/cli list --json`}</CodeBlock>
             </code>{" "}
             manifest file in the project root:
           </p>
-          <CodeBlock>{`{
+          <CodeBlock label="JSON">{`{
   "servers": {
     "github": {},
     "postgres": {
@@ -142,7 +142,7 @@ npx @getmcp/cli list --json`}</CodeBlock>
           <p>
             Then any team member can install all declared servers into their detected apps with:
           </p>
-          <CodeBlock>{`npx @getmcp/cli sync`}</CodeBlock>
+          <CodeBlock label="CLI">{`npx @getmcp/cli sync`}</CodeBlock>
           <p>
             The sync command reads the manifest, resolves each server from the registry, merges any
             local overrides (like environment variables), and writes the correct config for every
@@ -289,7 +289,7 @@ Desktop (servers)(YAML) (TOML)   apps`}</CodeBlock>
 
           <div>
             <h3 className="text-lg font-semibold text-text mb-2">Generate config for any app</h3>
-            <CodeBlock>{`import { generateConfig, generateAllConfigs } from "@getmcp/generators";
+            <CodeBlock label="TS">{`import { generateConfig, generateAllConfigs } from "@getmcp/generators";
 
 // Generate for a specific app
 const config = generateConfig("goose", "github", {
@@ -311,7 +311,7 @@ const all = generateAllConfigs("github", {
             <h3 className="text-lg font-semibold text-text mb-2">
               Validate configs with Zod schemas
             </h3>
-            <CodeBlock>{`import { StdioServerConfig, CanonicalMCPConfig } from "@getmcp/core";
+            <CodeBlock label="TS">{`import { StdioServerConfig, CanonicalMCPConfig } from "@getmcp/core";
 
 StdioServerConfig.parse({ command: "npx", args: ["server"] });
 // throws ZodError if invalid`}</CodeBlock>
@@ -319,7 +319,7 @@ StdioServerConfig.parse({ command: "npx", args: ["server"] });
 
           <div>
             <h3 className="text-lg font-semibold text-text mb-2">Search the registry</h3>
-            <CodeBlock>{`import { searchServers, getServersByCategory } from "@getmcp/registry";
+            <CodeBlock label="TS">{`import { searchServers, getServersByCategory } from "@getmcp/registry";
 
 searchServers("database");
 // => [{ id: "postgres", ... }]
@@ -352,7 +352,7 @@ getServersByCategory("web");
             <li>Run the tests to validate your entry</li>
           </ol>
           <p>Here{"'"}s an example registry entry:</p>
-          <CodeBlock>{`import type { RegistryEntryType } from "@getmcp/core";
+          <CodeBlock label="TS">{`import type { RegistryEntryType } from "@getmcp/core";
 
 export const myServer: RegistryEntryType = {
   id: "my-server",
