@@ -11,8 +11,15 @@ import { RegistryEntry } from "./schemas.js";
  * Useful for external validation tools, IDE autocompletion, and CI pipelines.
  */
 export function getRegistryEntryJsonSchema(): Record<string, unknown> {
-  return z.toJSONSchema(RegistryEntry, {
+  const schema = z.toJSONSchema(RegistryEntry, {
     target: "draft-07",
     reused: "inline",
   }) as Record<string, unknown>;
+
+  // Allow "$schema" so JSON files can reference the published schema URL
+  // for IDE autocompletion without failing additionalProperties validation.
+  const props = schema.properties as Record<string, unknown>;
+  props.$schema = { type: "string" };
+
+  return schema;
 }

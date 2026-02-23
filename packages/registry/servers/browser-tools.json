@@ -1,0 +1,19 @@
+{
+  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "id": "browser-tools",
+  "name": "Browser Tools",
+  "description": "Monitor browser logs, network requests, console output, and screenshots directly from AI-powered IDEs. Requires companion Chrome extension",
+  "config": {
+    "command": "npx",
+    "args": ["-y", "@agentdeskai/browser-tools-mcp@latest"],
+    "env": {},
+    "transport": "stdio"
+  },
+  "package": "@agentdeskai/browser-tools-mcp",
+  "runtime": "node",
+  "repository": "https://github.com/AgentDeskAI/browser-tools-mcp",
+  "homepage": "https://github.com/AgentDeskAI/browser-tools-mcp",
+  "author": "AgentDesk AI",
+  "categories": ["web", "developer-tools"],
+  "requiredEnvVars": []
+}

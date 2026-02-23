@@ -1,0 +1,19 @@
+{
+  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "id": "filesystem",
+  "name": "Filesystem",
+  "description": "Secure file operations with configurable access controls. Read, write, move, and search files within allowed directories",
+  "config": {
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-filesystem", "."],
+    "env": {},
+    "transport": "stdio"
+  },
+  "package": "@modelcontextprotocol/server-filesystem",
+  "runtime": "node",
+  "repository": "https://github.com/modelcontextprotocol/servers",
+  "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
+  "author": "Anthropic",
+  "categories": ["utilities"],
+  "requiredEnvVars": []
+}

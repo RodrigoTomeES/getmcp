@@ -124,24 +124,19 @@ getmcp/
       tests/
         generators.test.ts         # 119 tests
 
-    registry/                      # @getmcp/registry (v0.1.0)
+    registry/                      # @getmcp/registry
+      servers/                     # 106 JSON server definition files
+        github.json
+        filesystem.json
+        brave-search.json
+        ...
       src/
-        servers/
-          github.ts                # GitHub MCP Server
-          filesystem.ts            # Filesystem MCP Server
-          brave-search.ts          # Brave Search
-          memory.ts                # Memory (knowledge graph)
-          slack.ts                 # Slack
-          postgres.ts              # PostgreSQL
-          puppeteer.ts             # Puppeteer (browser automation)
-          sequential-thinking.ts   # Sequential Thinking
-          sentry.ts                # Sentry (remote SSE)
-          context7.ts              # Context7 (remote HTTP)
-          fetch.ts                 # Fetch (Python)
-          google-maps.ts           # Google Maps
         index.ts                   # Registry API (search, filter, lookup)
+      scripts/
+        validate-servers.js        # Build-time Zod validation
+        copy-servers.js            # Copies servers/*.json → dist/servers/
       tests/
-        registry.test.ts           # 60 tests
+        registry.test.ts
 
     cli/                           # @getmcp/cli (v0.1.0)
       src/
@@ -522,32 +517,33 @@ findServerByCommand(command: string, args: string[]): RegistryEntry | undefined
 
 ### Adding a New Server
 
-1. Create a file in `packages/registry/src/servers/<id>.ts`
-2. Export a `RegistryEntryType` object with all required fields
-3. Import and register it in `packages/registry/src/index.ts`
-4. Add a test in `packages/registry/tests/registry.test.ts`
+1. Create a JSON file at `packages/registry/servers/<id>.json`
+2. Run tests: `npx vitest run packages/registry`
+
+The registry auto-discovers all `.json` files in `servers/`. No manual imports or registration needed.
 
 Example:
 
-```typescript
-import type { RegistryEntryType } from "@getmcp/core";
-
-export const myServer: RegistryEntryType = {
-  id: "my-server",
-  name: "My Server",
-  description: "Description of what this server does",
-  config: {
-    command: "npx",
-    args: ["-y", "@my/mcp-server"],
-    env: { API_KEY: "" },
-    transport: "stdio",
+```json
+{
+  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "id": "my-server",
+  "name": "My Server",
+  "description": "Description of what this server does",
+  "config": {
+    "command": "npx",
+    "args": ["-y", "@my/mcp-server"],
+    "env": { "API_KEY": "" },
+    "transport": "stdio"
   },
-  package: "@my/mcp-server",
-  runtime: "node",
-  categories: ["category"],
-  requiredEnvVars: ["API_KEY"],
-};
+  "package": "@my/mcp-server",
+  "runtime": "node",
+  "categories": ["category"],
+  "requiredEnvVars": ["API_KEY"]
+}
 ```
+
+The `$schema` field enables autocompletion and validation in your editor. All entries are validated against the `RegistryEntry` Zod schema at build time.
 
 ---
 
@@ -638,7 +634,7 @@ Interactive wizard to scaffold a new MCP server registry entry. Prompts for:
 4. Required environment variables
 5. Categories, runtime, repository, author
 
-Generates a TypeScript file at `packages/registry/src/servers/<id>.ts` ready for registration.
+Generates a JSON file at `packages/registry/servers/<id>.json` with `$schema` for editor autocompletion.
 
 #### `getmcp doctor`
 

@@ -9,7 +9,7 @@ getmcp solves the MCP configuration fragmentation problem. Every AI application 
 ## Key Features
 
 - **19 supported AI applications**: Claude Desktop, Claude Code, VS Code, Cursor, Cline, Roo Code, Goose, Windsurf, OpenCode, Zed, PyCharm, Codex, Gemini CLI, Continue, Amazon Q, Trae, VS Code Insiders, BoltAI, LibreChat
-- **105+ MCP server registry**: Pre-configured definitions for popular MCP servers
+- **106+ MCP server registry**: Pre-configured definitions for popular MCP servers
 - **4 config formats**: JSON, JSONC, YAML, TOML — auto-detected from file extension
 - **CLI tool**: `npx @getmcp/cli add github` — auto-detects apps, prompts for env vars, merges configs
 - **Library-first**: Use `@getmcp/generators`, `@getmcp/registry`, or `@getmcp/core` as npm packages
@@ -21,7 +21,7 @@ getmcp solves the MCP configuration fragmentation problem. Every AI application 
 TypeScript monorepo with 5 packages:
 - `@getmcp/core` — Zod schemas, TypeScript types, utility functions
 - `@getmcp/generators` — Config generators for 19 AI applications
-- `@getmcp/registry` — Registry of 105+ MCP server definitions
+- `@getmcp/registry` — Registry of 106+ MCP server definitions
 - `@getmcp/cli` — CLI tool with add, remove, list, find, check, update, doctor, import commands
 - `@getmcp/web` — Next.js web directory at getmcp.es
 

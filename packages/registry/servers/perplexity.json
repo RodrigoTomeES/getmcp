@@ -1,0 +1,21 @@
+{
+  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "id": "perplexity",
+  "name": "Perplexity",
+  "description": "Perplexity AI search — access Perplexity's AI-powered search and answer engine with citations",
+  "config": {
+    "command": "npx",
+    "args": ["-y", "mcp-server-perplexity"],
+    "env": {
+      "PERPLEXITY_API_KEY": ""
+    },
+    "transport": "stdio"
+  },
+  "package": "mcp-server-perplexity",
+  "runtime": "node",
+  "repository": "https://github.com/ppl-ai/mcp-server-perplexity",
+  "homepage": "https://www.perplexity.ai",
+  "author": "Perplexity AI",
+  "categories": ["search", "ai"],
+  "requiredEnvVars": ["PERPLEXITY_API_KEY"]
+}

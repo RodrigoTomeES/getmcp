@@ -1,0 +1,21 @@
+{
+  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "id": "prometheus",
+  "name": "Prometheus",
+  "description": "Prometheus monitoring — query metrics, manage alerts, and explore time-series data",
+  "config": {
+    "command": "npx",
+    "args": ["-y", "mcp-prometheus"],
+    "env": {
+      "PROMETHEUS_URL": "http://localhost:9090"
+    },
+    "transport": "stdio"
+  },
+  "package": "mcp-prometheus",
+  "runtime": "node",
+  "repository": "https://github.com/nicholasgriffintn/mcp-prometheus",
+  "homepage": "https://prometheus.io",
+  "author": "Nicholas Griffin",
+  "categories": ["devops", "cloud"],
+  "requiredEnvVars": ["PROMETHEUS_URL"]
+}

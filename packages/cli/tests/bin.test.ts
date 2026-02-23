@@ -82,6 +82,21 @@ describe("parseFlags (bin-level)", () => {
     const result = parseFlags(["add", "--from-url=https://mcp.example.com/sse"]);
     expect(result.flags.fromUrl).toBe("https://mcp.example.com/sse");
   });
+
+  it("parses --output with space syntax", () => {
+    const result = parseFlags(["init", "--output", "/some/dir"]);
+    expect(result.flags.output).toBe("/some/dir");
+  });
+
+  it("parses --output with = syntax", () => {
+    const result = parseFlags(["init", "--output=/some/dir"]);
+    expect(result.flags.output).toBe("/some/dir");
+  });
+
+  it("parses -o shorthand for --output", () => {
+    const result = parseFlags(["init", "-o", "/some/dir"]);
+    expect(result.flags.output).toBe("/some/dir");
+  });
 });
 
 // ---------------------------------------------------------------------------

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "id": "neon",
+  "name": "Neon",
+  "description": "Neon serverless Postgres — manage databases, branches, and run queries on Neon's serverless platform",
+  "config": {
+    "command": "npx",
+    "args": ["-y", "@neondatabase/mcp-server-neon"],
+    "env": {
+      "NEON_API_KEY": ""
+    },
+    "transport": "stdio"
+  },
+  "package": "@neondatabase/mcp-server-neon",
+  "runtime": "node",
+  "repository": "https://github.com/neondatabase/mcp-server-neon",
+  "homepage": "https://neon.tech",
+  "author": "Neon",
+  "categories": ["data", "cloud"],
+  "requiredEnvVars": ["NEON_API_KEY"]
+}

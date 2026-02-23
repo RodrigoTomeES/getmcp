@@ -41,10 +41,10 @@ Bugs and incorrect behavior that affect users.
   - File: `packages/generators/src/goose.ts`
 
 - [x] **Fix Context7 runtime field** — Removed `runtime: "node"` from the remote server definition.
-  - File: `packages/registry/src/servers/context7.ts`
+  - File: `packages/registry/servers/context7.json`
 
 - [ ] **Fix filesystem server placeholder arg** — The `args` array includes `/path/to/allowed/directory`, a placeholder the user must customize. There is no mechanism to prompt for this or indicate it needs customization. Consider adding it to `requiredEnvVars` or introducing a `requiredArgs` field.
-  - File: `packages/registry/src/servers/filesystem.ts` (line 10)
+  - File: `packages/registry/servers/filesystem.json`
 
 - [x] **Add missing `timeout` forwarding in generators** — Added timeout forwarding to all affected generators.
   - Files: `packages/generators/src/cline.ts`, `roo-code.ts`, `windsurf.ts`, `zed.ts`
@@ -239,7 +239,7 @@ Longer-term roadmap items from the specification.
   - Files: `packages/core/src/json-schema.ts`, `packages/core/scripts/generate-schema.ts`, `packages/core/registry-entry.schema.json`
 - [ ] **Version tracking per server** — Track and display server package versions
 - [ ] **Server compatibility matrix** — Surface which servers work with which apps
-- [x] **Community submission workflow** — Created `CONTRIBUTING.md` guide, `.github/PULL_REQUEST_TEMPLATE/server-submission.md` PR template, and `.github/workflows/validate-server.yml` GitHub Action that validates registry entries and auto-labels server submission PRs.
+- [x] **Community submission workflow** — Created `CONTRIBUTING.md` guide, `.github/PULL_REQUEST_TEMPLATE/server-submission.md` PR template, and `.github/workflows/validate-server.yml` GitHub Action that validates registry entries and auto-labels server submission PRs. Contributors create a single JSON file in `packages/registry/servers/`; build-time validation handles schema checking and duplicate detection.
   - Files: `CONTRIBUTING.md`, `.github/PULL_REQUEST_TEMPLATE/server-submission.md`, `.github/workflows/validate-server.yml`
 
 ### Web Directory Stretch Goals

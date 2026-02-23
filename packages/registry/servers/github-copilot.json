@@ -1,0 +1,21 @@
+{
+  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "id": "github-copilot",
+  "name": "GitHub Copilot",
+  "description": "GitHub Copilot extensions — interact with Copilot tools, manage completions, and access AI coding features",
+  "config": {
+    "command": "npx",
+    "args": ["-y", "mcp-github-copilot"],
+    "env": {
+      "GITHUB_TOKEN": ""
+    },
+    "transport": "stdio"
+  },
+  "package": "mcp-github-copilot",
+  "runtime": "node",
+  "repository": "https://github.com/nicholasgriffintn/mcp-github-copilot",
+  "homepage": "https://github.com/features/copilot",
+  "author": "Nicholas Griffin",
+  "categories": ["developer-tools", "ai"],
+  "requiredEnvVars": ["GITHUB_TOKEN"]
+}
