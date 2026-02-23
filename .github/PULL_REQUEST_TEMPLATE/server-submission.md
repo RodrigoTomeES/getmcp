@@ -17,13 +17,12 @@
 
 ### Checklist
 
-- [ ] Server file created at `packages/registry/src/servers/<id>.ts`
-- [ ] Server registered in `packages/registry/src/index.ts` (import + register + re-export)
-- [ ] Server added to test array in `packages/registry/tests/registry.test.ts`
-- [ ] `version` field included (if `package` field is set)
+- [ ] JSON file created at `packages/registry/servers/<id>.json`
+- [ ] `$schema` field set to `"https://getmcp.es/registry-entry.schema.json"`
+- [ ] Filename matches `id` field (e.g., `my-server.json` contains `"id": "my-server"`)
 - [ ] All tests pass (`npx vitest run`)
 - [ ] Server ID is unique (not already in registry)
-- [ ] Entry validates against `RegistryEntry` Zod schema
+- [ ] Entry validates against `RegistryEntry` Zod schema (verified automatically at build time)
 
 ### Testing
 

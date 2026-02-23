@@ -1,0 +1,22 @@
+{
+  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "id": "cloudflare",
+  "name": "Cloudflare",
+  "description": "Cloudflare platform management — manage Workers, KV, R2, D1, and other Cloudflare services",
+  "config": {
+    "command": "npx",
+    "args": ["-y", "@cloudflare/mcp-server-cloudflare"],
+    "env": {
+      "CLOUDFLARE_ACCOUNT_ID": "",
+      "CLOUDFLARE_API_TOKEN": ""
+    },
+    "transport": "stdio"
+  },
+  "package": "@cloudflare/mcp-server-cloudflare",
+  "runtime": "node",
+  "repository": "https://github.com/cloudflare/mcp-server-cloudflare",
+  "homepage": "https://github.com/cloudflare/mcp-server-cloudflare",
+  "author": "Cloudflare",
+  "categories": ["cloud", "devops"],
+  "requiredEnvVars": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"]
+}

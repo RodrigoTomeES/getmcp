@@ -38,38 +38,22 @@ import {
   getServerCount,
 } from "@getmcp/registry";
 
-getAllServers(); // All 12 server entries, sorted by ID
-getServerIds(); // ["brave-search", "context7", "fetch", ...]
+getAllServers(); // All 106 server entries, sorted by ID
+getServerIds(); // ["airtable", "anthropic", "apify", ...]
 getServersByCategory("web"); // Servers tagged with "web"
 getCategories(); // All unique categories
-getServerCount(); // 12
+getServerCount(); // 106
 ```
 
-### Access individual server definitions
+## Architecture
 
-```ts
-import { github, filesystem, braveSearch, memory, slack, postgres } from "@getmcp/registry";
+Server definitions are stored as individual JSON files in `servers/` and auto-discovered at build time. Each file is validated against the `RegistryEntry` Zod schema during `npm run build`. No manual imports or registration needed — just add a `.json` file.
 
-console.log(github.config);
-// { command: "npx", args: ["-y", "@modelcontextprotocol/server-github"], env: { GITHUB_TOKEN: "" } }
+Browse all 106 servers at [getmcp.es](https://getmcp.es) or from the CLI:
+
+```bash
+npx @getmcp/cli list
 ```
-
-## Included Servers
-
-| ID                    | Name                | Transport | Categories                                  |
-| --------------------- | ------------------- | --------- | ------------------------------------------- |
-| `brave-search`        | Brave Search        | stdio     | search, web                                 |
-| `context7`            | Context7            | remote    | documentation, search, developer-tools      |
-| `fetch`               | Fetch               | stdio     | web, utilities                              |
-| `filesystem`          | Filesystem          | stdio     | filesystem, utilities                       |
-| `github`              | GitHub              | stdio     | developer-tools, git, version-control       |
-| `google-maps`         | Google Maps         | stdio     | maps, location, utilities                   |
-| `memory`              | Memory              | stdio     | memory, knowledge-graph                     |
-| `postgres`            | PostgreSQL          | stdio     | database, sql                               |
-| `puppeteer`           | Puppeteer           | stdio     | browser, automation, web-scraping           |
-| `sentry`              | Sentry              | remote    | monitoring, error-tracking, developer-tools |
-| `sequential-thinking` | Sequential Thinking | stdio     | reasoning, utilities                        |
-| `slack`               | Slack               | stdio     | communication, messaging                    |
 
 ## API
 
