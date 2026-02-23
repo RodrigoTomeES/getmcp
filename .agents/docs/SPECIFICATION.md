@@ -92,7 +92,7 @@ Every major AI application that supports MCP has chosen a slightly (or drastical
 getmcp/
   package.json                     # Root workspace config
   tsconfig.json                    # Shared TypeScript settings
-  SPECIFICATION.md                 # This file
+  .agents/docs/SPECIFICATION.md    # This file
   packages/
     core/                          # @getmcp/core (v0.1.0)
       src/
