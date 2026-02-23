@@ -44,6 +44,8 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+      - name: Clean TypeScript build cache
+        run: npx tsc --build --clean
       - name: Build all packages
         run: npm run build
       - name: Run tests
