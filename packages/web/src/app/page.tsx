@@ -16,7 +16,7 @@ export default function HomePage() {
       <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-10 lg:gap-14 mb-12 pt-4 md:pt-10 relative">
         {/* Subtle radial glow */}
         <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-125 rounded-full pointer-events-none"
+          className="absolute top-0 left-1/2 -translate-x-1/2 max-w-4/5 w-200 h-125 rounded-full pointer-events-none"
           style={{
             background: "radial-gradient(ellipse, rgba(59,130,246,0.06) 0%, transparent 70%)",
           }}
