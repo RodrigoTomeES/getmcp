@@ -22,7 +22,6 @@ const APP_LABELS: Record<AppIdType, string> = {
   continue: "Continue",
   "amazon-q": "Amazon Q",
   trae: "Trae",
-  "vscode-insiders": "VS Code Insiders",
   "bolt-ai": "BoltAI",
   "libre-chat": "LibreChat",
   antigravity: "Antigravity",

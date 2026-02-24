@@ -19,7 +19,6 @@ import {
   ContinueGenerator,
   AmazonQGenerator,
   TraeGenerator,
-  VSCodeInsidersGenerator,
   BoltAIGenerator,
   LibreChatGenerator,
   AntigravityGenerator,
@@ -763,36 +762,6 @@ describe("TraeGenerator", () => {
 });
 
 // ---------------------------------------------------------------------------
-// VS Code Insiders
-// ---------------------------------------------------------------------------
-
-describe("VSCodeInsidersGenerator", () => {
-  const gen = new VSCodeInsidersGenerator();
-
-  it("uses 'servers' root key (same as VS Code)", () => {
-    const result = gen.generate("github", stdioConfig);
-    expect(result).toHaveProperty("servers");
-    expect(result).not.toHaveProperty("mcpServers");
-  });
-
-  it("adds 'type: stdio' for stdio configs", () => {
-    const result = gen.generate("github", stdioConfig);
-    const server = (result.servers as Record<string, Record<string, unknown>>).github;
-    expect(server.type).toBe("stdio");
-  });
-
-  it("adds appropriate type for remote configs", () => {
-    const result = gen.generate("remote", remoteConfig);
-    const server = (result.servers as Record<string, Record<string, unknown>>).remote;
-    expect(server.type).toBe("http");
-  });
-
-  it("uses .vscode-insiders config path", () => {
-    expect(gen.app.configPaths).toBe(".vscode-insiders/mcp.json");
-  });
-});
-
-// ---------------------------------------------------------------------------
 // BoltAI
 // ---------------------------------------------------------------------------
 
@@ -892,12 +861,12 @@ describe("AntigravityGenerator", () => {
 
 describe("generators registry", () => {
   it("has all 20 generators", () => {
-    expect(Object.keys(generators)).toHaveLength(20);
+    expect(Object.keys(generators)).toHaveLength(19);
   });
 
-  it("getAppIds returns all 20 IDs", () => {
+  it("getAppIds returns all 19 IDs", () => {
     const ids = getAppIds();
-    expect(ids).toHaveLength(20);
+    expect(ids).toHaveLength(19);
     expect(ids).toContain("claude-desktop");
     expect(ids).toContain("goose");
     expect(ids).toContain("zed");
@@ -907,7 +876,6 @@ describe("generators registry", () => {
     expect(ids).toContain("continue");
     expect(ids).toContain("amazon-q");
     expect(ids).toContain("trae");
-    expect(ids).toContain("vscode-insiders");
     expect(ids).toContain("bolt-ai");
     expect(ids).toContain("libre-chat");
     expect(ids).toContain("antigravity");
@@ -922,9 +890,9 @@ describe("generators registry", () => {
     expect(() => getGenerator("unknown" as any)).toThrow();
   });
 
-  it("generateAllConfigs returns configs for all 20 apps", () => {
+  it("generateAllConfigs returns configs for all 19 apps", () => {
     const configs = generateAllConfigs("github", stdioConfig);
-    expect(Object.keys(configs)).toHaveLength(20);
+    expect(Object.keys(configs)).toHaveLength(19);
     // Each config should be a valid string
     for (const [, configStr] of Object.entries(configs)) {
       expect(typeof configStr).toBe("string");

@@ -23,7 +23,7 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22) with 5 
 | Package               | npm Name             | Purpose                                                                                                                                                                                             |
 | --------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/core`       | `@getmcp/core`       | Zod schemas, TypeScript types, utility functions (type guards, transport inference), JSON Schema generation                                                                                         |
-| `packages/generators` | `@getmcp/generators` | 20 config generators (one per AI app), each transforms canonical format to app-native format                                                                                                        |
+| `packages/generators` | `@getmcp/generators` | 19 config generators (one per AI app), each transforms canonical format to app-native format                                                                                                        |
 | `packages/registry`   | `@getmcp/registry`   | Catalog of MCP server definitions with search/filter API                                                                                                                                            |
 | `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `init`, `doctor`, `import`, `sync` commands with app auto-detection, config merging, and installation tracking via `getmcp-lock.json` |
 | `packages/web`        | `@getmcp/web`        | Next.js (App Router) web directory for browsing servers and generating config snippets                                                                                                              |
@@ -142,7 +142,7 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 | `app/docs/loading.tsx`                    | Loading skeleton for the docs page                                                              |
 | `app/servers/[id]/page.tsx`               | Dynamic server detail page (statically generated from registry)                                 |
 | `app/registry-entry.schema.json/route.ts` | API route serving the JSON Schema for registry entries (enables `$schema` URL resolution)       |
-| `components/ConfigViewer.tsx`             | Client component: tab selector for all 20 apps, shows generated config snippet with copy button |
+| `components/ConfigViewer.tsx`             | Client component: tab selector for all 19 apps, shows generated config snippet with copy button |
 | `components/SearchBar.tsx`                | Search and filter component                                                                     |
 | `components/ServerCard.tsx`               | Server listing card                                                                             |
 
@@ -201,12 +201,12 @@ This is not optional — documentation drift causes confusion and wastes time. T
 
 ## Testing
 
-- **592 tests** across 24 test files
+- **586 tests** across 24 test files
 - Run all tests: `npx vitest` (from repo root)
 - Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc.
 - Test locations:
   - `packages/core/tests/` — schema validation, type guards, transport inference, JSON Schema, ProjectManifest
-  - `packages/generators/tests/` — all 20 generators (stdio + remote + multi-server + serialization + detectInstalled)
+  - `packages/generators/tests/` — all 19 generators (stdio + remote + multi-server + serialization + detectInstalled)
   - `packages/registry/tests/` — entry validation, lookup, search, categories, content integrity
   - `packages/cli/tests/` — path resolution, app detection, config read/write/merge/remove, lock file, errors, preferences, utils, bin flags
   - `packages/cli/tests/commands/` — list (JSON/quiet output), doctor, import, sync command tests

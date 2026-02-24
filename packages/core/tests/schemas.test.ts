@@ -211,7 +211,6 @@ describe("AppId", () => {
       "continue",
       "amazon-q",
       "trae",
-      "vscode-insiders",
       "bolt-ai",
       "libre-chat",
     ];

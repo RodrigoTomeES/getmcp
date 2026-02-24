@@ -297,7 +297,6 @@ type AppId =
   | "continue"
   | "amazon-q"
   | "trae"
-  | "vscode-insiders"
   | "bolt-ai"
   | "libre-chat"
   | "antigravity";
@@ -1108,7 +1107,7 @@ Detailed documentation of every app's MCP config format, gathered from official 
 | Package              | Test Files | Tests   | Description                                                                                                          |
 | -------------------- | ---------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
 | `@getmcp/core`       | 3          | 39      | Schema validation, type guards, transport inference, JSON Schema, ProjectManifest                                    |
-| `@getmcp/generators` | 1          | 119     | All 20 generators (stdio + remote), multi-server, serialization                                                      |
+| `@getmcp/generators` | 1          | 119     | All 19 generators (stdio + remote), multi-server, serialization                                                      |
 | `@getmcp/registry`   | 1          | 60      | Entry validation, lookup, search, categories, content integrity                                                      |
 | `@getmcp/cli`        | 12         | 297     | Path resolution, app detection, config I/O, lock file, errors, preferences, utils, flags, doctor, import, sync, list |
 | **Total**            | **17**     | **515** |                                                                                                                      |

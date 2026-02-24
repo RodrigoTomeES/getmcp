@@ -69,7 +69,6 @@ npx @getmcp/cli remove github
 | Claude Desktop    | `mcpServers`      | JSON   |
 | Claude Code       | `mcpServers`      | JSON   |
 | VS Code / Copilot | `servers`         | JSON   |
-| VS Code Insiders  | `servers`         | JSON   |
 | Cursor            | `mcpServers`      | JSON   |
 | Cline             | `mcpServers`      | JSON   |
 | Roo Code          | `mcpServers`      | JSON   |

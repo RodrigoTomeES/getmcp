@@ -187,7 +187,6 @@ npx @getmcp/cli list --json`}</CodeBlock>
                   ["Continue", "mcpServers", "JSON"],
                   ["Amazon Q", "mcpServers", "JSON"],
                   ["Trae", "mcpServers", "JSON"],
-                  ["VS Code Insiders", "servers", "JSON"],
                   ["BoltAI", "mcpServers", "JSON"],
                   ["LibreChat", "mcpServers", "YAML"],
                   ["Antigravity", "mcpServers", "JSON"],
