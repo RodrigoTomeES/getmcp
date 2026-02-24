@@ -3,7 +3,7 @@ import { getAppIds } from "@getmcp/generators";
 import { SearchBar } from "@/components/SearchBar";
 import { AnimatedCommand } from "@/components/AnimatedCommand";
 
-const asciiArt = `██████╗ ███████╗████████╗███╗   ███╗ ██████╗██████╗
+const asciiArt = ` ██████╗ ███████╗████████╗███╗   ███╗ ██████╗██████╗
 ██╔════╝ ██╔════╝╚══██╔══╝████╗ ████║██╔════╝██╔══██╗
 ██║  ███╗█████╗     ██║   ██╔████╔██║██║     ██████╔╝
 ██║   ██║██╔══╝     ██║   ██║╚██╔╝██║██║     ██╔═══╝
