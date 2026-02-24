@@ -214,8 +214,7 @@ Longer-term roadmap items from the specification.
   - File: `packages/generators/src/continue.ts`
 - [x] **Trae** — Added `trae` generator (project-scoped, `mcpServers` root key).
   - File: `packages/generators/src/trae.ts`
-- [x] **VS Code Insiders** — Added `vscode-insiders` generator (reuses VS Code logic, `servers` root key).
-  - File: `packages/generators/src/vscode-insiders.ts`
+- [x] **VS Code Insiders** — Removed. Identical format to VS Code; users can use the VS Code generator directly.
 - [x] **Bolt AI** — Added `bolt-ai` generator (macOS only, `mcpServers` root key).
   - File: `packages/generators/src/bolt-ai.ts`
 - [x] **LibreChat** — Added `libre-chat` generator (YAML format, `mcpServers` root key).

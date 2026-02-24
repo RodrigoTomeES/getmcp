@@ -8,7 +8,7 @@ getmcp solves the MCP configuration fragmentation problem. Every AI application 
 
 ## Key Features
 
-- **19 supported AI applications**: Claude Desktop, Claude Code, VS Code, Cursor, Cline, Roo Code, Goose, Windsurf, OpenCode, Zed, PyCharm, Codex, Gemini CLI, Continue, Amazon Q, Trae, VS Code Insiders, BoltAI, LibreChat
+- **19 supported AI applications**: Claude Desktop, Claude Code, VS Code, Cursor, Cline, Roo Code, Goose, Windsurf, OpenCode, Zed, PyCharm, Codex, Gemini CLI, Continue, Amazon Q, Trae, BoltAI, LibreChat, Antigravity
 - **106+ MCP server registry**: Pre-configured definitions for popular MCP servers
 - **4 config formats**: JSON, JSONC, YAML, TOML — auto-detected from file extension
 - **CLI tool**: `npx @getmcp/cli add github` — auto-detects apps, prompts for env vars, merges configs

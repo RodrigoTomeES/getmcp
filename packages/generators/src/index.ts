@@ -2,7 +2,7 @@
  * @getmcp/generators
  *
  * Config generators that transform canonical MCP server definitions
- * into app-specific configuration formats for 20 AI applications.
+ * into app-specific configuration formats for 19 AI applications.
  */
 
 // Individual generators
@@ -22,7 +22,6 @@ export { GeminiCliGenerator } from "./gemini-cli.js";
 export { ContinueGenerator } from "./continue.js";
 export { AmazonQGenerator } from "./amazon-q.js";
 export { TraeGenerator } from "./trae.js";
-export { VSCodeInsidersGenerator } from "./vscode-insiders.js";
 export { BoltAIGenerator } from "./bolt-ai.js";
 export { LibreChatGenerator } from "./libre-chat.js";
 export { AntigravityGenerator } from "./antigravity.js";
@@ -67,7 +66,6 @@ import { GeminiCliGenerator } from "./gemini-cli.js";
 import { ContinueGenerator } from "./continue.js";
 import { AmazonQGenerator } from "./amazon-q.js";
 import { TraeGenerator } from "./trae.js";
-import { VSCodeInsidersGenerator } from "./vscode-insiders.js";
 import { BoltAIGenerator } from "./bolt-ai.js";
 import { LibreChatGenerator } from "./libre-chat.js";
 import { AntigravityGenerator } from "./antigravity.js";
@@ -92,7 +90,6 @@ export const generators: Record<AppIdType, ConfigGenerator> = {
   continue: new ContinueGenerator(),
   "amazon-q": new AmazonQGenerator(),
   trae: new TraeGenerator(),
-  "vscode-insiders": new VSCodeInsidersGenerator(),
   "bolt-ai": new BoltAIGenerator(),
   "libre-chat": new LibreChatGenerator(),
   antigravity: new AntigravityGenerator(),

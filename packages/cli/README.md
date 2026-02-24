@@ -237,7 +237,6 @@ The CLI auto-detects and generates configs for:
 | Claude Desktop    | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS), `%AppData%\Claude\claude_desktop_config.json` (Windows) | JSON   |
 | Claude Code       | `.mcp.json` (project), `~/.claude.json` (user)                                                                                     | JSON   |
 | VS Code / Copilot | `.vscode/mcp.json`                                                                                                                 | JSON   |
-| VS Code Insiders  | `.vscode-insiders/mcp.json`                                                                                                        | JSON   |
 | Cursor            | `.cursor/mcp.json`                                                                                                                 | JSON   |
 | Cline             | `cline_mcp_settings.json` (VS Code globalStorage)                                                                                  | JSON   |
 | Roo Code          | `mcp_settings.json` (VS Code globalStorage)                                                                                        | JSON   |
