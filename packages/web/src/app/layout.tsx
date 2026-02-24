@@ -49,7 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </span>
             </Link>
             <nav className="flex items-center gap-6 text-sm text-text-secondary">
-              <Link href="/" className="hover:text-text transition-colors">
+              <Link href="/" className="hover:text-text transition-colors hidden sm:inline-block">
                 Servers
               </Link>
               <Link href="/docs" className="hover:text-text transition-colors">
