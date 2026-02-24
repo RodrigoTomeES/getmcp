@@ -65,16 +65,25 @@ bg (#0a0a0a)  →  surface (#141414)  →  surface-hover (#1c1c1c)
 
 ## Fonts
 
-### Web (system stack)
+### Web (system stack + Fira Mono)
 
 ```css
+/* Body text */
 font-family:
   system-ui,
   -apple-system,
   sans-serif;
+
+/* Monospace (Tailwind font-mono) */
+font-family: var(--font-fira-mono), ui-monospace, monospace;
 ```
 
-No custom web fonts are loaded. Monospace for code uses the browser default via `font-mono`.
+**Fira Mono** is loaded via `next/font/google` in `layout.tsx` with the `latin` subset. Box-drawing and block element characters (█, ╗, ╔, etc.) used in the hero ASCII art are not part of any Google Fonts subset — they fall through to the `ui-monospace, monospace` fallback, which renders them natively on all platforms.
+
+- Weights loaded: **400** (ASCII art), **500** (tagline `font-medium`)
+- CSS variable: `--font-fira-mono`
+- Tailwind integration: `--font-mono` in `@theme` references the CSS variable with `ui-monospace, monospace` fallback
+- `display: swap` — shows fallback font immediately, swaps when Fira Mono loads
 
 ### OG Images (Inter)
 
