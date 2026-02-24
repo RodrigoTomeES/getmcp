@@ -32,6 +32,8 @@ npx @getmcp/cli list --search=database
 npx @getmcp/cli remove github
 ```
 
+> **Note:** If you run into issues with `npx`, try `npx @getmcp/cli@latest` — npx can cache stale versions, and v0.7.0 had a broken release.
+
 ## Why getmcp?
 
 | Feature              | getmcp                      | Smithery      | mcpm.sh     |
