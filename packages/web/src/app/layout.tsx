@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
+import { Fira_Mono } from "next/font/google";
 import Link from "next/link";
 import Image from "next/image";
 import "./globals.css";
+
+const firaMono = Fira_Mono({
+  weight: ["400", "500"],
+  subsets: ["latin"],
+  variable: "--font-fira-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://getmcp.es"),
@@ -23,7 +31,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={firaMono.variable}>
       <body className="min-h-screen flex flex-col">
         <header className="border-b border-border px-6 py-4">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
