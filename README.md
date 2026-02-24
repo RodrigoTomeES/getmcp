@@ -86,6 +86,7 @@ npx @getmcp/cli remove github
 | Trae              | `mcpServers`      | JSON   |
 | BoltAI            | `mcpServers`      | JSON   |
 | LibreChat         | `mcpServers`      | YAML   |
+| Antigravity       | `mcpServers`      | JSON   |
 
 ## Registry
 
@@ -123,7 +124,6 @@ npx @getmcp/cli list
 | [`@getmcp/core`](packages/core)             | Zod schemas, types, and utilities       | [![npm](https://img.shields.io/npm/v/@getmcp/core)](https://www.npmjs.com/package/@getmcp/core)             |
 | [`@getmcp/generators`](packages/generators) | Config generators for 19 apps           | [![npm](https://img.shields.io/npm/v/@getmcp/generators)](https://www.npmjs.com/package/@getmcp/generators) |
 | [`@getmcp/registry`](packages/registry)     | Registry of 105+ MCP server definitions | [![npm](https://img.shields.io/npm/v/@getmcp/registry)](https://www.npmjs.com/package/@getmcp/registry)     |
-| [`@getmcp/web`](packages/web)               | Web directory (Next.js, not published)  | --                                                                                                          |
 
 ## Library Usage
 
