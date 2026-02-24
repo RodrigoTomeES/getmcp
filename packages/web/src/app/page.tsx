@@ -32,15 +32,17 @@ export default function HomePage() {
 
         {/* Left column: ASCII brand + tagline */}
         <div className="relative text-center lg:text-left py-1">
-          <div className="relative max-w-[280px] sm:max-w-none overflow-hidden mx-auto lg:mx-0">
+          <div className="relative overflow-hidden mx-auto lg:mx-0 w-fit text-left">
             <pre
-              className="font-mono text-[10px] sm:text-[13px] lg:text-[15px] tracking-[-1px] leading-[125%] text-text/30 whitespace-pre select-none"
+              className="font-mono tracking-[-1px] leading-[125%] text-text/30 whitespace-pre select-none"
+              style={{ fontSize: "clamp(7px, 3.1vw, 15px)" }}
               aria-hidden="true"
             >
               {asciiArt}
             </pre>
             <pre
-              className="absolute top-0 left-0 font-mono text-[10px] sm:text-[13px] lg:text-[15px] tracking-[-1px] leading-[125%] text-text whitespace-pre select-none"
+              className="absolute top-0 left-0 font-mono tracking-[-1px] leading-[125%] text-text whitespace-pre select-none"
+              style={{ fontSize: "clamp(7px, 3.1vw, 15px)" }}
               aria-label="getmcp"
             >
               {solidArt}
