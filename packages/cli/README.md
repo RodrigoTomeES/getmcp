@@ -254,6 +254,7 @@ The CLI auto-detects and generates configs for:
 | Trae              | `.trae/mcp.json` (project-scoped)                                                                                                  | JSON   |
 | Bolt AI           | `~/Library/Application Support/BoltAI/mcp_config.json` (macOS only)                                                                | JSON   |
 | LibreChat         | `librechat.yaml`                                                                                                                   | YAML   |
+| Antigravity       | `~/.gemini/antigravity/mcp_config.json`                                                                                            | JSON   |
 
 ## Programmatic API
 

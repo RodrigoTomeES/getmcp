@@ -120,9 +120,16 @@ getmcp/
         zed.ts                     # Generator for Zed
         pycharm.ts                 # Generator for PyCharm
         codex.ts                   # Generator for Codex (TOML)
+        gemini-cli.ts              # Generator for Gemini CLI
+        continue.ts                # Generator for Continue
+        amazon-q.ts                # Generator for Amazon Q
+        trae.ts                    # Generator for Trae
+        bolt-ai.ts                 # Generator for BoltAI
+        libre-chat.ts              # Generator for LibreChat (YAML)
+        antigravity.ts             # Generator for Google Antigravity
         index.ts                   # Generator registry + public API
       tests/
-        generators.test.ts         # 119 tests
+        generators.test.ts         # 113 tests
 
     registry/                      # @getmcp/registry
       servers/                     # 106 JSON server definition files
