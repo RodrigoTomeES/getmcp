@@ -3,6 +3,14 @@ import { getAppIds } from "@getmcp/generators";
 import { SearchBar } from "@/components/SearchBar";
 import { AnimatedCommand } from "@/components/AnimatedCommand";
 
+const asciiArt = `██████╗ ███████╗████████╗███╗   ███╗ ██████╗██████╗
+██╔════╝ ██╔════╝╚══██╔══╝████╗ ████║██╔════╝██╔══██╗
+██║  ███╗█████╗     ██║   ██╔████╔██║██║     ██████╔╝
+██║   ██║██╔══╝     ██║   ██║╚██╔╝██║██║     ██╔═══╝
+╚██████╔╝███████╗   ██║   ██║ ╚═╝ ██║╚██████╗██║
+ ╚═════╝ ╚══════╝   ╚═╝   ╚═╝     ╚═╝ ╚═════╝╚═╝`;
+const solidArt = asciiArt.replace(/[╗╔╚╝═║]/g, " ");
+
 export default function HomePage() {
   const servers = getAllServers();
   const categories = getCategories();
@@ -24,17 +32,20 @@ export default function HomePage() {
 
         {/* Left column: ASCII brand + tagline */}
         <div className="relative text-center lg:text-left py-1">
-          <pre
-            className="font-mono text-[10px] sm:text-[13px] lg:text-[15px] leading-none text-text whitespace-pre select-none"
-            aria-label="getmcp"
-          >
-            {`██████╗ ███████╗████████╗███╗   ███╗ ██████╗██████╗
-██╔════╝ ██╔════╝╚══██╔══╝████╗ ████║██╔════╝██╔══██╗
-██║  ███╗█████╗     ██║   ██╔████╔██║██║     ██████╔╝
-██║   ██║██╔══╝     ██║   ██║╚██╔╝██║██║     ██╔═══╝
-╚██████╔╝███████╗   ██║   ██║ ╚═╝ ██║╚██████╗██║
- ╚═════╝ ╚══════╝   ╚═╝   ╚═╝     ╚═╝ ╚═════╝╚═╝`}
-          </pre>
+          <div className="relative max-w-[280px] sm:max-w-none overflow-hidden mx-auto lg:mx-0">
+            <pre
+              className="font-mono text-[10px] sm:text-[13px] lg:text-[15px] tracking-[-1px] leading-[125%] text-text/30 whitespace-pre select-none"
+              aria-hidden="true"
+            >
+              {asciiArt}
+            </pre>
+            <pre
+              className="absolute top-0 left-0 font-mono text-[10px] sm:text-[13px] lg:text-[15px] tracking-[-1px] leading-[125%] text-text whitespace-pre select-none"
+              aria-label="getmcp"
+            >
+              {solidArt}
+            </pre>
+          </div>
 
           <p className="font-mono text-[13px] lg:text-[17px] uppercase tracking-tight text-text font-medium mt-4">
             The Universal MCP Installer
