@@ -142,6 +142,7 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 | `app/docs/loading.tsx`                    | Loading skeleton for the docs page                                                              |
 | `app/servers/[id]/page.tsx`               | Dynamic server detail page (statically generated from registry)                                 |
 | `app/registry-entry.schema.json/route.ts` | API route serving the JSON Schema for registry entries (enables `$schema` URL resolution)       |
+| `components/AsciiArt.tsx`                 | Animated ASCII art hero with character-by-character reveal, uses Fira Mono font                 |
 | `components/ConfigViewer.tsx`             | Client component: tab selector for all 19 apps, shows generated config snippet with copy button |
 | `components/SearchBar.tsx`                | Search and filter component                                                                     |
 | `components/ServerCard.tsx`               | Server listing card                                                                             |
@@ -201,7 +202,7 @@ This is not optional — documentation drift causes confusion and wastes time. T
 
 ## Testing
 
-- **586 tests** across 24 test files
+- **588 tests** across 24 test files
 - Run all tests: `npx vitest` (from repo root)
 - Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc.
 - Test locations:
