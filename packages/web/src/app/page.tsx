@@ -2,14 +2,7 @@ import { getAllServers, getCategories, getServerCount } from "@getmcp/registry";
 import { getAppIds } from "@getmcp/generators";
 import { SearchBar } from "@/components/SearchBar";
 import { AnimatedCommand } from "@/components/AnimatedCommand";
-
-const asciiArt = ` ██████╗ ███████╗████████╗███╗   ███╗ ██████╗██████╗
-██╔════╝ ██╔════╝╚══██╔══╝████╗ ████║██╔════╝██╔══██╗
-██║  ███╗█████╗     ██║   ██╔████╔██║██║     ██████╔╝
-██║   ██║██╔══╝     ██║   ██║╚██╔╝██║██║     ██╔═══╝
-╚██████╔╝███████╗   ██║   ██║ ╚═╝ ██║╚██████╗██║
- ╚═════╝ ╚══════╝   ╚═╝   ╚═╝     ╚═╝ ╚═════╝╚═╝`;
-const solidArt = asciiArt.replace(/[╗╔╚╝═║]/g, " ");
+import { AsciiArt } from "@/components/AsciiArt";
 
 export default function HomePage() {
   const servers = getAllServers();
@@ -31,28 +24,7 @@ export default function HomePage() {
         />
 
         {/* Left column: ASCII brand + tagline */}
-        <div className="relative text-center lg:text-left py-1">
-          <div className="relative overflow-hidden mx-auto lg:mx-0 w-fit text-left">
-            <pre
-              className="font-mono tracking-[-1px] leading-[125%] text-text/30 whitespace-pre select-none"
-              style={{ fontSize: "clamp(7px, 3.1vw, 15px)" }}
-              aria-hidden="true"
-            >
-              {asciiArt}
-            </pre>
-            <pre
-              className="absolute top-0 left-0 font-mono tracking-[-1px] leading-[125%] text-text whitespace-pre select-none"
-              style={{ fontSize: "clamp(7px, 3.1vw, 15px)" }}
-              aria-label="getmcp"
-            >
-              {solidArt}
-            </pre>
-          </div>
-
-          <p className="font-mono text-[13px] lg:text-[17px] uppercase tracking-tight text-text font-medium mt-4">
-            The Universal MCP Installer
-          </p>
-        </div>
+        <AsciiArt />
 
         {/* Right column: description + animated CLI */}
         <div className="relative flex flex-col justify-center text-center lg:text-left">
