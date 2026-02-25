@@ -289,7 +289,7 @@ Configuration
  └──────────────────┘
 ```
 
-- Container: `rounded-lg border border-border bg-surface p-3`
+- Container: `rounded-lg bg-surface p-3`
 
 ### Transport Badge
 
