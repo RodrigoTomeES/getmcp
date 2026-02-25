@@ -9,12 +9,14 @@ export function ServerCard({ server }: { server: RegistryEntryType }) {
   return (
     <Link
       href={`/servers/${server.id}`}
-      className="block rounded-lg border border-border bg-surface p-5 hover:bg-surface-hover hover:border-accent transition-all"
+      className="group flex flex-col rounded-lg border border-border bg-surface p-5 hover:bg-surface-hover hover:border-accent/50 transition-all"
     >
       <div className="flex items-start justify-between gap-3 mb-2">
-        <h3 className="font-semibold text-lg">{server.name}</h3>
+        <h3 className="font-semibold text-lg group-hover:text-accent transition-colors leading-snug">
+          {server.name}
+        </h3>
         <span
-          className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
+          className={`text-xs px-2.5 py-0.5 rounded-full font-medium shrink-0 mt-0.5 ${
             isRemote
               ? "bg-transport-remote-bg text-transport-remote"
               : "bg-transport-stdio-bg text-transport-stdio"
@@ -24,9 +26,11 @@ export function ServerCard({ server }: { server: RegistryEntryType }) {
         </span>
       </div>
 
-      <p className="text-sm text-text-secondary mb-3 line-clamp-2">{server.description}</p>
+      <p className="text-sm text-text-secondary mb-4 line-clamp-2 leading-relaxed">
+        {server.description}
+      </p>
 
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-2 flex-wrap mt-auto">
         {server.categories?.map((cat) => (
           <span key={cat} className="text-xs px-2 py-0.5 rounded bg-tag-bg text-tag-text">
             {cat}
@@ -39,7 +43,11 @@ export function ServerCard({ server }: { server: RegistryEntryType }) {
         )}
       </div>
 
-      {server.author && <p className="text-xs text-text-secondary mt-3">by {server.author}</p>}
+      {server.author && (
+        <p className="text-xs text-text-secondary mt-4 pt-3 border-t border-border">
+          by {server.author}
+        </p>
+      )}
     </Link>
   );
 }
