@@ -121,7 +121,7 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
       </div>
 
       {/* Metadata grid */}
-      <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-5 py-6 border-y border-border mb-10">
+      <dl className="grid grid-cols-2 gap-x-8 gap-y-5 py-6 border-y border-border mb-10">
         {server.author && <MetaItem label="Author" value={server.author} />}
         {server.runtime && <MetaItem label="Runtime" value={server.runtime} />}
         {server.package && <MetaItem label="Package" value={server.package} mono />}
@@ -139,12 +139,12 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
 
       {/* Required env vars */}
       {server.requiredEnvVars.length > 0 && (
-        <div className="mb-10 rounded-lg border border-warning-border bg-warning-subtle p-5">
-          <h3 className="text-sm font-medium text-warning mb-3">Required Environment Variables</h3>
-          <ul className="flex flex-wrap gap-2">
+        <div className="mb-8 rounded-lg border border-warning-border bg-warning-subtle p-4">
+          <h3 className="text-sm font-medium text-warning mb-2">Required Environment Variables</h3>
+          <ul className="space-y-1">
             {server.requiredEnvVars.map((envVar) => (
-              <li key={envVar}>
-                <code className="text-sm text-warning-light bg-code-bg px-2.5 py-1 rounded font-mono">
+              <li key={envVar} className="text-sm">
+                <code className="text-warning-light bg-code-bg px-1.5 py-0.5 rounded">
                   {envVar}
                 </code>
               </li>

@@ -42,12 +42,6 @@ export function ServerCard({ server }: { server: RegistryEntryType }) {
           </span>
         )}
       </div>
-
-      {server.author && (
-        <p className="text-xs text-text-secondary mt-4 pt-3 border-t border-border">
-          by {server.author}
-        </p>
-      )}
     </Link>
   );
 }
