@@ -20,8 +20,6 @@ const CHARS_PER_FRAME = Math.ceil(solidArt.length / (REVEAL_MS / 16));
 export default function NotFound() {
   const pathname = usePathname() || "/unknown";
   const [charCount, setCharCount] = useState(0);
-  const [visibleLines, setVisibleLines] = useState(0);
-  const [showPrompt, setShowPrompt] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const rafRef = useRef<number>(null);
 
@@ -39,12 +37,9 @@ export default function NotFound() {
 
     if (prefersReduced) {
       setCharCount(solidArt.length);
-      setVisibleLines(terminalLines.length);
-      setShowPrompt(true);
       return;
     }
 
-    // Phase 1: ASCII character reveal
     let current = 0;
     const step = () => {
       current = Math.min(current + CHARS_PER_FRAME, solidArt.length);
@@ -55,26 +50,17 @@ export default function NotFound() {
     };
     rafRef.current = requestAnimationFrame(step);
 
-    // Phase 2: Terminal lines appear with staggered timing
-    const lineDelays = [500, 600, 850, 950, 1150];
-    const timers = lineDelays.map((delay, i) => setTimeout(() => setVisibleLines(i + 1), delay));
-
-    // Phase 3: Show final prompt cursor
-    const promptTimer = setTimeout(() => setShowPrompt(true), 1350);
-
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      timers.forEach(clearTimeout);
-      clearTimeout(promptTimer);
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const asciiFont: React.CSSProperties = {
     fontSize: "clamp(10px, 4.2vw, 26px)",
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-16 sm:py-24 flex flex-col items-center">
+    <div className="max-w-6xl mx-auto px-6 min-h-[calc(100vh-8rem)] flex flex-col items-center justify-center">
       {/* Static CRT scanlines */}
       <div
         className="pointer-events-none fixed inset-0 z-50"
@@ -98,7 +84,7 @@ export default function NotFound() {
         />
       )}
 
-      {/* ASCII 404 with glitch effect */}
+      {/* ASCII 404 */}
       <div className="relative mb-10 sm:mb-14" role="img" aria-label="Error 404">
         {/* Base shadow layer */}
         <pre
@@ -123,26 +109,6 @@ export default function NotFound() {
             <span className="inline-block w-[0.55em] h-[1.1em] bg-text/70 align-middle animate-[blink_1s_step-end_infinite]" />
           )}
         </pre>
-
-        {/* Chromatic aberration glitch layers */}
-        {!reducedMotion && charCount >= solidArt.length && (
-          <>
-            <pre
-              className="absolute top-0 left-0 w-full font-mono tracking-[-1px] leading-[125%] whitespace-pre select-none text-center mix-blend-screen animate-[glitch-1_5s_infinite_linear]"
-              style={{ ...asciiFont, color: "#3b82f6", opacity: 0 }}
-              aria-hidden="true"
-            >
-              {solidArt}
-            </pre>
-            <pre
-              className="absolute top-0 left-0 w-full font-mono tracking-[-1px] leading-[125%] whitespace-pre select-none text-center mix-blend-screen animate-[glitch-2_5s_infinite_linear]"
-              style={{ ...asciiFont, color: "#ef4444", opacity: 0 }}
-              aria-hidden="true"
-            >
-              {solidArt}
-            </pre>
-          </>
-        )}
       </div>
 
       {/* Terminal window */}
@@ -160,21 +126,15 @@ export default function NotFound() {
 
           {/* Terminal content */}
           <div className="p-4 font-mono text-[13px] leading-relaxed bg-surface">
-            {terminalLines.slice(0, visibleLines).map((line, i) => (
-              <div
-                key={i}
-                className={line.className}
-                style={!reducedMotion ? { animation: "fade-in-up 0.15s ease-out both" } : undefined}
-              >
+            {terminalLines.map((line, i) => (
+              <div key={i} className={line.className}>
                 {line.text || "\u00A0"}
               </div>
             ))}
-            {showPrompt && (
-              <div className="mt-1 flex items-center text-text">
-                <span>$ </span>
-                <span className="inline-block w-[0.55em] h-[1.1em] bg-text/70 align-middle animate-[blink_1s_step-end_infinite] ml-0.5" />
-              </div>
-            )}
+            <div className="mt-1 flex items-center text-text">
+              <span>$ </span>
+              <span className="inline-block w-[0.55em] h-[1.1em] bg-text/70 align-middle animate-[blink_1s_step-end_infinite] ml-0.5" />
+            </div>
           </div>
         </div>
       </div>
