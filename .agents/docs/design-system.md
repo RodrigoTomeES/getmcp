@@ -189,14 +189,16 @@ None. The design relies entirely on background color layering and borders for de
 ### Grid Patterns
 
 - **Server grid**: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4`
-- **Metadata grid**: `grid grid-cols-1 sm:grid-cols-2 gap-4`
+- **Metadata grid**: `grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-5`
 
 ### Spacing Conventions
 
-- Page vertical padding: `py-10` (homepage, detail) or `py-16` (docs)
-- Section spacing: `mb-8` between major sections
-- Component internal: `p-3` to `p-5`
+- Page vertical padding: `py-10`/`py-12` (homepage, detail) or `py-16` (docs)
+- Section spacing: `mb-8` to `mb-12` between major sections
+- Component internal: `p-4` to `p-5`
 - Flex gaps: `gap-1.5` (tabs), `gap-2` to `gap-4` (content), `gap-6` (nav links)
+- Hero to content separator: `<hr className="border-border mb-10" />` on homepage
+- Metadata grid: `py-6 border-y border-border` for bordered section feel
 
 ---
 
@@ -213,13 +215,15 @@ None. The design relies entirely on background color layering and borders for de
 │  Description text truncated to two      │  ← text-sm text-text-secondary
 │  lines maximum...                       │     line-clamp-2
 │                                         │
-│  [category] [category]     [ENV_VAR]    │  ← tags + env badge
+│  [category] [category]     [ENV_VAR]    │  ← tags + env badge (mt-auto)
+│  ─────────────────────────────────────  │  ← border-t
 │  by Author Name                         │  ← text-xs text-text-secondary
 └─────────────────────────────────────────┘
 ```
 
-- Container: `rounded-lg border border-border bg-surface p-5`
-- Hover: `hover:bg-surface-hover hover:border-accent transition-all`
+- Container: `flex flex-col rounded-lg border border-border bg-surface p-5`
+- Hover: `hover:bg-surface-hover hover:border-accent/50 transition-all`
+- Tags use `mt-auto` to pin to bottom when cards vary in height
 
 ### SearchBar
 
@@ -259,9 +263,10 @@ Configuration
  └──────────────────────────────────────┘
 ```
 
-- Tab active: `border-accent bg-accent text-white`
+- Tab active: `border-accent bg-accent text-white font-medium`
 - Tab inactive: `border-border text-text-secondary`
 - Code container: `rounded-lg border border-border bg-code-bg`
+- Footer: docs link + optional warnings in a `flex flex-wrap` row
 
 ### PackageManagerCommand
 
@@ -283,13 +288,15 @@ Configuration
 **File**: `components/MetaItem.tsx`
 
 ```
- LABEL            ← text-xs font-medium uppercase tracking-wider text-text-secondary
- Value            ← text-sm text-text (optional font-mono), truncate with title tooltip
+ LABEL            ← dt: text-xs font-medium uppercase tracking-wider text-text-secondary
+ Value            ← dd: text-sm text-text (optional font-mono), truncate with title tooltip
 ```
 
-- Uses semantic `<dt>`/`<dd>` elements inside a `<dl>` wrapper
-- No container box — just text on the page background with `space-y-1`
-- Grid: `grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-4` (compact row layout)
+- Uses semantic `<dt>`/`<dd>` elements inside a parent `<dl>` wrapper on the page
+- No container box -- definition-list style, text sits directly on page background
+- Wrapper div with `space-y-1` for label/value spacing
+- Grid on the `<dl>`: `grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-5`
+- Bordered section: `py-6 border-y border-border` separates metadata from surrounding content
 
 ### Transport Badge
 
@@ -310,7 +317,25 @@ Configuration
  └──────────────────────────────────────┘
 ```
 
-- Box: `rounded-lg border border-warning-border bg-warning-subtle p-4`
+- Box: `rounded-lg border border-warning-border bg-warning-subtle p-5`
+
+### DocsSidebar
+
+**File**: `components/DocsSidebar.tsx`
+
+```
+ ON THIS PAGE       ← text-xs font-medium uppercase tracking-wider
+ │ What is getmcp?  ← text-sm, text-text-secondary hover:text-text
+ │ Getting started
+ │   Generate config  ← level 3: pl-3 text-xs
+ │ ...
+```
+
+- Container: `sticky top-6 w-48 shrink-0 self-start`
+- Heading: `text-xs font-medium uppercase tracking-wider text-text-secondary mb-4`
+- List: `space-y-2.5 text-sm border-l border-border pl-4`
+- Level 3 items indented with `pl-3 text-xs`
+- Supports `scroll-target-group` and `:target-current` for active state highlighting
 
 ---
 
@@ -339,9 +364,36 @@ border-accent bg-accent text-white            (config tab)
 ### Icon Button (copy)
 
 ```
-text-text-secondary hover:text-text transition-colors
+text-text-secondary hover:text-text transition-colors rounded-md
 → text-success (copied state, reverts after 2s)
 ```
+
+---
+
+## Error/Empty States
+
+### 404 Page
+
+```
+ Error 404                ← text-sm font-mono uppercase tracking-wider
+ Page not found           ← text-5xl font-bold tracking-tight
+ description text         ← text-lg text-text-secondary max-w-md
+ [Browse servers]         ← primary CTA button
+```
+
+- Generous vertical padding: `py-32`
+- Centered layout with constrained description width
+
+### Error Page
+
+```
+ Error                    ← text-sm font-mono uppercase tracking-wider
+ Something went wrong     ← text-2xl font-bold tracking-tight
+ error message            ← text-sm text-text-secondary
+ [Try again]              ← secondary button
+```
+
+- Same `py-32` vertical padding for visual consistency
 
 ---
 
@@ -382,7 +434,30 @@ text-text placeholder-text-secondary
 focus:outline-none focus:border-accent transition-colors
 ```
 
-Left-padded for search icon positioned with `absolute left-3 top-1/2 -translate-y-1/2`.
+Left-padded for search icon positioned with `absolute left-3.5 top-1/2 -translate-y-1/2`.
+
+### Focus States
+
+Keyboard focus is handled globally in `globals.css`:
+
+```css
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+```
+
+### Text Selection
+
+```css
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+```
 
 ---
 
