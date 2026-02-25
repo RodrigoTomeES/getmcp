@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 // prettier-ignore
 const asciiArt =
@@ -17,28 +17,44 @@ const solidArt = asciiArt.replace(/[╗╔╚╝═║]/g, " ");
 const REVEAL_MS = 200;
 const CHARS_PER_FRAME = Math.ceil(solidArt.length / (REVEAL_MS / 16));
 
+function subscribeToReducedMotion(callback: () => void) {
+  const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mql.addEventListener("change", callback);
+  return () => mql.removeEventListener("change", callback);
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function getReducedMotionServerSnapshot() {
+  return false;
+}
+
 export default function NotFound() {
   const pathname = usePathname() || "/unknown";
   const [charCount, setCharCount] = useState(0);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const reducedMotion = useSyncExternalStore(
+    subscribeToReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  );
   const rafRef = useRef<number>(null);
 
   const terminalLines = [
-    { text: `$ getmcp find ${pathname}`, className: "text-text" },
-    { text: "", className: "" },
-    { text: "Error: resource not found in registry.", className: "text-red-400" },
-    { text: "", className: "" },
-    { text: 'hint: try "getmcp list" to browse all servers', className: "text-text-secondary" },
+    { id: "cmd", text: `$ getmcp find ${pathname}`, className: "text-text" },
+    { id: "blank-1", text: "", className: "" },
+    { id: "error", text: "Error: resource not found in registry.", className: "text-red-400" },
+    { id: "blank-2", text: "", className: "" },
+    {
+      id: "hint",
+      text: 'hint: try "getmcp list" to browse all servers',
+      className: "text-text-secondary",
+    },
   ];
 
   useEffect(() => {
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setReducedMotion(prefersReduced);
-
-    if (prefersReduced) {
-      setCharCount(solidArt.length);
-      return;
-    }
+    if (reducedMotion) return;
 
     let current = 0;
     const step = () => {
@@ -53,7 +69,9 @@ export default function NotFound() {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [reducedMotion]);
+
+  const displayCount = reducedMotion ? solidArt.length : charCount;
 
   const asciiFont: CSSProperties = {
     fontSize: "clamp(10px, 4.2vw, 26px)",
@@ -107,8 +125,8 @@ export default function NotFound() {
           }}
           aria-hidden="true"
         >
-          {solidArt.slice(0, charCount)}
-          {charCount < solidArt.length && (
+          {solidArt.slice(0, displayCount)}
+          {displayCount < solidArt.length && (
             <span className="inline-block w-[0.55em] h-[1.1em] bg-text/70 align-middle animate-[blink_1s_step-end_infinite]" />
           )}
         </pre>
@@ -129,8 +147,8 @@ export default function NotFound() {
 
           {/* Terminal content */}
           <div className="p-4 font-mono text-[13px] leading-relaxed bg-surface">
-            {terminalLines.map((line, i) => (
-              <div key={i} className={line.className}>
+            {terminalLines.map((line) => (
+              <div key={line.id} className={line.className}>
                 {line.text || "\u00A0"}
               </div>
             ))}
