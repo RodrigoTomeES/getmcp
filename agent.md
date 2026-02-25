@@ -335,4 +335,5 @@ Skills are installed under `.agents/skills/` and provide specialized capabilitie
 - **[`ROADMAP.md`](./.agents/docs/ROADMAP.md)** — Planned improvements and open tasks
 - **[`design-system.md`](./.agents/docs/design-system.md)** — Web package design system: colors, fonts, typography, components, layout patterns, and OG image specs
 - **[`competence.md`](./.agents/docs/competence.md)** — Competence analysis
+- **[`css-scroll-spy.md`](./.agents/docs/css-scroll-spy.md)** — CSS scroll spy pattern: inline `<style>` technique required by Turbopack constraint
 - **Repository**: `https://github.com/RodrigoTomeES/getmcp`

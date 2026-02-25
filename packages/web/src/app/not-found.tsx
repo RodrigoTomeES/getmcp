@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 
 // prettier-ignore
 const asciiArt =
@@ -55,12 +55,15 @@ export default function NotFound() {
     };
   }, []);
 
-  const asciiFont: React.CSSProperties = {
+  const asciiFont: CSSProperties = {
     fontSize: "clamp(10px, 4.2vw, 26px)",
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 min-h-[calc(100vh-8rem)] flex flex-col items-center justify-center">
+    <div
+      className="max-w-6xl mx-auto px-6 flex flex-col items-center justify-center"
+      style={{ minHeight: "calc(100dvh - 57px - 85px)" }}
+    >
       {/* Static CRT scanlines */}
       <div
         className="pointer-events-none fixed inset-0 z-50"
@@ -74,7 +77,7 @@ export default function NotFound() {
       {/* Sweeping scanline */}
       {!reducedMotion && (
         <div
-          className="pointer-events-none fixed left-0 right-0 z-50 h-[2px]"
+          className="pointer-events-none fixed left-0 right-0 z-50 h-0.5"
           style={{
             background:
               "linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.07), transparent)",

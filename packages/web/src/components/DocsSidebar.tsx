@@ -26,6 +26,9 @@ export function DocsSidebar() {
           nav[aria-label="Table of contents"] a:target-current {
             color: var(--color-accent);
           }
+          nav[aria-label="Table of contents"] li:has(a:target-current) {
+            border-left-color: var(--color-accent);
+          }
         }
       `}</style>
       <p className="text-xs font-medium uppercase tracking-wider text-text-secondary mb-4">
