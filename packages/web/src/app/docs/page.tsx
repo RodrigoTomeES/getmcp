@@ -26,13 +26,13 @@ export default function DocsPage() {
   const appCount = getAppIds().length;
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-16 flex gap-10">
+    <div className="max-w-5xl mx-auto px-6 py-16 flex gap-12">
       <DocsSidebar />
       <div className="min-w-0 max-w-3xl flex-1">
         {/* Hero */}
         <section className="mb-16">
           <h1 className="text-4xl font-bold tracking-tight mb-4">Documentation</h1>
-          <p className="text-lg text-text-secondary leading-relaxed">
+          <p className="text-lg text-text-secondary leading-relaxed max-w-2xl">
             Learn how to install, configure, and use getmcp to manage MCP servers across all AI
             applications.
           </p>
@@ -40,7 +40,7 @@ export default function DocsPage() {
 
         {/* What is getmcp? */}
         <section id="what-is-getmcp" className="mb-16">
-          <h2 className="text-2xl font-bold mb-4">What is getmcp?</h2>
+          <h2 className="text-2xl font-bold mb-5">What is getmcp?</h2>
           <div className="space-y-4 text-text-secondary leading-relaxed">
             <p>
               Every AI application uses a different config format for MCP (Model Context Protocol)
@@ -76,7 +76,7 @@ export default function DocsPage() {
 
         {/* Getting started */}
         <section id="getting-started" className="mb-16">
-          <h2 className="text-2xl font-bold mb-4">Getting started</h2>
+          <h2 className="text-2xl font-bold mb-5">Getting started</h2>
           <div className="space-y-4 text-text-secondary leading-relaxed">
             <p>Install any MCP server into all your detected AI apps with a single command:</p>
             <CodeBlock label="CLI">{`npx @getmcp/cli add <server>`}</CodeBlock>
@@ -123,7 +123,7 @@ npx @getmcp/cli list --json`}</CodeBlock>
 
         {/* Project manifests */}
         <section id="project-manifests" className="mb-16">
-          <h2 className="text-2xl font-bold mb-4">Project manifests</h2>
+          <h2 className="text-2xl font-bold mb-5">Project manifests</h2>
           <div className="space-y-4 text-text-secondary leading-relaxed">
             <p>
               Teams can share MCP server configurations via a{" "}
@@ -156,7 +156,7 @@ npx @getmcp/cli list --json`}</CodeBlock>
 
         {/* Supported apps */}
         <section id="supported-apps" className="mb-16">
-          <h2 className="text-2xl font-bold mb-4">Supported apps</h2>
+          <h2 className="text-2xl font-bold mb-5">Supported apps</h2>
           <p className="text-text-secondary leading-relaxed mb-4">
             getmcp generates config for {appCount} AI applications, each with its own format:
           </p>
@@ -208,7 +208,7 @@ npx @getmcp/cli list --json`}</CodeBlock>
 
         {/* How it works */}
         <section id="how-it-works" className="mb-16">
-          <h2 className="text-2xl font-bold mb-4">How it works</h2>
+          <h2 className="text-2xl font-bold mb-5">How it works</h2>
           <div className="space-y-4 text-text-secondary leading-relaxed">
             <p>
               Server definitions are stored in a{" "}
@@ -284,7 +284,7 @@ Desktop (servers)(YAML) (TOML)   apps`}</CodeBlock>
 
         {/* Library usage */}
         <section id="library-usage" className="mb-16">
-          <h2 className="text-2xl font-bold mb-4">Library usage</h2>
+          <h2 className="text-2xl font-bold mb-5">Library usage</h2>
           <div className="space-y-6 text-text-secondary leading-relaxed">
             <p>
               All packages are available on npm and can be used programmatically in your own
@@ -292,7 +292,7 @@ Desktop (servers)(YAML) (TOML)   apps`}</CodeBlock>
             </p>
 
             <div>
-              <h3 id="generate-config" className="text-lg font-semibold text-text mb-2">
+              <h3 id="generate-config" className="text-lg font-semibold text-text mb-3">
                 Generate config for any app
               </h3>
               <CodeBlock label="TS">{`import { generateConfig, generateAllConfigs } from "@getmcp/generators";
@@ -314,7 +314,7 @@ const all = generateAllConfigs("github", {
             </div>
 
             <div>
-              <h3 id="validate-schemas" className="text-lg font-semibold text-text mb-2">
+              <h3 id="validate-schemas" className="text-lg font-semibold text-text mb-3">
                 Validate configs with Zod schemas
               </h3>
               <CodeBlock label="TS">{`import { StdioServerConfig, CanonicalMCPConfig } from "@getmcp/core";
@@ -324,7 +324,7 @@ StdioServerConfig.parse({ command: "npx", args: ["server"] });
             </div>
 
             <div>
-              <h3 id="search-registry" className="text-lg font-semibold text-text mb-2">
+              <h3 id="search-registry" className="text-lg font-semibold text-text mb-3">
                 Search the registry
               </h3>
               <CodeBlock label="TS">{`import { searchServers, getServersByCategory } from "@getmcp/registry";
@@ -340,7 +340,7 @@ getServersByCategory("web");
 
         {/* Adding a server */}
         <section id="adding-a-server" className="mb-16">
-          <h2 className="text-2xl font-bold mb-4">Adding a server to the registry</h2>
+          <h2 className="text-2xl font-bold mb-5">Adding a server to the registry</h2>
           <div className="space-y-4 text-text-secondary leading-relaxed">
             <p>Want to add your MCP server to the getmcp registry? Here{"'"}s how:</p>
             <ol className="list-decimal list-inside space-y-2 ml-1">
@@ -399,8 +399,8 @@ export const myServer: RegistryEntryType = {
 
         {/* Security */}
         <section id="security-disclaimer">
-          <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-6">
-            <h2 className="text-xl font-bold text-amber-400 mb-3">Security disclaimer</h2>
+          <div className="rounded-lg border border-warning-border bg-warning-subtle p-6">
+            <h2 className="text-xl font-bold text-warning mb-3">Security disclaimer</h2>
             <div className="space-y-3 text-text-secondary leading-relaxed text-sm">
               <p>
                 MCP servers in the getmcp registry are community-contributed. While we review
