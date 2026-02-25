@@ -46,17 +46,17 @@ export function ConfigViewer({
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-3">Configuration</h3>
+      <h3 className="text-lg font-semibold mb-4">Configuration</h3>
 
       {/* App selector tabs */}
-      <div className="flex flex-wrap gap-1.5 mb-4">
+      <div className="flex flex-wrap gap-1.5 mb-5">
         {APP_IDS.map((appId) => (
           <button
             key={appId}
             onClick={() => setSelectedApp(appId)}
             className={`text-xs px-3 py-1.5 rounded-md border transition-colors ${
               selectedApp === appId
-                ? "border-accent bg-accent text-text"
+                ? "border-accent bg-accent text-white font-medium"
                 : "border-border text-text-secondary hover:border-text-secondary hover:text-text"
             }`}
           >
@@ -66,9 +66,9 @@ export function ConfigViewer({
       </div>
 
       {/* Config path hint */}
-      <p className="text-xs text-text-secondary mb-2">
+      <p className="text-xs text-text-secondary mb-3">
         Config file:{" "}
-        <code className="text-accent">
+        <code className="text-accent font-mono">
           {generator.app.configPaths !== null && generator.app.globalConfigPaths !== null
             ? `${generator.app.configPaths} (project) or ${generator.app.globalConfigPaths?.darwin ?? "—"} (global)`
             : (generator.app.configPaths ??
@@ -82,33 +82,34 @@ export function ConfigViewer({
       {/* Code block */}
       <CodeBlock label={generator.app.configFormat.toUpperCase()}>{serialized}</CodeBlock>
 
-      {/* PyCharm-specific warning */}
-      {selectedApp === "pycharm" && (
-        <p className="text-xs text-warning mt-3">
-          Requires the{" "}
-          <a
-            href="https://plugins.jetbrains.com/plugin/22282-jetbrains-ai-assistant"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline text-warning-light"
-          >
-            JetBrains AI Assistant
-          </a>{" "}
-          plugin. PyCharm must be closed and reopened for configuration changes to take effect.
-        </p>
-      )}
-
-      {/* Docs link */}
-      <p className="text-xs text-text-secondary mt-3">
+      {/* Footer info */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3">
+        {/* Docs link */}
         <a
           href={generator.app.docsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-accent hover:underline"
+          className="text-xs text-accent hover:underline"
         >
           {APP_LABELS[selectedApp]} MCP documentation
         </a>
-      </p>
+
+        {/* PyCharm-specific warning */}
+        {selectedApp === "pycharm" && (
+          <p className="text-xs text-warning">
+            Requires the{" "}
+            <a
+              href="https://plugins.jetbrains.com/plugin/22282-jetbrains-ai-assistant"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline text-warning-light"
+            >
+              JetBrains AI Assistant
+            </a>{" "}
+            plugin.
+          </p>
+        )}
+      </div>
     </div>
   );
 }
