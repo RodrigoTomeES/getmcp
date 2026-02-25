@@ -59,3 +59,19 @@ body {
     transform: translateY(0);
   }
 }
+
+/* Focus-visible ring for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Remove default focus outline for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Smooth selection color */
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}

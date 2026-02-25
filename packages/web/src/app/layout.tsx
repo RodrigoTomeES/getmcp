@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen flex flex-col">
         <header className="border-b border-border px-6 py-4">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2.5">
               <Image
                 src="/icon.svg"
                 alt="getmcp logo"
@@ -48,18 +48,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 beta
               </span>
             </Link>
-            <nav className="flex items-center gap-6 text-sm text-text-secondary">
-              <Link href="/" className="hover:text-text transition-colors hidden sm:inline-block">
+            <nav className="flex items-center gap-6 text-sm">
+              <Link
+                href="/"
+                className="text-text-secondary hover:text-text transition-colors hidden sm:inline-block"
+              >
                 Servers
               </Link>
-              <Link href="/docs" className="hover:text-text transition-colors">
+              <Link href="/docs" className="text-text-secondary hover:text-text transition-colors">
                 Docs
               </Link>
               <a
                 href="https://github.com/RodrigoTomeES/getmcp"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-text transition-colors"
+                className="text-text-secondary hover:text-text transition-colors"
               >
                 GitHub
               </a>
@@ -69,8 +72,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <main className="flex-1">{children}</main>
 
-        <footer className="border-t border-border px-6 py-6 text-center text-sm text-text-secondary">
-          <div className="max-w-6xl mx-auto">getmcp — One config format, every AI app.</div>
+        <footer className="border-t border-border px-6 py-8 text-center text-sm text-text-secondary">
+          <div className="max-w-6xl mx-auto">
+            <p>getmcp -- One config format, every AI app.</p>
+          </div>
         </footer>
       </body>
     </html>

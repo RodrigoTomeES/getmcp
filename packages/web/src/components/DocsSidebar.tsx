@@ -28,13 +28,16 @@ export function DocsSidebar() {
           }
         }
       `}</style>
-      <ul className="space-y-2 text-sm">
+      <p className="text-xs font-medium uppercase tracking-wider text-text-secondary mb-4">
+        On this page
+      </p>
+      <ul className="space-y-2.5 text-sm border-l border-border pl-4">
         {sections.map((section) => (
           <li key={section.id}>
             <a
               href={`#${section.id}`}
               className={`block transition-colors text-text-secondary hover:text-text ${
-                section.level === 3 ? "pl-4" : ""
+                section.level === 3 ? "pl-3 text-xs" : ""
               }`}
             >
               {section.label}
