@@ -74,7 +74,7 @@ export function PackageManagerCommand({ serverId }: { serverId?: string }) {
             <button
               key={pm}
               onClick={() => setStoredPm(pm)}
-              className={`text-xs px-2.5 py-1 rounded-md transition-colors ${
+              className={`text-xs px-2.5 py-1 rounded-md transition-colors font-medium ${
                 selectedPm === pm ? "bg-surface text-text" : "text-text-secondary hover:text-text"
               }`}
             >
@@ -86,7 +86,7 @@ export function PackageManagerCommand({ serverId }: { serverId?: string }) {
         {/* Copy button */}
         <button
           onClick={() => copy(command)}
-          className="text-text-secondary hover:text-text transition-colors shrink-0 p-1"
+          className="text-text-secondary hover:text-text transition-colors shrink-0 p-1 rounded-md"
           aria-label="Copy command"
         >
           {copied ? (
