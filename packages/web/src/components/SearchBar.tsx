@@ -41,7 +41,7 @@ export function SearchBar({
       {/* Search input */}
       <div className="relative mb-4">
         <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -72,7 +72,7 @@ export function SearchBar({
           className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
             !selectedCategory
               ? "border-accent bg-accent/10 text-accent"
-              : "border-border text-text-secondary hover:border-text-secondary"
+              : "border-border text-text-secondary hover:border-text-secondary hover:text-text"
           }`}
         >
           All
@@ -85,7 +85,7 @@ export function SearchBar({
             className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
               selectedCategory === cat
                 ? "border-accent bg-accent/10 text-accent"
-                : "border-border text-text-secondary hover:border-text-secondary"
+                : "border-border text-text-secondary hover:border-text-secondary hover:text-text"
             }`}
           >
             {cat}
@@ -94,7 +94,11 @@ export function SearchBar({
       </div>
 
       {/* Results count */}
-      <p className="text-sm text-text-secondary mb-4" role="status" aria-live="polite">
+      <p
+        className="text-xs text-text-secondary mb-4 uppercase tracking-wider font-medium"
+        role="status"
+        aria-live="polite"
+      >
         {filtered.length} server{filtered.length !== 1 ? "s" : ""}
         {query && ` matching "${query}"`}
         {selectedCategory && ` in ${selectedCategory}`}
@@ -108,7 +112,7 @@ export function SearchBar({
       </div>
 
       {filtered.length === 0 && (
-        <div className="text-center py-12 text-text-secondary">
+        <div className="text-center py-20 text-text-secondary">
           <p className="text-lg mb-2">No servers found</p>
           <p className="text-sm">Try adjusting your search or filters.</p>
         </div>

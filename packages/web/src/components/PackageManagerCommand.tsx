@@ -50,7 +50,7 @@ export function PackageManagerCommand({ serverId }: { serverId?: string }) {
   const command = getCommand(selectedPm, serverId);
 
   return (
-    <div className="rounded-lg border border-border bg-code-bg overflow-hidden mb-8">
+    <div className="rounded-lg border border-border bg-code-bg overflow-hidden">
       {/* Header: terminal icon + tabs + copy button */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-border">
         {/* Terminal icon */}
