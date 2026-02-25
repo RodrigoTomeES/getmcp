@@ -75,3 +75,79 @@ body {
 ::selection {
   background: color-mix(in srgb, var(--color-accent) 30%, transparent);
 }
+
+/* 404 glitch effect — chromatic aberration layers */
+@keyframes glitch-1 {
+  0%,
+  85%,
+  95%,
+  100% {
+    opacity: 0;
+  }
+  86% {
+    opacity: 0.7;
+    clip-path: inset(15% 0 60% 0);
+    transform: translateX(-4px);
+  }
+  88% {
+    opacity: 0.7;
+    clip-path: inset(50% 0 20% 0);
+    transform: translateX(3px);
+  }
+  90% {
+    opacity: 0.7;
+    clip-path: inset(30% 0 45% 0);
+    transform: translateX(-2px);
+  }
+  92% {
+    opacity: 0.5;
+    clip-path: inset(65% 0 10% 0);
+    transform: translateX(4px);
+  }
+  94% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+}
+
+@keyframes glitch-2 {
+  0%,
+  82%,
+  92%,
+  100% {
+    opacity: 0;
+  }
+  83% {
+    opacity: 0.7;
+    clip-path: inset(40% 0 35% 0);
+    transform: translateX(5px);
+  }
+  85% {
+    opacity: 0.7;
+    clip-path: inset(10% 0 65% 0);
+    transform: translateX(-3px);
+  }
+  87% {
+    opacity: 0.5;
+    clip-path: inset(60% 0 15% 0);
+    transform: translateX(2px);
+  }
+  89% {
+    opacity: 0.7;
+    clip-path: inset(5% 0 75% 0);
+    transform: translateX(-4px);
+  }
+  91% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scanline-sweep {
+  0% {
+    top: -5%;
+  }
+  100% {
+    top: 105%;
+  }
+}
