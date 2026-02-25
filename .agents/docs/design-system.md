@@ -283,13 +283,13 @@ Configuration
 **File**: `components/MetaItem.tsx`
 
 ```
- ┌──────────────────┐
- │  Label            │  ← text-xs text-text-secondary
- │  Value            │  ← text-sm (optional font-mono)
- └──────────────────┘
+ LABEL            ← text-xs font-medium uppercase tracking-wider text-text-secondary
+ Value            ← text-sm text-text (optional font-mono), truncate with title tooltip
 ```
 
-- Container: `rounded-lg bg-surface p-3`
+- Uses semantic `<dt>`/`<dd>` elements inside a `<dl>` wrapper
+- No container box — just text on the page background with `space-y-1`
+- Grid: `grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-4` (compact row layout)
 
 ### Transport Badge
 

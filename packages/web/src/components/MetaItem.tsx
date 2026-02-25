@@ -1,8 +1,10 @@
 export function MetaItem({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
-    <div className="rounded-lg bg-surface p-3">
-      <p className="text-xs text-text-secondary mb-1">{label}</p>
-      <p className={`text-sm ${mono ? "font-mono" : ""}`}>{value}</p>
+    <div className="space-y-1">
+      <dt className="text-xs font-medium uppercase tracking-wider text-text-secondary">{label}</dt>
+      <dd className={`text-sm text-text truncate ${mono ? "font-mono" : ""}`} title={value}>
+        {value}
+      </dd>
     </div>
   );
 }

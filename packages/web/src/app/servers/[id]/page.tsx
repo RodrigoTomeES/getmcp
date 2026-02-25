@@ -54,22 +54,22 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
   const transport = isRemote ? "remote" : "stdio";
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-10">
+    <div className="max-w-4xl mx-auto px-6 py-12">
       {/* Breadcrumb */}
-      <nav className="text-sm text-text-secondary mb-6">
+      <nav className="text-sm text-text-secondary mb-10" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-text transition-colors">
           Servers
         </Link>
-        <span className="mx-2">/</span>
+        <span className="mx-2 text-border">/</span>
         <span className="text-text">{server.name}</span>
       </nav>
 
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-start gap-3 mb-3">
-          <h1 className="text-3xl font-bold">{server.name}</h1>
+        <div className="flex items-center gap-3 mb-3">
+          <h1 className="text-3xl font-bold tracking-tight">{server.name}</h1>
           <span
-            className={`text-xs px-2 py-0.5 rounded-full font-medium mt-2 ${
+            className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
               isRemote
                 ? "bg-transport-remote-bg text-transport-remote"
                 : "bg-transport-stdio-bg text-transport-stdio"
@@ -78,11 +78,50 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
             {transport}
           </span>
         </div>
-        <p className="text-lg text-text-secondary">{server.description}</p>
+        <p className="text-lg text-text-secondary leading-relaxed max-w-2xl">
+          {server.description}
+        </p>
+      </div>
+
+      {/* Categories and links row */}
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-3 mb-8">
+        {server.categories && server.categories.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {server.categories.map((cat) => (
+              <span key={cat} className="text-xs px-3 py-1 rounded-full bg-tag-bg text-tag-text">
+                {cat}
+              </span>
+            ))}
+          </div>
+        )}
+        {(server.repository || server.homepage) && (
+          <div className="flex items-center gap-4">
+            {server.repository && (
+              <a
+                href={server.repository}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-accent hover:underline transition-colors"
+              >
+                Repository
+              </a>
+            )}
+            {server.homepage && (
+              <a
+                href={server.homepage}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-accent hover:underline transition-colors"
+              >
+                Homepage
+              </a>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Metadata grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+      <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-5 py-6 border-y border-border mb-10">
         {server.author && <MetaItem label="Author" value={server.author} />}
         {server.runtime && <MetaItem label="Runtime" value={server.runtime} />}
         {server.package && <MetaItem label="Package" value={server.package} mono />}
@@ -96,30 +135,16 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
             mono
           />
         )}
-      </div>
-
-      {/* Categories */}
-      {server.categories && server.categories.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-sm font-medium text-text-secondary mb-2">Categories</h3>
-          <div className="flex flex-wrap gap-2">
-            {server.categories.map((cat) => (
-              <span key={cat} className="text-xs px-3 py-1 rounded-full bg-tag-bg text-tag-text">
-                {cat}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+      </dl>
 
       {/* Required env vars */}
       {server.requiredEnvVars.length > 0 && (
-        <div className="mb-8 rounded-lg border border-warning-border bg-warning-subtle p-4">
-          <h3 className="text-sm font-medium text-warning mb-2">Required Environment Variables</h3>
-          <ul className="space-y-1">
+        <div className="mb-10 rounded-lg border border-warning-border bg-warning-subtle p-5">
+          <h3 className="text-sm font-medium text-warning mb-3">Required Environment Variables</h3>
+          <ul className="flex flex-wrap gap-2">
             {server.requiredEnvVars.map((envVar) => (
-              <li key={envVar} className="text-sm">
-                <code className="text-warning-light bg-code-bg px-1.5 py-0.5 rounded">
+              <li key={envVar}>
+                <code className="text-sm text-warning-light bg-code-bg px-2.5 py-1 rounded font-mono">
                   {envVar}
                 </code>
               </li>
@@ -128,32 +153,11 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
         </div>
       )}
 
-      {/* Links */}
-      <div className="flex gap-4 mb-8">
-        {server.repository && (
-          <a
-            href={server.repository}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-accent hover:underline"
-          >
-            Repository
-          </a>
-        )}
-        {server.homepage && (
-          <a
-            href={server.homepage}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-accent hover:underline"
-          >
-            Homepage
-          </a>
-        )}
-      </div>
-
       {/* CLI install command */}
-      <PackageManagerCommand serverId={server.id} />
+      <div className="mb-12">
+        <h3 className="text-lg font-semibold mb-4">Install</h3>
+        <PackageManagerCommand serverId={server.id} />
+      </div>
 
       {/* Config generator */}
       <ConfigViewer serverName={server.id} config={server.config} />
