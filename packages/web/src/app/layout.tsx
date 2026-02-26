@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fira_Mono } from "next/font/google";
 import Link from "next/link";
 import Image from "next/image";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const firaMono = Fira_Mono({
@@ -72,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <footer className="border-t border-border px-6 py-6 text-center text-sm text-text-secondary">
           <div className="max-w-6xl mx-auto">getmcp — One config format, every AI app.</div>
         </footer>
+        <Analytics />
       </body>
     </html>
   );
