@@ -16,7 +16,7 @@ export default function Error({
       </p>
       <button
         onClick={reset}
-        className="text-sm px-5 py-2 rounded-md border border-border hover:border-text-secondary hover:text-text transition-colors"
+        className="text-sm px-5 py-2 rounded-md border border-border hover:border-text-secondary hover:text-text transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
       >
         Try again
       </button>

@@ -84,7 +84,7 @@ export default function NotFound() {
     >
       {/* Static CRT scanlines */}
       <div
-        className="pointer-events-none fixed inset-0 z-50"
+        className="pointer-events-none fixed inset-0 z-10"
         style={{
           background:
             "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px)",
@@ -95,7 +95,7 @@ export default function NotFound() {
       {/* Sweeping scanline */}
       {!reducedMotion && (
         <div
-          className="pointer-events-none fixed left-0 right-0 z-50 h-0.5"
+          className="pointer-events-none fixed left-0 right-0 z-10 h-0.5"
           style={{
             background:
               "linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.07), transparent)",
@@ -137,7 +137,7 @@ export default function NotFound() {
         <div className="rounded-lg border border-border overflow-hidden">
           {/* Title bar */}
           <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-code-bg">
-            <div className="flex gap-1.5">
+            <div className="flex gap-1.5" aria-hidden="true">
               <span className="block w-3 h-3 rounded-full bg-[#ff5f57]/80" />
               <span className="block w-3 h-3 rounded-full bg-[#febc2e]/80" />
               <span className="block w-3 h-3 rounded-full bg-[#28c840]/80" />
@@ -154,7 +154,9 @@ export default function NotFound() {
             ))}
             <div className="mt-1 flex items-center text-text">
               <span>$ </span>
-              <span className="inline-block w-[0.55em] h-[1.1em] bg-text/70 align-middle animate-[blink_1s_step-end_infinite] ml-0.5" />
+              <span
+                className={`inline-block w-[0.55em] h-[1.1em] bg-text/70 align-middle${reducedMotion ? "" : " animate-[blink_1s_step-end_infinite]"} ml-0.5`}
+              />
             </div>
           </div>
         </div>
