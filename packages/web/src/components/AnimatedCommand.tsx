@@ -1,7 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useClipboard } from "@/hooks/use-clipboard";
+
+function subscribeToReducedMotion(callback: () => void) {
+  const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mql.addEventListener("change", callback);
+  return () => mql.removeEventListener("change", callback);
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function getReducedMotionServerSnapshot() {
+  return false;
+}
 
 const COMMANDS = [
   "add <server>",
@@ -25,12 +39,19 @@ export function AnimatedCommand() {
   const [isErasing, setIsErasing] = useState(false);
   const { copied, copy } = useClipboard();
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const reducedMotion = useSyncExternalStore(
+    subscribeToReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  );
 
   const currentCommand = COMMANDS[index];
-  const displayedPart = currentCommand.slice(0, charCount);
+  const displayedPart = reducedMotion ? currentCommand : currentCommand.slice(0, charCount);
   const fullCommand = `npx @getmcp/cli ${currentCommand}`;
 
   const tick = useCallback(() => {
+    if (reducedMotion) return;
+
     if (!isErasing) {
       // Typing forward
       if (charCount < currentCommand.length) {
@@ -51,7 +72,7 @@ export function AnimatedCommand() {
         }, PAUSE_AFTER_ERASE);
       }
     }
-  }, [charCount, isErasing, currentCommand]);
+  }, [charCount, isErasing, currentCommand, reducedMotion]);
 
   useEffect(() => {
     tick();
@@ -74,6 +95,7 @@ export function AnimatedCommand() {
             strokeLinecap="round"
             strokeLinejoin="round"
             className="w-4 h-4 text-text-secondary shrink-0"
+            aria-hidden="true"
           >
             <polyline points="4 17 10 11 4 5" />
             <line x1="12" x2="20" y1="19" y2="19" />
@@ -130,7 +152,9 @@ export function AnimatedCommand() {
             <span className="text-accent">$</span>{" "}
             <span className="text-text-secondary">npx @getmcp/cli</span>{" "}
             <span className="text-text">{displayedPart}</span>
-            <span className="inline-block w-[0.55em] h-[1.1em] bg-text-secondary/70 align-middle animate-[blink_1s_step-end_infinite]" />
+            {!reducedMotion && (
+              <span className="inline-block w-[0.55em] h-[1.1em] bg-text/70 align-middle animate-[blink_1s_step-end_infinite]" />
+            )}
           </code>
         </pre>
       </button>
