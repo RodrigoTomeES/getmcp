@@ -76,7 +76,7 @@ body {
   background: color-mix(in srgb, var(--color-accent) 30%, transparent);
 }
 
-/* 404 sweeping scanline */
+/* CRT sweeping scanline */
 @keyframes scanline-sweep {
   0% {
     top: -5%;
