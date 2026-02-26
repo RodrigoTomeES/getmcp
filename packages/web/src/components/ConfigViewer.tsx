@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import type { AppIdType, LooseServerConfigType } from "@getmcp/core";
 import { generators } from "@getmcp/generators";
 import { CodeBlock } from "@/components/CodeBlock";
+import { Pill } from "./Pill";
 
 const APP_LABELS: Record<AppIdType, string> = {
   "claude-desktop": "Claude Desktop",
@@ -51,17 +52,9 @@ export function ConfigViewer({
       {/* App selector tabs */}
       <div className="flex flex-wrap gap-1.5 mb-5">
         {APP_IDS.map((appId) => (
-          <button
-            key={appId}
-            onClick={() => setSelectedApp(appId)}
-            className={`text-xs px-3 py-1.5 rounded-md border transition-colors ${
-              selectedApp === appId
-                ? "border-accent bg-accent text-white font-medium"
-                : "border-border text-text-secondary hover:border-text-secondary hover:text-text"
-            }`}
-          >
+          <Pill key={appId} active={selectedApp === appId} onClick={() => setSelectedApp(appId)}>
             {APP_LABELS[appId]}
-          </button>
+          </Pill>
         ))}
       </div>
 
