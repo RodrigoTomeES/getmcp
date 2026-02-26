@@ -3,6 +3,7 @@ import { Fira_Mono } from "next/font/google";
 import Link from "next/link";
 import Image from "next/image";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const firaMono = Fira_Mono({
@@ -110,6 +111,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </footer>
 
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
