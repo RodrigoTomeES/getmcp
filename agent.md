@@ -26,7 +26,7 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22) with 5 
 | `packages/generators` | `@getmcp/generators` | 19 config generators (one per AI app), each transforms canonical format to app-native format                                                                                                        |
 | `packages/registry`   | `@getmcp/registry`   | Catalog of MCP server definitions with search/filter API                                                                                                                                            |
 | `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `init`, `doctor`, `import`, `sync` commands with app auto-detection, config merging, and installation tracking via `getmcp-lock.json` |
-| `packages/web`        | `@getmcp/web`        | Next.js (App Router) web directory for browsing servers and generating config snippets                                                                                                              |
+| `packages/web`        | `@getmcp/web`        | Next.js (App Router) web directory for browsing servers and generating config snippets, with Vercel Analytics and Speed Insights                                                                    |
 
 **Tech stack**: TypeScript 5.7+, Zod 4.0+, Vitest 3.0+, Next.js 15.3+ (web), Tailwind CSS 4.0+ (web), `@inquirer/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
 
@@ -137,6 +137,8 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 
 | File                                      | Purpose                                                                                         |
 | ----------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `app/layout.tsx`                          | Root layout with Vercel Analytics and Speed Insights                                            |
+| `app/not-found.tsx`                       | Custom 404 page with ASCII art and terminal simulation                                          |
 | `app/page.tsx`                            | Homepage with hero section and search                                                           |
 | `app/docs/page.tsx`                       | Documentation page with getting started, supported apps, library usage, and more                |
 | `app/docs/loading.tsx`                    | Loading skeleton for the docs page                                                              |
@@ -144,6 +146,7 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 | `app/registry-entry.schema.json/route.ts` | API route serving the JSON Schema for registry entries (enables `$schema` URL resolution)       |
 | `components/AsciiArt.tsx`                 | Animated ASCII art hero with character-by-character reveal, uses Fira Mono font                 |
 | `components/ConfigViewer.tsx`             | Client component: tab selector for all 19 apps, shows generated config snippet with copy button |
+| `components/Pill.tsx`                     | Shared pill/tab button with `aria-pressed` support                                              |
 | `components/SearchBar.tsx`                | Search and filter component                                                                     |
 | `components/ServerCard.tsx`               | Server listing card                                                                             |
 

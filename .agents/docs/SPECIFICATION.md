@@ -822,7 +822,7 @@ getTrackedServers(filePath?: string): LockFile                                  
 
 A Next.js website that serves as a public directory for MCP servers. Think "npm registry for MCP servers" with one-click config generation.
 
-**Tech stack**: Next.js 15.3+ (App Router), Tailwind CSS 4.0+, with `@getmcp/core`, `@getmcp/generators`, and `@getmcp/registry` imported directly. Server pages are statically generated from the registry.
+**Tech stack**: Next.js 15.3+ (App Router), Tailwind CSS 4.0+, Vercel Analytics + Speed Insights, with `@getmcp/core`, `@getmcp/generators`, and `@getmcp/registry` imported directly. Server pages are statically generated from the registry.
 
 ---
 

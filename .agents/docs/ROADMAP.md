@@ -157,7 +157,7 @@ Enhancements to the Next.js web directory.
 - [x] **Add sitemap and robots.txt** — Created `sitemap.ts` (generates entries for homepage + all server detail pages) and `robots.ts` (allows all crawlers, references sitemap) using the Next.js Metadata API.
   - Files: `packages/web/src/app/sitemap.ts`, `packages/web/src/app/robots.ts`
 
-- [x] **Add custom 404 page** — Created a styled `not-found.tsx` with a "Browse servers" link back to the homepage, consistent with the site's design.
+- [x] **Add custom 404 page** — Redesigned `not-found.tsx` with ASCII art, terminal simulation, and animated command suggestions. Includes "Browse servers" link back to the homepage.
   - File: `packages/web/src/app/not-found.tsx`
 
 - [x] **Add loading states** — Created skeleton loading states for both the homepage and server detail page routes, matching the layout structure of each page.
