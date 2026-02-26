@@ -42,13 +42,13 @@ export default function NotFound() {
   const rafRef = useRef<number>(null);
 
   const terminalLines = [
-    { id: "cmd", text: `$ getmcp find ${pathname}`, className: "text-text" },
+    { id: "cmd", text: `$ npx @getmcp/cli find ${pathname}`, className: "text-text" },
     { id: "blank-1", text: "", className: "" },
     { id: "error", text: "Error: resource not found in registry.", className: "text-red-400" },
     { id: "blank-2", text: "", className: "" },
     {
       id: "hint",
-      text: 'hint: try "getmcp list" to browse all servers',
+      text: 'hint: try "npx @getmcp/cli list" to browse all servers',
       className: "text-text-secondary",
     },
   ];
@@ -79,7 +79,7 @@ export default function NotFound() {
 
   return (
     <div
-      className="max-w-6xl mx-auto px-6 flex flex-col items-center justify-center"
+      className="max-w-6xl mx-auto px-6 py-20 flex flex-col items-center justify-center"
       style={{ minHeight: "calc(100dvh - 57px - 85px)" }}
     >
       {/* Static CRT scanlines */}
@@ -169,7 +169,8 @@ export default function NotFound() {
           Browse servers
         </Link>
         <p className="text-xs text-text-secondary mt-3 font-mono">
-          or run <code className="px-1.5 py-0.5 rounded bg-code-bg text-text">npx getmcp find</code>
+          or run{" "}
+          <code className="px-1.5 py-0.5 rounded bg-code-bg text-text">npx @getmcp/cli find</code>
         </p>
       </div>
     </div>
