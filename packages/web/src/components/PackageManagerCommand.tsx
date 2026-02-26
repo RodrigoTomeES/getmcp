@@ -63,13 +63,14 @@ export function PackageManagerCommand({ serverId }: { serverId?: string }) {
           strokeLinecap="round"
           strokeLinejoin="round"
           className="w-4 h-4 text-text-secondary shrink-0"
+          aria-hidden="true"
         >
           <polyline points="4 17 10 11 4 5" />
           <line x1="12" x2="20" y1="19" y2="19" />
         </svg>
 
         {/* Package manager tabs */}
-        <div className="flex gap-1 flex-1">
+        <div className="flex gap-1 flex-1" role="group" aria-label="Select package manager">
           {PACKAGE_MANAGERS.map((pm) => (
             <button
               key={pm}

@@ -44,7 +44,7 @@ export function CodeBlock({ children, label }: { children: string; label?: strin
           )}
         </button>
       </div>
-      <pre className="p-4 overflow-x-auto text-sm font-mono leading-relaxed text-text/90">
+      <pre className="p-4 overflow-x-auto text-sm font-mono leading-relaxed text-text">
         <code>{children}</code>
       </pre>
     </div>

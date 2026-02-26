@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 // prettier-ignore
 const asciiArt =
@@ -15,16 +15,33 @@ const solidArt = asciiArt.replace(/[╗╔╚╝═║]/g, " ");
 const DURATION_MS = 250; // total animation duration
 const CHARS_PER_FRAME = Math.ceil(solidArt.length / (DURATION_MS / 16)); // ~16ms per frame at 60fps
 
+function subscribeToReducedMotion(callback: () => void) {
+  const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mql.addEventListener("change", callback);
+  return () => mql.removeEventListener("change", callback);
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function getReducedMotionServerSnapshot() {
+  return false;
+}
+
 export function AsciiArt() {
   const [charCount, setCharCount] = useState(0);
   const rafRef = useRef<number>(null);
+  const reducedMotion = useSyncExternalStore(
+    subscribeToReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  );
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      rafRef.current = requestAnimationFrame(() => setCharCount(solidArt.length));
-      return () => {
-        if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      };
+    if (reducedMotion) {
+      setCharCount(solidArt.length);
+      return;
     }
 
     let current = 0;
@@ -42,7 +59,7 @@ export function AsciiArt() {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [reducedMotion]);
 
   return (
     <div className="relative text-center lg:text-left py-1">
@@ -66,7 +83,7 @@ export function AsciiArt() {
           aria-label="getmcp"
         >
           {solidArt.slice(0, charCount)}
-          {charCount < solidArt.length && (
+          {charCount < solidArt.length && !reducedMotion && (
             <span className="inline-block w-[0.55em] h-[1.1em] bg-text/70 align-middle animate-[blink_1s_step-end_infinite]" />
           )}
         </pre>
@@ -84,7 +101,7 @@ export function AsciiArt() {
         />
       </div>
 
-      <p className="font-mono text-[13px] lg:text-[17px] uppercase tracking-tight text-text font-medium mt-4">
+      <p className="font-mono text-sm lg:text-base uppercase tracking-tight text-text font-medium mt-4">
         The Universal MCP Installer
       </p>
     </div>

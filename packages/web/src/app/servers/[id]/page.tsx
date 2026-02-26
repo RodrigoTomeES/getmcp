@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getServer, getAllServers } from "@getmcp/registry";
-import type { RegistryEntryType } from "@getmcp/core";
-import { ConfigViewer } from "@/components/ConfigViewer";
+import { generators } from "@getmcp/generators";
+import type { RegistryEntryType, AppIdType } from "@getmcp/core";
+import { ConfigViewer, type PreGeneratedConfig } from "@/components/ConfigViewer";
 import { PackageManagerCommand } from "@/components/PackageManagerCommand";
 import { MetaItem } from "@/components/MetaItem";
 
@@ -13,29 +14,60 @@ export function generateStaticParams() {
 }
 
 export function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
-  // This runs at build time for static export
   return params.then(({ id }) => {
     const server = getServer(id);
     if (!server) return { title: "Not Found" };
 
-    const title = `${server.name} — getmcp`;
+    const title = server.name;
     const description = server.description;
 
     return {
       title,
       description,
+      alternates: {
+        canonical: `/servers/${id}`,
+      },
       openGraph: {
-        title,
+        title: `${server.name} \u2014 getmcp`,
         description,
         type: "article",
       },
       twitter: {
         card: "summary_large_image" as const,
-        title,
+        title: `${server.name} \u2014 getmcp`,
         description,
       },
     };
   });
+}
+
+function preGenerateConfigs(
+  serverId: string,
+  config: RegistryEntryType["config"],
+): Record<string, PreGeneratedConfig> {
+  const appIds = Object.keys(generators) as AppIdType[];
+  return Object.fromEntries(
+    appIds.map((appId) => {
+      const gen = generators[appId];
+      const generated = gen.generate(serverId, config);
+      return [
+        appId,
+        {
+          serialized: gen.serialize(generated),
+          configPath:
+            gen.app.configPaths !== null && gen.app.globalConfigPaths !== null
+              ? `${gen.app.configPaths} (project) or ${gen.app.globalConfigPaths?.darwin ?? "\u2014"} (global)`
+              : (gen.app.configPaths ??
+                gen.app.globalConfigPaths?.darwin ??
+                gen.app.globalConfigPaths?.win32 ??
+                gen.app.globalConfigPaths?.linux ??
+                "\u2014"),
+          format: gen.app.configFormat.toUpperCase(),
+          docsUrl: gen.app.docsUrl,
+        },
+      ];
+    }),
+  );
 }
 
 export default async function ServerPage({ params }: { params: Promise<{ id: string }> }) {
@@ -52,18 +84,35 @@ export default async function ServerPage({ params }: { params: Promise<{ id: str
 function ServerDetail({ server }: { server: RegistryEntryType }) {
   const isRemote = "url" in server.config;
   const transport = isRemote ? "remote" : "stdio";
+  const configs = preGenerateConfigs(server.id, server.config);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: server.name,
+    description: server.description,
+    applicationCategory: "DeveloperApplication",
+    ...(server.author && { author: { "@type": "Person", name: server.author } }),
+    ...(server.repository && { url: server.repository }),
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Breadcrumb */}
       <nav className="text-sm text-text-secondary mb-10" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-text transition-colors">
           Servers
         </Link>
-        <span className="mx-2 text-border">/</span>
+        <span className="mx-2 text-text-secondary/50">/</span>
         <span className="text-text">{server.name}</span>
       </nav>
 
+      {/* Categories */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3 mb-8">
         {server.categories && server.categories.length > 0 && (
           <div className="flex flex-wrap gap-2">
@@ -81,7 +130,7 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
         <div className="flex items-center gap-3 mb-3">
           <h1 className="text-3xl font-bold tracking-tight">{server.name}</h1>
           <span
-            className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
+            className={`text-xs px-2 py-0.5 rounded-full font-medium ${
               isRemote
                 ? "bg-transport-remote-bg text-transport-remote"
                 : "bg-transport-stdio-bg text-transport-stdio"
@@ -95,7 +144,7 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
         </p>
       </div>
 
-      {/* Categories and links row */}
+      {/* Links */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3 mb-8">
         {(server.repository || server.homepage) && (
           <div className="flex items-center gap-4">
@@ -109,7 +158,7 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
                 Repository
               </a>
             )}
-            {server.homepage && (
+            {server.homepage && server.repository !== server.homepage && (
               <a
                 href={server.homepage}
                 target="_blank"
@@ -143,7 +192,7 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
       {/* Required env vars */}
       {server.requiredEnvVars.length > 0 && (
         <div className="mb-8 rounded-lg border border-warning-border bg-warning-subtle p-4">
-          <h3 className="text-sm font-medium text-warning mb-2">Required Environment Variables</h3>
+          <h2 className="text-sm font-medium text-warning mb-2">Required Environment Variables</h2>
           <ul className="space-y-1">
             {server.requiredEnvVars.map((envVar) => (
               <li key={envVar} className="text-sm">
@@ -158,12 +207,12 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
 
       {/* CLI install command */}
       <div className="mb-12">
-        <h3 className="text-lg font-semibold mb-4">Install</h3>
+        <h2 className="text-lg font-semibold mb-4">Install</h2>
         <PackageManagerCommand serverId={server.id} />
       </div>
 
       {/* Config generator */}
-      <ConfigViewer serverName={server.id} config={server.config} />
+      <ConfigViewer configs={configs} />
     </div>
   );
 }

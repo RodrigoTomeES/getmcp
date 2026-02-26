@@ -1,21 +1,18 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { RegistryEntryType } from "@getmcp/core";
-import { ServerCard } from "./ServerCard";
+import { ServerCard, type ServerCardData } from "./ServerCard";
 import { Pill } from "./Pill";
 
 export function SearchBar({
   servers,
   categories,
 }: {
-  servers: RegistryEntryType[];
-  categories: RegistryEntryType["categories"];
+  servers: ServerCardData[];
+  categories: string[];
 }) {
   const [query, setQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<
-    RegistryEntryType["categories"][number] | null
-  >(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     let result = servers;
@@ -59,6 +56,7 @@ export function SearchBar({
           type="text"
           placeholder="Search servers..."
           aria-label="Search servers"
+          autoComplete="off"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-surface text-text placeholder-text-secondary focus:outline-none focus:border-accent transition-colors"
@@ -80,6 +78,8 @@ export function SearchBar({
           </Pill>
         ))}
       </div>
+
+      <h2 className="absolute hidden">servers</h2>
 
       {/* Results count */}
       <p

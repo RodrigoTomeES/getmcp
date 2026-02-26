@@ -5,18 +5,21 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { DocsSidebar } from "@/components/DocsSidebar";
 
 export const metadata: Metadata = {
-  title: "Documentation — getmcp",
+  title: "Documentation",
   description:
     "Learn how to install, configure, and use getmcp to manage MCP servers across all AI applications.",
+  alternates: {
+    canonical: "/docs",
+  },
   openGraph: {
-    title: "Documentation — getmcp",
+    title: "Documentation \u2014 getmcp",
     description:
       "Learn how to install, configure, and use getmcp to manage MCP servers across all AI applications.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Documentation — getmcp",
+    title: "Documentation \u2014 getmcp",
     description:
       "Learn how to install, configure, and use getmcp to manage MCP servers across all AI applications.",
   },
@@ -39,7 +42,7 @@ export default function DocsPage() {
         </section>
 
         {/* What is getmcp? */}
-        <section id="what-is-getmcp" className="mb-16">
+        <section id="what-is-getmcp" className="mb-16 scroll-mt-24">
           <h2 className="text-2xl font-bold mb-5">What is getmcp?</h2>
           <div className="space-y-4 text-text-secondary leading-relaxed">
             <p>
@@ -75,7 +78,7 @@ export default function DocsPage() {
         </section>
 
         {/* Getting started */}
-        <section id="getting-started" className="mb-16">
+        <section id="getting-started" className="mb-16 scroll-mt-24">
           <h2 className="text-2xl font-bold mb-5">Getting started</h2>
           <div className="space-y-4 text-text-secondary leading-relaxed">
             <p>Install any MCP server into all your detected AI apps with a single command:</p>
@@ -122,7 +125,7 @@ npx @getmcp/cli list --json`}</CodeBlock>
         </section>
 
         {/* Project manifests */}
-        <section id="project-manifests" className="mb-16">
+        <section id="project-manifests" className="mb-16 scroll-mt-24">
           <h2 className="text-2xl font-bold mb-5">Project manifests</h2>
           <div className="space-y-4 text-text-secondary leading-relaxed">
             <p>
@@ -155,7 +158,7 @@ npx @getmcp/cli list --json`}</CodeBlock>
         </section>
 
         {/* Supported apps */}
-        <section id="supported-apps" className="mb-16">
+        <section id="supported-apps" className="mb-16 scroll-mt-24">
           <h2 className="text-2xl font-bold mb-5">Supported apps</h2>
           <p className="text-text-secondary leading-relaxed mb-4">
             getmcp generates config for {appCount} AI applications, each with its own format:
@@ -207,7 +210,7 @@ npx @getmcp/cli list --json`}</CodeBlock>
         </section>
 
         {/* How it works */}
-        <section id="how-it-works" className="mb-16">
+        <section id="how-it-works" className="mb-16 scroll-mt-24">
           <h2 className="text-2xl font-bold mb-5">How it works</h2>
           <div className="space-y-4 text-text-secondary leading-relaxed">
             <p>
@@ -283,7 +286,7 @@ Desktop (servers)(YAML) (TOML)   apps`}</CodeBlock>
         </section>
 
         {/* Library usage */}
-        <section id="library-usage" className="mb-16">
+        <section id="library-usage" className="mb-16 scroll-mt-24">
           <h2 className="text-2xl font-bold mb-5">Library usage</h2>
           <div className="space-y-6 text-text-secondary leading-relaxed">
             <p>
@@ -339,45 +342,47 @@ getServersByCategory("web");
         </section>
 
         {/* Adding a server */}
-        <section id="adding-a-server" className="mb-16">
+        <section id="adding-a-server" className="mb-16 scroll-mt-24">
           <h2 className="text-2xl font-bold mb-5">Adding a server to the registry</h2>
           <div className="space-y-4 text-text-secondary leading-relaxed">
             <p>Want to add your MCP server to the getmcp registry? Here{"'"}s how:</p>
             <ol className="list-decimal list-inside space-y-2 ml-1">
               <li>
-                Create a new file at{" "}
+                Create a new JSON file at{" "}
                 <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
-                  packages/registry/src/servers/your-server.ts
+                  packages/registry/servers/your-server.json
                 </code>
               </li>
-              <li>Define a registry entry with your server{"'"}s metadata and config</li>
               <li>
-                Register it in{" "}
+                Add a{" "}
                 <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
-                  packages/registry/src/index.ts
-                </code>
+                  $schema
+                </code>{" "}
+                field for IDE autocompletion
               </li>
-              <li>Run the tests to validate your entry</li>
+              <li>Define your server{"'"}s metadata and config</li>
+              <li>
+                Run the tests to validate your entry (the registry auto-discovers all JSON files)
+              </li>
             </ol>
             <p>Here{"'"}s an example registry entry:</p>
-            <CodeBlock label="TS">{`import type { RegistryEntryType } from "@getmcp/core";
-
-export const myServer: RegistryEntryType = {
-  id: "my-server",
-  name: "My Server",
-  description: "What your server does",
-  categories: ["productivity"],
-  author: "your-name",
-  runtime: "node",
-  package: "@scope/my-mcp-server",
-  repository: "https://github.com/you/my-mcp-server",
-  requiredEnvVars: ["MY_API_KEY"],
-  config: {
-    command: "npx",
-    args: ["-y", "@scope/my-mcp-server"],
-    env: { MY_API_KEY: "" },
-  },
-};`}</CodeBlock>
+            <CodeBlock label="JSON">{`{
+  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "id": "my-server",
+  "name": "My Server",
+  "description": "What your server does",
+  "categories": ["productivity"],
+  "author": "your-name",
+  "runtime": "node",
+  "package": "@scope/my-mcp-server",
+  "repository": "https://github.com/you/my-mcp-server",
+  "requiredEnvVars": ["MY_API_KEY"],
+  "config": {
+    "command": "npx",
+    "args": ["-y", "@scope/my-mcp-server"],
+    "env": { "MY_API_KEY": "" }
+  }
+}`}</CodeBlock>
             <p>
               Once added, your server will automatically appear in the{" "}
               <Link href="/" className="text-accent hover:underline">
@@ -398,7 +403,7 @@ export const myServer: RegistryEntryType = {
         </section>
 
         {/* Security */}
-        <section id="security-disclaimer">
+        <section id="security-disclaimer" className="scroll-mt-24">
           <div className="rounded-lg border border-warning-border bg-warning-subtle p-6">
             <h2 className="text-xl font-bold text-warning mb-3">Security disclaimer</h2>
             <div className="space-y-3 text-text-secondary leading-relaxed text-sm">

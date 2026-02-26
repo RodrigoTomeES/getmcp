@@ -25,8 +25,13 @@
   --color-warning-light: color-mix(in srgb, #f59e0b 80%, white);
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 html {
-  scroll-behavior: smooth;
   scroll-padding-block-start: 6rem;
 }
 
