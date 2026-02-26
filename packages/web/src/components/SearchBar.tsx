@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import type { RegistryEntryType } from "@getmcp/core";
 import { ServerCard } from "./ServerCard";
+import { Pill } from "./Pill";
 
 export function SearchBar({
   servers,
@@ -66,30 +67,17 @@ export function SearchBar({
 
       {/* Category filters */}
       <div className="flex flex-wrap gap-2 mb-6" role="group" aria-label="Filter by category">
-        <button
-          onClick={() => setSelectedCategory(null)}
-          aria-pressed={!selectedCategory}
-          className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-            !selectedCategory
-              ? "border-accent bg-accent/10 text-accent"
-              : "border-border text-text-secondary hover:border-text-secondary hover:text-text"
-          }`}
-        >
+        <Pill active={!selectedCategory} onClick={() => setSelectedCategory(null)}>
           All
-        </button>
+        </Pill>
         {categories.map((cat) => (
-          <button
+          <Pill
             key={cat}
+            active={selectedCategory === cat}
             onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
-            aria-pressed={selectedCategory === cat}
-            className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-              selectedCategory === cat
-                ? "border-accent bg-accent/10 text-accent"
-                : "border-border text-text-secondary hover:border-text-secondary hover:text-text"
-            }`}
           >
             {cat}
-          </button>
+          </Pill>
         ))}
       </div>
 
