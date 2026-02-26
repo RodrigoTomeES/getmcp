@@ -13,6 +13,7 @@
     "@getmcp/core": "*",
     "@getmcp/generators": "*",
     "@getmcp/registry": "*",
+    "@vercel/analytics": "^1.6.1",
     "lightningcss": "^1.30.0",
     "next": "^16.1.6",
     "react": "^19.2.4",
