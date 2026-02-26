@@ -64,6 +64,18 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
         <span className="text-text">{server.name}</span>
       </nav>
 
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-3 mb-8">
+        {server.categories && server.categories.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {server.categories.map((cat) => (
+              <span key={cat} className="text-xs px-3 py-1 rounded-full bg-tag-bg text-tag-text">
+                {cat}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-3">
@@ -85,15 +97,6 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
 
       {/* Categories and links row */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3 mb-8">
-        {server.categories && server.categories.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {server.categories.map((cat) => (
-              <span key={cat} className="text-xs px-3 py-1 rounded-full bg-tag-bg text-tag-text">
-                {cat}
-              </span>
-            ))}
-          </div>
-        )}
         {(server.repository || server.homepage) && (
           <div className="flex items-center gap-4">
             {server.repository && (
