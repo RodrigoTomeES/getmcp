@@ -325,6 +325,8 @@ Skills are installed under `.agents/skills/` and provide specialized capabilitie
 | `frontend-design`             | Create distinctive, production-grade frontend interfaces with high design quality     | Building web components, pages, dashboards, or styling/beautifying any web UI                    |
 | `web-design-guidelines`       | Review UI code for Web Interface Guidelines compliance                                | "Review my UI", "check accessibility", "audit design", "review UX"                               |
 | `vercel-react-best-practices` | React/Next.js performance optimization (57 rules across 8 categories)                 | Writing, reviewing, or refactoring React/Next.js code for performance                            |
+| `react-doctor`                | Scan React code for security, performance, correctness, and architecture issues       | Run after making React changes, reviewing code, finishing a feature, or fixing bugs              |
+| `tailwind-design-system`      | Build scalable design systems with Tailwind CSS v4, design tokens, and components     | Creating component libraries, implementing design systems, or standardizing UI patterns          |
 | `find-skills`                 | Discover and install agent skills from the ecosystem                                  | "How do I do X", "find a skill for X", extending agent capabilities                              |
 
 ---
