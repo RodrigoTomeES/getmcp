@@ -135,20 +135,24 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 
 ### `@getmcp/web` (`packages/web/src/`)
 
-| File                                      | Purpose                                                                                         |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `app/layout.tsx`                          | Root layout with Vercel Analytics and Speed Insights                                            |
-| `app/not-found.tsx`                       | Custom 404 page with ASCII art and terminal simulation                                          |
-| `app/page.tsx`                            | Homepage with hero section and search                                                           |
-| `app/docs/page.tsx`                       | Documentation page with getting started, supported apps, library usage, and more                |
-| `app/docs/loading.tsx`                    | Loading skeleton for the docs page                                                              |
-| `app/servers/[id]/page.tsx`               | Dynamic server detail page (statically generated from registry)                                 |
-| `app/registry-entry.schema.json/route.ts` | API route serving the JSON Schema for registry entries (enables `$schema` URL resolution)       |
-| `components/AsciiArt.tsx`                 | Animated ASCII art hero with character-by-character reveal, uses Fira Mono font                 |
-| `components/ConfigViewer.tsx`             | Client component: tab selector for all 19 apps, shows generated config snippet with copy button |
-| `components/Pill.tsx`                     | Shared pill/tab button with `aria-pressed` support                                              |
-| `components/SearchBar.tsx`                | Search and filter component                                                                     |
-| `components/ServerCard.tsx`               | Server listing card                                                                             |
+| File                                      | Purpose                                                                                                                                        |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/layout.tsx`                          | Root layout with Vercel Analytics and Speed Insights                                                                                           |
+| `app/not-found.tsx`                       | Custom 404 page with ASCII art and terminal simulation                                                                                         |
+| `app/page.tsx`                            | Homepage with hero section and search                                                                                                          |
+| `app/docs/page.tsx`                       | Documentation page with getting started, supported apps, library usage, and more                                                               |
+| `app/docs/loading.tsx`                    | Loading skeleton for the docs page                                                                                                             |
+| `app/servers/page.tsx`                    | Server directory index page with search and filters                                                                                            |
+| `app/servers/[id]/page.tsx`               | Dynamic server detail page (statically generated from registry)                                                                                |
+| `app/category/[slug]/page.tsx`            | 14 category landing pages with per-category server grids                                                                                       |
+| `app/guides/[app]/page.tsx`               | 19 app-specific MCP setup guides                                                                                                               |
+| `app/registry-entry.schema.json/route.ts` | API route serving the JSON Schema for registry entries (enables `$schema` URL resolution)                                                      |
+| `lib/guide-data.ts`                       | Guide content data module (names, overviews, config details, troubleshooting)                                                                  |
+| `components/AsciiArt.tsx`                 | Animated ASCII art hero with character-by-character reveal, uses Fira Mono font                                                                |
+| `components/ConfigViewer.tsx`             | Client component: tab selector for all 19 apps with mobile dropdown, shows generated config snippet with copy button, localStorage persistence |
+| `components/Pill.tsx`                     | Shared pill/tab button with `aria-pressed` support                                                                                             |
+| `components/SearchBar.tsx`                | Search, category, runtime, and transport filter component                                                                                      |
+| `components/ServerCard.tsx`               | Server listing card with runtime badge and author display                                                                                      |
 
 ---
 
