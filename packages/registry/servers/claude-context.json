@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "claude-context",
   "name": "Claude Context",
   "description": "Code search MCP for AI coding agents. Index and search entire codebases using semantic and keyword search powered by vector embeddings",

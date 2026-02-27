@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "everart",
   "name": "EverArt",
   "description": "EverArt AI image generation — create and manage AI-generated images with various models and styles",

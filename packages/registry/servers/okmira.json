@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "okmira",
   "name": "Okmira",
   "description": "Connect AI coding assistants to stakeholder feedback, skills, and specialized agents through the Mira platform",

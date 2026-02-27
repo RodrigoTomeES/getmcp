@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "docker",
   "name": "Docker",
   "description": "Docker container management — list, start, stop, and manage containers, images, volumes, and networks",

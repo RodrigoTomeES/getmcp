@@ -7,6 +7,7 @@ import { getServer } from "@getmcp/registry";
 import { CodeBlock } from "@/components/CodeBlock";
 import { PackageManagerCommand } from "@/components/PackageManagerCommand";
 import { GUIDES, GUIDE_SLUGS, type GuideData } from "@/lib/guide-data";
+import { SITE_URL } from "@/lib/constants";
 
 export const dynamicParams = false;
 
@@ -82,16 +83,16 @@ export default async function GuidePage({ params }: { params: Promise<{ app: str
       "@type": "TechArticle",
       headline: `How to Install MCP Servers in ${guide.name}`,
       description: `Step-by-step guide to install and configure MCP servers in ${guide.name}.`,
-      url: `https://getmcp.es/guides/${app}`,
+      url: `${SITE_URL}/guides/${app}`,
       mainEntityOfPage: {
         "@type": "WebPage",
-        "@id": `https://getmcp.es/guides/${app}`,
+        "@id": `${SITE_URL}/guides/${app}`,
       },
       author: { "@type": "Organization", name: "getmcp" },
       publisher: {
         "@type": "Organization",
         name: "getmcp",
-        url: "https://getmcp.es",
+        url: SITE_URL,
       },
       inLanguage: "en",
       proficiencyLevel: "Beginner",
@@ -104,19 +105,19 @@ export default async function GuidePage({ params }: { params: Promise<{ app: str
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://getmcp.es",
+          item: SITE_URL,
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Guides",
-          item: "https://getmcp.es/guides",
+          item: `${SITE_URL}/guides`,
         },
         {
           "@type": "ListItem",
           position: 3,
           name: guide.name,
-          item: `https://getmcp.es/guides/${app}`,
+          item: `${SITE_URL}/guides/${app}`,
         },
       ],
     },

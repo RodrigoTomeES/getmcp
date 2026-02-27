@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "azure",
   "name": "Azure",
   "description": "Microsoft Azure integration — manage Azure resources, storage, compute, and cloud services",

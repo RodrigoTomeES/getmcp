@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "next-devtools",
   "name": "Next.js DevTools MCP",
   "description": "Access Next.js application internals in real-time. Retrieve build/runtime/type errors, development logs, page metadata, server actions, and project structure. Includes Next.js knowledge base and migration tools. Requires Next.js 16+",

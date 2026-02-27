@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "email",
   "name": "Email",
   "description": "Email integration — send emails via SMTP with support for HTML content and attachments",

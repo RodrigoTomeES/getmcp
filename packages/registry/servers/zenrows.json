@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "zenrows",
   "name": "ZenRows",
   "description": "ZenRows web scraping API — scrape websites at scale with anti-bot bypass and data extraction",

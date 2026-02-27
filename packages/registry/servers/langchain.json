@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "langchain",
   "name": "LangChain",
   "description": "LangChain framework tools — run chains, manage prompts, and interact with LangChain components",

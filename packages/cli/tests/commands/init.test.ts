@@ -68,7 +68,7 @@ describe("initCommand", () => {
     expect(fs.existsSync(outputFile)).toBe(true);
 
     const content = fs.readFileSync(outputFile, "utf-8");
-    expect(content).toContain('"$schema": "https://getmcp.es/registry-entry.schema.json"');
+    expect(content).toContain('"$schema": "https://installmcp.dev/registry-entry.schema.json"');
     expect(content).toContain('"id": "my-server"');
     expect(content).toContain('"name": "My Server"');
     expect(content).toContain('"command": "npx"');

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "unity-mcp",
   "name": "Unity",
   "description": "Bridge AI assistants with the Unity Editor. Manage assets, control scenes, edit scripts, and automate game development tasks within Unity",

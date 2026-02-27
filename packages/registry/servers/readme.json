@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "readme",
   "name": "ReadMe",
   "description": "ReadMe documentation platform — manage API documentation, changelogs, and developer hubs",

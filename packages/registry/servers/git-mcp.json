@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "git-mcp",
   "name": "GitMCP",
   "description": "Free remote MCP server for any GitHub project. Provides up-to-date documentation and code context to reduce hallucinations in AI coding assistants",

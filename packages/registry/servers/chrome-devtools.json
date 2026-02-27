@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "chrome-devtools",
   "name": "Chrome DevTools",
   "description": "Chrome DevTools for coding agents. Inspect pages, debug JavaScript, monitor network requests, analyze performance, and access the DOM",

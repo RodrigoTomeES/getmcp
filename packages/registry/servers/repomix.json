@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "repomix",
   "name": "Repomix",
   "description": "Pack entire repositories into a single AI-friendly file. Analyze codebases, generate repository summaries, and provide context for AI coding assistants",

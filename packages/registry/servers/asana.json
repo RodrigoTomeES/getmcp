@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "asana",
   "name": "Asana",
   "description": "Asana project management — create, update, and track tasks, projects, and workspaces",

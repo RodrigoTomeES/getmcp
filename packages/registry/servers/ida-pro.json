@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "ida-pro",
   "name": "IDA Pro",
   "description": "AI-powered reverse engineering assistant that bridges IDA Pro with language models. Analyze binaries, decompile functions, rename variables, and navigate disassembly",

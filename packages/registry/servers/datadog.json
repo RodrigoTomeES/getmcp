@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "datadog",
   "name": "Datadog",
   "description": "Datadog monitoring platform — query metrics, manage monitors, view dashboards, and analyze logs",

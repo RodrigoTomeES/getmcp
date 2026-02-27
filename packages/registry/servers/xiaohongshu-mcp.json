@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "xiaohongshu-mcp",
   "name": "Xiaohongshu",
   "description": "MCP server for Xiaohongshu (Little Red Book). Automate publishing, searching, commenting, and browsing content on xiaohongshu.com via browser automation",

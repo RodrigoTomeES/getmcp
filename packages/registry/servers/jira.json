@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "jira",
   "name": "Jira",
   "description": "Atlassian Jira integration — search, create, and update issues, manage sprints and boards",

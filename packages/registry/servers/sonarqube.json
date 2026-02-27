@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "sonarqube",
   "name": "SonarQube",
   "description": "SonarQube code quality — analyze code quality, track bugs, vulnerabilities, and code smells",

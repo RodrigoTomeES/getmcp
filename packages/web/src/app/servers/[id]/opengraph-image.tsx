@@ -270,7 +270,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             color: "#a0a0a0",
           }}
         >
-          getmcp.es
+          installmcp.dev
         </span>
       </div>
     </div>,

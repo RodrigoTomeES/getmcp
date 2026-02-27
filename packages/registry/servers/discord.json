@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "discord",
   "name": "Discord",
   "description": "Discord bot integration — send messages, manage channels, read message history, and interact with servers",

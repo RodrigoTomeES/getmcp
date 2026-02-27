@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "gcp",
   "name": "Google Cloud",
   "description": "Google Cloud Platform integration — manage GCP resources, Cloud Storage, BigQuery, and more",

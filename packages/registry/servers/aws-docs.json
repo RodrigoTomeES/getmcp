@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "aws-docs",
   "name": "AWS Documentation",
   "description": "Access AWS documentation, search content via the official AWS search API, and get content recommendations. Converts AWS doc pages to markdown format",

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "replicate",
   "name": "Replicate",
   "description": "Replicate ML platform — run ML models in the cloud, manage predictions, and explore model catalog",

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "genai-toolbox",
   "name": "MCP Toolbox for Databases",
   "description": "Google's open source MCP server for databases. Handles connection pooling, authentication, and observability. Query databases using AI-defined tools configured via YAML",

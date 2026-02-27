@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "aws",
   "name": "AWS",
   "description": "Amazon Web Services integration — manage S3, EC2, Lambda, and other AWS services",

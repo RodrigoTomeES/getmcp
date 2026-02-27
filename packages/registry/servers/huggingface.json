@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "huggingface",
   "name": "Hugging Face",
   "description": "Hugging Face model hub — search models, datasets, and spaces on the Hugging Face platform",

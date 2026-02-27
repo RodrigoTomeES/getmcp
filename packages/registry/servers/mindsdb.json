@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "mindsdb",
   "name": "MindsDB",
   "description": "Federated AI query engine with a built-in MCP server. Connect, unify, and query across databases, data warehouses, and SaaS applications using AI",

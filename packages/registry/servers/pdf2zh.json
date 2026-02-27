@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "pdf2zh",
   "name": "PDF Math Translate",
   "description": "Translate PDF scientific papers while preserving formatting, formulas, and layout. Supports multiple translation services and languages",

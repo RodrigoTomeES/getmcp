@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "clickup",
   "name": "ClickUp",
   "description": "ClickUp productivity platform — manage tasks, docs, goals, and workspaces",

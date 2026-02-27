@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "vault",
   "name": "HashiCorp Vault",
   "description": "HashiCorp Vault secrets management — read, write, and manage secrets in Vault",

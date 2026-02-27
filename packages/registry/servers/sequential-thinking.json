@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "sequential-thinking",
   "name": "Sequential Thinking",
   "description": "Dynamic and reflective problem-solving through structured sequential thinking. Helps break down complex tasks into manageable steps",

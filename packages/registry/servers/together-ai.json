@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "together-ai",
   "name": "Together AI",
   "description": "Together AI inference platform — run open-source models, manage fine-tuning jobs, and generate embeddings",

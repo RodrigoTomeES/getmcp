@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "openai-docs",
   "name": "OpenAI Docs",
   "description": "Search and read OpenAI developer documentation from developers.openai.com and platform.openai.com. Read-only access to API docs, guides, and reference materials",

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "todoist",
   "name": "Todoist",
   "description": "Todoist task management — create, update, complete, and organize tasks and projects",

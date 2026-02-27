@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getAppIds } from "@getmcp/generators";
 import { CodeBlock } from "@/components/CodeBlock";
 import { DocsSidebar } from "@/components/DocsSidebar";
+import { SITE_URL, SCHEMA_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Documentation \u2014 CLI Commands, Config Formats & API Reference",
@@ -48,16 +49,16 @@ export default function DocsPage() {
               headline: "getmcp Documentation — CLI Commands, Config Formats & API Reference",
               description:
                 "Complete guide to getmcp: CLI installation, commands, project manifests, supported AI apps, library API, and contributing.",
-              url: "https://getmcp.es/docs",
+              url: `${SITE_URL}/docs`,
               mainEntityOfPage: {
                 "@type": "WebPage",
-                "@id": "https://getmcp.es/docs",
+                "@id": `${SITE_URL}/docs`,
               },
               author: { "@type": "Organization", name: "getmcp" },
               publisher: {
                 "@type": "Organization",
                 name: "getmcp",
-                url: "https://getmcp.es",
+                url: SITE_URL,
               },
               inLanguage: "en",
               proficiencyLevel: "Beginner",
@@ -71,13 +72,13 @@ export default function DocsPage() {
                   "@type": "ListItem",
                   position: 1,
                   name: "Home",
-                  item: "https://getmcp.es",
+                  item: SITE_URL,
                 },
                 {
                   "@type": "ListItem",
                   position: 2,
                   name: "Documentation",
-                  item: "https://getmcp.es/docs",
+                  item: `${SITE_URL}/docs`,
                 },
               ],
             },
@@ -431,7 +432,7 @@ getServersByCategory("web");
             </ol>
             <p>Here{"'"}s an example registry entry:</p>
             <CodeBlock label="JSON">{`{
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "${SCHEMA_URL}",
   "id": "my-server",
   "name": "My Server",
   "description": "What your server does",

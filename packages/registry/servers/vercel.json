@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "vercel",
   "name": "Vercel",
   "description": "Vercel platform management — manage deployments, projects, domains, and environment variables",

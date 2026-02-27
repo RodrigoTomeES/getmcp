@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "pagerduty",
   "name": "PagerDuty",
   "description": "PagerDuty incident management — create, update, and resolve incidents, manage on-call schedules",

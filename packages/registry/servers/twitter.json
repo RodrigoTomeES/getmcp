@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "twitter",
   "name": "Twitter/X",
   "description": "Twitter/X social media integration — post tweets, search content, manage timeline and interactions",

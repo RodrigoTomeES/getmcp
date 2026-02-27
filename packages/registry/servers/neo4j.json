@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "neo4j",
   "name": "Neo4j",
   "description": "Neo4j graph database — run Cypher queries, manage nodes and relationships in graph databases",

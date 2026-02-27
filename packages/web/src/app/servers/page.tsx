@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllServers, getCategories, getServerCount } from "@getmcp/registry";
 import { SearchBar } from "@/components/SearchBar";
+import { SITE_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "MCP Server Directory — Browse & Install",
@@ -46,10 +47,10 @@ export default function ServersPage() {
       "@type": "CollectionPage",
       name: "MCP Server Directory",
       description: `Browse and install ${count}+ MCP servers for 19 AI applications.`,
-      url: "https://getmcp.es/servers",
+      url: `${SITE_URL}/servers`,
       mainEntityOfPage: {
         "@type": "WebPage",
-        "@id": "https://getmcp.es/servers",
+        "@id": `${SITE_URL}/servers`,
       },
     },
     {
@@ -60,13 +61,13 @@ export default function ServersPage() {
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://getmcp.es",
+          item: SITE_URL,
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Servers",
-          item: "https://getmcp.es/servers",
+          item: `${SITE_URL}/servers`,
         },
       ],
     },

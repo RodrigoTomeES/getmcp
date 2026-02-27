@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "neon",
   "name": "Neon",
   "description": "Neon serverless Postgres — manage databases, branches, and run queries on Neon's serverless platform",

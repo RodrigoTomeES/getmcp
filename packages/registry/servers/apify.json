@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "apify",
   "name": "Apify",
   "description": "Apify web scraping platform — run actors, manage datasets, and automate web data extraction",

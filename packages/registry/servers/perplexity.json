@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "perplexity",
   "name": "Perplexity",
   "description": "Perplexity AI search — access Perplexity's AI-powered search and answer engine with citations",

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "swagger",
   "name": "Swagger/OpenAPI",
   "description": "OpenAPI specification tools — parse, validate, and explore API definitions from Swagger/OpenAPI specs",

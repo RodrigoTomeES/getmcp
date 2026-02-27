@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
 import { getAllServers, getCategories } from "@getmcp/registry";
 import { GUIDE_SLUGS } from "@/lib/guide-data";
+import { SITE_URL as BASE_URL } from "@/lib/constants";
 
-const BASE_URL = "https://getmcp.es";
 const BUILD_DATE = new Date();
 
 export default function sitemap(): MetadataRoute.Sitemap {

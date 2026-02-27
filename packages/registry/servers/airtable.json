@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "airtable",
   "name": "Airtable",
   "description": "Airtable database integration — read, create, update, and delete records in Airtable bases",

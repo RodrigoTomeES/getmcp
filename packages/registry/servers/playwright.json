@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "playwright",
   "name": "Playwright",
   "description": "Browser automation using Playwright. Navigate pages, take screenshots, interact with elements, execute JavaScript, and generate PDFs",

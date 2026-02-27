@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "n8n-mcp",
   "name": "n8n",
   "description": "Build, manage, and execute n8n workflows from AI assistants. Create automation workflows, manage credentials, and trigger executions",

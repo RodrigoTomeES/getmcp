@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "supabase",
   "name": "Supabase",
   "description": "Connect AI tools to Supabase. Query databases, manage projects, deploy Edge Functions, view logs, search docs, and manage storage. Supports read-only mode and project scoping",

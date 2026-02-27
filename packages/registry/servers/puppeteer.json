@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "puppeteer",
   "name": "Puppeteer",
   "description": "Browser automation and web scraping using Puppeteer. Navigate pages, take screenshots, click elements, and extract content",

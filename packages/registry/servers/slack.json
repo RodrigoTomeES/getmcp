@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "slack",
   "name": "Slack",
   "description": "Channel management and messaging capabilities for Slack workspaces",

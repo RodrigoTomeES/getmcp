@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "llamaindex",
   "name": "LlamaIndex",
   "description": "LlamaIndex data framework — build and query indexes over documents for RAG applications",

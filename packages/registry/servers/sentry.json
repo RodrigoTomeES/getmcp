@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "sentry",
   "name": "Sentry",
   "description": "Interact with Sentry for error tracking, issue management, and performance monitoring",

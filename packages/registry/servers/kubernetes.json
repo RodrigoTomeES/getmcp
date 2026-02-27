@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "kubernetes",
   "name": "Kubernetes",
   "description": "Kubernetes cluster management — manage pods, deployments, services, and cluster resources",

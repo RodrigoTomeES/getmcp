@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SITE_URL } from "@/lib/constants";
 import "./globals.css";
 
 const firaMono = Fira_Mono({
@@ -20,7 +21,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://getmcp.es"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "getmcp \u2014 Install MCP Servers in 19 AI Apps with One Command",
     template: "%s \u2014 getmcp",
@@ -57,8 +58,8 @@ export const metadata: Metadata = {
   },
   alternates: {
     languages: {
-      en: "https://getmcp.es",
-      "x-default": "https://getmcp.es",
+      en: SITE_URL,
+      "x-default": SITE_URL,
     },
   },
 };

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "desktop-commander",
   "name": "Desktop Commander",
   "description": "Terminal control, filesystem search, and diff-based file editing capabilities. Execute commands, manage processes, and search files with advanced pattern matching",

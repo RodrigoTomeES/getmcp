@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "terraform",
   "name": "Terraform",
   "description": "Terraform infrastructure-as-code — plan, apply, and manage Terraform configurations and state",

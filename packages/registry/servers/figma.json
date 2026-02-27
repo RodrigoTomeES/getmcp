@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "figma",
   "name": "Figma",
   "description": "Read Figma design files and provide layout information to AI coding agents. Translate designs into code with accurate context from Figma files",

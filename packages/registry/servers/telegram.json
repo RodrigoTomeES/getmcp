@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "telegram",
   "name": "Telegram",
   "description": "Telegram bot integration — send messages, manage chats, and interact with the Telegram Bot API",

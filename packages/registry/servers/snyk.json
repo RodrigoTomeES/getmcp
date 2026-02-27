@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "snyk",
   "name": "Snyk",
   "description": "Snyk security scanning — find and fix vulnerabilities in code, dependencies, and container images",

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "google-maps",
   "name": "Google Maps",
   "description": "Location services, directions, place details, and geocoding via the Google Maps Platform API",

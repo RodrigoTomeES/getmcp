@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "fetch",
   "name": "Fetch",
   "description": "Fetch web content and convert HTML to markdown. Useful for reading web pages, APIs, and documentation",

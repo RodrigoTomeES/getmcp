@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "confluence",
   "name": "Confluence",
   "description": "Atlassian Confluence wiki — search, read, create, and update pages and spaces",

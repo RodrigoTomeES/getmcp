@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "browser-tools",
   "name": "Browser Tools",
   "description": "Monitor browser logs, network requests, console output, and screenshots directly from AI-powered IDEs. Requires companion Chrome extension",

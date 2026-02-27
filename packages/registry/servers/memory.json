@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "memory",
   "name": "Memory",
   "description": "Knowledge graph-based persistent memory system. Allows AI to remember information across sessions",

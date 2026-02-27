@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "youtube",
   "name": "YouTube",
   "description": "YouTube data integration — search videos, get video details, retrieve transcripts and channel information",

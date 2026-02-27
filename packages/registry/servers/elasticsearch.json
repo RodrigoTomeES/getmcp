@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "elasticsearch",
   "name": "Elasticsearch",
   "description": "Elasticsearch search and analytics — index, search, and manage documents in Elasticsearch clusters",

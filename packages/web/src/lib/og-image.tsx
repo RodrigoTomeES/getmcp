@@ -174,7 +174,7 @@ export async function createOGImage({ heading, description, pills }: OGImageOpti
             color: "#a0a0a0",
           }}
         >
-          getmcp.es
+          installmcp.dev
         </span>
       </div>
     </div>,

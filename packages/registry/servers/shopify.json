@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "shopify",
   "name": "Shopify",
   "description": "Shopify e-commerce platform — manage products, orders, customers, and store configuration",

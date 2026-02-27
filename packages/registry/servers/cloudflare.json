@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "cloudflare",
   "name": "Cloudflare",
   "description": "Cloudflare platform management — manage Workers, KV, R2, D1, and other Cloudflare services",

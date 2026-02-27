@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "shadcn",
   "name": "shadcn/ui",
   "description": "Browse, search, and install components from shadcn registries. Supports multiple registries, namespaced components, and natural language component installation.",

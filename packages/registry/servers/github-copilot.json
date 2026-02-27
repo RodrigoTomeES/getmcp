@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "github-copilot",
   "name": "GitHub Copilot",
   "description": "GitHub Copilot extensions — interact with Copilot tools, manage completions, and access AI coding features",

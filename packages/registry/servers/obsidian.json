@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "obsidian",
   "name": "Obsidian",
   "description": "Obsidian note-taking integration — search, read, create, and edit notes in Obsidian vaults",

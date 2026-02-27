@@ -203,7 +203,7 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
   // Build the JSON object
   const categoriesArr = categories as string[];
   const entry: Record<string, unknown> = {
-    $schema: "https://getmcp.es/registry-entry.schema.json",
+    $schema: "https://installmcp.dev/registry-entry.schema.json",
     id,
     name,
     description,

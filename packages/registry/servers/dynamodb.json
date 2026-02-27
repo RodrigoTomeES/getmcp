@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "dynamodb",
   "name": "DynamoDB",
   "description": "AWS DynamoDB NoSQL database — scan, query, get, put, update, and delete items in DynamoDB tables",

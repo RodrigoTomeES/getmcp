@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "redis",
   "name": "Redis",
   "description": "Redis in-memory data store — get, set, delete keys, manage data structures, and monitor server info",

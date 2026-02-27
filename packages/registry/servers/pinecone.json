@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "pinecone",
   "name": "Pinecone",
   "description": "Pinecone vector database — manage indexes, upsert and query vector embeddings for similarity search",

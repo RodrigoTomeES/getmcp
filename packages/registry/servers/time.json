@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "time",
   "name": "Time",
   "description": "Time and timezone utilities — get current time, convert between timezones, and format dates",

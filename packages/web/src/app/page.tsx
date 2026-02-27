@@ -4,6 +4,7 @@ import { getAppIds } from "@getmcp/generators";
 import { SearchBar } from "@/components/SearchBar";
 import { AnimatedCommand } from "@/components/AnimatedCommand";
 import { AsciiArt } from "@/components/AsciiArt";
+import { SITE_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Install MCP Servers in 19 AI Apps with One Command",
@@ -36,11 +37,11 @@ export default function HomePage() {
       "@context": "https://schema.org",
       "@type": "WebSite",
       name: "getmcp",
-      url: "https://getmcp.es",
+      url: SITE_URL,
       description: `Browse, discover, and install MCP servers into ${appCount} AI applications. One config, every app.`,
       potentialAction: {
         "@type": "SearchAction",
-        target: "https://getmcp.es/?q={search_term_string}",
+        target: `${SITE_URL}/?q={search_term_string}`,
         "query-input": "required name=search_term_string",
       },
     },
@@ -48,15 +49,15 @@ export default function HomePage() {
       "@context": "https://schema.org",
       "@type": "Organization",
       name: "getmcp",
-      url: "https://getmcp.es",
-      logo: "https://getmcp.es/icon.svg",
+      url: SITE_URL,
+      logo: `${SITE_URL}/icon.svg`,
       sameAs: ["https://github.com/RodrigoTomeES/getmcp"],
     },
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       name: "getmcp",
-      url: "https://getmcp.es",
+      url: SITE_URL,
       applicationCategory: "DeveloperApplication",
       operatingSystem: "Windows, macOS, Linux",
       description: `Universal MCP server installer supporting ${appCount} AI applications and 4 config formats.`,
@@ -72,12 +73,12 @@ export default function HomePage() {
       name: "MCP Servers",
       description: `${count}+ MCP servers available for installation across ${appCount} AI apps.`,
       numberOfItems: count,
-      url: "https://getmcp.es",
+      url: SITE_URL,
       itemListElement: servers.slice(0, 20).map((s, i) => ({
         "@type": "ListItem",
         position: i + 1,
         name: s.name,
-        url: `https://getmcp.es/servers/${s.id}`,
+        url: `${SITE_URL}/servers/${s.id}`,
       })),
     },
   ];

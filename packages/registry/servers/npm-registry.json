@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "npm-registry",
   "name": "npm Registry",
   "description": "npm package registry — search packages, view metadata, check versions, and explore dependencies",

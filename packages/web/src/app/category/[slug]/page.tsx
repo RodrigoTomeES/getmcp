@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCategories, getServersByCategory } from "@getmcp/registry";
 import { ServerCard, type ServerCardData } from "@/components/ServerCard";
+import { SITE_URL } from "@/lib/constants";
 
 export const dynamicParams = false;
 
@@ -110,10 +111,10 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       "@type": "CollectionPage",
       name: `${name} MCP Servers`,
       description,
-      url: `https://getmcp.es/category/${slug}`,
+      url: `${SITE_URL}/category/${slug}`,
       mainEntityOfPage: {
         "@type": "WebPage",
-        "@id": `https://getmcp.es/category/${slug}`,
+        "@id": `${SITE_URL}/category/${slug}`,
       },
     },
     {
@@ -125,20 +126,20 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         "@type": "ListItem",
         position: i + 1,
         name: s.name,
-        url: `https://getmcp.es/servers/${s.id}`,
+        url: `${SITE_URL}/servers/${s.id}`,
       })),
     },
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "https://getmcp.es" },
-        { "@type": "ListItem", position: 2, name: "Servers", item: "https://getmcp.es/servers" },
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Servers", item: `${SITE_URL}/servers` },
         {
           "@type": "ListItem",
           position: 3,
           name,
-          item: `https://getmcp.es/category/${slug}`,
+          item: `${SITE_URL}/category/${slug}`,
         },
       ],
     },

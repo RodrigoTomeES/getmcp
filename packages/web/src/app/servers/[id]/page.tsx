@@ -8,6 +8,7 @@ import { PackageManagerCommand } from "@/components/PackageManagerCommand";
 import { MetaItem } from "@/components/MetaItem";
 import { ServerCard, type ServerCardData } from "@/components/ServerCard";
 import { GUIDE_SLUGS } from "@/lib/guide-data";
+import { SITE_URL } from "@/lib/constants";
 
 export const dynamicParams = false;
 
@@ -143,11 +144,11 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
       ...(server.author && {
         author: { "@type": "Organization", name: server.author },
       }),
-      url: `https://getmcp.es/servers/${server.id}`,
+      url: `${SITE_URL}/servers/${server.id}`,
       ...(server.repository && { downloadUrl: server.repository }),
       mainEntityOfPage: {
         "@type": "WebPage",
-        "@id": `https://getmcp.es/servers/${server.id}`,
+        "@id": `${SITE_URL}/servers/${server.id}`,
       },
     },
     {
@@ -158,19 +159,19 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://getmcp.es",
+          item: SITE_URL,
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Servers",
-          item: "https://getmcp.es/servers",
+          item: `${SITE_URL}/servers`,
         },
         {
           "@type": "ListItem",
           position: 3,
           name: server.name,
-          item: `https://getmcp.es/servers/${server.id}`,
+          item: `${SITE_URL}/servers/${server.id}`,
         },
       ],
     },

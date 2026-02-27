@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "prometheus",
   "name": "Prometheus",
   "description": "Prometheus monitoring — query metrics, manage alerts, and explore time-series data",

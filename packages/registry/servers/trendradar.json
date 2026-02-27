@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "trendradar",
   "name": "TrendRadar",
   "description": "AI-driven public opinion and trend monitoring with multi-platform aggregation, RSS support, and smart alerts. Analyze trends, sentiment, and news via MCP",

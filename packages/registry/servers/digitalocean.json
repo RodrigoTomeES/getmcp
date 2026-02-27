@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "digitalocean",
   "name": "DigitalOcean",
   "description": "DigitalOcean cloud management — manage droplets, databases, Kubernetes clusters, and cloud resources",

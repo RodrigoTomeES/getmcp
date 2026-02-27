@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "tavily",
   "name": "Tavily",
   "description": "AI-optimized web search — search the web and extract content optimized for LLM consumption",

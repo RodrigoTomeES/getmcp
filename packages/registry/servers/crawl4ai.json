@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "crawl4ai",
   "name": "Crawl4AI",
   "description": "AI-optimized web crawler — crawl websites and extract structured content optimized for LLM consumption",

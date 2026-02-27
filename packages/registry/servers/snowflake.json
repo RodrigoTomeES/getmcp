@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "snowflake",
   "name": "Snowflake",
   "description": "Snowflake data warehouse — query data, manage schemas, and interact with Snowflake databases",

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "raycast",
   "name": "Raycast",
   "description": "Raycast productivity launcher — manage clipboard history, snippets, and interact with extensions",

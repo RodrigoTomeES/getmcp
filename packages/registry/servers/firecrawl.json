@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "firecrawl",
   "name": "Firecrawl",
   "description": "Web scraping and search using Firecrawl. Crawl websites, extract content, scrape pages with JavaScript rendering, and perform web searches",

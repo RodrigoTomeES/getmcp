@@ -1,5 +1,5 @@
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "everything",
   "name": "Everything",
   "description": "MCP test and reference server — implements all MCP capabilities for testing and development",
