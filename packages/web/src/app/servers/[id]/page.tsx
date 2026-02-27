@@ -18,23 +18,32 @@ export function generateMetadata({ params }: { params: Promise<{ id: string }> }
     const server = getServer(id);
     if (!server) return { title: "Not Found" };
 
-    const title = server.name;
-    const description = server.description;
+    const title = `${server.name} MCP Server`;
+    const description = `${server.description}. Install with: npx @getmcp/cli add ${id}`;
 
     return {
       title,
       description,
+      keywords: [
+        server.name,
+        `${server.name} MCP`,
+        `${server.name} MCP server`,
+        ...server.categories,
+        "MCP server",
+        "getmcp",
+        "install MCP",
+      ],
       alternates: {
         canonical: `/servers/${id}`,
       },
       openGraph: {
-        title: `${server.name} \u2014 getmcp`,
+        title: `${server.name} MCP Server \u2014 getmcp`,
         description,
-        type: "article",
+        type: "website",
       },
       twitter: {
         card: "summary_large_image" as const,
-        title: `${server.name} \u2014 getmcp`,
+        title: `${server.name} MCP Server \u2014 getmcp`,
         description,
       },
     };
@@ -81,20 +90,72 @@ export default async function ServerPage({ params }: { params: Promise<{ id: str
   return <ServerDetail server={server} />;
 }
 
+function runtimeToRequirements(runtime?: string): string {
+  const map: Record<string, string> = {
+    node: "Node.js 18+",
+    docker: "Docker Engine",
+    python: "Python 3.10+",
+    binary: "Pre-built binary",
+  };
+  return runtime ? (map[runtime] ?? runtime) : "Node.js 18+";
+}
+
 function ServerDetail({ server }: { server: RegistryEntryType }) {
   const isRemote = "url" in server.config;
   const transport = isRemote ? "remote" : "stdio";
   const configs = preGenerateConfigs(server.id, server.config);
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: server.name,
-    description: server.description,
-    applicationCategory: "DeveloperApplication",
-    ...(server.author && { author: { "@type": "Person", name: server.author } }),
-    ...(server.repository && { url: server.repository }),
-  };
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: `${server.name} MCP Server`,
+      description: server.description,
+      applicationCategory: "DeveloperApplication",
+      applicationSubCategory: "MCP Server",
+      operatingSystem: "Windows, macOS, Linux",
+      softwareRequirements: runtimeToRequirements(server.runtime),
+      isAccessibleForFree: true,
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+      ...(server.author && {
+        author: { "@type": "Organization", name: server.author },
+      }),
+      url: `https://getmcp.es/servers/${server.id}`,
+      ...(server.repository && { downloadUrl: server.repository }),
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": `https://getmcp.es/servers/${server.id}`,
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://getmcp.es",
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Servers",
+          item: "https://getmcp.es/servers",
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: server.name,
+          item: `https://getmcp.es/servers/${server.id}`,
+        },
+      ],
+    },
+  ];
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
