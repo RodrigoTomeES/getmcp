@@ -92,7 +92,7 @@ describe("findCommand", () => {
     await findCommand("github");
 
     expect(p.select).toHaveBeenCalled();
-    expect(addCommand).toHaveBeenCalledWith("github");
+    expect(addCommand).toHaveBeenCalledWith("github", expect.objectContaining({}));
   });
 
   it("prompts for search term when no initial query provided", async () => {
@@ -117,6 +117,6 @@ describe("findCommand", () => {
     expect(p.text).toHaveBeenCalledWith(
       expect.objectContaining({ message: expect.stringContaining("Search") }),
     );
-    expect(addCommand).toHaveBeenCalledWith("github");
+    expect(addCommand).toHaveBeenCalledWith("github", expect.objectContaining({}));
   });
 });

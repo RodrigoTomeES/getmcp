@@ -24,7 +24,7 @@ import { resolveAppsFromFlags, resolveScope } from "../app-selection.js";
 import { mergeServerIntoConfig, writeConfigFile } from "../config-file.js";
 import { getSavedSelectedApps, saveSelectedApps } from "../preferences.js";
 import { trackInstallation } from "../lock.js";
-import { shortenPath, isNonInteractive as checkNonInteractive } from "../utils.js";
+import { shortenPath, isNonInteractive as isNonInteractiveCheck } from "../utils.js";
 import {
   ServerNotFoundError,
   AppNotDetectedError,
@@ -47,7 +47,7 @@ export interface AddOptions {
 }
 
 export async function addCommand(serverIdArg?: string, options: AddOptions = {}): Promise<void> {
-  const isNonInteractive = checkNonInteractive(options);
+  const isNonInteractive = isNonInteractiveCheck(options);
 
   p.intro("getmcp add");
 
@@ -120,13 +120,14 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
   const config = structuredClone(entry.config) as LooseServerConfigType;
 
   if (entry.requiredEnvVars.length > 0 && isStdioConfig(config)) {
+    config.env ??= {};
     if (isNonInteractive) {
       // In non-interactive mode, check if env vars are already set in the environment
       let allSet = true;
       for (const envVar of entry.requiredEnvVars) {
         const envValue = process.env[envVar];
         if (envValue) {
-          config.env![envVar] = envValue;
+          config.env[envVar] = envValue;
         } else {
           allSet = false;
           p.log.warn(`Required env var ${envVar} is not set in environment`);
@@ -153,7 +154,7 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
           p.cancel("Operation cancelled.");
           process.exit(0);
         }
-        config.env![envVar] = (value as string).trim();
+        config.env[envVar] = (value as string).trim();
       }
     }
   }
@@ -266,6 +267,11 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
   }
 
   // Step 4.5: Scope selection for dual-scope apps
+  if (options.global && options.project) {
+    p.log.error("Cannot use both --global and --project. Choose one.");
+    process.exit(1);
+  }
+
   let chosenScope: "project" | "global" = "project";
   const dualScopeApps = selectedApps.filter((a) => a.supportsBothScopes);
   if (dualScopeApps.length > 0) {
@@ -373,6 +379,18 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
   const action = options.dryRun ? "would be configured" : "has been configured";
   p.outro(`"${entry.name}" ${action}.`);
 
+  // Warn about .gitignore for project-scoped configs with env vars
+  if (!options.dryRun && entry.requiredEnvVars.length > 0 && chosenScope === "project") {
+    const projectPaths = results.filter((r) => r.ok).map((r) => shortenPath(r.app.configPath));
+    if (projectPaths.length > 0) {
+      p.log.warn(
+        "Env var values were written to project-scoped config files.\n" +
+          "  Make sure these paths are in your .gitignore to avoid committing secrets:\n" +
+          projectPaths.map((p) => `    ${p}`).join("\n"),
+      );
+    }
+  }
+
   // Reminder for apps that need restart
   const needsRestart = selectedApps.some((a) =>
     ["claude-desktop", "windsurf", "cursor"].includes(a.id),
@@ -393,7 +411,7 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
 }
 
 async function addUnverifiedServer(options: AddOptions): Promise<void> {
-  const isNonInteractive = checkNonInteractive(options);
+  const isNonInteractive = isNonInteractiveCheck(options);
 
   let serverName: string;
   let config: LooseServerConfigType;
@@ -401,7 +419,18 @@ async function addUnverifiedServer(options: AddOptions): Promise<void> {
   if (options.fromUrl) {
     // Remote server from URL
     const url = options.fromUrl;
-    serverName = new URL(url).hostname.replace(/\./g, "-");
+    let parsed: URL;
+    try {
+      parsed = new URL(url);
+    } catch {
+      p.log.error("Invalid URL. Provide a valid http or https URL.");
+      process.exit(1);
+    }
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      p.log.error("URL must use http or https protocol.");
+      process.exit(1);
+    }
+    serverName = parsed.hostname.replace(/\./g, "-");
     config = { url } as LooseServerConfigType;
     p.log.warn("Unverified remote server — not from the getmcp registry.");
   } else if (options.fromNpm) {

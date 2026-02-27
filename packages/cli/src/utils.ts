@@ -136,7 +136,16 @@ export function parseFlags(argv: string[]): {
       flags.help = true;
     } else if (arg === "--version" || arg === "-v") {
       flags.version = true;
-    } else if (!arg.startsWith("-")) {
+    } else if (arg.startsWith("-")) {
+      // Unknown flag — warn the user
+      const flagName = arg.split("=")[0];
+      const similar = findSimilarFlag(flagName);
+      if (similar) {
+        console.warn(`Warning: Unknown flag "${flagName}". Did you mean "${similar}"?`);
+      } else {
+        console.warn(`Warning: Unknown flag "${flagName}". Run "getmcp --help" for usage.`);
+      }
+    } else {
       positionals.push(arg);
     }
   }
@@ -175,4 +184,76 @@ const COMMAND_ALIASES: Record<string, string> = {
 
 export function resolveAlias(command: string): string | undefined {
   return COMMAND_ALIASES[command];
+}
+
+/**
+ * Exit if the user cancelled a @clack/prompts prompt.
+ * Replaces the repeated `if (p.isCancel(val)) { p.cancel(...); process.exit(0); }` pattern.
+ */
+export function exitIfCancelled<T>(value: T | symbol): asserts value is T {
+  // @clack/prompts returns a Symbol when the user cancels
+  if (typeof value === "symbol") {
+    // Dynamic import would be circular; use process.exit directly
+    console.log("Cancelled.");
+    process.exit(0);
+  }
+}
+
+const KNOWN_FLAGS = [
+  "--yes",
+  "-y",
+  "--app",
+  "--all-apps",
+  "--dry-run",
+  "--installed",
+  "--search",
+  "--category",
+  "--from-npm",
+  "--from-pypi",
+  "--from-url",
+  "--json",
+  "--quiet",
+  "-q",
+  "--global",
+  "-g",
+  "--project",
+  "--output",
+  "-o",
+  "--help",
+  "-h",
+  "--version",
+  "-v",
+];
+
+function findSimilarFlag(input: string): string | undefined {
+  const name = input.replace(/^-+/, "").toLowerCase();
+  let best: string | undefined;
+  let bestDist = 3; // max edit distance threshold
+  for (const flag of KNOWN_FLAGS) {
+    if (!flag.startsWith("--")) continue;
+    const candidate = flag.replace(/^-+/, "");
+    const dist = levenshtein(name, candidate);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = flag;
+    }
+  }
+  return best;
+}
+
+function levenshtein(a: string, b: string): number {
+  const m = a.length;
+  const n = b.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0) as number[]);
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] =
+        a[i - 1] === b[j - 1]
+          ? dp[i - 1][j - 1]
+          : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    }
+  }
+  return dp[m][n];
 }

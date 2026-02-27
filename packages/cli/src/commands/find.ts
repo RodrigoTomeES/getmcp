@@ -10,9 +10,20 @@
 import * as p from "@clack/prompts";
 import { getAllServers, searchServers } from "@getmcp/registry";
 import type { RegistryEntryType } from "@getmcp/core";
+import type { AddOptions } from "./add.js";
 import { addCommand } from "./add.js";
 
-export async function findCommand(initialQuery?: string): Promise<void> {
+export interface FindOptions {
+  yes?: boolean;
+  apps?: string[];
+  allApps?: boolean;
+  dryRun?: boolean;
+  json?: boolean;
+  global?: boolean;
+  project?: boolean;
+}
+
+export async function findCommand(initialQuery?: string, options: FindOptions = {}): Promise<void> {
   p.intro("getmcp find");
 
   const servers = getAllServers();
@@ -95,6 +106,15 @@ export async function findCommand(initialQuery?: string): Promise<void> {
 
   p.outro(`Selected: ${selected.name}`);
 
-  // Jump into add flow
-  await addCommand(selected.id);
+  // Jump into add flow, forwarding relevant flags
+  const addOptions: AddOptions = {
+    yes: options.yes,
+    apps: options.apps,
+    allApps: options.allApps,
+    dryRun: options.dryRun,
+    json: options.json,
+    global: options.global,
+    project: options.project,
+  };
+  await addCommand(selected.id, addOptions);
 }
