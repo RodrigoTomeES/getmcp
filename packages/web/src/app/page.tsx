@@ -6,6 +6,9 @@ import { AnimatedCommand } from "@/components/AnimatedCommand";
 import { AsciiArt } from "@/components/AsciiArt";
 
 export const metadata: Metadata = {
+  title: "Install MCP Servers in 19 AI Apps with One Command",
+  description:
+    "Install and configure MCP servers across Claude Desktop, VS Code, Cursor, Windsurf, and 15 more AI apps. Universal config generator for JSON, JSONC, YAML, and TOML formats.",
   alternates: {
     canonical: "/",
   },
@@ -90,9 +93,11 @@ export default function HomePage() {
         {/* Right column: description + animated CLI */}
         <div className="relative flex flex-col justify-center text-center lg:text-left">
           <p className="text-text-secondary text-xl sm:text-2xl lg:text-3xl leading-tight tracking-tight text-balance mb-8">
-            Browse <span className="text-text font-medium">{count} MCP servers</span> and install
-            them into <span className="text-text font-medium">{appCount} AI applications</span> with
-            a single command.
+            Install MCP servers into{" "}
+            <span className="text-text font-medium">{appCount} AI applications</span> with a single
+            command. Browse our registry of{" "}
+            <span className="text-text font-medium">{count}+ servers</span> with configs for JSON,
+            JSONC, YAML, and TOML.
           </p>
 
           <div>
@@ -106,6 +111,26 @@ export default function HomePage() {
 
       {/* Separator */}
       <hr className="border-border mb-10" />
+
+      {/* What is MCP? */}
+      <section className="mb-10">
+        <h2 className="text-lg font-semibold mb-3">What is MCP?</h2>
+        <p className="text-text-secondary leading-relaxed max-w-3xl">
+          The{" "}
+          <a
+            href="https://modelcontextprotocol.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:underline"
+          >
+            Model Context Protocol
+          </a>{" "}
+          (MCP) lets AI assistants connect to external tools and data sources. The problem? Every AI
+          app uses a different config format — different root keys, field names, and file formats.
+          getmcp solves this: define your servers once, and we generate the correct config for all{" "}
+          {appCount} supported apps automatically.
+        </p>
+      </section>
 
       {/* Search + server listing */}
       <SearchBar servers={minimalServers} categories={categories} />

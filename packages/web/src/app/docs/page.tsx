@@ -5,23 +5,23 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { DocsSidebar } from "@/components/DocsSidebar";
 
 export const metadata: Metadata = {
-  title: "Documentation",
+  title: "Documentation \u2014 CLI Commands, Config Formats & API Reference",
   description:
-    "Learn how to install, configure, and use getmcp to manage MCP servers across all AI applications.",
+    "Complete guide to getmcp: CLI installation, commands, project manifests, supported AI apps, library API, and contributing.",
   alternates: {
     canonical: "/docs",
   },
   openGraph: {
-    title: "Documentation \u2014 getmcp",
+    title: "Documentation \u2014 CLI Commands, Config Formats & API Reference",
     description:
-      "Learn how to install, configure, and use getmcp to manage MCP servers across all AI applications.",
+      "Complete guide to getmcp: CLI installation, commands, project manifests, supported AI apps, library API, and contributing.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Documentation \u2014 getmcp",
+    title: "Documentation \u2014 CLI Commands, Config Formats & API Reference",
     description:
-      "Learn how to install, configure, and use getmcp to manage MCP servers across all AI applications.",
+      "Complete guide to getmcp: CLI installation, commands, project manifests, supported AI apps, library API, and contributing.",
   },
 };
 
