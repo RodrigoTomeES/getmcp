@@ -18,7 +18,7 @@
 ### Checklist
 
 - [ ] JSON file created at `packages/registry/servers/<id>.json`
-- [ ] `$schema` field set to `"https://getmcp.es/registry-entry.schema.json"`
+- [ ] `$schema` field set to `"https://installmcp.dev/registry-entry.schema.json"`
 - [ ] Filename matches `id` field (e.g., `my-server.json` contains `"id": "my-server"`)
 - [ ] All tests pass (`npx vitest run`)
 - [ ] Server ID is unique (not already in registry)

@@ -49,7 +49,7 @@ getServerCount(); // 106
 
 Server definitions are stored as individual JSON files in `servers/` and auto-discovered at build time. Each file is validated against the `RegistryEntry` Zod schema during `npm run build`. No manual imports or registration needed — just add a `.json` file.
 
-Browse all 106 servers at [getmcp.es](https://getmcp.es) or from the CLI:
+Browse all 106 servers at [installmcp.dev](https://installmcp.dev) or from the CLI:
 
 ```bash
 npx @getmcp/cli list

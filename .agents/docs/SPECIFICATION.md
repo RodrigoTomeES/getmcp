@@ -532,7 +532,7 @@ Example:
 
 ```json
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "my-server",
   "name": "My Server",
   "description": "Description of what this server does",

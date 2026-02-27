@@ -23,7 +23,7 @@ TypeScript monorepo with 5 packages:
 - `@getmcp/generators` — Config generators for 19 AI applications
 - `@getmcp/registry` — Registry of 106+ MCP server definitions
 - `@getmcp/cli` — CLI tool with add, remove, list, find, check, update, doctor, import commands
-- `@getmcp/web` — Next.js web directory at getmcp.es
+- `@getmcp/web` — Next.js web directory at installmcp.dev
 
 ## Quick Start
 
@@ -36,6 +36,6 @@ npx @getmcp/cli doctor              # Health diagnostics
 
 ## Links
 
-- Website: https://getmcp.es
+- Website: https://installmcp.dev
 - Repository: https://github.com/RodrigoTomeES/getmcp
 - npm: https://www.npmjs.com/package/@getmcp/cli

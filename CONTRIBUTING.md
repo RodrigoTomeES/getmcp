@@ -14,7 +14,7 @@ Create a single JSON file in `packages/registry/servers/`:
 
 ```json
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "my-server",
   "name": "My Server",
   "description": "What it does",
@@ -59,7 +59,7 @@ For servers accessed via URL instead of a local command:
 
 ```json
 {
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
+  "$schema": "https://installmcp.dev/registry-entry.schema.json",
   "id": "my-remote-server",
   "name": "My Remote Server",
   "description": "A remote MCP server",

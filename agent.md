@@ -160,7 +160,7 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 
 ### Adding a new MCP server to the registry
 
-1. Create `packages/registry/servers/<id>.json` with `"$schema": "https://getmcp.es/registry-entry.schema.json"` and the server definition
+1. Create `packages/registry/servers/<id>.json` with `"$schema": "https://installmcp.dev/registry-entry.schema.json"` and the server definition
 2. Ensure the filename matches the `id` field (e.g., `my-server.json` contains `"id": "my-server"`)
 3. Run `npx vitest run packages/registry` — the registry auto-discovers all JSON files, no manual imports needed
 4. The server will automatically appear in CLI search, web directory, and all generators

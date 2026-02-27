@@ -14,7 +14,7 @@
 
 **The solution:** One canonical format, config generators for every app, a registry of 105+ servers, and a CLI that auto-detects your apps and writes the correct config.
 
-> Browse the full server catalog at [getmcp.es](https://getmcp.es)
+> Browse the full server catalog at [installmcp.dev](https://installmcp.dev)
 
 ## Quick Start
 
@@ -110,7 +110,7 @@ npx @getmcp/cli remove github
 | Repomix      | stdio     | Pack entire repositories into a single AI-friendly file      |
 | n8n          | stdio     | Build and manage n8n automation workflows from AI            |
 
-Browse the full catalog at [getmcp.es](https://getmcp.es) or from the CLI:
+Browse the full catalog at [installmcp.dev](https://installmcp.dev) or from the CLI:
 
 ```bash
 npx @getmcp/cli list
@@ -202,7 +202,7 @@ getmcp/
     generators/    # 19 config generators (one per app)
     registry/      # 105+ MCP server definitions
     cli/           # add/remove/list/doctor/import commands, app detection
-    web/           # Next.js web directory at getmcp.es
+    web/           # Next.js web directory at installmcp.dev
 ```
 
 The CLI supports JSON, JSONC, YAML, and TOML config files natively. Format is auto-detected from the file extension, so Goose configs are read/written as YAML and Codex configs as TOML.
