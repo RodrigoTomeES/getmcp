@@ -72,11 +72,16 @@ export function ConfigViewer({ configs }: { configs: Record<string, PreGenerated
       {/* App selector tabs */}
       <div
         className="hidden md:flex flex-wrap gap-1.5 mb-5"
-        role="group"
+        role="tablist"
         aria-label="Select AI application"
       >
         {appIds.map((appId) => (
-          <Pill key={appId} active={selectedApp === appId} onClick={() => handleSelectApp(appId)}>
+          <Pill
+            key={appId}
+            active={selectedApp === appId}
+            onClick={() => handleSelectApp(appId)}
+            role="tab"
+          >
             {APP_LABELS[appId] ?? appId}
           </Pill>
         ))}

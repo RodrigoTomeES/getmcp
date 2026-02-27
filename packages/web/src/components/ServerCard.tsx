@@ -49,7 +49,7 @@ export function ServerCard({ server }: { server: ServerCardData }) {
           </span>
         )}
         {server.envCount > 0 && (
-          <span className="text-xs px-2 py-0.5 rounded bg-warning-bg text-warning">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-warning-bg text-warning">
             {server.envCount} env var{server.envCount > 1 ? "s" : ""}
           </span>
         )}

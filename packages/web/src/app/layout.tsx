@@ -89,16 +89,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 beta
               </span>
             </Link>
-            <nav className="flex items-center gap-6 text-sm">
+            <nav className="flex items-center gap-3 sm:gap-6 text-sm">
               <Link
                 href="/servers"
-                className="text-text-secondary hover:text-text transition-colors hidden sm:inline-block"
+                className="text-text-secondary hover:text-text transition-colors"
               >
                 Servers
               </Link>
               <Link
                 href="/guides"
-                className="text-text-secondary hover:text-text transition-colors hidden sm:inline-block"
+                className="text-text-secondary hover:text-text transition-colors"
               >
                 Guides
               </Link>
@@ -112,6 +112,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 className="text-text-secondary hover:text-text transition-colors"
               >
                 GitHub
+                <span className="sr-only"> (opens in new tab)</span>
               </a>
             </nav>
           </div>
@@ -121,9 +122,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
 
-        <footer className="border-t border-border px-6 py-8 text-center text-sm text-text-secondary">
+        <footer className="border-t border-border px-6 py-8 text-sm text-text-secondary">
           <div className="max-w-6xl mx-auto">
-            <p>getmcp &mdash; One config format, every AI app.</p>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+              <p>getmcp &mdash; One config format, every AI app.</p>
+              <nav className="flex items-center gap-4">
+                <Link href="/servers" className="hover:text-text transition-colors">
+                  Servers
+                </Link>
+                <Link href="/guides" className="hover:text-text transition-colors">
+                  Guides
+                </Link>
+                <Link href="/docs" className="hover:text-text transition-colors">
+                  Docs
+                </Link>
+                <a
+                  href="https://github.com/RodrigoTomeES/getmcp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-text transition-colors"
+                >
+                  GitHub
+                  <span className="sr-only"> (opens in new tab)</span>
+                </a>
+              </nav>
+            </div>
+            <p className="text-xs text-text-secondary/60 text-center">&copy; 2026 getmcp</p>
           </div>
         </footer>
 

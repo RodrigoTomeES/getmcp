@@ -78,6 +78,9 @@ export function SearchBar({
       </div>
 
       {/* Category filters */}
+      <p className="text-[11px] text-text-secondary uppercase tracking-wider font-medium mb-1.5">
+        Category
+      </p>
       <div className="flex flex-wrap gap-2 mb-4" role="group" aria-label="Filter by category">
         <Pill active={!selectedCategory} onClick={() => setSelectedCategory(null)}>
           All
@@ -94,6 +97,9 @@ export function SearchBar({
       </div>
 
       {/* Runtime and transport filters */}
+      <p className="text-[11px] text-text-secondary uppercase tracking-wider font-medium mb-1.5">
+        Runtime & Transport
+      </p>
       <div
         className="flex flex-wrap gap-2 mb-6"
         role="group"
@@ -154,7 +160,18 @@ export function SearchBar({
       {filtered.length === 0 && (
         <div className="text-center py-20 text-text-secondary">
           <p className="text-lg mb-2">No servers found</p>
-          <p className="text-sm">Try adjusting your search or filters.</p>
+          <p className="text-sm mb-4">Try adjusting your search or filters.</p>
+          <button
+            onClick={() => {
+              setQuery("");
+              setSelectedCategory(null);
+              setSelectedRuntime(null);
+              setSelectedTransport(null);
+            }}
+            className="text-sm text-accent hover:underline"
+          >
+            Clear all filters
+          </button>
         </div>
       )}
     </div>
