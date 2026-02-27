@@ -13,12 +13,26 @@ export function SearchBar({
 }) {
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedRuntime, setSelectedRuntime] = useState<string | null>(null);
+  const [selectedTransport, setSelectedTransport] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     let result = servers;
 
     if (selectedCategory) {
       result = result.filter((s) => s.categories?.includes(selectedCategory));
+    }
+
+    if (selectedRuntime) {
+      result = result.filter((s) => s.runtime === selectedRuntime);
+    }
+
+    if (selectedTransport) {
+      if (selectedTransport === "remote") {
+        result = result.filter((s) => s.isRemote);
+      } else {
+        result = result.filter((s) => !s.isRemote);
+      }
     }
 
     if (query.trim()) {
@@ -32,7 +46,7 @@ export function SearchBar({
     }
 
     return result;
-  }, [servers, query, selectedCategory]);
+  }, [servers, query, selectedCategory, selectedRuntime, selectedTransport]);
 
   return (
     <div>
@@ -64,7 +78,7 @@ export function SearchBar({
       </div>
 
       {/* Category filters */}
-      <div className="flex flex-wrap gap-2 mb-6" role="group" aria-label="Filter by category">
+      <div className="flex flex-wrap gap-2 mb-4" role="group" aria-label="Filter by category">
         <Pill active={!selectedCategory} onClick={() => setSelectedCategory(null)}>
           All
         </Pill>
@@ -79,6 +93,42 @@ export function SearchBar({
         ))}
       </div>
 
+      {/* Runtime and transport filters */}
+      <div
+        className="flex flex-wrap gap-2 mb-6"
+        role="group"
+        aria-label="Filter by runtime and transport"
+      >
+        <Pill active={!selectedRuntime} onClick={() => setSelectedRuntime(null)}>
+          All runtimes
+        </Pill>
+        {["node", "python", "docker", "binary"].map((rt) => (
+          <Pill
+            key={rt}
+            active={selectedRuntime === rt}
+            onClick={() => setSelectedRuntime(selectedRuntime === rt ? null : rt)}
+          >
+            {rt}
+          </Pill>
+        ))}
+        <span className="w-px h-6 bg-border self-center mx-1" aria-hidden="true" />
+        <Pill active={!selectedTransport} onClick={() => setSelectedTransport(null)}>
+          All transports
+        </Pill>
+        <Pill
+          active={selectedTransport === "stdio"}
+          onClick={() => setSelectedTransport(selectedTransport === "stdio" ? null : "stdio")}
+        >
+          stdio
+        </Pill>
+        <Pill
+          active={selectedTransport === "remote"}
+          onClick={() => setSelectedTransport(selectedTransport === "remote" ? null : "remote")}
+        >
+          remote
+        </Pill>
+      </div>
+
       <h2 className="absolute hidden">servers</h2>
 
       {/* Results count */}
@@ -90,6 +140,8 @@ export function SearchBar({
         {filtered.length} server{filtered.length !== 1 ? "s" : ""}
         {query && ` matching "${query}"`}
         {selectedCategory && ` in ${selectedCategory}`}
+        {selectedRuntime && ` (${selectedRuntime})`}
+        {selectedTransport && ` (${selectedTransport})`}
       </p>
 
       {/* Server grid */}

@@ -6,6 +6,7 @@ export type ServerCardData = {
   description: string;
   categories: string[];
   author?: string;
+  runtime?: string;
   isRemote: boolean;
   envCount: number;
 };
@@ -43,10 +44,18 @@ export function ServerCard({ server }: { server: ServerCardData }) {
             {cat}
           </span>
         ))}
+        {server.runtime && (
+          <span className="text-xs px-2 py-0.5 rounded-full bg-surface-hover text-text-secondary font-mono">
+            {server.runtime}
+          </span>
+        )}
         {server.envCount > 0 && (
           <span className="text-xs px-2 py-0.5 rounded bg-warning-bg text-warning">
             {server.envCount} env var{server.envCount > 1 ? "s" : ""}
           </span>
+        )}
+        {server.author && (
+          <span className="text-xs text-text-secondary truncate ml-auto">by {server.author}</span>
         )}
       </div>
     </Link>
