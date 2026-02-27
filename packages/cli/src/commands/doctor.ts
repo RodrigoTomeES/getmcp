@@ -12,7 +12,7 @@
  */
 
 import * as p from "@clack/prompts";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { getServer } from "@getmcp/registry";
 import { detectInstalledApps } from "../detect.js";
 import { readConfigFile, listServersInConfig } from "../config-file.js";
@@ -44,10 +44,12 @@ export async function doctorCommand(options: DoctorOptions = {}): Promise<void> 
     details: apps.map((a) => a.name).join(", ") || undefined,
   });
 
-  // 2. Parse config files
+  // 2. Parse config files and cache parsed configs for reuse
+  const parsedConfigs = new Map<string, Record<string, unknown>>();
   for (const app of apps) {
     try {
-      readConfigFile(app.configPath);
+      const config = readConfigFile(app.configPath);
+      parsedConfigs.set(app.configPath, config);
       results.push({
         category: "config-parse",
         status: "ok",
@@ -63,13 +65,15 @@ export async function doctorCommand(options: DoctorOptions = {}): Promise<void> 
     }
   }
 
-  // 3-6. Check servers in configs
+  // 3-6. Check servers in configs (reuse parsed configs)
   const allConfiguredServers = new Map<string, string[]>();
 
   for (const app of apps) {
-    let servers: string[] = [];
+    const cached = parsedConfigs.get(app.configPath);
+    if (!cached) continue;
+    let servers: string[];
     try {
-      servers = listServersInConfig(app.configPath);
+      servers = listServersInConfig(cached);
     } catch {
       continue;
     }
@@ -180,7 +184,7 @@ export async function doctorCommand(options: DoctorOptions = {}): Promise<void> 
 
 function checkRuntime(command: string, versionFlag: string, results: DiagnosticResult[]): void {
   try {
-    const version = execSync(`${command} ${versionFlag}`, {
+    const version = execFileSync(command, [versionFlag], {
       timeout: 5000,
       stdio: ["pipe", "pipe", "pipe"],
     })
@@ -194,7 +198,7 @@ function checkRuntime(command: string, versionFlag: string, results: DiagnosticR
   } catch {
     results.push({
       category: "runtime",
-      status: command === "uvx" ? "warn" : "warn",
+      status: "warn",
       message: `${command}: not found`,
       details:
         command === "uvx"

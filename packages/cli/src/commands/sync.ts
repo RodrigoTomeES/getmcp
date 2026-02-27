@@ -16,7 +16,7 @@ import { detectApps, resolveAppForScope, type DetectedApp } from "../detect.js";
 import { mergeServerIntoConfig, writeConfigFile } from "../config-file.js";
 import { trackInstallation } from "../lock.js";
 import { getSavedSelectedApps, saveSelectedApps } from "../preferences.js";
-import { shortenPath, isNonInteractive as checkNonInteractive } from "../utils.js";
+import { shortenPath, isNonInteractive as isNonInteractiveCheck } from "../utils.js";
 import { InvalidAppError, formatError } from "../errors.js";
 
 export interface SyncOptions {
@@ -40,7 +40,7 @@ export async function syncCommand(options: SyncOptions = {}): Promise<void> {
     } else {
       p.intro("getmcp sync");
       p.log.error("No getmcp.json found in current directory.");
-      p.log.info("Create one with: getmcp init --manifest");
+      p.log.info("Create a getmcp.json file to declare your project's MCP servers.");
       p.outro("Done");
     }
     return;
@@ -81,7 +81,7 @@ export async function syncCommand(options: SyncOptions = {}): Promise<void> {
     return;
   }
 
-  const isNonInteractive = checkNonInteractive(options);
+  const isNonInteractive = isNonInteractiveCheck(options);
 
   if (!options.json) {
     p.intro("getmcp sync");

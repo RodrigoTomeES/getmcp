@@ -1,6 +1,6 @@
 # getmcp Roadmap
 
-> Last updated: 2026-02-22
+> Last updated: 2026-02-27
 
 This document tracks all planned improvements, bug fixes, and feature work for the getmcp project. Items are organized by priority and category, with checkboxes to track completion.
 
@@ -88,8 +88,8 @@ Features that improve the developer experience.
 - [x] **Add `--json` / `--quiet` output mode** — Added `--json` and `--quiet`/`-q` flags to `list`, `add`, and `check` commands. JSON outputs structured data, quiet outputs one ID per line.
   - Files: `packages/cli/src/commands/list.ts`, `add.ts`, `check.ts`, `packages/cli/src/utils.ts`
 
-- [ ] **Add fuzzy matching to `remove` command** — Currently requires an exact server name. Should suggest similar names when no exact match is found (like `add` does with search).
-  - File: `packages/cli/src/commands/remove.ts` (lines 19-24)
+- [x] **Interactive server picker for `remove` command** — When `remove` is called without arguments, shows an interactive picker of all configured servers. In non-interactive mode, still requires the server name argument.
+  - File: `packages/cli/src/commands/remove.ts` (lines 62-90)
 
 - [ ] **Handle empty registry gracefully** — If `getAllServers()` returns an empty array, `select()` from `@inquirer/prompts` receives empty `choices` and may crash. Add a guard with a clear error message.
   - File: `packages/cli/src/commands/add.ts` (lines 54-62)
@@ -174,6 +174,78 @@ Enhancements to the Next.js web directory.
 
 - [ ] **Add light mode / theme toggle** — The site is dark-mode only with hardcoded dark colors. Add light theme support or respect `prefers-color-scheme` media query.
   - File: `packages/web/src/app/globals.css`
+
+---
+
+## 9. Web — SEO, Content & UX (Completed 2026-02-27)
+
+Major content expansion and UX improvements to the web directory.
+
+- [x] **Fix JSON-LD structured data** — Fixed offer schema, author @type, url, mainEntityOfPage, and BreadcrumbList in server detail pages.
+  - File: `packages/web/src/app/servers/[id]/page.tsx`
+
+- [x] **Add Organization + WebApplication schemas to homepage** — Added structured data for brand identity and application type.
+  - File: `packages/web/src/app/page.tsx`
+
+- [x] **Add twitter:site/creator + hreflang tags** — Added social media metadata and language/region hints.
+  - File: `packages/web/src/app/layout.tsx`
+
+- [x] **Optimize title tags across all page types** — Refined titles for homepage, server details, docs, and category pages with consistent SEO patterns.
+  - Files: `packages/web/src/app/layout.tsx`, `packages/web/src/app/page.tsx`, `packages/web/src/app/servers/[id]/page.tsx`, `packages/web/src/app/docs/page.tsx`
+
+- [x] **Overhaul homepage messaging to lead with "19 AI apps"** — Restructured hero section to prominently feature app count and value proposition.
+  - File: `packages/web/src/app/page.tsx`
+
+- [x] **Add "What is MCP?" section to homepage** — Educational section explaining Model Context Protocol and its purpose.
+  - File: `packages/web/src/app/page.tsx`
+
+- [x] **Create /servers index page** — Hub page for browsing all servers with search, filters, and pagination metadata.
+  - File: `packages/web/src/app/servers/page.tsx`
+
+- [x] **Add ItemList JSON-LD to homepage** — Structured data for homepage server list for search engines.
+  - File: `packages/web/src/app/page.tsx`
+
+- [x] **Create 14 category landing pages** — Dedicated pages for each MCP server category with filtered server grids.
+  - File: `packages/web/src/app/category/[slug]/page.tsx`
+
+- [x] **Category badges link to category pages** — Server cards now link category tags to dedicated category pages.
+  - File: `packages/web/src/app/servers/[id]/page.tsx`
+
+- [x] **Create 19 app-specific setup guides** — Comprehensive installation and configuration guides for each supported AI app.
+  - Files: `packages/web/src/app/guides/[app]/page.tsx`, `packages/web/src/lib/guide-data.ts`
+
+- [x] **Add Guides nav link** — Navigation link to guides hub.
+  - File: `packages/web/src/app/layout.tsx`
+
+- [x] **Cross-link guides from docs supported apps** — Docs page references app-specific guides for easy access.
+  - File: `packages/web/src/app/docs/page.tsx`
+
+- [x] **Mobile dropdown for ConfigViewer tabs** — Responsive select element for app tabs on smaller screens.
+  - File: `packages/web/src/components/ConfigViewer.tsx`
+
+- [x] **localStorage preference for selected app** — ConfigViewer persists user's app selection across page reloads.
+  - File: `packages/web/src/components/ConfigViewer.tsx`
+
+- [x] **Add TechArticle JSON-LD to docs** — Structured data for docs page as educational technical content.
+  - File: `packages/web/src/app/docs/page.tsx`
+
+- [x] **Add runtime badges to server cards** — Display server runtime (node, python, etc.) on card UI.
+  - File: `packages/web/src/components/ServerCard.tsx`
+
+- [x] **Add runtime/transport filter pills to search** — Enhanced search with toggleable runtime and transport type filters.
+  - File: `packages/web/src/components/SearchBar.tsx`
+
+- [x] **Add "Getting Started" section to server pages** — Quick-start instructions for installing each server.
+  - File: `packages/web/src/app/servers/[id]/page.tsx`
+
+- [x] **Add "Related Servers" section to server pages** — Dynamic recommendations of similar servers based on category and tags.
+  - File: `packages/web/src/app/servers/[id]/page.tsx`
+
+- [x] **Improve sitemap with priority tiers and all new routes** — Updated sitemap to include category pages, guides, and /servers with proper priority levels.
+  - File: `packages/web/src/app/sitemap.ts`
+
+- [x] **OG images for all new page types** — Generated Open Graph images for category pages, guide pages, and servers index.
+  - Files: `packages/web/src/app/servers/opengraph-image.tsx`, `packages/web/src/app/category/[slug]/opengraph-image.tsx`, `packages/web/src/app/guides/[app]/opengraph-image.tsx`
 
 ---
 

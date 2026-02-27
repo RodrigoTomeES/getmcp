@@ -101,7 +101,7 @@ export function AsciiArt() {
         />
       </div>
 
-      <p className="font-mono text-sm lg:text-base uppercase tracking-tight text-text font-medium mt-4">
+      <p className="font-mono text-sm lg:text-base uppercase tracking-wider text-text font-medium mt-4">
         The Universal MCP Installer
       </p>
     </div>

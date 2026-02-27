@@ -57,7 +57,20 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe("removeCommand", () => {
-  it("exits with error when no server name provided", async () => {
+  it("exits with error when no server name provided in non-interactive mode", async () => {
+    // Must have detected apps for the code to reach the no-server-name check
+    const { detectInstalledApps } = await import("../../src/detect.js");
+    const mockDetect = detectInstalledApps as ReturnType<typeof vi.fn>;
+    mockDetect.mockReturnValueOnce([
+      {
+        id: "claude-desktop",
+        name: "Claude Desktop",
+        configPath: "/tmp/test.json",
+        exists: true,
+        supportsBothScopes: false,
+      },
+    ]);
+
     await expect(removeCommand(undefined, { yes: true })).rejects.toThrow(ExitError);
 
     const { log } = await import("@clack/prompts");

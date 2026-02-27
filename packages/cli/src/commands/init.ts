@@ -8,6 +8,7 @@
 import * as p from "@clack/prompts";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { exitIfCancelled } from "../utils.js";
 
 function validateUrl(val: string): string | undefined {
   try {
@@ -34,10 +35,7 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
     },
   });
 
-  if (p.isCancel(id)) {
-    p.cancel("Operation cancelled.");
-    process.exit(0);
-  }
+  exitIfCancelled(id);
 
   const name = await p.text({
     message: "Display name:",
@@ -47,10 +45,7 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
     },
   });
 
-  if (p.isCancel(name)) {
-    p.cancel("Operation cancelled.");
-    process.exit(0);
-  }
+  exitIfCancelled(name);
 
   const description = await p.text({
     message: "Description:",
@@ -60,10 +55,7 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
     },
   });
 
-  if (p.isCancel(description)) {
-    p.cancel("Operation cancelled.");
-    process.exit(0);
-  }
+  exitIfCancelled(description);
 
   // Transport type
   const transport = await p.select({
@@ -80,10 +72,7 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
     ],
   });
 
-  if (p.isCancel(transport)) {
-    p.cancel("Operation cancelled.");
-    process.exit(0);
-  }
+  exitIfCancelled(transport);
 
   let config: Record<string, unknown>;
   let envVarNames: string[] = [];
@@ -97,20 +86,14 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
       },
     });
 
-    if (p.isCancel(command)) {
-      p.cancel("Operation cancelled.");
-      process.exit(0);
-    }
+    exitIfCancelled(command);
 
     const argsRaw = await p.text({
       message: "Arguments (space-separated):",
       placeholder: "-y @modelcontextprotocol/server-github",
     });
 
-    if (p.isCancel(argsRaw)) {
-      p.cancel("Operation cancelled.");
-      process.exit(0);
-    }
+    exitIfCancelled(argsRaw);
 
     const args = argsRaw.trim() ? argsRaw.trim().split(/\s+/) : [];
 
@@ -119,10 +102,7 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
       placeholder: "GITHUB_TOKEN, API_KEY",
     });
 
-    if (p.isCancel(envRaw)) {
-      p.cancel("Operation cancelled.");
-      process.exit(0);
-    }
+    exitIfCancelled(envRaw);
 
     envVarNames = envRaw.trim()
       ? envRaw
@@ -146,10 +126,7 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
       },
     });
 
-    if (p.isCancel(url)) {
-      p.cancel("Operation cancelled.");
-      process.exit(0);
-    }
+    exitIfCancelled(url);
 
     config = { url: url as string, transport };
   }
@@ -176,10 +153,7 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
     required: false,
   });
 
-  if (p.isCancel(categories)) {
-    p.cancel("Operation cancelled.");
-    process.exit(0);
-  }
+  exitIfCancelled(categories);
 
   // Runtime (for stdio)
   let runtime: string | undefined;
@@ -194,10 +168,7 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
       ],
     });
 
-    if (p.isCancel(runtimeChoice)) {
-      p.cancel("Operation cancelled.");
-      process.exit(0);
-    }
+    exitIfCancelled(runtimeChoice);
     runtime = runtimeChoice;
   }
 
@@ -210,10 +181,7 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
     },
   });
 
-  if (p.isCancel(repository)) {
-    p.cancel("Operation cancelled.");
-    process.exit(0);
-  }
+  exitIfCancelled(repository);
 
   const homepage = await p.text({
     message: "Homepage URL (optional):",
@@ -223,20 +191,14 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
     },
   });
 
-  if (p.isCancel(homepage)) {
-    p.cancel("Operation cancelled.");
-    process.exit(0);
-  }
+  exitIfCancelled(homepage);
 
   const author = await p.text({
     message: "Author (optional):",
     placeholder: "Author Name",
   });
 
-  if (p.isCancel(author)) {
-    p.cancel("Operation cancelled.");
-    process.exit(0);
-  }
+  exitIfCancelled(author);
 
   // Build the JSON object
   const categoriesArr = categories as string[];
@@ -268,7 +230,8 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
     });
 
     if (p.isCancel(overwrite) || !overwrite) {
-      p.cancel("Operation cancelled.");
+      exitIfCancelled(overwrite);
+      p.cancel("Not overwriting.");
       process.exit(0);
     }
   }
@@ -282,6 +245,7 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
   });
 
   if (p.isCancel(confirmed) || !confirmed) {
+    exitIfCancelled(confirmed);
     p.cancel("Operation cancelled.");
     process.exit(0);
   }

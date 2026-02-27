@@ -13,6 +13,8 @@ export function SearchBar({
 }) {
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedRuntime, setSelectedRuntime] = useState<string | null>(null);
+  const [selectedTransport, setSelectedTransport] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     let result = servers;
@@ -21,10 +23,22 @@ export function SearchBar({
       result = result.filter((s) => s.categories?.includes(selectedCategory));
     }
 
+    if (selectedRuntime) {
+      result = result.filter((s) => s.runtime === selectedRuntime);
+    }
+
+    if (selectedTransport) {
+      if (selectedTransport === "remote") {
+        result = result.filter((s) => s.isRemote);
+      } else {
+        result = result.filter((s) => !s.isRemote);
+      }
+    }
+
     if (query.trim()) {
       const q = query.toLowerCase();
       result = result.filter((s) => {
-        const searchable = [s.id, s.name, s.description, ...(s.categories ?? []), s.author ?? ""]
+        const searchable = [s.id, s.name, s.description, ...(s.categories ?? [])]
           .join(" ")
           .toLowerCase();
         return searchable.includes(q);
@@ -32,7 +46,7 @@ export function SearchBar({
     }
 
     return result;
-  }, [servers, query, selectedCategory]);
+  }, [servers, query, selectedCategory, selectedRuntime, selectedTransport]);
 
   return (
     <div>
@@ -64,7 +78,10 @@ export function SearchBar({
       </div>
 
       {/* Category filters */}
-      <div className="flex flex-wrap gap-2 mb-6" role="group" aria-label="Filter by category">
+      <p className="text-[11px] text-text-secondary uppercase tracking-wider font-medium mb-1.5">
+        Category
+      </p>
+      <div className="flex flex-wrap gap-2 mb-4" role="group" aria-label="Filter by category">
         <Pill active={!selectedCategory} onClick={() => setSelectedCategory(null)}>
           All
         </Pill>
@@ -79,6 +96,45 @@ export function SearchBar({
         ))}
       </div>
 
+      {/* Runtime and transport filters */}
+      <p className="text-[11px] text-text-secondary uppercase tracking-wider font-medium mb-1.5">
+        Runtime & Transport
+      </p>
+      <div
+        className="flex flex-wrap gap-2 mb-6"
+        role="group"
+        aria-label="Filter by runtime and transport"
+      >
+        <Pill active={!selectedRuntime} onClick={() => setSelectedRuntime(null)}>
+          All runtimes
+        </Pill>
+        {["node", "python", "docker", "binary"].map((rt) => (
+          <Pill
+            key={rt}
+            active={selectedRuntime === rt}
+            onClick={() => setSelectedRuntime(selectedRuntime === rt ? null : rt)}
+          >
+            {rt}
+          </Pill>
+        ))}
+        <span className="w-px h-6 bg-border self-center mx-1" aria-hidden="true" />
+        <Pill active={!selectedTransport} onClick={() => setSelectedTransport(null)}>
+          All transports
+        </Pill>
+        <Pill
+          active={selectedTransport === "stdio"}
+          onClick={() => setSelectedTransport(selectedTransport === "stdio" ? null : "stdio")}
+        >
+          stdio
+        </Pill>
+        <Pill
+          active={selectedTransport === "remote"}
+          onClick={() => setSelectedTransport(selectedTransport === "remote" ? null : "remote")}
+        >
+          remote
+        </Pill>
+      </div>
+
       <h2 className="absolute hidden">servers</h2>
 
       {/* Results count */}
@@ -90,6 +146,8 @@ export function SearchBar({
         {filtered.length} server{filtered.length !== 1 ? "s" : ""}
         {query && ` matching "${query}"`}
         {selectedCategory && ` in ${selectedCategory}`}
+        {selectedRuntime && ` (${selectedRuntime})`}
+        {selectedTransport && ` (${selectedTransport})`}
       </p>
 
       {/* Server grid */}
@@ -102,7 +160,18 @@ export function SearchBar({
       {filtered.length === 0 && (
         <div className="text-center py-20 text-text-secondary">
           <p className="text-lg mb-2">No servers found</p>
-          <p className="text-sm">Try adjusting your search or filters.</p>
+          <p className="text-sm mb-4">Try adjusting your search or filters.</p>
+          <button
+            onClick={() => {
+              setQuery("");
+              setSelectedCategory(null);
+              setSelectedRuntime(null);
+              setSelectedTransport(null);
+            }}
+            className="text-sm text-accent hover:underline"
+          >
+            Clear all filters
+          </button>
         </div>
       )}
     </div>

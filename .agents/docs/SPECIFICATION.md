@@ -157,7 +157,7 @@ getmcp/
         format.ts                  # Config format detection from file extension
         commands/
           add.ts                   # getmcp add [server-id]
-          remove.ts                # getmcp remove <server-name>
+          remove.ts                # getmcp remove [server-name]
           list.ts                  # getmcp list [options]
           find.ts                  # getmcp find [query] (aliases: search, s, f)
           check.ts                 # getmcp check
@@ -582,14 +582,22 @@ Interactive installation workflow:
 | `--global`  | `-g`  | Install to global config for dual-scope apps            |
 | `--project` |       | Install to project config for dual-scope apps (default) |
 
-#### `getmcp remove <server-name>`
+#### `getmcp remove [server-name]`
 
-1. Scans all detected apps for the named server
-2. Shows which apps have it configured
-3. User selects which apps to remove from
-4. Confirms removal
-5. Removes the server entry from each selected config
-6. Reports results
+1. If no server name provided: shows interactive picker of all configured servers across all apps (non-interactive mode exits with error)
+2. Scans all detected apps for the named server
+3. Shows which apps have it configured
+4. User selects which apps to remove from (or all)
+5. Confirms removal
+6. Removes the server entry from each selected config
+7. Reports results
+
+| Flag        | Short | Description                               |
+| ----------- | ----- | ----------------------------------------- |
+| `--yes`     | `-y`  | Skip confirmation prompts                 |
+| `--dry-run` |       | Preview changes without writing files     |
+| `--global`  | `-g`  | Target global config for dual-scope apps  |
+| `--project` |       | Target project config for dual-scope apps |
 
 #### `getmcp list [options]`
 
@@ -823,6 +831,33 @@ getTrackedServers(filePath?: string): LockFile                                  
 A Next.js website that serves as a public directory for MCP servers. Think "npm registry for MCP servers" with one-click config generation.
 
 **Tech stack**: Next.js 15.3+ (App Router), Tailwind CSS 4.0+, Vercel Analytics + Speed Insights, with `@getmcp/core`, `@getmcp/generators`, and `@getmcp/registry` imported directly. Server pages are statically generated from the registry.
+
+### Routes
+
+The web application provides the following public routes:
+
+| Route              | Purpose                                                                        |
+| ------------------ | ------------------------------------------------------------------------------ |
+| `/`                | Homepage with hero section, search, and recent servers                         |
+| `/docs`            | Documentation page (getting started, supported apps, library usage)            |
+| `/servers`         | Server directory index page with search and category/runtime/transport filters |
+| `/servers/[id]`    | Individual server detail page with config generators for all 19 apps           |
+| `/category/[slug]` | 14 category landing pages with per-category server grids and descriptions      |
+| `/guides/[app]`    | 19 app-specific MCP setup guides (config details, examples, troubleshooting)   |
+
+### JSON-LD Schemas
+
+The site uses structured data (JSON-LD) for SEO and schema.org compliance:
+
+- **BreadcrumbList** — Category and guide navigation breadcrumbs
+- **CollectionPage** — Server directory index (`/servers`)
+- **ItemList** — Category server grids (`/category/[slug]`)
+- **TechArticle** — App-specific guides (`/guides/[app]`)
+- **SoftwareApplication** (fixed) — Organization schema in root layout
+- **WebApplication** — Root application metadata
+- **Organization** — getmcp organization metadata
+
+All schemas include proper `@context`, `@type`, and required properties per schema.org specification.
 
 ---
 

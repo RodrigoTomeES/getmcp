@@ -5,24 +5,32 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { DocsSidebar } from "@/components/DocsSidebar";
 
 export const metadata: Metadata = {
-  title: "Documentation",
+  title: "Documentation \u2014 CLI Commands, Config Formats & API Reference",
   description:
-    "Learn how to install, configure, and use getmcp to manage MCP servers across all AI applications.",
+    "Complete guide to getmcp: CLI installation, commands, project manifests, supported AI apps, library API, and contributing.",
   alternates: {
     canonical: "/docs",
   },
   openGraph: {
-    title: "Documentation \u2014 getmcp",
+    title: "Documentation \u2014 CLI Commands, Config Formats & API Reference",
     description:
-      "Learn how to install, configure, and use getmcp to manage MCP servers across all AI applications.",
+      "Complete guide to getmcp: CLI installation, commands, project manifests, supported AI apps, library API, and contributing.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Documentation \u2014 getmcp",
+    title: "Documentation \u2014 CLI Commands, Config Formats & API Reference",
     description:
-      "Learn how to install, configure, and use getmcp to manage MCP servers across all AI applications.",
+      "Complete guide to getmcp: CLI installation, commands, project manifests, supported AI apps, library API, and contributing.",
   },
+  keywords: [
+    "getmcp documentation",
+    "MCP CLI commands",
+    "MCP config format",
+    "getmcp API",
+    "MCP server installation",
+    "getmcp guide",
+  ],
 };
 
 export default function DocsPage() {
@@ -30,6 +38,52 @@ export default function DocsPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-16 flex gap-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "TechArticle",
+              headline: "getmcp Documentation — CLI Commands, Config Formats & API Reference",
+              description:
+                "Complete guide to getmcp: CLI installation, commands, project manifests, supported AI apps, library API, and contributing.",
+              url: "https://getmcp.es/docs",
+              mainEntityOfPage: {
+                "@type": "WebPage",
+                "@id": "https://getmcp.es/docs",
+              },
+              author: { "@type": "Organization", name: "getmcp" },
+              publisher: {
+                "@type": "Organization",
+                name: "getmcp",
+                url: "https://getmcp.es",
+              },
+              inLanguage: "en",
+              proficiencyLevel: "Beginner",
+              dependencies: "Node.js 18+, npm",
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  name: "Home",
+                  item: "https://getmcp.es",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: "Documentation",
+                  item: "https://getmcp.es/docs",
+                },
+              ],
+            },
+          ]),
+        }}
+      />
       <DocsSidebar />
       <div className="min-w-0 max-w-3xl flex-1">
         {/* Hero */}
@@ -48,23 +102,23 @@ export default function DocsPage() {
             <p>
               Every AI application uses a different config format for MCP (Model Context Protocol)
               servers. Claude Desktop uses{" "}
-              <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
                 mcpServers
               </code>
               , VS Code uses{" "}
-              <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
                 servers
               </code>
               , Goose uses YAML with{" "}
-              <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
                 cmd
               </code>
               /
-              <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
                 envs
               </code>
               , Codex uses TOML with{" "}
-              <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
                 mcp_servers
               </code>
               ... there are {appCount} apps, 6 root keys, and 4 formats.
@@ -130,7 +184,7 @@ npx @getmcp/cli list --json`}</CodeBlock>
           <div className="space-y-4 text-text-secondary leading-relaxed">
             <p>
               Teams can share MCP server configurations via a{" "}
-              <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
                 getmcp.json
               </code>{" "}
               manifest file in the project root:
@@ -174,30 +228,40 @@ npx @getmcp/cli list --json`}</CodeBlock>
               </thead>
               <tbody className="text-text-secondary">
                 {[
-                  ["Claude Desktop", "mcpServers", "JSON"],
-                  ["Claude Code", "mcpServers", "JSON"],
-                  ["VS Code / Copilot", "servers", "JSON"],
-                  ["Cursor", "mcpServers", "JSON"],
-                  ["Cline", "mcpServers", "JSON"],
-                  ["Roo Code", "mcpServers", "JSON"],
-                  ["Goose", "extensions", "YAML"],
-                  ["Windsurf", "mcpServers", "JSON"],
-                  ["OpenCode", "mcp", "JSONC"],
-                  ["Zed", "context_servers", "JSON"],
-                  ["PyCharm", "mcpServers", "JSON"],
-                  ["Codex", "mcp_servers", "TOML"],
-                  ["Gemini CLI", "mcpServers", "JSON"],
-                  ["Continue", "mcpServers", "JSON"],
-                  ["Amazon Q", "mcpServers", "JSON"],
-                  ["Trae", "mcpServers", "JSON"],
-                  ["BoltAI", "mcpServers", "JSON"],
-                  ["LibreChat", "mcpServers", "YAML"],
-                  ["Antigravity", "mcpServers", "JSON"],
-                ].map(([app, rootKey, format]) => (
+                  ["Claude Desktop", "mcpServers", "JSON", "claude-desktop"],
+                  ["Claude Code", "mcpServers", "JSON", "claude-code"],
+                  ["VS Code / Copilot", "servers", "JSON", "vscode"],
+                  ["Cursor", "mcpServers", "JSON", "cursor"],
+                  ["Cline", "mcpServers", "JSON", "cline"],
+                  ["Roo Code", "mcpServers", "JSON", "roo-code"],
+                  ["Goose", "extensions", "YAML", "goose"],
+                  ["Windsurf", "mcpServers", "JSON", "windsurf"],
+                  ["OpenCode", "mcp", "JSONC", "opencode"],
+                  ["Zed", "context_servers", "JSON", "zed"],
+                  ["PyCharm", "mcpServers", "JSON", "pycharm"],
+                  ["Codex", "mcp_servers", "TOML", "codex"],
+                  ["Gemini CLI", "mcpServers", "JSON", "gemini-cli"],
+                  ["Continue", "mcpServers", "JSON", "continue"],
+                  ["Amazon Q", "mcpServers", "JSON", "amazon-q"],
+                  ["Trae", "mcpServers", "JSON", "trae"],
+                  ["BoltAI", "mcpServers", "JSON", "bolt-ai"],
+                  ["LibreChat", "mcpServers", "YAML", "libre-chat"],
+                  ["Antigravity", "mcpServers", "JSON", "antigravity"],
+                ].map(([app, rootKey, format, guideSlug]) => (
                   <tr key={app} className="border-b border-border last:border-b-0">
-                    <td className="px-4 py-2.5">{app}</td>
                     <td className="px-4 py-2.5">
-                      <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                      {app}
+                      {guideSlug && (
+                        <Link
+                          href={`/guides/${guideSlug}`}
+                          className="text-accent hover:underline ml-2 text-xs"
+                        >
+                          guide
+                        </Link>
+                      )}
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                         {rootKey}
                       </code>
                     </td>
@@ -238,38 +302,38 @@ Desktop (servers)(YAML) (TOML)   apps`}</CodeBlock>
               <li>
                 <span className="text-text font-medium">Stdio servers</span> — run a local process
                 with{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   command
                 </code>
                 ,{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   args
                 </code>
                 , and{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   env
                 </code>
               </li>
               <li>
                 <span className="text-text font-medium">Remote servers</span> — connect to a URL
                 with{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   url
                 </code>{" "}
                 and optional{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   transport
                 </code>{" "}
                 (
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   http
                 </code>
                 ,{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   streamable-http
                 </code>
                 , or{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   sse
                 </code>
                 )
@@ -277,7 +341,7 @@ Desktop (servers)(YAML) (TOML)   apps`}</CodeBlock>
             </ul>
             <p>
               Transport is auto-inferred: URLs ending in{" "}
-              <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                 /sse
               </code>{" "}
               default to SSE, others default to HTTP.
@@ -349,13 +413,13 @@ getServersByCategory("web");
             <ol className="list-decimal list-inside space-y-2 ml-1">
               <li>
                 Create a new JSON file at{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   packages/registry/servers/your-server.json
                 </code>
               </li>
               <li>
                 Add a{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   $schema
                 </code>{" "}
                 field for IDE autocompletion
