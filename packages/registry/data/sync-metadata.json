@@ -1,0 +1,8 @@
+{
+  "syncedAt": "2026-02-27T21:02:59.625Z",
+  "totalEntries": 2648,
+  "enrichedWithGitHub": 1968,
+  "withMetrics": 2076,
+  "sources": ["official"],
+  "duration": "317.6s"
+}

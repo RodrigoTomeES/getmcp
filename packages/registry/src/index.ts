@@ -1,26 +1,32 @@
 /**
  * @getmcp/registry
  *
- * Registry of popular MCP server definitions in canonical format.
- * Provides lookup, search, and listing functions.
- *
- * Server definitions are stored as JSON files in the `servers/` directory
- * and loaded automatically at startup.
+ * Registry of MCP server definitions synced from the official MCP registry.
+ * Loads from data/servers.json, transforms to internal format, and provides
+ * lookup, search, and listing functions.
  */
 
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { RegistryEntry } from "@getmcp/core";
 import type { RegistryEntryType } from "@getmcp/core";
+import { transformToInternal, type InternalRegistryEntry } from "./transform.js";
+import { extractServerConfig, type ExtractedConfig } from "./extract-config.js";
+import type { GetMCPMetricsType } from "./enrichment-types.js";
+
+// Re-export for consumers
+export { extractServerConfig, type ExtractedConfig } from "./extract-config.js";
+export { type InternalRegistryEntry } from "./transform.js";
 
 // ---------------------------------------------------------------------------
-// Registry — all servers indexed by ID, loaded from JSON files
+// Registry state
 // ---------------------------------------------------------------------------
 
-const _registry: Map<string, RegistryEntryType> = new Map();
+const _registry: Map<string, InternalRegistryEntry> = new Map();
+const _officialNameIndex: Map<string, string> = new Map(); // officialName -> slug
+let _rawEntries: RegistryEntryType[] = [];
 let _loaded = false;
-let _sortedCache: RegistryEntryType[] | null = null;
+let _sortedCache: InternalRegistryEntry[] | null = null;
 let _sortedIdsCache: string[] | null = null;
 
 function ensureLoaded(): void {
@@ -38,33 +44,27 @@ function invalidateCache(): void {
 function loadServers(): void {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-  // Resolve servers directory for both dev (src/) and dist/ contexts
-  let serversDir = path.resolve(__dirname, "..", "servers");
-  if (!fs.existsSync(serversDir)) {
-    serversDir = path.resolve(__dirname, "servers");
+  // Resolve data directory for both dev (src/) and dist/ contexts
+  let dataPath = path.resolve(__dirname, "..", "data", "servers.json");
+  if (!fs.existsSync(dataPath)) {
+    dataPath = path.resolve(__dirname, "data", "servers.json");
   }
 
-  const files = fs.readdirSync(serversDir).filter((f) => f.endsWith(".json"));
+  if (!fs.existsSync(dataPath)) {
+    // No data file yet — registry is empty until first sync
+    return;
+  }
 
-  for (const file of files) {
-    const filePath = path.join(serversDir, file);
-    const raw = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  _rawEntries = JSON.parse(fs.readFileSync(dataPath, "utf-8")) as RegistryEntryType[];
 
-    // Strip $schema before validation (it's for IDE use only)
-    const { $schema: _, ...data } = raw;
-
-    const entry = RegistryEntry.parse(data);
-
-    // Enforce filename === id
-    const expectedFile = `${entry.id}.json`;
-    if (file !== expectedFile) {
-      throw new Error(
-        `Filename mismatch: "${file}" contains id "${entry.id}" (expected "${expectedFile}")`,
-      );
+  for (const raw of _rawEntries) {
+    const entry = transformToInternal(raw);
+    if (entry) {
+      _registry.set(entry.id, entry);
+      _officialNameIndex.set(entry.officialName, entry.id);
     }
-
-    _registry.set(entry.id, entry);
   }
+
   invalidateCache();
 }
 
@@ -73,18 +73,17 @@ function loadServers(): void {
 // ---------------------------------------------------------------------------
 
 /**
- * Get a server definition by its ID.
- * Returns undefined if not found.
+ * Get a server by its slug ID.
  */
-export function getServer(id: string): RegistryEntryType | undefined {
+export function getServer(id: string): InternalRegistryEntry | undefined {
   ensureLoaded();
   return _registry.get(id);
 }
 
 /**
- * Get a server definition by its ID, throwing if not found.
+ * Get a server by its slug ID, throwing if not found.
  */
-export function getServerOrThrow(id: string): RegistryEntryType {
+export function getServerOrThrow(id: string): InternalRegistryEntry {
   ensureLoaded();
   const entry = _registry.get(id);
   if (!entry) {
@@ -96,7 +95,17 @@ export function getServerOrThrow(id: string): RegistryEntryType {
 }
 
 /**
- * Get all registered server IDs.
+ * Get a server by its official reverse-DNS name.
+ */
+export function getServerByOfficialName(name: string): InternalRegistryEntry | undefined {
+  ensureLoaded();
+  const slug = _officialNameIndex.get(name);
+  if (!slug) return undefined;
+  return _registry.get(slug);
+}
+
+/**
+ * Get all registered server IDs (sorted).
  */
 export function getServerIds(): string[] {
   ensureLoaded();
@@ -107,9 +116,9 @@ export function getServerIds(): string[] {
 }
 
 /**
- * Get all registered server entries.
+ * Get all registered server entries (sorted by ID).
  */
-export function getAllServers(): RegistryEntryType[] {
+export function getAllServers(): InternalRegistryEntry[] {
   ensureLoaded();
   if (!_sortedCache) {
     _sortedCache = Array.from(_registry.values()).sort((a, b) => a.id.localeCompare(b.id));
@@ -118,10 +127,10 @@ export function getAllServers(): RegistryEntryType[] {
 }
 
 /**
- * Search servers by a text query.
- * Matches against id, name, description, and categories.
+ * Search servers by text query.
+ * Matches against id, name, description, categories, author, and tags.
  */
-export function searchServers(query: string): RegistryEntryType[] {
+export function searchServers(query: string): InternalRegistryEntry[] {
   const q = query.toLowerCase().trim();
   if (!q) return getAllServers();
 
@@ -132,6 +141,8 @@ export function searchServers(query: string): RegistryEntryType[] {
       entry.description,
       ...(entry.categories ?? []),
       entry.author ?? "",
+      ...(entry.tags ?? []),
+      entry.officialName,
     ]
       .join(" ")
       .toLowerCase();
@@ -143,7 +154,7 @@ export function searchServers(query: string): RegistryEntryType[] {
 /**
  * Filter servers by category.
  */
-export function getServersByCategory(category: string): RegistryEntryType[] {
+export function getServersByCategory(category: string): InternalRegistryEntry[] {
   const cat = category.toLowerCase();
   return getAllServers().filter((entry) =>
     (entry.categories ?? []).some((c: string) => c.toLowerCase() === cat),
@@ -151,11 +162,11 @@ export function getServersByCategory(category: string): RegistryEntryType[] {
 }
 
 /**
- * Get all unique categories across all servers.
+ * Get all unique categories across all servers (sorted).
  */
-export function getCategories(): RegistryEntryType["categories"] {
+export function getCategories(): string[] {
   ensureLoaded();
-  const categories = new Set<RegistryEntryType["categories"][number]>();
+  const categories = new Set<string>();
   for (const entry of _registry.values()) {
     for (const cat of entry.categories ?? []) {
       categories.add(cat);
@@ -173,14 +184,13 @@ export function getServerCount(): number {
 }
 
 /**
- * Find a registry server that matches a given command+args or package name.
- * Used by the `import` command to match existing configured servers
- * back to known registry entries.
+ * Find a registry server by command+args or package name.
+ * Used by the `import` command to match existing servers.
  */
 export function findServerByCommand(
   command: string,
   args: string[],
-): RegistryEntryType | undefined {
+): InternalRegistryEntry | undefined {
   const argsStr = args.join(" ");
 
   ensureLoaded();
@@ -203,4 +213,68 @@ export function findServerByCommand(
   }
 
   return undefined;
+}
+
+/**
+ * Get metrics for a server by slug ID.
+ * Reads from the raw data's _meta["es.getmcp/metrics"].
+ */
+export function getServerMetrics(id: string): GetMCPMetricsType | undefined {
+  ensureLoaded();
+  const slug = id;
+  for (const raw of _rawEntries) {
+    const enrichment = raw._meta?.["es.getmcp/enrichment"] as { slug?: string } | undefined;
+    if (enrichment?.slug === slug) {
+      return raw._meta?.["es.getmcp/metrics"] as GetMCPMetricsType | undefined;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Get the full raw entry in official format by slug ID.
+ */
+export function getRawServerData(id: string): RegistryEntryType | undefined {
+  ensureLoaded();
+  for (const raw of _rawEntries) {
+    const enrichment = raw._meta?.["es.getmcp/enrichment"] as { slug?: string } | undefined;
+    if (enrichment?.slug === id) {
+      return raw;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Get servers sorted by a metric.
+ */
+export function getServersSortedBy(
+  metric: "stars" | "downloads" | "recent",
+  limit?: number,
+): InternalRegistryEntry[] {
+  ensureLoaded();
+
+  const withMetrics = getAllServers().map((entry) => ({
+    entry,
+    metrics: getServerMetrics(entry.id),
+  }));
+
+  withMetrics.sort((a, b) => {
+    switch (metric) {
+      case "stars":
+        return (b.metrics?.github?.stars ?? 0) - (a.metrics?.github?.stars ?? 0);
+      case "downloads": {
+        const aDownloads =
+          (a.metrics?.npm?.weeklyDownloads ?? 0) + (a.metrics?.pypi?.monthlyDownloads ?? 0);
+        const bDownloads =
+          (b.metrics?.npm?.weeklyDownloads ?? 0) + (b.metrics?.pypi?.monthlyDownloads ?? 0);
+        return bDownloads - aDownloads;
+      }
+      case "recent":
+        return (b.metrics?.github?.lastPush ?? "").localeCompare(a.metrics?.github?.lastPush ?? "");
+    }
+  });
+
+  const sorted = withMetrics.map((m) => m.entry);
+  return limit ? sorted.slice(0, limit) : sorted;
 }
