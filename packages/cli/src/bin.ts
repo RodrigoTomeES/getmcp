@@ -14,16 +14,6 @@
  */
 
 import { createRequire } from "node:module";
-import { addCommand } from "./commands/add.js";
-import { removeCommand } from "./commands/remove.js";
-import { listCommand } from "./commands/list.js";
-import { findCommand } from "./commands/find.js";
-import { checkCommand } from "./commands/check.js";
-import { updateCommand } from "./commands/update.js";
-import { initCommand } from "./commands/init.js";
-import { doctorCommand } from "./commands/doctor.js";
-import { importCommand } from "./commands/import.js";
-import { syncCommand } from "./commands/sync.js";
 import { parseFlags, resolveAlias } from "./utils.js";
 
 const require = createRequire(import.meta.url);
@@ -111,6 +101,7 @@ async function main(): Promise<void> {
 
   switch (command) {
     case "add": {
+      const { addCommand } = await import("./commands/add.js");
       await addCommand(serverId, {
         yes: flags.yes,
         apps: flags.apps,
@@ -127,6 +118,7 @@ async function main(): Promise<void> {
     }
 
     case "remove": {
+      const { removeCommand } = await import("./commands/remove.js");
       await removeCommand(serverId, {
         yes: flags.yes,
         apps: flags.apps,
@@ -138,6 +130,7 @@ async function main(): Promise<void> {
     }
 
     case "list": {
+      const { listCommand } = await import("./commands/list.js");
       await listCommand({
         installed: flags.installed,
         search: flags.search,
@@ -149,11 +142,21 @@ async function main(): Promise<void> {
     }
 
     case "find": {
-      await findCommand(serverId);
+      const { findCommand } = await import("./commands/find.js");
+      await findCommand(serverId, {
+        yes: flags.yes,
+        apps: flags.apps,
+        allApps: flags.allApps,
+        dryRun: flags.dryRun,
+        json: flags.json,
+        global: flags.global,
+        project: flags.project,
+      });
       break;
     }
 
     case "check": {
+      const { checkCommand } = await import("./commands/check.js");
       await checkCommand({
         json: flags.json,
       });
@@ -161,6 +164,7 @@ async function main(): Promise<void> {
     }
 
     case "update": {
+      const { updateCommand } = await import("./commands/update.js");
       await updateCommand({
         yes: flags.yes,
         apps: flags.apps,
@@ -173,11 +177,13 @@ async function main(): Promise<void> {
     }
 
     case "init": {
+      const { initCommand } = await import("./commands/init.js");
       await initCommand({ output: flags.output });
       break;
     }
 
     case "doctor": {
+      const { doctorCommand } = await import("./commands/doctor.js");
       await doctorCommand({
         json: flags.json,
       });
@@ -185,6 +191,7 @@ async function main(): Promise<void> {
     }
 
     case "import": {
+      const { importCommand } = await import("./commands/import.js");
       await importCommand({
         yes: flags.yes,
         json: flags.json,
@@ -193,6 +200,7 @@ async function main(): Promise<void> {
     }
 
     case "sync": {
+      const { syncCommand } = await import("./commands/sync.js");
       await syncCommand({
         yes: flags.yes,
         apps: flags.apps,

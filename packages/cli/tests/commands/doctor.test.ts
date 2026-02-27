@@ -19,11 +19,11 @@ vi.mock("../../src/lock.js", () => ({
 
 // Mock child_process to avoid running real commands
 vi.mock("node:child_process", () => ({
-  execSync: vi.fn((cmd: string) => {
-    if (cmd.startsWith("node")) return "v22.0.0";
-    if (cmd.startsWith("npx")) return "10.0.0";
-    if (cmd.startsWith("uvx")) throw new Error("not found");
-    return "";
+  execFileSync: vi.fn((cmd: string) => {
+    if (cmd === "node") return Buffer.from("v22.0.0");
+    if (cmd === "npx") return Buffer.from("10.0.0");
+    if (cmd === "uvx") throw new Error("not found");
+    return Buffer.from("");
   }),
 }));
 

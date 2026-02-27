@@ -111,12 +111,15 @@ export abstract class BaseGenerator implements ConfigGenerator {
 /**
  * Deep merge two objects. Arrays are replaced, not merged.
  */
+const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
 export function deepMerge(
   target: Record<string, unknown>,
   source: Record<string, unknown>,
 ): Record<string, unknown> {
   const result = { ...target };
   for (const key of Object.keys(source)) {
+    if (UNSAFE_KEYS.has(key)) continue;
     const targetVal = target[key];
     const sourceVal = source[key];
     if (isPlainObject(targetVal) && isPlainObject(sourceVal)) {

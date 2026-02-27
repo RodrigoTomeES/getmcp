@@ -15,7 +15,7 @@ import * as p from "@clack/prompts";
 import { detectInstalledApps, type DetectedApp } from "../detect.js";
 import { removeServerFromConfig, writeConfigFile, listServersInConfig } from "../config-file.js";
 import { trackRemoval } from "../lock.js";
-import { shortenPath, isNonInteractive as checkNonInteractive } from "../utils.js";
+import { shortenPath, isNonInteractive as isNonInteractiveCheck } from "../utils.js";
 import { formatError } from "../errors.js";
 
 export interface RemoveOptions {
@@ -31,16 +31,9 @@ export async function removeCommand(
   serverName?: string,
   options: RemoveOptions = {},
 ): Promise<void> {
-  const isNonInteractive = checkNonInteractive(options);
+  const isNonInteractive = isNonInteractiveCheck(options);
 
   p.intro("getmcp remove");
-
-  if (!serverName) {
-    p.log.error(
-      "Usage: getmcp remove <server-name>\n  Provide the name/key of the MCP server to remove.",
-    );
-    process.exit(1);
-  }
 
   const installed = detectInstalledApps();
 
@@ -50,18 +43,54 @@ export async function removeCommand(
     return;
   }
 
-  // Find which apps have this server configured
-  const appsWithServer: DetectedApp[] = [];
+  // Build map of all configured servers across apps
+  const serverAppMap = new Map<string, DetectedApp[]>();
   for (const app of installed) {
     try {
       const servers = listServersInConfig(app.configPath);
-      if (servers.includes(serverName)) {
-        appsWithServer.push(app);
+      for (const s of servers) {
+        const existing = serverAppMap.get(s) ?? [];
+        existing.push(app);
+        serverAppMap.set(s, existing);
       }
     } catch {
       // Skip apps with unreadable config
     }
   }
+
+  // If no server name provided, offer interactive picker
+  if (!serverName) {
+    if (isNonInteractive) {
+      p.log.error(
+        "Usage: getmcp remove <server-name>\n  Provide the name/key of the MCP server to remove.",
+      );
+      process.exit(1);
+    }
+
+    if (serverAppMap.size === 0) {
+      p.log.warn("No MCP servers found in any app configuration.");
+      p.outro("Done");
+      return;
+    }
+
+    const selected = await p.select({
+      message: "Select a server to remove:",
+      options: Array.from(serverAppMap.entries()).map(([name, apps]) => ({
+        label: name,
+        hint: `in ${apps.map((a) => a.name).join(", ")}`,
+        value: name,
+      })),
+    });
+
+    if (p.isCancel(selected)) {
+      p.cancel("Operation cancelled.");
+      process.exit(0);
+    }
+    serverName = selected;
+  }
+
+  // Find which apps have this server configured
+  const appsWithServer = serverAppMap.get(serverName) ?? [];
 
   if (appsWithServer.length === 0) {
     p.log.warn(`Server "${serverName}" was not found in any detected app config.`);
