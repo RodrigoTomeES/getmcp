@@ -157,7 +157,7 @@ getmcp/
         format.ts                  # Config format detection from file extension
         commands/
           add.ts                   # getmcp add [server-id]
-          remove.ts                # getmcp remove <server-name>
+          remove.ts                # getmcp remove [server-name]
           list.ts                  # getmcp list [options]
           find.ts                  # getmcp find [query] (aliases: search, s, f)
           check.ts                 # getmcp check
@@ -582,14 +582,22 @@ Interactive installation workflow:
 | `--global`  | `-g`  | Install to global config for dual-scope apps            |
 | `--project` |       | Install to project config for dual-scope apps (default) |
 
-#### `getmcp remove <server-name>`
+#### `getmcp remove [server-name]`
 
-1. Scans all detected apps for the named server
-2. Shows which apps have it configured
-3. User selects which apps to remove from
-4. Confirms removal
-5. Removes the server entry from each selected config
-6. Reports results
+1. If no server name provided: shows interactive picker of all configured servers across all apps (non-interactive mode exits with error)
+2. Scans all detected apps for the named server
+3. Shows which apps have it configured
+4. User selects which apps to remove from (or all)
+5. Confirms removal
+6. Removes the server entry from each selected config
+7. Reports results
+
+| Flag        | Short | Description                               |
+| ----------- | ----- | ----------------------------------------- |
+| `--yes`     | `-y`  | Skip confirmation prompts                 |
+| `--dry-run` |       | Preview changes without writing files     |
+| `--global`  | `-g`  | Target global config for dual-scope apps  |
+| `--project` |       | Target project config for dual-scope apps |
 
 #### `getmcp list [options]`
 

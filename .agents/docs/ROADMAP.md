@@ -88,8 +88,8 @@ Features that improve the developer experience.
 - [x] **Add `--json` / `--quiet` output mode** — Added `--json` and `--quiet`/`-q` flags to `list`, `add`, and `check` commands. JSON outputs structured data, quiet outputs one ID per line.
   - Files: `packages/cli/src/commands/list.ts`, `add.ts`, `check.ts`, `packages/cli/src/utils.ts`
 
-- [ ] **Add fuzzy matching to `remove` command** — Currently requires an exact server name. Should suggest similar names when no exact match is found (like `add` does with search).
-  - File: `packages/cli/src/commands/remove.ts` (lines 19-24)
+- [x] **Interactive server picker for `remove` command** — When `remove` is called without arguments, shows an interactive picker of all configured servers. In non-interactive mode, still requires the server name argument.
+  - File: `packages/cli/src/commands/remove.ts` (lines 62-90)
 
 - [ ] **Handle empty registry gracefully** — If `getAllServers()` returns an empty array, `select()` from `@inquirer/prompts` receives empty `choices` and may crash. Add a guard with a clear error message.
   - File: `packages/cli/src/commands/add.ts` (lines 54-62)
