@@ -482,6 +482,178 @@ Fonts: `Inter-Bold.ttf` (700), `Inter-Regular.ttf` (400) loaded from `assets/`.
 
 ---
 
+---
+
+## New Page Patterns (2026-02-27)
+
+### Category Pages (`/category/[slug]`)
+
+Dedicated landing pages for each of the 14 server categories.
+
+```
+┌─────────────────────────────────────────┐
+│ Home / Servers / {Category}             │  ← Breadcrumb
+│                                         │
+│ {Category} MCP Servers                  │  ← h1 with category count
+│ Description of this category             │
+│ 42 servers available                    │
+├─────────────────────────────────────────┤
+│ [Card] [Card] [Card]                    │  ← 3-col ServerCard grid
+│ [Card] [Card] [Card]                    │
+│ [Card] [Card]                           │
+└─────────────────────────────────────────┘
+```
+
+- **Layout**: `max-w-6xl mx-auto px-6 py-12`
+- **Server grid**: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4`
+- **JSON-LD**: `CollectionPage` + `ItemList` of servers + `BreadcrumbList`
+- **Breadcrumb styling**: `text-sm text-text-secondary hover:text-text`
+
+### Guide Pages (`/guides/[app]`)
+
+Per-app installation and configuration guides with generator metadata.
+
+```
+┌─────────────────────────────────────────┐
+│ Home / Guides / VS Code                 │  ← Breadcrumb
+│                                         │
+│ Setting up MCP in VS Code               │  ← h1
+│ A step-by-step guide to installing      │
+│ and configuring MCP servers             │
+├─────────────────────────────────────────┤
+│ Overview                                │  ← h2 sections
+│ VS Code supports both stdio and remote  │
+│ servers via the built-in MCP client.    │
+│                                         │
+│ Quick Install                           │  ← Code block with copy
+│ $ npx @getmcp/cli add github --app vscode
+│                                         │
+│ Configuration Format                    │
+│ Config Path:  ~/.vscode/argv.json      │  ← dl grid metadata
+│ Field Name:   mcp                       │
+│ Root Key:     mcpServers                │
+│                                         │
+│ Sample Configuration                    │  ← Code block
+│ { "mcp": { "mcpServers": { ... } } }    │
+│                                         │
+│ Prerequisites                           │  ← Checklist or paragraph
+│ □ VS Code 1.80+                         │
+│ □ MCP CLI installed                     │
+│                                         │
+│ Popular Servers for VS Code             │  ← Compact 2-col grid
+│ [Server] [Server]                       │     (names + badges only)
+│ [Server] [Server]                       │
+│                                         │
+│ Troubleshooting                         │  ← FAQ or common issues
+│ Q: How do I enable MCP?                 │
+│ A: Uncomment the mcp section...         │
+│                                         │
+│ Official Documentation                  │  ← External link
+│ VS Code MCP Extension →                 │
+└─────────────────────────────────────────┘
+```
+
+- **Layout**: `max-w-3xl mx-auto px-6 py-12`
+- **Breadcrumb**: Link styled as `text-text-secondary hover:text-text text-sm`
+- **Section spacing**: `mb-10` between major sections
+- **Code blocks**: `rounded-lg border border-border bg-code-bg p-4 font-mono text-sm`
+- **Metadata grid** (`dl`): `grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-5 py-6 border-y border-border`
+- **Related servers grid**: `grid grid-cols-1 md:grid-cols-2 gap-4`
+- **JSON-LD**: `TechArticle` (author: "getmcp", about: "[App] MCP Configuration") + `BreadcrumbList`
+- **Config metadata sourced from**: `packages/generators/src/<app-name>.ts` `AppMetadata` (configFileName, configPaths, docsUrl)
+
+### /servers Index Page
+
+Hub page for discovering all servers in the registry.
+
+```
+┌─────────────────────────────────────────┐
+│ Home / Servers                          │  ← Breadcrumb
+│                                         │
+│ Discover MCP Servers                    │  ← h1
+│ Browse all available servers across     │
+│ 14 categories                           │
+├─────────────────────────────────────────┤
+│ 🔍 Search...     [All] [dev-tools] ...  │  ← SearchBar (reused)
+│                                         │
+│ Showing 142 servers                     │
+│                                         │
+│ [Card] [Card] [Card]                    │  ← Full 3-col grid
+│ [Card] [Card] [Card]                    │
+│ ...                                     │
+└─────────────────────────────────────────┘
+```
+
+- **SearchBar reuse**: Full component with category filter pills
+- **Server grid**: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4`
+- **JSON-LD**: `CollectionPage` (name: "MCP Server Registry") + server `ItemList` + `BreadcrumbList`
+
+### Mobile ConfigViewer Tabs
+
+Responsive tab switching for app configuration display.
+
+```
+Desktop (md+):
+ [Claude Desktop] [VS Code] [Cursor] ...  ← Flex pill buttons, visible on md+
+
+Mobile (<md):
+ ┌────────────────────────────┐
+ │ Claude Desktop        [∨]  │  ← HTML select element
+ └────────────────────────────┘
+```
+
+- **Mobile select**: `md:hidden` applied to `<select>` element
+- **Desktop pills**: `hidden md:flex` for pill buttons
+- **Preference storage**: `localStorage.getItem("getmcp-preferred-app")` / `localStorage.setItem("getmcp-preferred-app", appId)`
+- **Select styling**: `rounded-md border border-border bg-surface text-text p-2`
+- **File**: `packages/web/src/components/ConfigViewer.tsx`
+
+### Search Filter Pills
+
+Dual filter rows for category search and runtime/transport filtering.
+
+```
+Row 1 (Category pills):
+ [All] [developer-tools] [web] [ai] [analytics] ...
+
+Row 2 (Runtime + Transport filters):
+ Runtime: [Node.js] [Python] [Go] [Rust] ...
+ ─────────────────────────────────────────
+ Transport: [Stdio] [Remote]
+```
+
+- **Filter rows**: Stacked on mobile, side-by-side on md+
+- **Category pills**: `rounded-full border px-3 py-1.5 text-xs`
+  - Active: `border-accent bg-accent/10 text-accent`
+  - Inactive: `border-border text-text-secondary`
+- **Separator between runtime/transport**: `<span className="w-px h-6 bg-border">` (or use `mx-2`)
+- **Active filter count**: Shown in results text (e.g., "Showing 12 servers (3 filters)")
+- **File**: `packages/web/src/components/SearchBar.tsx`
+
+### Server Card Enrichment
+
+Enhanced metadata display on server listing cards.
+
+```
+┌──────────────────────────────────┐
+│ Server Name          [node.js]   │  ← Runtime badge pushed right
+│                                  │
+│ Description text about the       │  ← line-clamp-2
+│ server's functionality...        │
+│                                  │
+│ [category] [tag]     by Author   │  ← Author pushed to right
+│ ──────────────────────────────── │
+│ [stdio]              $35/month   │  ← Transport badge + pricing
+└──────────────────────────────────┘
+```
+
+- **Runtime badge**: `bg-surface-hover text-text-secondary font-mono text-xs px-2 py-0.5 rounded-full`
+- **Author byline**: `text-xs text-text-secondary ml-auto` (absolute right on card, or flex justify-between)
+- **Transport badge**: Existing `text-xs px-2 py-0.5 rounded-full font-medium` (green for stdio, purple for remote)
+- **File**: `packages/web/src/components/ServerCard.tsx`
+
+---
+
 ## Dependencies
 
 | Package                       | Purpose                     |
