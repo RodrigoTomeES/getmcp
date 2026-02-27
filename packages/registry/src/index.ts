@@ -19,6 +19,21 @@ import type { RegistryEntryType } from "@getmcp/core";
 // ---------------------------------------------------------------------------
 
 const _registry: Map<string, RegistryEntryType> = new Map();
+let _loaded = false;
+let _sortedCache: RegistryEntryType[] | null = null;
+let _sortedIdsCache: string[] | null = null;
+
+function ensureLoaded(): void {
+  if (!_loaded) {
+    loadServers();
+    _loaded = true;
+  }
+}
+
+function invalidateCache(): void {
+  _sortedCache = null;
+  _sortedIdsCache = null;
+}
 
 function loadServers(): void {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -50,9 +65,8 @@ function loadServers(): void {
 
     _registry.set(entry.id, entry);
   }
+  invalidateCache();
 }
-
-loadServers();
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -63,6 +77,7 @@ loadServers();
  * Returns undefined if not found.
  */
 export function getServer(id: string): RegistryEntryType | undefined {
+  ensureLoaded();
   return _registry.get(id);
 }
 
@@ -70,6 +85,7 @@ export function getServer(id: string): RegistryEntryType | undefined {
  * Get a server definition by its ID, throwing if not found.
  */
 export function getServerOrThrow(id: string): RegistryEntryType {
+  ensureLoaded();
   const entry = _registry.get(id);
   if (!entry) {
     throw new Error(
@@ -83,14 +99,22 @@ export function getServerOrThrow(id: string): RegistryEntryType {
  * Get all registered server IDs.
  */
 export function getServerIds(): string[] {
-  return Array.from(_registry.keys()).sort();
+  ensureLoaded();
+  if (!_sortedIdsCache) {
+    _sortedIdsCache = Array.from(_registry.keys()).sort();
+  }
+  return _sortedIdsCache;
 }
 
 /**
  * Get all registered server entries.
  */
 export function getAllServers(): RegistryEntryType[] {
-  return Array.from(_registry.values()).sort((a, b) => a.id.localeCompare(b.id));
+  ensureLoaded();
+  if (!_sortedCache) {
+    _sortedCache = Array.from(_registry.values()).sort((a, b) => a.id.localeCompare(b.id));
+  }
+  return _sortedCache;
 }
 
 /**
@@ -130,6 +154,7 @@ export function getServersByCategory(category: string): RegistryEntryType[] {
  * Get all unique categories across all servers.
  */
 export function getCategories(): RegistryEntryType["categories"] {
+  ensureLoaded();
   const categories = new Set<RegistryEntryType["categories"][number]>();
   for (const entry of _registry.values()) {
     for (const cat of entry.categories ?? []) {
@@ -143,6 +168,7 @@ export function getCategories(): RegistryEntryType["categories"] {
  * Get the total number of registered servers.
  */
 export function getServerCount(): number {
+  ensureLoaded();
   return _registry.size;
 }
 
@@ -157,6 +183,7 @@ export function findServerByCommand(
 ): RegistryEntryType | undefined {
   const argsStr = args.join(" ");
 
+  ensureLoaded();
   for (const entry of _registry.values()) {
     const config = entry.config;
     if (!("command" in config)) continue;

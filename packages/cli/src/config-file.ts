@@ -182,7 +182,9 @@ export function mergeServerIntoConfig(
   const existing = readConfigFile(filePath);
 
   // Deep merge: for each top-level key in generated config
+  const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
   for (const [rootKey, value] of Object.entries(generatedConfig)) {
+    if (UNSAFE_KEYS.has(rootKey)) continue;
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
       const existingSection = (existing[rootKey] as Record<string, unknown>) ?? {};
       existing[rootKey] = {
@@ -242,10 +244,13 @@ export const ROOT_KEYS = [
  * List all server names found in a config file.
  * Scans known root keys: mcpServers, servers, extensions, mcp,
  * context_servers, mcp_servers.
- * Format is auto-detected from the file extension.
+ *
+ * Accepts either a file path (reads from disk) or a pre-parsed config object
+ * to avoid redundant file reads.
  */
-export function listServersInConfig(filePath: string): string[] {
-  const existing = readConfigFile(filePath);
+export function listServersInConfig(filePathOrConfig: string | Record<string, unknown>): string[] {
+  const existing =
+    typeof filePathOrConfig === "string" ? readConfigFile(filePathOrConfig) : filePathOrConfig;
   const rootKeys = ROOT_KEYS;
   const servers: string[] = [];
 

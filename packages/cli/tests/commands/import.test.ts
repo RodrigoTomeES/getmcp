@@ -24,7 +24,8 @@ vi.mock("../../src/config-file.js", () => ({
 // Mock lock file
 vi.mock("../../src/lock.js", () => ({
   getTrackedServers: vi.fn(() => ({ version: 1, installations: {} })),
-  trackInstallation: vi.fn(),
+  readLockFile: vi.fn(() => ({ version: 1, installations: {} })),
+  writeLockFile: vi.fn(),
 }));
 
 let consoleSpy: ReturnType<typeof vi.spyOn>;
@@ -127,7 +128,7 @@ describe("importCommand", () => {
   it("imports matched servers in non-interactive mode", async () => {
     const { detectInstalledApps } = await import("../../src/detect.js");
     const { readConfigFile } = await import("../../src/config-file.js");
-    const { trackInstallation } = await import("../../src/lock.js");
+    const { writeLockFile } = await import("../../src/lock.js");
 
     (detectInstalledApps as ReturnType<typeof vi.fn>).mockReturnValueOnce([
       {
@@ -150,8 +151,16 @@ describe("importCommand", () => {
 
     await importCommand({ yes: true });
 
-    expect(trackInstallation).toHaveBeenCalledWith("github", ["claude-desktop"], [], undefined, {
-      "claude-desktop": "project",
-    });
+    expect(writeLockFile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        installations: expect.objectContaining({
+          github: expect.objectContaining({
+            apps: ["claude-desktop"],
+            envVars: [],
+            scopes: { "claude-desktop": "project" },
+          }),
+        }),
+      }),
+    );
   });
 });

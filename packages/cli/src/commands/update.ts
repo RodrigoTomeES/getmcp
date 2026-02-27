@@ -8,11 +8,17 @@
 import * as p from "@clack/prompts";
 import { getServer } from "@getmcp/registry";
 import { getGenerator } from "@getmcp/generators";
+import { isStdioConfig } from "@getmcp/core";
 import type { LooseServerConfigType, AppIdType } from "@getmcp/core";
 import { getTrackedServers, trackInstallation } from "../lock.js";
 import { detectApps } from "../detect.js";
-import { mergeServerIntoConfig, writeConfigFile } from "../config-file.js";
-import { shortenPath, isNonInteractive as checkNonInteractive } from "../utils.js";
+import {
+  mergeServerIntoConfig,
+  writeConfigFile,
+  readConfigFile,
+  ROOT_KEYS,
+} from "../config-file.js";
+import { shortenPath, isNonInteractive as isNonInteractiveCheck } from "../utils.js";
 import { formatError } from "../errors.js";
 
 export interface UpdateOptions {
@@ -25,7 +31,7 @@ export interface UpdateOptions {
 }
 
 export async function updateCommand(options: UpdateOptions = {}): Promise<void> {
-  const isNonInteractive = checkNonInteractive(options);
+  const isNonInteractive = isNonInteractiveCheck(options);
 
   p.intro("getmcp update");
 
@@ -77,6 +83,35 @@ export async function updateCommand(options: UpdateOptions = {}): Promise<void> 
     }
 
     const config = structuredClone(registryEntry.config) as LooseServerConfigType;
+
+    // Preserve existing env var values from current configs
+    if (isStdioConfig(config) && config.env) {
+      for (const appId of installation.apps) {
+        const app = appMap.get(appId);
+        if (!app) continue;
+        try {
+          const existingConfig = readConfigFile(app.configPath);
+          for (const rootKey of ROOT_KEYS) {
+            const section = existingConfig[rootKey] as Record<string, unknown> | undefined;
+            if (!section || typeof section !== "object") continue;
+            const serverSection = section[serverId] as Record<string, unknown> | undefined;
+            if (!serverSection || typeof serverSection !== "object") continue;
+            const existingEnv = serverSection.env as Record<string, string> | undefined;
+            if (!existingEnv) continue;
+            // Merge non-empty existing values into the new config
+            for (const [key, val] of Object.entries(existingEnv)) {
+              if (val && key in config.env!) {
+                config.env![key] = val;
+              }
+            }
+            break; // Found env values, no need to check more root keys
+          }
+          break; // Only need values from one app's config
+        } catch {
+          // Config not readable, skip
+        }
+      }
+    }
 
     // Determine which apps to update
     let targetAppIds: AppIdType[];

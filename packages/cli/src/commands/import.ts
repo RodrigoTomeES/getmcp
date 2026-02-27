@@ -10,7 +10,8 @@ import * as p from "@clack/prompts";
 import { getServer, findServerByCommand } from "@getmcp/registry";
 import { detectInstalledApps } from "../detect.js";
 import { readConfigFile, ROOT_KEYS } from "../config-file.js";
-import { getTrackedServers, trackInstallation } from "../lock.js";
+import { getTrackedServers, readLockFile, writeLockFile } from "../lock.js";
+import { isNonInteractive as isNonInteractiveCheck } from "../utils.js";
 
 export interface ImportOptions {
   yes?: boolean;
@@ -25,7 +26,7 @@ interface DiscoveredServer {
 }
 
 export async function importCommand(options: ImportOptions = {}): Promise<void> {
-  const isNonInteractive = !!options.yes || !process.stdin.isTTY;
+  const isNonInteractive = isNonInteractiveCheck(options);
   const apps = detectInstalledApps();
 
   if (apps.length === 0) {
@@ -177,22 +178,25 @@ export async function importCommand(options: ImportOptions = {}): Promise<void> 
     return;
   }
 
-  // Track selected servers
+  // Track selected servers (batch: read lock once, write once)
+  const updatedLock = readLockFile();
+  const now = new Date().toISOString();
   for (const s of toImport) {
     const serverId = s.registryId ?? s.name;
     const scopes: Record<string, "project" | "global"> = {};
     for (const appId of s.apps) {
       scopes[appId] = "project";
     }
-    trackInstallation(
-      serverId,
-      s.apps as import("@getmcp/core").AppIdType[],
-      [],
-      undefined,
-      scopes,
-    );
+    updatedLock.installations[serverId] = {
+      apps: s.apps as import("@getmcp/core").AppIdType[],
+      installedAt: now,
+      updatedAt: now,
+      envVars: [],
+      ...(Object.keys(scopes).length > 0 ? { scopes } : {}),
+    };
     p.log.success(`Imported: ${s.registryName ?? s.name} (${serverId})`);
   }
+  writeLockFile(updatedLock);
 
   p.outro(`${toImport.length} server(s) imported.`);
 }
