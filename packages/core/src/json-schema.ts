@@ -16,10 +16,5 @@ export function getRegistryEntryJsonSchema(): Record<string, unknown> {
     reused: "inline",
   }) as Record<string, unknown>;
 
-  // Allow "$schema" so JSON files can reference the published schema URL
-  // for IDE autocompletion without failing additionalProperties validation.
-  const props = schema.properties as Record<string, unknown>;
-  props.$schema = { type: "string" };
-
   return schema;
 }
