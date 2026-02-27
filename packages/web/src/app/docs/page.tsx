@@ -23,6 +23,14 @@ export const metadata: Metadata = {
     description:
       "Complete guide to getmcp: CLI installation, commands, project manifests, supported AI apps, library API, and contributing.",
   },
+  keywords: [
+    "getmcp documentation",
+    "MCP CLI commands",
+    "MCP config format",
+    "getmcp API",
+    "MCP server installation",
+    "getmcp guide",
+  ],
 };
 
 export default function DocsPage() {
@@ -30,6 +38,52 @@ export default function DocsPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-16 flex gap-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "TechArticle",
+              headline: "getmcp Documentation — CLI Commands, Config Formats & API Reference",
+              description:
+                "Complete guide to getmcp: CLI installation, commands, project manifests, supported AI apps, library API, and contributing.",
+              url: "https://getmcp.es/docs",
+              mainEntityOfPage: {
+                "@type": "WebPage",
+                "@id": "https://getmcp.es/docs",
+              },
+              author: { "@type": "Organization", name: "getmcp" },
+              publisher: {
+                "@type": "Organization",
+                name: "getmcp",
+                url: "https://getmcp.es",
+              },
+              inLanguage: "en",
+              proficiencyLevel: "Beginner",
+              dependencies: "Node.js 18+, npm",
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  name: "Home",
+                  item: "https://getmcp.es",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: "Documentation",
+                  item: "https://getmcp.es/docs",
+                },
+              ],
+            },
+          ]),
+        }}
+      />
       <DocsSidebar />
       <div className="min-w-0 max-w-3xl flex-1">
         {/* Hero */}
