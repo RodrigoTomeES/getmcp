@@ -38,7 +38,7 @@ export function SearchBar({
     if (query.trim()) {
       const q = query.toLowerCase();
       result = result.filter((s) => {
-        const searchable = [s.id, s.name, s.description, ...(s.categories ?? []), s.author ?? ""]
+        const searchable = [s.id, s.name, s.description, ...(s.categories ?? [])]
           .join(" ")
           .toLowerCase();
         return searchable.includes(q);
