@@ -97,7 +97,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 Servers
               </Link>
               <Link
-                href="/guides/claude-desktop"
+                href="/guides"
                 className="text-text-secondary hover:text-text transition-colors hidden sm:inline-block"
               >
                 Guides
