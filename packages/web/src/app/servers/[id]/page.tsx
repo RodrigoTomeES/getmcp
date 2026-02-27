@@ -6,6 +6,8 @@ import type { RegistryEntryType, AppIdType } from "@getmcp/core";
 import { ConfigViewer, type PreGeneratedConfig } from "@/components/ConfigViewer";
 import { PackageManagerCommand } from "@/components/PackageManagerCommand";
 import { MetaItem } from "@/components/MetaItem";
+import { ServerCard, type ServerCardData } from "@/components/ServerCard";
+import { GUIDE_SLUGS } from "@/lib/guide-data";
 
 export const dynamicParams = false;
 
@@ -104,6 +106,23 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
   const isRemote = "url" in server.config;
   const transport = isRemote ? "remote" : "stdio";
   const configs = preGenerateConfigs(server.id, server.config);
+
+  const primaryCategory = server.categories?.[0];
+  const relatedServers: ServerCardData[] = primaryCategory
+    ? getAllServers()
+        .filter((s) => s.id !== server.id && s.categories?.includes(primaryCategory))
+        .slice(0, 4)
+        .map((s) => ({
+          id: s.id,
+          name: s.name,
+          description: s.description,
+          categories: s.categories,
+          author: s.author,
+          runtime: s.runtime,
+          isRemote: "url" in s.config,
+          envCount: s.requiredEnvVars.length,
+        }))
+    : [];
 
   const jsonLd = [
     {
@@ -276,8 +295,64 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
         <PackageManagerCommand serverId={server.id} />
       </div>
 
+      {/* Getting started */}
+      <section className="mb-12">
+        <h2 className="text-lg font-semibold mb-4">Getting Started</h2>
+        <div className="space-y-3 text-text-secondary text-sm">
+          <p>
+            <span className="text-text font-medium">1. Prerequisites:</span>{" "}
+            {server.runtime === "docker"
+              ? "Docker Engine installed and running"
+              : server.runtime === "python"
+                ? "Python 3.10+ installed"
+                : server.runtime === "binary"
+                  ? "Download the pre-built binary for your platform"
+                  : "Node.js 18+ installed"}
+          </p>
+          {server.requiredEnvVars.length > 0 && (
+            <p>
+              <span className="text-text font-medium">2. Set environment variables:</span>{" "}
+              {server.requiredEnvVars.map((v) => (
+                <code key={v} className="text-accent bg-code-bg px-1 py-0.5 rounded mx-0.5">
+                  {v}
+                </code>
+              ))}
+            </p>
+          )}
+          <p>
+            <span className="text-text font-medium">
+              {server.requiredEnvVars.length > 0 ? "3" : "2"}. Install:
+            </span>{" "}
+            Run the install command above — getmcp will auto-detect your installed AI apps.
+          </p>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {GUIDE_SLUGS.slice(0, 5).map((slug) => (
+            <Link
+              key={slug}
+              href={`/guides/${slug}`}
+              className="text-xs text-accent hover:underline"
+            >
+              {slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())} guide &rarr;
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Config generator */}
       <ConfigViewer configs={configs} />
+
+      {/* Related servers */}
+      {relatedServers.length > 0 && (
+        <section className="mt-16 pt-10 border-t border-border">
+          <h2 className="text-lg font-semibold mb-6">Related Servers</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {relatedServers.map((s) => (
+              <ServerCard key={s.id} server={s} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
