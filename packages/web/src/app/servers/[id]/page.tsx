@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getServer, getAllServers } from "@getmcp/registry";
 import { generators } from "@getmcp/generators";
-import type { RegistryEntryType, AppIdType } from "@getmcp/core";
+import type { AppIdType } from "@getmcp/core";
+import type { InternalRegistryEntry } from "@getmcp/registry";
 import { ConfigViewer, type PreGeneratedConfig } from "@/components/ConfigViewer";
 import { PackageManagerCommand } from "@/components/PackageManagerCommand";
 import { MetaItem } from "@/components/MetaItem";
@@ -54,7 +55,7 @@ export function generateMetadata({ params }: { params: Promise<{ id: string }> }
 
 function preGenerateConfigs(
   serverId: string,
-  config: RegistryEntryType["config"],
+  config: InternalRegistryEntry["config"],
 ): Record<string, PreGeneratedConfig> {
   const appIds = Object.keys(generators) as AppIdType[];
   return Object.fromEntries(
@@ -102,7 +103,7 @@ function runtimeToRequirements(runtime?: string): string {
   return runtime ? (map[runtime] ?? runtime) : "Node.js 18+";
 }
 
-function ServerDetail({ server }: { server: RegistryEntryType }) {
+function ServerDetail({ server }: { server: InternalRegistryEntry }) {
   const isRemote = "url" in server.config;
   const transport = isRemote ? "remote" : "stdio";
   const configs = preGenerateConfigs(server.id, server.config);

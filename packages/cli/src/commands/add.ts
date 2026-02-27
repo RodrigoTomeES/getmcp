@@ -17,7 +17,8 @@ import * as p from "@clack/prompts";
 import { getAllServers, getServer, searchServers } from "@getmcp/registry";
 import { getGenerator, getAppIds } from "@getmcp/generators";
 import { isStdioConfig } from "@getmcp/core";
-import type { LooseServerConfigType, RegistryEntryType, AppIdType } from "@getmcp/core";
+import type { LooseServerConfigType, AppIdType } from "@getmcp/core";
+import type { InternalRegistryEntry } from "@getmcp/registry";
 import { generators } from "@getmcp/generators";
 import { detectApps, resolveAppForScope, type DetectedApp } from "../detect.js";
 import { resolveAppsFromFlags, resolveScope } from "../app-selection.js";
@@ -57,7 +58,7 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
   }
 
   // Step 1: Select server
-  let entry: RegistryEntryType;
+  let entry: InternalRegistryEntry;
 
   if (serverIdArg) {
     const found = getServer(serverIdArg);
@@ -575,7 +576,7 @@ async function addUnverifiedServer(options: AddOptions): Promise<void> {
   p.outro(`"${serverName}" ${action}.`);
 }
 
-function printManualConfig(entry: RegistryEntryType, config: LooseServerConfigType): void {
+function printManualConfig(entry: InternalRegistryEntry, config: LooseServerConfigType): void {
   const canonical = {
     mcpServers: {
       [entry.id]: config,
