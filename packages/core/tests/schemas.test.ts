@@ -147,44 +147,84 @@ describe("CanonicalMCPConfig", () => {
 });
 
 // ---------------------------------------------------------------------------
-// RegistryEntry
+// RegistryEntry (official format)
 // ---------------------------------------------------------------------------
 
 describe("RegistryEntry", () => {
-  it("parses a valid registry entry", () => {
+  it("parses a valid registry entry with packages", () => {
     const result = RegistryEntry.parse({
-      id: "github-mcp-server",
-      name: "GitHub MCP Server",
-      description: "GitHub integration for MCP",
-      config: {
-        command: "npx",
-        args: ["-y", "@modelcontextprotocol/server-github"],
-        env: { GITHUB_PERSONAL_ACCESS_TOKEN: "" },
+      server: {
+        name: "io.github.example/test-server",
+        description: "A test server",
+        version: "1.0.0",
+        packages: [
+          {
+            registryType: "npm",
+            identifier: "@example/test-server",
+            transport: { type: "stdio" },
+            environmentVariables: [{ name: "API_KEY", isRequired: true, isSecret: true }],
+          },
+        ],
       },
-      package: "@modelcontextprotocol/server-github",
-      runtime: "node",
-      repository: "https://github.com/modelcontextprotocol/servers",
-      categories: ["developer-tools", "devops"],
-      requiredEnvVars: ["GITHUB_PERSONAL_ACCESS_TOKEN"],
+      _meta: {
+        "es.getmcp/enrichment": {
+          slug: "test-server",
+          categories: ["developer-tools"],
+        },
+      },
     });
-    expect(result.id).toBe("github-mcp-server");
-    expect(result.categories).toContain("developer-tools");
+    expect(result.server.name).toBe("io.github.example/test-server");
+    expect(result.server.packages).toHaveLength(1);
   });
 
-  it("rejects invalid ID format", () => {
-    expect(() =>
-      RegistryEntry.parse({
-        id: "Invalid ID",
-        name: "Test",
+  it("parses a valid registry entry with remotes", () => {
+    const result = RegistryEntry.parse({
+      server: {
+        name: "io.example/remote-server",
+        description: "A remote server",
+        remotes: [
+          {
+            type: "streamable-http",
+            url: "https://example.com/mcp",
+          },
+        ],
+      },
+    });
+    expect(result.server.remotes).toHaveLength(1);
+  });
+
+  it("parses with _meta enrichment and metrics", () => {
+    const result = RegistryEntry.parse({
+      server: {
+        name: "io.github.test/server",
         description: "Test",
-        config: { command: "test" },
-      }),
-    ).toThrow();
+      },
+      _meta: {
+        "io.modelcontextprotocol.registry/official": {
+          status: "active",
+          publishedAt: "2025-01-01T00:00:00Z",
+          updatedAt: "2025-01-01T00:00:00Z",
+          isLatest: true,
+        },
+        "es.getmcp/enrichment": {
+          slug: "test",
+          categories: ["ai", "data"],
+          author: "TestOrg",
+          license: "MIT",
+        },
+        "es.getmcp/metrics": {
+          github: { stars: 100, forks: 10 },
+          npm: { weeklyDownloads: 5000 },
+          fetchedAt: "2025-01-01T00:00:00Z",
+        },
+      },
+    });
+    expect(result._meta).toBeDefined();
   });
 
-  it("requires id, name, description, config", () => {
-    expect(() => RegistryEntry.parse({})).toThrow();
-    expect(() => RegistryEntry.parse({ id: "test" })).toThrow();
+  it("requires server.name and server.description", () => {
+    expect(() => RegistryEntry.parse({ server: {} })).toThrow();
+    expect(() => RegistryEntry.parse({ server: { name: "test" } })).toThrow();
   });
 });
 

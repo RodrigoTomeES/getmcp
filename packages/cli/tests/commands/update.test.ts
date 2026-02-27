@@ -93,7 +93,7 @@ describe("updateCommand", () => {
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
       version: 1,
       installations: {
-        github: {
+        "github-github": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -125,7 +125,7 @@ describe("updateCommand", () => {
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
       version: 1,
       installations: {
-        github: {
+        "github-github": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -147,7 +147,7 @@ describe("updateCommand", () => {
     await updateCommand({ yes: true });
 
     expect(trackInstallation).toHaveBeenCalledWith(
-      "github",
+      "github-github",
       ["claude-desktop"],
       ["GITHUB_TOKEN"],
       undefined,
@@ -164,7 +164,7 @@ describe("updateCommand", () => {
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
       version: 1,
       installations: {
-        github: {
+        "github-github": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -196,7 +196,7 @@ describe("updateCommand", () => {
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
       version: 1,
       installations: {
-        github: {
+        "github-github": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -223,7 +223,7 @@ describe("updateCommand", () => {
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
       version: 1,
       installations: {
-        github: {
+        "github-github": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",

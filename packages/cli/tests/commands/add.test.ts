@@ -87,12 +87,12 @@ describe("addCommand", () => {
       },
     ]);
 
-    await addCommand("github", { yes: true });
+    await addCommand("github-github", { yes: true });
 
     expect(mergeServerIntoConfig).toHaveBeenCalled();
     expect(writeConfigFile).toHaveBeenCalled();
     expect(trackInstallation).toHaveBeenCalledWith(
-      "github",
+      "github-github",
       ["claude-desktop"],
       expect.any(Array),
       undefined,
@@ -130,8 +130,8 @@ describe("addCommand", () => {
       },
     ]);
 
-    // "git" should fuzzy match multiple servers (github, etc.)
-    await addCommand("github", { yes: true });
+    // "github-github" is an exact match for the official GitHub server
+    await addCommand("github-github", { yes: true });
 
     expect(mergeServerIntoConfig).toHaveBeenCalled();
   });
@@ -157,7 +157,7 @@ describe("addCommand", () => {
       },
     ]);
 
-    await addCommand("github", { allApps: true });
+    await addCommand("github-github", { allApps: true });
 
     expect(writeConfigFile).toHaveBeenCalledTimes(2);
   });
@@ -166,7 +166,9 @@ describe("addCommand", () => {
     const { detectApps } = await import("../../src/detect.js");
     (detectApps as ReturnType<typeof vi.fn>).mockReturnValue([]);
 
-    await expect(addCommand("github", { apps: ["invalid-app-id"] })).rejects.toThrow(ExitError);
+    await expect(addCommand("github-github", { apps: ["invalid-app-id"] })).rejects.toThrow(
+      ExitError,
+    );
 
     const { log } = await import("@clack/prompts");
     expect(log.error).toHaveBeenCalledWith(expect.stringContaining("Unknown app"));
@@ -188,7 +190,7 @@ describe("addCommand", () => {
       },
     ]);
 
-    await addCommand("github", { yes: true, dryRun: true });
+    await addCommand("github-github", { yes: true, dryRun: true });
 
     expect(writeConfigFile).not.toHaveBeenCalled();
     expect(trackInstallation).not.toHaveBeenCalled();
@@ -207,11 +209,11 @@ describe("addCommand", () => {
       },
     ]);
 
-    await addCommand("github", { yes: true, json: true });
+    await addCommand("github-github", { yes: true, json: true });
 
     const output = consoleSpy.mock.calls.map((c) => c.join(" ")).join("\n");
     const parsed = JSON.parse(output);
-    expect(parsed).toHaveProperty("server", "github");
+    expect(parsed).toHaveProperty("server", "github-github");
     expect(parsed).toHaveProperty("apps");
     expect(parsed.apps[0]).toHaveProperty("id", "claude-desktop");
     expect(parsed.apps[0]).toHaveProperty("ok", true);
@@ -221,7 +223,7 @@ describe("addCommand", () => {
     const { detectApps } = await import("../../src/detect.js");
     (detectApps as ReturnType<typeof vi.fn>).mockReturnValue([]);
 
-    await addCommand("github", { yes: true });
+    await addCommand("github-github", { yes: true });
 
     const { note, outro } = await import("@clack/prompts");
     expect(note).toHaveBeenCalledWith(expect.stringContaining("mcpServers"), "Canonical config");
