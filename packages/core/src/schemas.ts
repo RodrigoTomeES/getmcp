@@ -6,7 +6,7 @@
  *   - Stdio: command, args, env, cwd, timeout, description
  *   - Remote: url, transport, headers, timeout, description
  *
- * Extended with registry metadata for the getmcp ecosystem.
+ * Extended with the official MCP registry format for RegistryEntry.
  */
 
 import { z } from "zod";
@@ -100,19 +100,7 @@ export const CanonicalMCPConfig = z.object({
 });
 
 // ---------------------------------------------------------------------------
-// Platform overrides
-// ---------------------------------------------------------------------------
-
-/** Platform-specific command overrides for stdio servers */
-export const PlatformOverride = z.object({
-  command: z.string().min(1).optional(),
-  args: z.array(z.string()).optional(),
-  env: z.record(z.string(), z.string()).optional(),
-  cwd: z.string().optional(),
-});
-
-// ---------------------------------------------------------------------------
-// Registry entry (our metadata layer on top of canonical config)
+// Category and Runtime enums (shared between core and enrichment)
 // ---------------------------------------------------------------------------
 
 export const Category = z.enum([
@@ -134,52 +122,128 @@ export const Category = z.enum([
 
 export const Runtime = z.enum(["node", "python", "docker", "binary"]);
 
+// ---------------------------------------------------------------------------
+// Registry entry (official MCP registry format + getmcp _meta extensions)
+// ---------------------------------------------------------------------------
+
 /**
- * A full MCP server registry entry.
- * Contains the canonical server config plus metadata for discovery,
- * display, and multi-platform support.
+ * A full MCP server registry entry in the official format.
+ * Contains the server definition plus _meta enrichments.
+ *
+ * This is the format stored in data/servers.json and shipped in the npm package.
+ * The registry engine transforms this into internal types for consumers.
  */
 export const RegistryEntry = z.object({
-  /** Unique identifier (e.g. "github-mcp-server") */
-  id: z
-    .string()
-    .min(1)
-    .regex(/^[a-z0-9-]+$/, "ID must be lowercase alphanumeric with hyphens"),
-
-  /** Display name (e.g. "GitHub MCP Server") */
-  name: z.string().min(1),
-
-  /** What this server does */
-  description: z.string().min(1),
-
-  /** The canonical server configuration */
-  config: LooseServerConfig,
-
-  /** Package name (npm or pypi) */
-  package: z.string().optional(),
-
-  /** Runtime used to execute the server */
-  runtime: Runtime.optional(),
-
-  /** Source code repository URL */
-  repository: z.string().url().optional(),
-
-  /** Homepage URL */
-  homepage: z.string().url().optional(),
-
-  /** Author or organization */
-  author: z.string().optional(),
-
-  /** Discovery categories (e.g. ["developer-tools", "data"]) */
-  categories: z.array(Category).optional().default([]),
-
-  /** Environment variables that the user MUST provide */
-  requiredEnvVars: z.array(z.string()).optional().default([]),
-
-  /** Platform-specific overrides (e.g. Windows needs cmd /c wrapper) */
-  windows: PlatformOverride.optional(),
-  linux: PlatformOverride.optional(),
-  macos: PlatformOverride.optional(),
+  server: z.object({
+    $schema: z.string().optional(),
+    name: z.string().min(1),
+    description: z.string(),
+    version: z.string().optional(),
+    title: z.string().optional(),
+    websiteUrl: z.string().optional(),
+    repository: z
+      .object({
+        url: z.string(),
+        source: z.string(),
+        id: z.string().optional(),
+        subfolder: z.string().optional(),
+      })
+      .optional(),
+    icons: z
+      .array(
+        z.object({
+          src: z.string(),
+          mimeType: z.string().optional(),
+          sizes: z.union([z.array(z.string()), z.string()]).optional(),
+          theme: z.enum(["light", "dark"]).optional(),
+        }),
+      )
+      .optional(),
+    packages: z
+      .array(
+        z.object({
+          registryType: z.enum(["npm", "pypi", "oci", "nuget", "mcpb"]),
+          identifier: z.string(),
+          version: z.string().optional(),
+          runtimeHint: z.string().optional(),
+          transport: z.object({
+            type: z.enum(["stdio", "streamable-http", "sse"]),
+            url: z.string().optional(),
+          }),
+          packageArguments: z
+            .array(
+              z.object({
+                name: z.string().optional(),
+                description: z.string().optional(),
+                value: z.string().optional(),
+                default: z.string().optional(),
+                format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
+                isRequired: z.boolean().optional(),
+              }),
+            )
+            .optional(),
+          runtimeArguments: z
+            .array(
+              z.object({
+                name: z.string().optional(),
+                description: z.string().optional(),
+                value: z.string().optional(),
+                default: z.string().optional(),
+                format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
+                isRequired: z.boolean().optional(),
+              }),
+            )
+            .optional(),
+          environmentVariables: z
+            .array(
+              z.object({
+                name: z.string(),
+                description: z.string().optional(),
+                value: z.string().optional(),
+                default: z.string().optional(),
+                format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
+                isRequired: z.boolean().optional(),
+                isSecret: z.boolean().optional(),
+              }),
+            )
+            .optional(),
+        }),
+      )
+      .optional(),
+    remotes: z
+      .array(
+        z.object({
+          type: z.enum(["streamable-http", "sse"]),
+          url: z.string(),
+          headers: z
+            .array(
+              z.object({
+                name: z.string(),
+                description: z.string().optional(),
+                value: z.string().optional(),
+                default: z.string().optional(),
+                format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
+                isRequired: z.boolean().optional(),
+                isSecret: z.boolean().optional(),
+              }),
+            )
+            .optional(),
+          variables: z
+            .record(
+              z.string(),
+              z.object({
+                description: z.string().optional(),
+                format: z.string().optional(),
+                default: z.string().optional(),
+              }),
+            )
+            .optional(),
+        }),
+      )
+      .optional(),
+    _meta: z.record(z.string(), z.unknown()).optional(),
+  }),
+  _meta: z.record(z.string(), z.unknown()).optional().default({}),
 });
 
 // ---------------------------------------------------------------------------

@@ -13,7 +13,6 @@ import {
   ServerConfig,
   LooseServerConfig,
   CanonicalMCPConfig,
-  PlatformOverride,
   Category,
   Runtime,
   RegistryEntry,
@@ -44,10 +43,9 @@ export type LooseServerConfig = z.infer<typeof LooseServerConfig>;
 export type CanonicalMCPConfig = z.infer<typeof CanonicalMCPConfig>;
 
 // ---------------------------------------------------------------------------
-// Platform & registry
+// Registry
 // ---------------------------------------------------------------------------
 
-export type PlatformOverride = z.infer<typeof PlatformOverride>;
 export type Category = z.infer<typeof Category>;
 export type Runtime = z.infer<typeof Runtime>;
 export type RegistryEntry = z.infer<typeof RegistryEntry>;
