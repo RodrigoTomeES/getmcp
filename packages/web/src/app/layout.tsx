@@ -91,7 +91,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </Link>
             <nav className="flex items-center gap-6 text-sm">
               <Link
-                href="/"
+                href="/servers"
                 className="text-text-secondary hover:text-text transition-colors hidden sm:inline-block"
               >
                 Servers

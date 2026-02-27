@@ -20,6 +20,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.9,
     },
+    {
+      url: `${BASE_URL}/servers`,
+      lastModified: BUILD_DATE,
+      changeFrequency: "weekly",
+      priority: 0.95,
+    },
     ...servers.map((server) => ({
       url: `${BASE_URL}/servers/${server.id}`,
       lastModified: BUILD_DATE,
