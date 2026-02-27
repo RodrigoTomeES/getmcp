@@ -33,6 +33,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.85,
     })),
+    // Guides
+    ...["claude-desktop", "vscode", "cursor", "windsurf", "goose"].map((app) => ({
+      url: `${BASE_URL}/guides/${app}`,
+      lastModified: BUILD_DATE,
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    })),
     ...servers.map((server) => ({
       url: `${BASE_URL}/servers/${server.id}`,
       lastModified: BUILD_DATE,
