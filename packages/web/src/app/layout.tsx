@@ -22,19 +22,22 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://getmcp.es"),
   title: {
-    default: "getmcp \u2014 Universal MCP Server Directory",
+    default: "getmcp \u2014 Install MCP Servers in 19 AI Apps with One Command",
     template: "%s \u2014 getmcp",
   },
   description:
-    "Browse, discover, and install MCP servers into any AI application. One config, every app.",
+    "Install and configure MCP servers across Claude Desktop, VS Code, Cursor, and 16 more AI apps with one command. Universal config generator for JSON, JSONC, YAML, and TOML.",
   keywords: [
     "MCP",
+    "MCP server",
+    "install MCP",
     "Model Context Protocol",
-    "AI tools",
-    "Claude Desktop",
-    "VS Code",
-    "MCP servers",
-    "config generator",
+    "Claude Desktop MCP",
+    "VS Code MCP",
+    "Cursor MCP",
+    "MCP config generator",
+    "MCP CLI",
+    "getmcp",
   ],
   icons: {
     icon: "/icon.svg",
@@ -43,9 +46,9 @@ export const metadata: Metadata = {
     siteName: "getmcp",
     locale: "en_US",
     type: "website",
-    title: "getmcp \u2014 Universal MCP Server Directory",
+    title: "getmcp \u2014 Install MCP Servers in 19 AI Apps with One Command",
     description:
-      "Browse, discover, and install MCP servers into any AI application. One config, every app.",
+      "Install and configure MCP servers across Claude Desktop, VS Code, Cursor, and 16 more AI apps with one command. Universal config generator for JSON, JSONC, YAML, and TOML.",
   },
   twitter: {
     card: "summary_large_image",
