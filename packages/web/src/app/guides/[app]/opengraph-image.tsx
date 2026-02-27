@@ -10,6 +10,20 @@ const GUIDE_NAMES: Record<string, string> = {
   cursor: "Cursor",
   windsurf: "Windsurf",
   goose: "Goose",
+  "claude-code": "Claude Code",
+  cline: "Cline",
+  "roo-code": "Roo Code",
+  opencode: "OpenCode",
+  zed: "Zed",
+  pycharm: "PyCharm",
+  codex: "Codex",
+  "gemini-cli": "Gemini CLI",
+  continue: "Continue",
+  "amazon-q": "Amazon Q Developer",
+  trae: "Trae",
+  "bolt-ai": "BoltAI",
+  "libre-chat": "LibreChat",
+  antigravity: "Antigravity",
 };
 
 export function generateStaticParams() {
