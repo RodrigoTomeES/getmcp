@@ -178,9 +178,13 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
         {server.categories && server.categories.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {server.categories.map((cat) => (
-              <span key={cat} className="text-xs px-3 py-1 rounded-full bg-tag-bg text-tag-text">
+              <Link
+                key={cat}
+                href={`/category/${cat}`}
+                className="text-xs px-3 py-1 rounded-full bg-tag-bg text-tag-text hover:bg-tag-bg/80 transition-colors"
+              >
                 {cat}
-              </span>
+              </Link>
             ))}
           </div>
         )}
