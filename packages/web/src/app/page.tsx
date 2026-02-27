@@ -27,14 +27,42 @@ export default function HomePage() {
     envCount: s.requiredEnvVars.length,
   }));
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "getmcp",
-    url: "https://getmcp.es",
-    description:
-      "Browse, discover, and install MCP servers into any AI application. One config, every app.",
-  };
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "getmcp",
+      url: "https://getmcp.es",
+      description: `Browse, discover, and install MCP servers into ${appCount} AI applications. One config, every app.`,
+      potentialAction: {
+        "@type": "SearchAction",
+        target: "https://getmcp.es/?q={search_term_string}",
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "getmcp",
+      url: "https://getmcp.es",
+      logo: "https://getmcp.es/icon.svg",
+      sameAs: ["https://github.com/RodrigoTomeES/getmcp"],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "getmcp",
+      url: "https://getmcp.es",
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: "Windows, macOS, Linux",
+      description: `Universal MCP server installer supporting ${appCount} AI applications and 4 config formats.`,
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+    },
+  ];
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10 md:py-16">

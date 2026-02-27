@@ -49,6 +49,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: "@getmcp",
+    creator: "@RodrigoTomeES",
+  },
+  alternates: {
+    languages: {
+      en: "https://getmcp.es",
+      "x-default": "https://getmcp.es",
+    },
   },
 };
 
