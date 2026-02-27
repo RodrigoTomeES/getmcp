@@ -65,6 +65,20 @@ export default function HomePage() {
         priceCurrency: "USD",
       },
     },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "MCP Servers",
+      description: `${count}+ MCP servers available for installation across ${appCount} AI apps.`,
+      numberOfItems: count,
+      url: "https://getmcp.es",
+      itemListElement: servers.slice(0, 20).map((s, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: s.name,
+        url: `https://getmcp.es/servers/${s.id}`,
+      })),
+    },
   ];
 
   return (
