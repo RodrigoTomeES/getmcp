@@ -832,6 +832,33 @@ A Next.js website that serves as a public directory for MCP servers. Think "npm 
 
 **Tech stack**: Next.js 15.3+ (App Router), Tailwind CSS 4.0+, Vercel Analytics + Speed Insights, with `@getmcp/core`, `@getmcp/generators`, and `@getmcp/registry` imported directly. Server pages are statically generated from the registry.
 
+### Routes
+
+The web application provides the following public routes:
+
+| Route              | Purpose                                                                        |
+| ------------------ | ------------------------------------------------------------------------------ |
+| `/`                | Homepage with hero section, search, and recent servers                         |
+| `/docs`            | Documentation page (getting started, supported apps, library usage)            |
+| `/servers`         | Server directory index page with search and category/runtime/transport filters |
+| `/servers/[id]`    | Individual server detail page with config generators for all 19 apps           |
+| `/category/[slug]` | 14 category landing pages with per-category server grids and descriptions      |
+| `/guides/[app]`    | 19 app-specific MCP setup guides (config details, examples, troubleshooting)   |
+
+### JSON-LD Schemas
+
+The site uses structured data (JSON-LD) for SEO and schema.org compliance:
+
+- **BreadcrumbList** — Category and guide navigation breadcrumbs
+- **CollectionPage** — Server directory index (`/servers`)
+- **ItemList** — Category server grids (`/category/[slug]`)
+- **TechArticle** — App-specific guides (`/guides/[app]`)
+- **SoftwareApplication** (fixed) — Organization schema in root layout
+- **WebApplication** — Root application metadata
+- **Organization** — getmcp organization metadata
+
+All schemas include proper `@context`, `@type`, and required properties per schema.org specification.
+
 ---
 
 ## 9. Future Plans
