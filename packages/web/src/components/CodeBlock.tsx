@@ -12,7 +12,7 @@ export function CodeBlock({ children, label }: { children: string; label?: strin
         <button
           onClick={() => copy(children)}
           className="text-text-secondary hover:text-text transition-colors shrink-0 p-1 rounded-md"
-          aria-label="Copy code"
+          aria-label={copied ? "Copied!" : "Copy code"}
         >
           {copied ? (
             <svg

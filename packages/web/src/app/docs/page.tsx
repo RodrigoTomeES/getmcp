@@ -102,23 +102,23 @@ export default function DocsPage() {
             <p>
               Every AI application uses a different config format for MCP (Model Context Protocol)
               servers. Claude Desktop uses{" "}
-              <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
                 mcpServers
               </code>
               , VS Code uses{" "}
-              <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
                 servers
               </code>
               , Goose uses YAML with{" "}
-              <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
                 cmd
               </code>
               /
-              <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
                 envs
               </code>
               , Codex uses TOML with{" "}
-              <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
                 mcp_servers
               </code>
               ... there are {appCount} apps, 6 root keys, and 4 formats.
@@ -184,7 +184,7 @@ npx @getmcp/cli list --json`}</CodeBlock>
           <div className="space-y-4 text-text-secondary leading-relaxed">
             <p>
               Teams can share MCP server configurations via a{" "}
-              <code className="bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-text">
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
                 getmcp.json
               </code>{" "}
               manifest file in the project root:
@@ -261,7 +261,7 @@ npx @getmcp/cli list --json`}</CodeBlock>
                       )}
                     </td>
                     <td className="px-4 py-2.5">
-                      <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                      <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                         {rootKey}
                       </code>
                     </td>
@@ -302,38 +302,38 @@ Desktop (servers)(YAML) (TOML)   apps`}</CodeBlock>
               <li>
                 <span className="text-text font-medium">Stdio servers</span> — run a local process
                 with{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   command
                 </code>
                 ,{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   args
                 </code>
                 , and{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   env
                 </code>
               </li>
               <li>
                 <span className="text-text font-medium">Remote servers</span> — connect to a URL
                 with{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   url
                 </code>{" "}
                 and optional{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   transport
                 </code>{" "}
                 (
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   http
                 </code>
                 ,{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   streamable-http
                 </code>
                 , or{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   sse
                 </code>
                 )
@@ -341,7 +341,7 @@ Desktop (servers)(YAML) (TOML)   apps`}</CodeBlock>
             </ul>
             <p>
               Transport is auto-inferred: URLs ending in{" "}
-              <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                 /sse
               </code>{" "}
               default to SSE, others default to HTTP.
@@ -413,13 +413,13 @@ getServersByCategory("web");
             <ol className="list-decimal list-inside space-y-2 ml-1">
               <li>
                 Create a new JSON file at{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   packages/registry/servers/your-server.json
                 </code>
               </li>
               <li>
                 Add a{" "}
-                <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
                   $schema
                 </code>{" "}
                 field for IDE autocompletion

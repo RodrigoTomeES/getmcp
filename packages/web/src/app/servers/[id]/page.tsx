@@ -185,29 +185,12 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
 
       {/* Breadcrumb */}
       <nav className="text-sm text-text-secondary mb-10" aria-label="Breadcrumb">
-        <Link href="/" className="hover:text-text transition-colors">
+        <Link href="/servers" className="hover:text-text transition-colors">
           Servers
         </Link>
         <span className="mx-2 text-text-secondary/50">/</span>
         <span className="text-text">{server.name}</span>
       </nav>
-
-      {/* Categories */}
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-3 mb-8">
-        {server.categories && server.categories.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {server.categories.map((cat) => (
-              <Link
-                key={cat}
-                href={`/category/${cat}`}
-                className="text-xs px-3 py-1 rounded-full bg-tag-bg text-tag-text hover:bg-tag-bg/80 transition-colors"
-              >
-                {cat}
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
 
       {/* Header */}
       <div className="mb-8">
@@ -228,8 +211,21 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
         </p>
       </div>
 
-      {/* Links */}
+      {/* Categories + Links */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3 mb-8">
+        {server.categories && server.categories.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {server.categories.map((cat) => (
+              <Link
+                key={cat}
+                href={`/category/${cat}`}
+                className="text-xs px-3 py-1 rounded-full bg-tag-bg text-tag-text hover:bg-tag-bg/80 transition-colors"
+              >
+                {cat}
+              </Link>
+            ))}
+          </div>
+        )}
         {(server.repository || server.homepage) && (
           <div className="flex items-center gap-4">
             {server.repository && (
@@ -240,6 +236,7 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
                 className="text-sm text-accent hover:underline transition-colors"
               >
                 Repository
+                <span className="sr-only"> (opens in new tab)</span>
               </a>
             )}
             {server.homepage && server.repository !== server.homepage && (
@@ -250,54 +247,16 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
                 className="text-sm text-accent hover:underline transition-colors"
               >
                 Homepage
+                <span className="sr-only"> (opens in new tab)</span>
               </a>
             )}
           </div>
         )}
       </div>
 
-      {/* Metadata grid */}
-      <dl className="grid grid-cols-2 gap-x-8 gap-y-5 py-6 border-y border-border mb-10">
-        {server.author && <MetaItem label="Author" value={server.author} />}
-        {server.runtime && <MetaItem label="Runtime" value={server.runtime} />}
-        {server.package && <MetaItem label="Package" value={server.package} mono />}
-        {isRemote && "url" in server.config && (
-          <MetaItem label="URL" value={server.config.url} mono />
-        )}
-        {!isRemote && "command" in server.config && (
-          <MetaItem
-            label="Command"
-            value={[server.config.command, ...(server.config.args ?? [])].join(" ")}
-            mono
-          />
-        )}
-      </dl>
-
-      {/* Required env vars */}
-      {server.requiredEnvVars.length > 0 && (
-        <div className="mb-8 rounded-lg border border-warning-border bg-warning-subtle p-4">
-          <h2 className="text-sm font-medium text-warning mb-2">Required Environment Variables</h2>
-          <ul className="space-y-1">
-            {server.requiredEnvVars.map((envVar) => (
-              <li key={envVar} className="text-sm">
-                <code className="text-warning-light bg-code-bg px-1.5 py-0.5 rounded">
-                  {envVar}
-                </code>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* CLI install command */}
-      <div className="mb-12">
-        <h2 className="text-lg font-semibold mb-4">Install</h2>
-        <PackageManagerCommand serverId={server.id} />
-      </div>
-
       {/* Getting started */}
       <section className="mb-12">
-        <h2 className="text-lg font-semibold mb-4">Getting Started</h2>
+        <h2 className="text-xl font-semibold mb-4">Getting Started</h2>
         <div className="space-y-3 text-text-secondary text-sm">
           <p>
             <span className="text-text font-medium">1. Prerequisites:</span>{" "}
@@ -323,7 +282,7 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
             <span className="text-text font-medium">
               {server.requiredEnvVars.length > 0 ? "3" : "2"}. Install:
             </span>{" "}
-            Run the install command above — getmcp will auto-detect your installed AI apps.
+            Run the install command below — getmcp will auto-detect your installed AI apps.
           </p>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
@@ -339,13 +298,59 @@ function ServerDetail({ server }: { server: RegistryEntryType }) {
         </div>
       </section>
 
+      {/* Required env vars */}
+      {server.requiredEnvVars.length > 0 && (
+        <div className="mb-8 rounded-lg border border-warning-border bg-warning-subtle p-4">
+          <h2 className="text-sm font-medium text-warning mb-2">Required Environment Variables</h2>
+          <ul className="space-y-1">
+            {server.requiredEnvVars.map((envVar) => (
+              <li key={envVar} className="text-sm">
+                <code className="text-warning-light bg-code-bg px-1.5 py-0.5 rounded">
+                  {envVar}
+                </code>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* CLI install command */}
+      <div className="mb-12">
+        <h2 className="text-xl font-semibold mb-4">Install</h2>
+        <PackageManagerCommand serverId={server.id} />
+        <p className="text-xs text-text-secondary mt-3">
+          This is a community-contributed server.{" "}
+          <Link href="/docs#security-disclaimer" className="text-accent hover:underline">
+            Review source before installing
+          </Link>
+          .
+        </p>
+      </div>
+
       {/* Config generator */}
       <ConfigViewer configs={configs} />
+
+      {/* Metadata grid */}
+      <dl className="grid grid-cols-2 gap-x-8 gap-y-5 py-6 border-y border-border my-10">
+        {server.author && <MetaItem label="Author" value={server.author} />}
+        {server.runtime && <MetaItem label="Runtime" value={server.runtime} />}
+        {server.package && <MetaItem label="Package" value={server.package} mono />}
+        {isRemote && "url" in server.config && (
+          <MetaItem label="URL" value={server.config.url} mono />
+        )}
+        {!isRemote && "command" in server.config && (
+          <MetaItem
+            label="Command"
+            value={[server.config.command, ...(server.config.args ?? [])].join(" ")}
+            mono
+          />
+        )}
+      </dl>
 
       {/* Related servers */}
       {relatedServers.length > 0 && (
         <section className="mt-16 pt-10 border-t border-border">
-          <h2 className="text-lg font-semibold mb-6">Related Servers</h2>
+          <h2 className="text-xl font-semibold mb-6">Related Servers</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {relatedServers.map((s) => (
               <ServerCard key={s.id} server={s} />

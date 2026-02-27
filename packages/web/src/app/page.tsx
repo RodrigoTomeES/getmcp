@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { getAllServers, getCategories, getServerCount } from "@getmcp/registry";
+import Link from "next/link";
+import { getServerCount } from "@getmcp/registry";
 import { getAppIds } from "@getmcp/generators";
-import { SearchBar } from "@/components/SearchBar";
 import { AnimatedCommand } from "@/components/AnimatedCommand";
 import { AsciiArt } from "@/components/AsciiArt";
+import { FormatShowcase } from "@/components/FormatShowcase";
+import { PopularServers } from "@/components/PopularServers";
+import { CategoryGrid } from "@/components/CategoryGrid";
+import { SupportedApps } from "@/components/SupportedApps";
 
 export const metadata: Metadata = {
   title: "Install MCP Servers in 19 AI Apps with One Command",
@@ -15,20 +19,8 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  const servers = getAllServers();
-  const categories = getCategories();
   const count = getServerCount();
   const appCount = getAppIds().length;
-
-  const minimalServers = servers.map((s) => ({
-    id: s.id,
-    name: s.name,
-    description: s.description,
-    categories: s.categories,
-    runtime: s.runtime,
-    isRemote: "url" in s.config,
-    envCount: s.requiredEnvVars.length,
-  }));
 
   const jsonLd = [
     {
@@ -65,20 +57,6 @@ export default function HomePage() {
         priceCurrency: "USD",
       },
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      name: "MCP Servers",
-      description: `${count}+ MCP servers available for installation across ${appCount} AI apps.`,
-      numberOfItems: count,
-      url: "https://getmcp.es",
-      itemListElement: servers.slice(0, 20).map((s, i) => ({
-        "@type": "ListItem",
-        position: i + 1,
-        name: s.name,
-        url: `https://getmcp.es/servers/${s.id}`,
-      })),
-    },
   ];
 
   return (
@@ -96,7 +74,7 @@ export default function HomePage() {
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 max-w-4/5 w-200 h-125 rounded-full pointer-events-none"
           style={{
-            background: "radial-gradient(ellipse, rgba(59,130,246,0.06) 0%, transparent 70%)",
+            background: "radial-gradient(ellipse, rgba(59,130,246,0.10) 0%, transparent 70%)",
           }}
           aria-hidden="true"
         />
@@ -116,7 +94,7 @@ export default function HomePage() {
 
           <div>
             <p className="font-mono text-xs font-medium uppercase tracking-wider text-text-secondary mb-3">
-              Try it now
+              Install via CLI
             </p>
             <AnimatedCommand />
           </div>
@@ -127,9 +105,9 @@ export default function HomePage() {
       <hr className="border-border mb-10" />
 
       {/* What is MCP? */}
-      <section className="mb-10">
-        <h2 className="text-lg font-semibold mb-3">What is MCP?</h2>
-        <p className="text-text-secondary leading-relaxed max-w-3xl">
+      <section className="mb-12">
+        <h2 className="text-xl font-bold mb-3">What is MCP?</h2>
+        <p className="text-text-secondary leading-relaxed max-w-3xl mb-6">
           The{" "}
           <a
             href="https://modelcontextprotocol.io"
@@ -144,10 +122,42 @@ export default function HomePage() {
           getmcp solves this: define your servers once, and we generate the correct config for all{" "}
           {appCount} supported apps automatically.
         </p>
+        <FormatShowcase />
       </section>
 
-      {/* Search + server listing */}
-      <SearchBar servers={minimalServers} categories={categories} />
+      <hr className="border-border my-12" />
+
+      {/* Popular Servers */}
+      <section className="mb-12">
+        <PopularServers />
+      </section>
+
+      <hr className="border-border my-12" />
+
+      {/* Browse by Category */}
+      <section className="mb-12">
+        <CategoryGrid />
+      </section>
+
+      <hr className="border-border my-12" />
+
+      {/* Supported Apps */}
+      <section className="mb-12">
+        <SupportedApps />
+      </section>
+
+      {/* Final CTA */}
+      <div className="text-center py-10 border-t border-border">
+        <p className="text-text-secondary mb-4">
+          {count}+ servers ready to install across {appCount} AI apps.
+        </p>
+        <Link
+          href="/guides"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium transition-colors"
+        >
+          Get started with a setup guide &rarr;
+        </Link>
+      </div>
     </div>
   );
 }
