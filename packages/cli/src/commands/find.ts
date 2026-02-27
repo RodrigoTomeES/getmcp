@@ -9,7 +9,7 @@
 
 import * as p from "@clack/prompts";
 import { getAllServers, searchServers } from "@getmcp/registry";
-import type { RegistryEntryType } from "@getmcp/core";
+import type { InternalRegistryEntry } from "@getmcp/registry";
 import type { AddOptions } from "./add.js";
 import { addCommand } from "./add.js";
 
@@ -35,7 +35,7 @@ export async function findCommand(initialQuery?: string, options: FindOptions = 
   }
 
   // If a query was provided as argument, search and show results
-  let filteredServers: RegistryEntryType[];
+  let filteredServers: InternalRegistryEntry[];
 
   if (initialQuery) {
     filteredServers = searchServers(initialQuery);
