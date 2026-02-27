@@ -17,16 +17,7 @@ function getReducedMotionServerSnapshot() {
   return false;
 }
 
-const COMMANDS = [
-  "add <server>",
-  "find <query>",
-  "list --category ai",
-  "doctor",
-  "sync",
-  "remove <server>",
-  "check",
-  "import",
-];
+const COMMANDS = ["add github", "find search", "list --category ai", "remove github"];
 
 const TYPE_SPEED = 60; // ms per character when typing
 const ERASE_SPEED = 30; // ms per character when erasing
@@ -107,7 +98,7 @@ export function AnimatedCommand() {
         <button
           onClick={() => copy(fullCommand)}
           className="text-text-secondary hover:text-text transition-colors shrink-0 p-1"
-          aria-label="Copy command"
+          aria-label={copied ? "Copied!" : "Copy command"}
         >
           {copied ? (
             <svg
