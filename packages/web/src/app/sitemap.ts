@@ -34,7 +34,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.85,
     })),
-    // Guides
+    {
+      url: `${BASE_URL}/guides`,
+      lastModified: BUILD_DATE,
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    },
     ...GUIDE_SLUGS.map((app) => ({
       url: `${BASE_URL}/guides/${app}`,
       lastModified: BUILD_DATE,
