@@ -1,11 +1,8 @@
 {
   "name": "@getmcp/registry",
   "version": "0.9.1",
-  "description": "Registry of popular MCP server definitions in canonical format",
+  "description": "Registry of MCP server definitions synced from the official MCP registry",
   "keywords": [
-    "brave-search-mcp",
-    "filesystem-mcp",
-    "github-mcp",
     "mcp",
     "model-context-protocol",
     "registry",
@@ -39,7 +36,8 @@
     "access": "public"
   },
   "scripts": {
-    "build": "node scripts/validate-servers.js && tsc && node scripts/copy-servers.js",
+    "sync": "tsx --env-file=.env scripts/sync.ts",
+    "build": "tsc && node scripts/copy-data.js",
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
