@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Pill } from "./Pill";
 
@@ -37,16 +37,46 @@ export function ConfigViewer({ configs }: { configs: Record<string, PreGenerated
   const appIds = Object.keys(configs);
   const [selectedApp, setSelectedApp] = useState(appIds[0]);
 
+  useEffect(() => {
+    const saved = localStorage.getItem("getmcp-preferred-app");
+    if (saved && configs[saved]) {
+      setSelectedApp(saved);
+    }
+  }, [configs]);
+
+  const handleSelectApp = (appId: string) => {
+    setSelectedApp(appId);
+    localStorage.setItem("getmcp-preferred-app", appId);
+  };
+
   const current = configs[selectedApp];
 
   return (
     <div>
       <h3 className="text-lg font-semibold mb-4">Configuration</h3>
 
-      {/* App selector tabs */}
-      <div className="flex flex-wrap gap-1.5 mb-5" role="group" aria-label="Select AI application">
+      {/* Mobile app selector */}
+      <select
+        className="md:hidden w-full mb-4 rounded-lg border border-border bg-surface text-text py-2.5 px-3 focus:outline-none focus:border-accent transition-colors"
+        value={selectedApp}
+        onChange={(e) => handleSelectApp(e.target.value)}
+        aria-label="Select AI application"
+      >
         {appIds.map((appId) => (
-          <Pill key={appId} active={selectedApp === appId} onClick={() => setSelectedApp(appId)}>
+          <option key={appId} value={appId}>
+            {APP_LABELS[appId] ?? appId}
+          </option>
+        ))}
+      </select>
+
+      {/* App selector tabs */}
+      <div
+        className="hidden md:flex flex-wrap gap-1.5 mb-5"
+        role="group"
+        aria-label="Select AI application"
+      >
+        {appIds.map((appId) => (
+          <Pill key={appId} active={selectedApp === appId} onClick={() => handleSelectApp(appId)}>
             {APP_LABELS[appId] ?? appId}
           </Pill>
         ))}

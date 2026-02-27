@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllServers, getCategories } from "@getmcp/registry";
+import { GUIDE_SLUGS } from "@/lib/guide-data";
 
 const BASE_URL = "https://getmcp.es";
 const BUILD_DATE = new Date();
@@ -34,7 +35,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     })),
     // Guides
-    ...["claude-desktop", "vscode", "cursor", "windsurf", "goose"].map((app) => ({
+    ...GUIDE_SLUGS.map((app) => ({
       url: `${BASE_URL}/guides/${app}`,
       lastModified: BUILD_DATE,
       changeFrequency: "monthly" as const,
