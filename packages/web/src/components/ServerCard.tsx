@@ -5,7 +5,6 @@ export type ServerCardData = {
   name: string;
   description: string;
   categories: string[];
-  author?: string;
   runtime?: string;
   isRemote: boolean;
   envCount: number;
@@ -53,9 +52,6 @@ export function ServerCard({ server }: { server: ServerCardData }) {
           <span className="text-xs px-2 py-0.5 rounded bg-warning-bg text-warning">
             {server.envCount} env var{server.envCount > 1 ? "s" : ""}
           </span>
-        )}
-        {server.author && (
-          <span className="text-xs text-text-secondary truncate ml-auto">by {server.author}</span>
         )}
       </div>
     </Link>

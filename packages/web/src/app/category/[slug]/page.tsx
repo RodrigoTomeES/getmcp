@@ -99,7 +99,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     name: s.name,
     description: s.description,
     categories: s.categories,
-    author: s.author,
     isRemote: "url" in s.config,
     envCount: s.requiredEnvVars.length,
   }));

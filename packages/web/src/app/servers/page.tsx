@@ -34,7 +34,6 @@ export default function ServersPage() {
     name: s.name,
     description: s.description,
     categories: s.categories,
-    author: s.author,
     runtime: s.runtime,
     isRemote: "url" in s.config,
     envCount: s.requiredEnvVars.length,
