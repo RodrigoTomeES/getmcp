@@ -135,7 +135,9 @@ export default async function GuidePage({ params }: { params: Promise<{ app: str
           Home
         </Link>
         <span className="mx-2 text-text-secondary/50">/</span>
-        <span className="text-text">Guides</span>
+        <Link href="/guides" className="hover:text-text transition-colors">
+          Guides
+        </Link>
         <span className="mx-2 text-text-secondary/50">/</span>
         <span className="text-text">{guide.name}</span>
       </nav>
