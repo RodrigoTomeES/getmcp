@@ -77,9 +77,9 @@ describe("importCommand", () => {
 
     (readConfigFile as ReturnType<typeof vi.fn>).mockReturnValueOnce({
       mcpServers: {
-        github: {
+        "1password": {
           command: "npx",
-          args: ["-y", "@modelcontextprotocol/server-github"],
+          args: ["-y", "@takescake/1password-mcp"],
         },
         "custom-server": {
           command: "node",
@@ -93,9 +93,9 @@ describe("importCommand", () => {
     const output = consoleSpy.mock.calls.map((c) => c.join(" ")).join("\n");
     const parsed = JSON.parse(output);
     expect(parsed.discovered.length).toBe(2);
-    // github should be matched to registry
-    const ghServer = parsed.discovered.find((s: { name: string }) => s.name === "github");
-    expect(ghServer.registryId).toBe("github");
+    // 1password should be matched to registry (exact ID match)
+    const matchedServer = parsed.discovered.find((s: { name: string }) => s.name === "1password");
+    expect(matchedServer.registryId).toBe("1password");
     // custom-server should not be matched
     const customServer = parsed.discovered.find(
       (s: { name: string }) => s.name === "custom-server",
@@ -142,9 +142,9 @@ describe("importCommand", () => {
 
     (readConfigFile as ReturnType<typeof vi.fn>).mockReturnValueOnce({
       mcpServers: {
-        github: {
+        "1password": {
           command: "npx",
-          args: ["-y", "@modelcontextprotocol/server-github"],
+          args: ["-y", "@takescake/1password-mcp"],
         },
       },
     });
@@ -154,7 +154,7 @@ describe("importCommand", () => {
     expect(writeLockFile).toHaveBeenCalledWith(
       expect.objectContaining({
         installations: expect.objectContaining({
-          github: expect.objectContaining({
+          "1password": expect.objectContaining({
             apps: ["claude-desktop"],
             envVars: [],
             scopes: { "claude-desktop": "project" },

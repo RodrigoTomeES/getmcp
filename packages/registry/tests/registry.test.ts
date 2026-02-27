@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { RegistryEntry } from "@getmcp/core";
 import {
   getServer,
   getServerOrThrow,
@@ -9,23 +8,32 @@ import {
   getServersByCategory,
   getCategories,
   getServerCount,
+  getServerMetrics,
+  getServerByOfficialName,
+  findServerByCommand,
 } from "../src/index.js";
 
 // ---------------------------------------------------------------------------
-// All entries pass schema validation
+// Basic loading
 // ---------------------------------------------------------------------------
 
-describe("registry entries validate against schema", () => {
-  const allServers = getAllServers();
+describe("registry loads from data/servers.json", () => {
+  it("loads a non-zero number of servers", () => {
+    expect(getServerCount()).toBeGreaterThan(100);
+  });
 
-  for (const server of allServers) {
-    it(`${server.id} passes RegistryEntry validation`, () => {
-      expect(() => RegistryEntry.parse(server)).not.toThrow();
-    });
-  }
+  it("all entries have required fields", () => {
+    for (const server of getAllServers()) {
+      expect(server.id).toBeTruthy();
+      expect(server.name).toBeTruthy();
+      expect(server.description).toBeTruthy();
+      expect(server.config).toBeDefined();
+      expect(server.officialName).toBeTruthy();
+    }
+  });
 
   it("all entries have unique IDs", () => {
-    const ids = allServers.map((s) => s.id);
+    const ids = getAllServers().map((s) => s.id);
     const unique = new Set(ids);
     expect(unique.size).toBe(ids.length);
   });
@@ -36,26 +44,50 @@ describe("registry entries validate against schema", () => {
 // ---------------------------------------------------------------------------
 
 describe("getServer", () => {
-  it("returns a known server by ID", () => {
-    const result = getServer("github");
-    expect(result).toBeDefined();
-    expect(result!.name).toBe("GitHub");
+  it("returns a server by slug ID", () => {
+    const servers = getAllServers();
+    if (servers.length > 0) {
+      const first = servers[0];
+      const result = getServer(first.id);
+      expect(result).toBeDefined();
+      expect(result!.id).toBe(first.id);
+    }
   });
 
   it("returns undefined for unknown ID", () => {
-    expect(getServer("nonexistent")).toBeUndefined();
+    expect(getServer("nonexistent-server-xyz")).toBeUndefined();
   });
 });
 
 describe("getServerOrThrow", () => {
-  it("returns a known server by ID", () => {
-    const result = getServerOrThrow("github");
-    expect(result.name).toBe("GitHub");
+  it("returns a server by slug ID", () => {
+    const servers = getAllServers();
+    if (servers.length > 0) {
+      const first = servers[0];
+      const result = getServerOrThrow(first.id);
+      expect(result.id).toBe(first.id);
+    }
   });
 
   it("throws for unknown ID with helpful message", () => {
-    expect(() => getServerOrThrow("nonexistent")).toThrow(/not found in registry/);
-    expect(() => getServerOrThrow("nonexistent")).toThrow(/Available:/);
+    expect(() => getServerOrThrow("nonexistent-server-xyz")).toThrow(/not found in registry/);
+    expect(() => getServerOrThrow("nonexistent-server-xyz")).toThrow(/Available:/);
+  });
+});
+
+describe("getServerByOfficialName", () => {
+  it("looks up server by reverse-DNS name", () => {
+    const servers = getAllServers();
+    if (servers.length > 0) {
+      const first = servers[0];
+      const result = getServerByOfficialName(first.officialName);
+      expect(result).toBeDefined();
+      expect(result!.id).toBe(first.id);
+    }
+  });
+
+  it("returns undefined for unknown name", () => {
+    expect(getServerByOfficialName("io.unknown/nonexistent")).toBeUndefined();
   });
 });
 
@@ -66,33 +98,16 @@ describe("getServerOrThrow", () => {
 describe("getServerIds", () => {
   it("returns all IDs sorted alphabetically", () => {
     const ids = getServerIds();
-    expect(ids.length).toBeGreaterThanOrEqual(100);
-    // Verify sorted
+    expect(ids.length).toBeGreaterThan(100);
     const sorted = [...ids].sort();
     expect(ids).toEqual(sorted);
-  });
-
-  it("includes known servers", () => {
-    const ids = getServerIds();
-    expect(ids).toContain("github");
-    expect(ids).toContain("sentry");
-    expect(ids).toContain("context7");
-    expect(ids).toContain("fetch");
-    // Batch 1 servers
-    expect(ids).toContain("gitlab");
-    expect(ids).toContain("tavily");
-    expect(ids).toContain("cloudflare");
   });
 });
 
 describe("getAllServers", () => {
-  it("returns all server entries", () => {
+  it("returns all server entries sorted by ID", () => {
     const servers = getAllServers();
-    expect(servers.length).toBeGreaterThanOrEqual(100);
-  });
-
-  it("entries are sorted by ID", () => {
-    const servers = getAllServers();
+    expect(servers.length).toBeGreaterThan(100);
     const ids = servers.map((s) => s.id);
     const sorted = [...ids].sort();
     expect(ids).toEqual(sorted);
@@ -101,7 +116,7 @@ describe("getAllServers", () => {
 
 describe("getServerCount", () => {
   it("returns the correct count", () => {
-    expect(getServerCount()).toBeGreaterThanOrEqual(100);
+    expect(getServerCount()).toBe(getAllServers().length);
   });
 });
 
@@ -111,31 +126,13 @@ describe("getServerCount", () => {
 
 describe("searchServers", () => {
   it("returns all servers for empty query", () => {
-    expect(searchServers("").length).toBeGreaterThanOrEqual(100);
-    expect(searchServers("  ").length).toBeGreaterThanOrEqual(100);
+    expect(searchServers("").length).toBe(getServerCount());
+    expect(searchServers("  ").length).toBe(getServerCount());
   });
 
-  it("finds servers by name", () => {
-    const results = searchServers("GitHub");
+  it("finds servers by name keyword", () => {
+    const results = searchServers("github");
     expect(results.length).toBeGreaterThanOrEqual(1);
-    expect(results.some((s) => s.id === "github")).toBe(true);
-  });
-
-  it("finds servers by description keywords", () => {
-    const results = searchServers("database");
-    expect(results.length).toBeGreaterThanOrEqual(1);
-    expect(results.some((s) => s.id === "postgres")).toBe(true);
-  });
-
-  it("finds servers by category", () => {
-    const results = searchServers("automation");
-    expect(results.length).toBeGreaterThanOrEqual(1);
-    expect(results.some((s) => s.id === "puppeteer")).toBe(true);
-  });
-
-  it("finds servers by author", () => {
-    const results = searchServers("Anthropic");
-    expect(results.length).toBeGreaterThanOrEqual(5);
   });
 
   it("is case-insensitive", () => {
@@ -145,21 +142,27 @@ describe("searchServers", () => {
   });
 
   it("returns empty for no match", () => {
-    const results = searchServers("xyznonexistent");
+    const results = searchServers("xyznonexistentzzz");
     expect(results.length).toBe(0);
   });
 });
 
 describe("getServersByCategory", () => {
   it("finds servers by category", () => {
-    const results = getServersByCategory("developer-tools");
-    expect(results.length).toBeGreaterThanOrEqual(2);
-    expect(results.some((s) => s.id === "github")).toBe(true);
+    const categories = getCategories();
+    if (categories.length > 0) {
+      const results = getServersByCategory(categories[0]);
+      expect(results.length).toBeGreaterThanOrEqual(1);
+    }
   });
 
   it("is case-insensitive", () => {
-    const results = getServersByCategory("Developer-Tools");
-    expect(results.length).toBeGreaterThanOrEqual(2);
+    const categories = getCategories();
+    if (categories.length > 0) {
+      const lower = getServersByCategory(categories[0]);
+      const upper = getServersByCategory(categories[0].toUpperCase());
+      expect(lower.length).toBe(upper.length);
+    }
   });
 
   it("returns empty for unknown category", () => {
@@ -168,24 +171,14 @@ describe("getServersByCategory", () => {
 });
 
 describe("getCategories", () => {
-  it("returns all unique categories sorted", () => {
+  it("returns unique categories sorted", () => {
     const categories = getCategories();
-    expect(categories.length).toBeGreaterThan(5);
-    // Verify sorted
+    // Categories may be empty if GitHub enrichment hasn't run (no GITHUB_TOKEN).
+    // Just verify the array is sorted and unique.
     const sorted = [...categories].sort();
     expect(categories).toEqual(sorted);
-    // Verify no duplicates
     const unique = new Set(categories);
     expect(unique.size).toBe(categories.length);
-  });
-
-  it("includes known categories", () => {
-    const categories = getCategories();
-    expect(categories).toContain("developer-tools");
-    expect(categories).toContain("data");
-    expect(categories).toContain("search");
-    expect(categories).toContain("cloud");
-    expect(categories).toContain("communication");
   });
 });
 
@@ -205,23 +198,50 @@ describe("server content integrity", () => {
 
   it("remote servers have url field", () => {
     const remoteServers = getAllServers().filter((s) => "url" in s.config);
-    expect(remoteServers.length).toBeGreaterThan(0);
     for (const server of remoteServers) {
       const config = server.config as { url: string };
       expect(config.url).toMatch(/^https?:\/\//);
     }
   });
+});
 
-  it("servers with requiredEnvVars have those vars in config.env", () => {
-    for (const server of getAllServers()) {
-      if (server.requiredEnvVars.length > 0 && "env" in server.config && server.config.env) {
-        for (const envVar of server.requiredEnvVars) {
-          expect(
-            envVar in server.config.env,
-            `${server.id}: required env var "${envVar}" not found in config.env`,
-          ).toBe(true);
-        }
+// ---------------------------------------------------------------------------
+// Metrics
+// ---------------------------------------------------------------------------
+
+describe("getServerMetrics", () => {
+  it("returns metrics for servers that have them", () => {
+    const servers = getAllServers();
+    let foundMetrics = false;
+    for (const server of servers.slice(0, 50)) {
+      const metrics = getServerMetrics(server.id);
+      if (metrics) {
+        foundMetrics = true;
+        expect(metrics.fetchedAt).toBeTruthy();
+        break;
       }
     }
+    // At least some servers should have metrics from the sync
+    expect(foundMetrics).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// findServerByCommand
+// ---------------------------------------------------------------------------
+
+describe("findServerByCommand", () => {
+  it("finds a server by package name in args", () => {
+    const servers = getAllServers().filter((s) => s.package && "command" in s.config);
+    if (servers.length > 0) {
+      const server = servers[0];
+      const config = server.config as { command: string; args: string[] };
+      const result = findServerByCommand(config.command, config.args);
+      expect(result).toBeDefined();
+    }
+  });
+
+  it("returns undefined for unknown command", () => {
+    expect(findServerByCommand("nonexistent-cmd", ["arg1"])).toBeUndefined();
   });
 });

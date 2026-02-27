@@ -15,20 +15,13 @@ describe("getRegistryEntryJsonSchema", () => {
   });
 
   it("includes required properties", () => {
-    expect(schema.required).toContain("id");
-    expect(schema.required).toContain("name");
-    expect(schema.required).toContain("description");
-    expect(schema.required).toContain("config");
+    expect(schema.required).toContain("server");
   });
 
   it("includes optional fields in properties", () => {
     const props = schema.properties as Record<string, unknown>;
-    expect(props).toHaveProperty("package");
-    expect(props).toHaveProperty("runtime");
-    expect(props).toHaveProperty("repository");
-    expect(props).toHaveProperty("author");
-    expect(props).toHaveProperty("categories");
-    expect(props).toHaveProperty("requiredEnvVars");
+    expect(props).toHaveProperty("server");
+    expect(props).toHaveProperty("_meta");
   });
 
   it("static file matches runtime output", () => {
