@@ -174,28 +174,38 @@ npx @getmcp/cli list --json`}</CodeBlock>
               </thead>
               <tbody className="text-text-secondary">
                 {[
-                  ["Claude Desktop", "mcpServers", "JSON"],
-                  ["Claude Code", "mcpServers", "JSON"],
-                  ["VS Code / Copilot", "servers", "JSON"],
-                  ["Cursor", "mcpServers", "JSON"],
-                  ["Cline", "mcpServers", "JSON"],
-                  ["Roo Code", "mcpServers", "JSON"],
-                  ["Goose", "extensions", "YAML"],
-                  ["Windsurf", "mcpServers", "JSON"],
-                  ["OpenCode", "mcp", "JSONC"],
-                  ["Zed", "context_servers", "JSON"],
-                  ["PyCharm", "mcpServers", "JSON"],
-                  ["Codex", "mcp_servers", "TOML"],
-                  ["Gemini CLI", "mcpServers", "JSON"],
-                  ["Continue", "mcpServers", "JSON"],
-                  ["Amazon Q", "mcpServers", "JSON"],
-                  ["Trae", "mcpServers", "JSON"],
-                  ["BoltAI", "mcpServers", "JSON"],
-                  ["LibreChat", "mcpServers", "YAML"],
-                  ["Antigravity", "mcpServers", "JSON"],
-                ].map(([app, rootKey, format]) => (
+                  ["Claude Desktop", "mcpServers", "JSON", "claude-desktop"],
+                  ["Claude Code", "mcpServers", "JSON", null],
+                  ["VS Code / Copilot", "servers", "JSON", "vscode"],
+                  ["Cursor", "mcpServers", "JSON", "cursor"],
+                  ["Cline", "mcpServers", "JSON", null],
+                  ["Roo Code", "mcpServers", "JSON", null],
+                  ["Goose", "extensions", "YAML", "goose"],
+                  ["Windsurf", "mcpServers", "JSON", "windsurf"],
+                  ["OpenCode", "mcp", "JSONC", null],
+                  ["Zed", "context_servers", "JSON", null],
+                  ["PyCharm", "mcpServers", "JSON", null],
+                  ["Codex", "mcp_servers", "TOML", null],
+                  ["Gemini CLI", "mcpServers", "JSON", null],
+                  ["Continue", "mcpServers", "JSON", null],
+                  ["Amazon Q", "mcpServers", "JSON", null],
+                  ["Trae", "mcpServers", "JSON", null],
+                  ["BoltAI", "mcpServers", "JSON", null],
+                  ["LibreChat", "mcpServers", "YAML", null],
+                  ["Antigravity", "mcpServers", "JSON", null],
+                ].map(([app, rootKey, format, guideSlug]) => (
                   <tr key={app} className="border-b border-border last:border-b-0">
-                    <td className="px-4 py-2.5">{app}</td>
+                    <td className="px-4 py-2.5">
+                      {app}
+                      {guideSlug && (
+                        <Link
+                          href={`/guides/${guideSlug}`}
+                          className="text-accent hover:underline ml-2 text-xs"
+                        >
+                          guide
+                        </Link>
+                      )}
+                    </td>
                     <td className="px-4 py-2.5">
                       <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono text-text">
                         {rootKey}
