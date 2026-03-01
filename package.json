@@ -19,7 +19,7 @@
     "getmcp": "npx tsx packages/cli/src/bin.ts"
   },
   "devDependencies": {
-    "@types/node": "^24.0.0",
+    "@types/node": "^25.3.3",
     "@vitest/coverage-v8": "^4.0.18",
     "lefthook": "^2.1.1",
     "oxfmt": "^0.34.0",
