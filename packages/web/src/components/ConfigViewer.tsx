@@ -81,48 +81,52 @@ export function ConfigViewer({ configs }: { configs: Record<string, PreGenerated
             active={selectedApp === appId}
             onClick={() => handleSelectApp(appId)}
             role="tab"
+            aria-controls="config-tabpanel"
+            id={`config-tab-${appId}`}
           >
             {APP_LABELS[appId] ?? appId}
           </Pill>
         ))}
       </div>
 
-      {/* Config path hint */}
-      <p className="text-xs text-text-secondary mb-3">
-        Config file: <code className="text-accent font-mono">{current.configPath}</code>
-      </p>
+      {/* Tab panel content */}
+      <div role="tabpanel" id="config-tabpanel" aria-labelledby={`config-tab-${selectedApp}`}>
+        <p className="text-xs text-text-secondary mb-3">
+          Config file: <code className="text-accent font-mono">{current.configPath}</code>
+        </p>
 
-      {/* Code block */}
-      <CodeBlock label={current.format}>{current.serialized}</CodeBlock>
+        {/* Code block */}
+        <CodeBlock label={current.format}>{current.serialized}</CodeBlock>
 
-      {/* Footer info */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3">
-        {/* Docs link */}
-        <a
-          href={current.docsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-accent hover:underline"
-        >
-          {APP_LABELS[selectedApp] ?? selectedApp} MCP documentation
-          <span className="sr-only"> (opens in new tab)</span>
-        </a>
+        {/* Footer info */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3">
+          {/* Docs link */}
+          <a
+            href={current.docsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-accent hover:underline"
+          >
+            {APP_LABELS[selectedApp] ?? selectedApp} MCP documentation
+            <span className="sr-only"> (opens in new tab)</span>
+          </a>
 
-        {/* PyCharm-specific warning */}
-        {selectedApp === "pycharm" && (
-          <p className="text-xs text-warning">
-            Requires the{" "}
-            <a
-              href="https://plugins.jetbrains.com/plugin/22282-jetbrains-ai-assistant"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline text-warning-light"
-            >
-              JetBrains AI Assistant
-            </a>{" "}
-            plugin.
-          </p>
-        )}
+          {/* PyCharm-specific warning */}
+          {selectedApp === "pycharm" && (
+            <p className="text-xs text-warning">
+              Requires the{" "}
+              <a
+                href="https://plugins.jetbrains.com/plugin/22282-jetbrains-ai-assistant"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-warning-light"
+              >
+                JetBrains AI Assistant
+              </a>{" "}
+              plugin.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

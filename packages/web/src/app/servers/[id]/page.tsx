@@ -6,8 +6,8 @@ import type { AppIdType } from "@getmcp/core";
 import type { InternalRegistryEntry } from "@getmcp/registry";
 import { ConfigViewer, type PreGeneratedConfig } from "@/components/ConfigViewer";
 import { PackageManagerCommand } from "@/components/PackageManagerCommand";
-import { MetaItem } from "@/components/MetaItem";
 import { ServerCard, type ServerCardData } from "@/components/ServerCard";
+import { ServerSidebar } from "@/components/ServerSidebar";
 import { GUIDE_SLUGS } from "@/lib/guide-data";
 
 export const dynamicParams = false;
@@ -90,36 +90,8 @@ export default async function ServerPage({ params }: { params: Promise<{ id: str
     notFound();
   }
 
-  return <ServerDetail server={server} />;
-}
-
-function runtimeToRequirements(runtime?: string): string {
-  const map: Record<string, string> = {
-    node: "Node.js 18+",
-    docker: "Docker Engine",
-    python: "Python 3.10+",
-    binary: "Pre-built binary",
-  };
-  return runtime ? (map[runtime] ?? runtime) : "Node.js 18+";
-}
-
-function compactNumber(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
-  return String(n);
-}
-
-function ServerDetail({ server }: { server: InternalRegistryEntry }) {
-  const isRemote = "url" in server.config;
-  const transport = isRemote ? "remote" : "stdio";
   const configs = preGenerateConfigs(server.id, server.config);
   const metrics = getServerMetrics(server.id);
-  const downloads = metrics?.npm?.weeklyDownloads ?? metrics?.pypi?.monthlyDownloads;
-  const downloadLabel = metrics?.npm?.weeklyDownloads
-    ? "/week"
-    : metrics?.pypi?.monthlyDownloads
-      ? "/month"
-      : "";
 
   const primaryCategory = server.categories?.[0];
   const relatedServers: ServerCardData[] = primaryCategory
@@ -143,6 +115,43 @@ function ServerDetail({ server }: { server: InternalRegistryEntry }) {
         })
     : [];
 
+  return (
+    <ServerDetail
+      server={server}
+      configs={configs}
+      metrics={metrics}
+      relatedServers={relatedServers}
+    />
+  );
+}
+
+function runtimeToRequirements(runtime?: string): string {
+  const map: Record<string, string> = {
+    node: "Node.js 18+",
+    docker: "Docker Engine",
+    python: "Python 3.10+",
+    binary: "Pre-built binary",
+  };
+  return runtime ? (map[runtime] ?? runtime) : "Node.js 18+";
+}
+
+type Metrics = ReturnType<typeof getServerMetrics>;
+
+function ServerDetail({
+  server,
+  configs,
+  metrics,
+  relatedServers,
+}: {
+  server: InternalRegistryEntry;
+  configs: Record<string, PreGeneratedConfig>;
+  metrics: Metrics;
+  relatedServers: ServerCardData[];
+}) {
+  const isRemote = "url" in server.config;
+  const transport = isRemote ? "remote" : "stdio";
+  const version = metrics?.npm?.latestVersion ?? metrics?.pypi?.latestVersion;
+
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -153,6 +162,7 @@ function ServerDetail({ server }: { server: InternalRegistryEntry }) {
       applicationSubCategory: "MCP Server",
       operatingSystem: "Windows, macOS, Linux",
       softwareRequirements: runtimeToRequirements(server.runtime),
+      ...(version && { softwareVersion: version }),
       isAccessibleForFree: true,
       offers: {
         "@type": "Offer",
@@ -195,8 +205,15 @@ function ServerDetail({ server }: { server: InternalRegistryEntry }) {
     },
   ];
 
+  const serverCommand =
+    !isRemote && "command" in server.config
+      ? [server.config.command, ...(server.config.args ?? [])].join(" ")
+      : null;
+
+  const serverUrl = isRemote && "url" in server.config ? server.config.url : null;
+
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="max-w-6xl mx-auto px-6 py-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -204,28 +221,36 @@ function ServerDetail({ server }: { server: InternalRegistryEntry }) {
 
       {/* Breadcrumb */}
       <nav className="text-sm text-text-secondary mb-10" aria-label="Breadcrumb">
-        <Link href="/servers" className="hover:text-text transition-colors">
-          Servers
-        </Link>
-        <span className="mx-2 text-text-secondary/50">/</span>
-        <span className="text-text">{server.name}</span>
+        <ol className="flex items-center gap-2">
+          <li>
+            <Link href="/servers" className="hover:text-text transition-colors">
+              Servers
+            </Link>
+          </li>
+          <li className="text-text-secondary/50" aria-hidden="true">
+            /
+          </li>
+          <li aria-current="page" className="text-text">
+            {server.name}
+          </li>
+        </ol>
       </nav>
 
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-3">
+      {/* Hero */}
+      <section className="mb-10">
+        <div className="flex flex-wrap items-center gap-3 mb-4">
           {server.icons?.[0]?.src && (
             <img
               src={server.icons[0].src}
               alt=""
-              width={32}
-              height={32}
-              className="w-8 h-8 rounded"
+              width={48}
+              height={48}
+              className="w-12 h-12 rounded-lg shrink-0"
             />
           )}
           <h1 className="text-3xl font-bold tracking-tight">{server.name}</h1>
           <span
-            className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+            className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
               isRemote
                 ? "bg-transport-remote-bg text-transport-remote"
                 : "bg-transport-stdio-bg text-transport-stdio"
@@ -233,14 +258,18 @@ function ServerDetail({ server }: { server: InternalRegistryEntry }) {
           >
             {transport}
           </span>
+          {metrics?.github?.archived && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-warning-bg text-warning font-medium shrink-0">
+              Archived
+            </span>
+          )}
         </div>
-        <p className="text-lg text-text-secondary leading-relaxed max-w-2xl">
+
+        <p className="text-lg text-text-secondary leading-relaxed max-w-3xl mb-5">
           {server.description}
         </p>
-      </div>
 
-      {/* Categories + Links */}
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-3 mb-8">
+        {/* Categories */}
         {server.categories && server.categories.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {server.categories.map((cat) => (
@@ -254,156 +283,106 @@ function ServerDetail({ server }: { server: InternalRegistryEntry }) {
             ))}
           </div>
         )}
-        {(server.repository || server.homepage) && (
-          <div className="flex items-center gap-4">
-            {server.repository && (
-              <a
-                href={server.repository}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-accent hover:underline transition-colors"
-              >
-                Repository
-                <span className="sr-only"> (opens in new tab)</span>
-              </a>
-            )}
-            {server.homepage && server.repository !== server.homepage && (
-              <a
-                href={server.homepage}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-accent hover:underline transition-colors"
-              >
-                Homepage
-                <span className="sr-only"> (opens in new tab)</span>
-              </a>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Getting started */}
-      <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4">Getting Started</h2>
-        <div className="space-y-3 text-text-secondary text-sm">
-          <p>
-            <span className="text-text font-medium">1. Prerequisites:</span>{" "}
-            {server.runtime === "docker"
-              ? "Docker Engine installed and running"
-              : server.runtime === "python"
-                ? "Python 3.10+ installed"
-                : server.runtime === "binary"
-                  ? "Download the pre-built binary for your platform"
-                  : "Node.js 18+ installed"}
-          </p>
-          {server.requiredEnvVars.length > 0 && (
-            <p>
-              <span className="text-text font-medium">2. Set environment variables:</span>{" "}
-              {server.requiredEnvVars.map((v) => (
-                <code key={v} className="text-accent bg-code-bg px-1 py-0.5 rounded mx-0.5">
-                  {v}
-                </code>
-              ))}
-            </p>
-          )}
-          <p>
-            <span className="text-text font-medium">
-              {server.requiredEnvVars.length > 0 ? "3" : "2"}. Install:
-            </span>{" "}
-            Run the install command below — getmcp will auto-detect your installed AI apps.
-          </p>
-        </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {GUIDE_SLUGS.slice(0, 5).map((slug) => (
-            <Link
-              key={slug}
-              href={`/guides/${slug}`}
-              className="text-xs text-accent hover:underline"
-            >
-              {slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())} guide &rarr;
-            </Link>
-          ))}
-        </div>
       </section>
 
-      {/* Required env vars */}
-      {server.requiredEnvVars.length > 0 && (
-        <div className="mb-8 rounded-lg border border-warning-border bg-warning-subtle p-4">
-          <h2 className="text-sm font-medium text-warning mb-2">Required Environment Variables</h2>
-          <ul className="space-y-2">
-            {server.requiredEnvVars.map((envVar) => {
-              const detail = server.envVarDetails?.find((d) => d.name === envVar);
-              return (
-                <li key={envVar} className="text-sm">
-                  <div className="flex items-center gap-1.5">
-                    <code className="text-warning-light bg-code-bg px-1.5 py-0.5 rounded">
-                      {envVar}
-                    </code>
-                    {detail?.isSecret && (
-                      <span className="text-warning-light text-xs" title="Secret value">
-                        <svg
-                          className="w-3.5 h-3.5 inline"
-                          fill="currentColor"
-                          viewBox="0 0 16 16"
-                          aria-label="Secret"
-                        >
-                          <path d="M4 4a4 4 0 0 1 8 0v2h.25c.966 0 1.75.784 1.75 1.75v5.5A1.75 1.75 0 0 1 12.25 15h-8.5A1.75 1.75 0 0 1 2 13.25v-5.5C2 6.784 2.784 6 3.75 6H4Zm8.25 3.5h-8.5a.25.25 0 0 0-.25.25v5.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-5.5a.25.25 0 0 0-.25-.25ZM10.5 6V4a2.5 2.5 0 1 0-5 0v2Z" />
-                        </svg>
-                      </span>
-                    )}
-                  </div>
-                  {detail?.description && (
-                    <p className="text-xs text-text-secondary mt-0.5 ml-0.5">
-                      {detail.description}
-                    </p>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+      {/* Two-column layout */}
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+        {/* Main content */}
+        <div className="min-w-0 flex-1 space-y-10">
+          {/* Install command */}
+          <section>
+            <h2 className="text-lg font-semibold mb-3">Install</h2>
+            <PackageManagerCommand serverId={server.id} />
+            <p className="text-xs text-text-secondary mt-2">
+              Community-contributed server.{" "}
+              <Link href="/docs#security-disclaimer" className="text-accent hover:underline">
+                Review source before installing
+              </Link>
+              .
+            </p>
+          </section>
+
+          {/* Required env vars */}
+          {server.requiredEnvVars.length > 0 && (
+            <section className="rounded-lg border border-warning-border bg-warning-subtle p-4">
+              <h2 className="text-sm font-medium text-warning mb-2">
+                Required Environment Variables
+              </h2>
+              <ul className="space-y-2">
+                {server.requiredEnvVars.map((envVar) => {
+                  const detail = server.envVarDetails?.find((d) => d.name === envVar);
+                  return (
+                    <li key={envVar} className="text-sm">
+                      <div className="flex items-center gap-1.5">
+                        <code className="text-warning-light bg-code-bg px-1.5 py-0.5 rounded">
+                          {envVar}
+                        </code>
+                        {detail?.isSecret && (
+                          <span className="text-warning-light text-xs" title="Secret value">
+                            <svg
+                              className="w-3.5 h-3.5 inline"
+                              fill="currentColor"
+                              viewBox="0 0 16 16"
+                              aria-label="Secret"
+                            >
+                              <path d="M4 4a4 4 0 0 1 8 0v2h.25c.966 0 1.75.784 1.75 1.75v5.5A1.75 1.75 0 0 1 12.25 15h-8.5A1.75 1.75 0 0 1 2 13.25v-5.5C2 6.784 2.784 6 3.75 6H4Zm8.25 3.5h-8.5a.25.25 0 0 0-.25.25v5.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-5.5a.25.25 0 0 0-.25-.25ZM10.5 6V4a2.5 2.5 0 1 0-5 0v2Z" />
+                            </svg>
+                          </span>
+                        )}
+                      </div>
+                      {detail?.description && (
+                        <p className="text-xs text-text-secondary mt-0.5 ml-0.5">
+                          {detail.description}
+                        </p>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
+
+          {/* Config generator */}
+          <ConfigViewer configs={configs} />
+
+          {/* Getting started */}
+          <section>
+            <h2 className="text-lg font-semibold mb-3">Getting Started</h2>
+            <p className="text-sm text-text-secondary">
+              Requires {runtimeToRequirements(server.runtime)}. Run the install command above and
+              getmcp will auto-detect your installed AI apps.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-3">
+              {GUIDE_SLUGS.slice(0, 4).map((slug) => (
+                <Link
+                  key={slug}
+                  href={`/guides/${slug}`}
+                  className="text-xs text-accent hover:underline"
+                >
+                  {slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())} guide &rarr;
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          {/* Server command/URL detail */}
+          {(serverCommand || serverUrl) && (
+            <section className="rounded-lg border border-border bg-surface p-5">
+              <h3 className="text-xs font-medium uppercase tracking-wider text-text-secondary mb-3">
+                {serverCommand ? "Server Command" : "Server URL"}
+              </h3>
+              <code className="text-sm font-mono text-text break-all">
+                {serverCommand ?? serverUrl}
+              </code>
+            </section>
+          )}
         </div>
-      )}
 
-      {/* CLI install command */}
-      <div className="mb-12">
-        <h2 className="text-xl font-semibold mb-4">Install</h2>
-        <PackageManagerCommand serverId={server.id} />
-        <p className="text-xs text-text-secondary mt-3">
-          This is a community-contributed server.{" "}
-          <Link href="/docs#security-disclaimer" className="text-accent hover:underline">
-            Review source before installing
-          </Link>
-          .
-        </p>
+        {/* Sidebar */}
+        <aside className="w-full lg:w-72 shrink-0 lg:sticky lg:top-6 lg:self-start">
+          <ServerSidebar server={server} metrics={metrics} />
+        </aside>
       </div>
-
-      {/* Config generator */}
-      <ConfigViewer configs={configs} />
-
-      {/* Metadata grid */}
-      <dl className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-5 py-6 border-y border-border my-10">
-        {server.author && <MetaItem label="Author" value={server.author} />}
-        {server.runtime && <MetaItem label="Runtime" value={server.runtime} />}
-        {server.package && <MetaItem label="Package" value={server.package} mono />}
-        {server.license && <MetaItem label="License" value={server.license} />}
-        {server.language && <MetaItem label="Language" value={server.language} />}
-        {metrics?.github?.stars != null && metrics.github.stars > 0 && (
-          <MetaItem label="GitHub Stars" value={compactNumber(metrics.github.stars)} />
-        )}
-        {downloads != null && downloads > 0 && (
-          <MetaItem label="Downloads" value={`${compactNumber(downloads)}${downloadLabel}`} />
-        )}
-        {isRemote && "url" in server.config && (
-          <MetaItem label="URL" value={server.config.url} mono />
-        )}
-        {!isRemote && "command" in server.config && (
-          <MetaItem
-            label="Command"
-            value={[server.config.command, ...(server.config.args ?? [])].join(" ")}
-            mono
-          />
-        )}
-      </dl>
 
       {/* Related servers */}
       {relatedServers.length > 0 && (

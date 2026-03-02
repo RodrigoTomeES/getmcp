@@ -175,7 +175,7 @@ None. The design relies entirely on background color layering and borders for de
 | --------------- | ------------------------ |
 | Homepage        | `max-w-6xl mx-auto px-6` |
 | Docs            | `max-w-3xl mx-auto px-6` |
-| Server detail   | `max-w-4xl mx-auto px-6` |
+| Server detail   | `max-w-6xl mx-auto px-6` |
 | Install command | `max-w-xl mx-auto`       |
 
 ### Responsive Breakpoints (Tailwind defaults)
