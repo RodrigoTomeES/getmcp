@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllServers, getCategories } from "@getmcp/registry";
 import { GUIDE_SLUGS } from "@/lib/guide-data";
-
-const BASE_URL = "https://getmcp.es";
+import { SITE_URL } from "@/lib/constants";
 const BUILD_DATE = new Date();
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -11,43 +10,43 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     {
-      url: BASE_URL,
+      url: SITE_URL,
       lastModified: BUILD_DATE,
       changeFrequency: "weekly",
       priority: 1,
     },
     {
-      url: `${BASE_URL}/docs`,
+      url: `${SITE_URL}/docs`,
       lastModified: BUILD_DATE,
       changeFrequency: "monthly",
       priority: 0.9,
     },
     {
-      url: `${BASE_URL}/servers`,
+      url: `${SITE_URL}/servers`,
       lastModified: BUILD_DATE,
       changeFrequency: "weekly",
       priority: 0.95,
     },
     ...categories.map((cat) => ({
-      url: `${BASE_URL}/category/${cat}`,
+      url: `${SITE_URL}/category/${cat}`,
       lastModified: BUILD_DATE,
       changeFrequency: "monthly" as const,
       priority: 0.85,
     })),
     {
-      url: `${BASE_URL}/guides`,
+      url: `${SITE_URL}/guides`,
       lastModified: BUILD_DATE,
       changeFrequency: "monthly" as const,
       priority: 0.9,
     },
     ...GUIDE_SLUGS.map((app) => ({
-      url: `${BASE_URL}/guides/${app}`,
+      url: `${SITE_URL}/guides/${app}`,
       lastModified: BUILD_DATE,
       changeFrequency: "monthly" as const,
       priority: 0.9,
     })),
     ...servers.map((server) => ({
-      url: `${BASE_URL}/servers/${server.id}`,
+      url: `${SITE_URL}/servers/${server.id}`,
       lastModified: BUILD_DATE,
       changeFrequency: "monthly" as const,
       priority: 0.8,
