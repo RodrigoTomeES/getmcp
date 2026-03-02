@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Pill } from "./Pill";
+import { APP_LABELS } from "@/lib/guide-data";
 
 export type PreGeneratedConfig = {
   serialized: string;
@@ -11,36 +12,18 @@ export type PreGeneratedConfig = {
   docsUrl: string;
 };
 
-const APP_LABELS: Record<string, string> = {
-  "claude-desktop": "Claude Desktop",
-  "claude-code": "Claude Code",
-  vscode: "VS Code / Copilot",
-  cursor: "Cursor",
-  cline: "Cline",
-  "roo-code": "Roo Code",
-  goose: "Goose",
-  windsurf: "Windsurf",
-  opencode: "OpenCode",
-  zed: "Zed",
-  pycharm: "PyCharm",
-  codex: "Codex",
-  "gemini-cli": "Gemini CLI",
-  continue: "Continue",
-  "amazon-q": "Amazon Q",
-  trae: "Trae",
-  "bolt-ai": "BoltAI",
-  "libre-chat": "LibreChat",
-  antigravity: "Antigravity",
-};
-
 export function ConfigViewer({ configs }: { configs: Record<string, PreGeneratedConfig> }) {
   const appIds = Object.keys(configs);
   const [selectedApp, setSelectedApp] = useState(appIds[0]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("getmcp-preferred-app");
-    if (saved && configs[saved]) {
-      setSelectedApp(saved);
+    try {
+      const saved = localStorage.getItem("getmcp-preferred-app");
+      if (saved && configs[saved]) {
+        setSelectedApp(saved);
+      }
+    } catch {
+      // localStorage unavailable (private browsing, restrictive CSP)
     }
     // configs is stable per mount (pre-generated in server component)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -48,7 +31,11 @@ export function ConfigViewer({ configs }: { configs: Record<string, PreGenerated
 
   const handleSelectApp = (appId: string) => {
     setSelectedApp(appId);
-    localStorage.setItem("getmcp-preferred-app", appId);
+    try {
+      localStorage.setItem("getmcp-preferred-app", appId);
+    } catch {
+      // localStorage unavailable
+    }
   };
 
   const current = configs[selectedApp];
