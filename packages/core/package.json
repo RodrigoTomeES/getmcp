@@ -23,7 +23,6 @@
   },
   "files": [
     "dist",
-    "registry-entry.schema.json",
     "README.md",
     "LICENSE"
   ],
@@ -34,15 +33,13 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    },
-    "./registry-entry.schema.json": "./registry-entry.schema.json"
+    }
   },
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "generate-schema": "npx tsx scripts/generate-schema.ts",
-    "build": "npm run generate-schema && tsc",
+    "build": "tsc",
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },

@@ -112,8 +112,7 @@ Features that improve the developer experience.
 - [x] **Implement `getmcp doctor` command** — Health diagnostics: installed apps, config parsing, registry status, orphaned servers, env vars, runtime dependencies (node, npx, uvx). Supports `--json` output.
   - File: `packages/cli/src/commands/doctor.ts`
 
-- [x] **Implement `getmcp init` command** — Interactive wizard that scaffolds a new MCP server registry entry (TypeScript file) with all required metadata.
-  - File: `packages/cli/src/commands/init.ts`
+- [x] ~~**Implement `getmcp init` command**~~ — Removed. Was scaffolding entries in the old getmcp format; obsolete after migration to official MCP registry sync.
 
 - [x] **Add `detectInstalled()` to generators** — Each generator now has a `detectInstalled()` method that checks if the app is installed using `existsSync()` on platform-specific directories. Replaces the old `detectApps()` logic that derived "installed" from config path parent directory existence. Shared path constants (`home`, `configHome`, `appData`, `claudeHome`, `codexHome`) in `base.ts` support env var overrides.
   - Files: `packages/core/src/types.ts`, `packages/generators/src/base.ts`, all 20 generator files, `packages/cli/src/detect.ts`
@@ -321,12 +320,10 @@ Longer-term roadmap items from the specification.
 
 ### Registry Enhancements
 
-- [x] **JSON Schema for server definitions** — Published a JSON Schema (`packages/core/registry-entry.schema.json`) generated from the Zod schema via Zod v4's built-in `z.toJSONSchema()`. Available as a runtime function (`getRegistryEntryJsonSchema()`) and as a static file via subpath export.
-  - Files: `packages/core/src/json-schema.ts`, `packages/core/scripts/generate-schema.ts`, `packages/core/registry-entry.schema.json`
+- [x] ~~**JSON Schema for server definitions**~~ — Removed. Was providing IDE autocompletion for manually-authored server JSON files; obsolete after migration to official MCP registry sync.
 - [ ] **Version tracking per server** — Track and display server package versions
 - [ ] **Server compatibility matrix** — Surface which servers work with which apps
-- [x] **Community submission workflow** — Created `CONTRIBUTING.md` guide, `.github/PULL_REQUEST_TEMPLATE/server-submission.md` PR template, and `.github/workflows/validate-server.yml` GitHub Action that validates registry entries and auto-labels server submission PRs. Contributors create a single JSON file in `packages/registry/servers/`; build-time validation handles schema checking and duplicate detection.
-  - Files: `CONTRIBUTING.md`, `.github/PULL_REQUEST_TEMPLATE/server-submission.md`, `.github/workflows/validate-server.yml`
+- [x] ~~**Community submission workflow**~~ — Removed local server submission pipeline (PR template, validation workflow). Server data now syncs from the official MCP registry. `CONTRIBUTING.md` updated to point contributors to the official registry.
 
 ### Web Directory Stretch Goals
 
