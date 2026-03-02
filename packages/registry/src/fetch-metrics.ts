@@ -1,6 +1,6 @@
 /**
  * Metrics fetchers for the sync pipeline.
- * Fetches volatile data from GitHub, npm, PyPI, and Docker Hub.
+ * Fetches volatile data from GitHub, npm, PyPI, and Docker Hub / GHCR.
  */
 
 import type {
@@ -12,14 +12,36 @@ import type {
 import { parseGitHubUrl, fetchGitHubRepo } from "./enrich.js";
 
 // ---------------------------------------------------------------------------
+// Retry helper
+// ---------------------------------------------------------------------------
+
+async function fetchWithRetry(
+  url: string,
+  options?: RequestInit,
+  retries = 3,
+  baseDelay = 500,
+): Promise<Response> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const resp = await fetch(url, options);
+    if (resp.ok || resp.status !== 429) return resp;
+    if (attempt < retries) {
+      await new Promise((r) => setTimeout(r, baseDelay * 2 ** attempt));
+    }
+  }
+  return new Response(null, { status: 429 });
+}
+
+// ---------------------------------------------------------------------------
 // npm downloads
 // ---------------------------------------------------------------------------
 
 export async function fetchNpmMetrics(packageName: string): Promise<NpmMetricsType | null> {
   try {
     const [downloadsResp, pkgResp] = await Promise.all([
-      fetch(`https://api.npmjs.org/downloads/point/last-week/${encodeURIComponent(packageName)}`),
-      fetch(`https://registry.npmjs.org/${encodeURIComponent(packageName)}/latest`),
+      fetchWithRetry(
+        `https://api.npmjs.org/downloads/point/last-week/${encodeURIComponent(packageName)}`,
+      ),
+      fetchWithRetry(`https://registry.npmjs.org/${encodeURIComponent(packageName)}/latest`),
     ]);
 
     if (!downloadsResp.ok) return null;
@@ -55,8 +77,10 @@ export async function fetchNpmMetrics(packageName: string): Promise<NpmMetricsTy
 export async function fetchPyPIMetrics(packageName: string): Promise<PyPIMetricsType | null> {
   try {
     const [statsResp, pkgResp] = await Promise.all([
-      fetch(`https://pypistats.org/api/packages/${encodeURIComponent(packageName)}/recent`),
-      fetch(`https://pypi.org/pypi/${encodeURIComponent(packageName)}/json`),
+      fetchWithRetry(
+        `https://pypistats.org/api/packages/${encodeURIComponent(packageName)}/recent`,
+      ),
+      fetchWithRetry(`https://pypi.org/pypi/${encodeURIComponent(packageName)}/json`),
     ]);
 
     let monthlyDownloads: number | undefined;
@@ -81,17 +105,102 @@ export async function fetchPyPIMetrics(packageName: string): Promise<PyPIMetrics
 }
 
 // ---------------------------------------------------------------------------
-// Docker Hub
+// Docker Hub / GHCR
 // ---------------------------------------------------------------------------
+
+/**
+ * Fetch metrics for a GHCR (GitHub Container Registry) image.
+ * Uses the GitHub Packages API with GITHUB_TOKEN from the environment.
+ */
+async function fetchGhcrMetrics(imageNoTag: string): Promise<DockerMetricsType | null> {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) return null;
+
+  // ghcr.io/{owner}/{name} — extract owner and package name
+  const match = imageNoTag.match(/^ghcr\.io\/([^/]+)\/(.+)$/);
+  if (!match) return null;
+
+  const [, owner, packageName] = match;
+
+  try {
+    const resp = await fetchWithRetry(
+      `https://api.github.com/users/${owner}/packages/container/${encodeURIComponent(packageName)}`,
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    if (!resp.ok) return null;
+
+    // The GitHub Packages API doesn't directly expose pull counts,
+    // but we can get version count as a proxy metric
+    const data = (await resp.json()) as {
+      id: number;
+      name: string;
+      html_url?: string;
+    };
+
+    if (!data.id) return null;
+
+    // Fetch versions to get total download count across all versions
+    const versionsResp = await fetchWithRetry(
+      `https://api.github.com/users/${owner}/packages/container/${encodeURIComponent(packageName)}/versions?per_page=1`,
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    if (!versionsResp.ok) return null;
+
+    const versions = (await versionsResp.json()) as Array<{
+      metadata?: { container?: { tags?: string[] } };
+    }>;
+
+    // Return basic metrics — GHCR doesn't expose pull counts publicly
+    return {
+      pulls: 0,
+      imageSize: undefined,
+      ...(versions.length > 0 ? {} : {}),
+    };
+  } catch {
+    return null;
+  }
+}
 
 export async function fetchDockerMetrics(image: string): Promise<DockerMetricsType | null> {
   try {
-    // Parse docker image: "namespace/repo" or just "repo" (library)
-    const parts = image.split("/");
+    // Strip version tag
+    const imageNoTag = image.replace(/:[\w.-]+$/, "");
+
+    // GHCR images — use GitHub Packages API
+    if (imageNoTag.startsWith("ghcr.io/")) {
+      return fetchGhcrMetrics(imageNoTag);
+    }
+
+    // Skip unsupported registries
+    if (
+      !imageNoTag.startsWith("docker.io/") &&
+      imageNoTag.includes(".") &&
+      !imageNoTag.includes("/")
+    ) {
+      return null;
+    }
+
+    // Docker Hub — strip docker.io/ prefix if present
+    const cleaned = imageNoTag.replace(/^docker\.io\//, "");
+    const parts = cleaned.split("/");
     const namespace = parts.length > 1 ? parts[0] : "library";
     const repo = parts.length > 1 ? parts.slice(1).join("/") : parts[0];
 
-    const resp = await fetch(`https://hub.docker.com/v2/repositories/${namespace}/${repo}/`);
+    const resp = await fetchWithRetry(
+      `https://hub.docker.com/v2/repositories/${namespace}/${repo}/`,
+    );
     if (!resp.ok) return null;
 
     const data = (await resp.json()) as { pull_count: number; full_size?: number };

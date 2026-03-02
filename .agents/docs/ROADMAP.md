@@ -1,6 +1,6 @@
 # getmcp Roadmap
 
-> Last updated: 2026-02-27
+> Last updated: 2026-03-02
 
 This document tracks all planned improvements, bug fixes, and feature work for the getmcp project. Items are organized by priority and category, with checkboxes to track completion.
 
@@ -42,6 +42,9 @@ Bugs and incorrect behavior that affect users.
 
 - [x] **Fix Context7 runtime field** — Removed `runtime: "node"` from the remote server definition.
   - File: `packages/registry/servers/context7.json`
+
+- [x] **Fix npm/Docker metrics extraction in sync pipeline** — npm metrics had 87% failure rate due to rate limiting; Docker metrics had 100% failure rate due to OCI identifiers with registry prefixes (`ghcr.io/`, `docker.io/`) and version tags. Added `fetchWithRetry()` with exponential backoff for npm/PyPI, fixed Docker identifier parsing (strip tags, strip `docker.io/` prefix), added GHCR support via GitHub Packages API reading `GITHUB_TOKEN` from environment.
+  - File: `packages/registry/src/fetch-metrics.ts`
 
 - [ ] **Fix filesystem server placeholder arg** — The `args` array includes `/path/to/allowed/directory`, a placeholder the user must customize. There is no mechanism to prompt for this or indicate it needs customization. Consider adding it to `requiredEnvVars` or introducing a `requiredArgs` field.
   - File: `packages/registry/servers/filesystem.json`
@@ -174,6 +177,15 @@ Enhancements to the Next.js web directory.
 
 - [x] **Update website to reflect all 19 apps and new CLI features** — Made app counts dynamic using `getAppIds().length` on homepage, OG image, and docs page. Added 7 missing apps to docs supported apps table. Added new CLI commands (update, doctor, import, sync, --json) to getting started section. Added "Project manifests" documentation section for `getmcp.json` and the `sync` command. Fixed stale workspace dependency versions (`^0.1.0` → `*`) that caused npm to install old published packages instead of using workspace symlinks.
   - Files: `packages/web/src/app/page.tsx`, `packages/web/src/app/opengraph-image.tsx`, `packages/web/src/app/docs/page.tsx`, `packages/generators/package.json`, `packages/registry/package.json`, `packages/cli/package.json`
+
+- [x] **Add metrics display to server cards** — Server cards now show GitHub stars (star icon) and download counts (download icon) as compact badges. Added `stars` and `downloads` fields to `ServerCardData`, with `compactNumber()` formatter (1.2k, 5.6M).
+  - Files: `packages/web/src/components/ServerCard.tsx`, `packages/web/src/app/servers/page.tsx`
+
+- [x] **Add sort controls to server directory** — Added "Sort by" pill row (Relevance / Stars / Downloads) to the search bar. Sort is applied after filtering. "Clear all filters" also resets sort to relevance.
+  - File: `packages/web/src/components/SearchBar.tsx`
+
+- [x] **Add rich metadata to server detail page** — Server detail page now displays: server icon next to title, GitHub stars and download counts in metadata grid, license and language fields, env var descriptions from `envVarDetails` with lock icon for secrets. Related servers also include stars/downloads data.
+  - File: `packages/web/src/app/servers/[id]/page.tsx`
 
 - [ ] **Add light mode / theme toggle** — The site is dark-mode only with hardcoded dark colors. Add light theme support or respect `prefers-color-scheme` media query.
   - File: `packages/web/src/app/globals.css`

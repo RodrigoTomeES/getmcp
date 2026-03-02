@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getServer, getAllServers } from "@getmcp/registry";
+import { getServer, getAllServers, getServerMetrics } from "@getmcp/registry";
 import { generators } from "@getmcp/generators";
 import type { AppIdType } from "@getmcp/core";
 import type { InternalRegistryEntry } from "@getmcp/registry";
@@ -103,26 +103,44 @@ function runtimeToRequirements(runtime?: string): string {
   return runtime ? (map[runtime] ?? runtime) : "Node.js 18+";
 }
 
+function compactNumber(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
+  return String(n);
+}
+
 function ServerDetail({ server }: { server: InternalRegistryEntry }) {
   const isRemote = "url" in server.config;
   const transport = isRemote ? "remote" : "stdio";
   const configs = preGenerateConfigs(server.id, server.config);
+  const metrics = getServerMetrics(server.id);
+  const downloads = metrics?.npm?.weeklyDownloads ?? metrics?.pypi?.monthlyDownloads;
+  const downloadLabel = metrics?.npm?.weeklyDownloads
+    ? "/week"
+    : metrics?.pypi?.monthlyDownloads
+      ? "/month"
+      : "";
 
   const primaryCategory = server.categories?.[0];
   const relatedServers: ServerCardData[] = primaryCategory
     ? getAllServers()
         .filter((s) => s.id !== server.id && s.categories?.includes(primaryCategory))
         .slice(0, 4)
-        .map((s) => ({
-          id: s.id,
-          name: s.name,
-          description: s.description,
-          categories: s.categories,
-          author: s.author,
-          runtime: s.runtime,
-          isRemote: "url" in s.config,
-          envCount: s.requiredEnvVars.length,
-        }))
+        .map((s) => {
+          const m = getServerMetrics(s.id);
+          return {
+            id: s.id,
+            name: s.name,
+            description: s.description,
+            categories: s.categories,
+            author: s.author,
+            runtime: s.runtime,
+            isRemote: "url" in s.config,
+            envCount: s.requiredEnvVars.length,
+            stars: m?.github?.stars,
+            downloads: m?.npm?.weeklyDownloads ?? m?.pypi?.monthlyDownloads,
+          };
+        })
     : [];
 
   const jsonLd = [
@@ -196,6 +214,15 @@ function ServerDetail({ server }: { server: InternalRegistryEntry }) {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-3">
+          {server.icons?.[0]?.src && (
+            <img
+              src={server.icons[0].src}
+              alt=""
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded"
+            />
+          )}
           <h1 className="text-3xl font-bold tracking-tight">{server.name}</h1>
           <span
             className={`text-xs px-2 py-0.5 rounded-full font-medium ${
@@ -303,14 +330,36 @@ function ServerDetail({ server }: { server: InternalRegistryEntry }) {
       {server.requiredEnvVars.length > 0 && (
         <div className="mb-8 rounded-lg border border-warning-border bg-warning-subtle p-4">
           <h2 className="text-sm font-medium text-warning mb-2">Required Environment Variables</h2>
-          <ul className="space-y-1">
-            {server.requiredEnvVars.map((envVar) => (
-              <li key={envVar} className="text-sm">
-                <code className="text-warning-light bg-code-bg px-1.5 py-0.5 rounded">
-                  {envVar}
-                </code>
-              </li>
-            ))}
+          <ul className="space-y-2">
+            {server.requiredEnvVars.map((envVar) => {
+              const detail = server.envVarDetails?.find((d) => d.name === envVar);
+              return (
+                <li key={envVar} className="text-sm">
+                  <div className="flex items-center gap-1.5">
+                    <code className="text-warning-light bg-code-bg px-1.5 py-0.5 rounded">
+                      {envVar}
+                    </code>
+                    {detail?.isSecret && (
+                      <span className="text-warning-light text-xs" title="Secret value">
+                        <svg
+                          className="w-3.5 h-3.5 inline"
+                          fill="currentColor"
+                          viewBox="0 0 16 16"
+                          aria-label="Secret"
+                        >
+                          <path d="M4 4a4 4 0 0 1 8 0v2h.25c.966 0 1.75.784 1.75 1.75v5.5A1.75 1.75 0 0 1 12.25 15h-8.5A1.75 1.75 0 0 1 2 13.25v-5.5C2 6.784 2.784 6 3.75 6H4Zm8.25 3.5h-8.5a.25.25 0 0 0-.25.25v5.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-5.5a.25.25 0 0 0-.25-.25ZM10.5 6V4a2.5 2.5 0 1 0-5 0v2Z" />
+                        </svg>
+                      </span>
+                    )}
+                  </div>
+                  {detail?.description && (
+                    <p className="text-xs text-text-secondary mt-0.5 ml-0.5">
+                      {detail.description}
+                    </p>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
@@ -332,10 +381,18 @@ function ServerDetail({ server }: { server: InternalRegistryEntry }) {
       <ConfigViewer configs={configs} />
 
       {/* Metadata grid */}
-      <dl className="grid grid-cols-2 gap-x-8 gap-y-5 py-6 border-y border-border my-10">
+      <dl className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-5 py-6 border-y border-border my-10">
         {server.author && <MetaItem label="Author" value={server.author} />}
         {server.runtime && <MetaItem label="Runtime" value={server.runtime} />}
         {server.package && <MetaItem label="Package" value={server.package} mono />}
+        {server.license && <MetaItem label="License" value={server.license} />}
+        {server.language && <MetaItem label="Language" value={server.language} />}
+        {metrics?.github?.stars != null && metrics.github.stars > 0 && (
+          <MetaItem label="GitHub Stars" value={compactNumber(metrics.github.stars)} />
+        )}
+        {downloads != null && downloads > 0 && (
+          <MetaItem label="Downloads" value={`${compactNumber(downloads)}${downloadLabel}`} />
+        )}
         {isRemote && "url" in server.config && (
           <MetaItem label="URL" value={server.config.url} mono />
         )}

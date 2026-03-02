@@ -5,6 +5,7 @@
   "description": "Web directory for browsing and configuring MCP servers",
   "scripts": {
     "dev": "next dev",
+    "debug": "next dev --inspect",
     "build": "next build",
     "start": "next start",
     "lint": "tsc --noEmit"
