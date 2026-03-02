@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerCount } from "@getmcp/registry";
 import { getAppIds } from "@getmcp/generators";
+import { SITE_URL } from "@/lib/constants";
 import { AnimatedCommand } from "@/components/AnimatedCommand";
 import { AsciiArt } from "@/components/AsciiArt";
 import { FormatShowcase } from "@/components/FormatShowcase";
@@ -27,11 +28,11 @@ export default function HomePage() {
       "@context": "https://schema.org",
       "@type": "WebSite",
       name: "getmcp",
-      url: "https://getmcp.es",
+      url: SITE_URL,
       description: `Browse, discover, and install MCP servers into ${appCount} AI applications. One config, every app.`,
       potentialAction: {
         "@type": "SearchAction",
-        target: "https://getmcp.es/?q={search_term_string}",
+        target: `${SITE_URL}/?q={search_term_string}`,
         "query-input": "required name=search_term_string",
       },
     },
@@ -39,15 +40,15 @@ export default function HomePage() {
       "@context": "https://schema.org",
       "@type": "Organization",
       name: "getmcp",
-      url: "https://getmcp.es",
-      logo: "https://getmcp.es/icon.svg",
+      url: SITE_URL,
+      logo: `${SITE_URL}/icon.svg`,
       sameAs: ["https://github.com/RodrigoTomeES/getmcp"],
     },
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       name: "getmcp",
-      url: "https://getmcp.es",
+      url: SITE_URL,
       applicationCategory: "DeveloperApplication",
       operatingSystem: "Windows, macOS, Linux",
       description: `Universal MCP server installer supporting ${appCount} AI applications and 4 config formats.`,

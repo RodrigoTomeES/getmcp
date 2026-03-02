@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GUIDES, GUIDE_SLUGS } from "@/lib/guide-data";
+import { SITE_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "MCP Setup Guides — Install Servers in 19 AI Apps",
@@ -30,10 +31,10 @@ export default function GuidesPage() {
       "@type": "CollectionPage",
       name: "MCP Setup Guides",
       description: `Step-by-step guides to install and configure MCP servers in ${guides.length} AI applications.`,
-      url: "https://getmcp.es/guides",
+      url: `${SITE_URL}/guides`,
       mainEntityOfPage: {
         "@type": "WebPage",
-        "@id": "https://getmcp.es/guides",
+        "@id": `${SITE_URL}/guides`,
       },
     },
     {
@@ -44,13 +45,13 @@ export default function GuidesPage() {
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://getmcp.es",
+          item: SITE_URL,
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Guides",
-          item: "https://getmcp.es/guides",
+          item: `${SITE_URL}/guides`,
         },
       ],
     },
