@@ -57,9 +57,18 @@ export default function ServersLoading() {
 
       {/* Server grid skeleton */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array.from({ length: 9 }).map((_, i) => (
+        {Array.from({ length: 24 }).map((_, i) => (
           <div key={i} className="h-40 bg-surface-hover rounded-lg border border-border" />
         ))}
+      </div>
+
+      {/* Pagination skeleton */}
+      <div className="flex justify-center items-center gap-1.5 mt-8">
+        <div className="h-7 w-12 bg-surface-hover rounded-full" />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="h-7 w-8 bg-surface-hover rounded-full" />
+        ))}
+        <div className="h-7 w-12 bg-surface-hover rounded-full" />
       </div>
     </div>
   );
