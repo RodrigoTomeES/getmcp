@@ -1,9 +1,8 @@
 import { ImageResponse } from "next/og";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { getServer, getAllServers } from "@getmcp/registry";
 import { isStdioConfig } from "@getmcp/core";
 import { getCommand, DEFAULT_PM } from "@/lib/package-manager";
+import { loadOGFonts, OG_FONT_FAMILY, stripEmoji } from "@/lib/og-image";
 
 export function generateStaticParams() {
   return getAllServers().map((server) => ({ id: server.id }));
@@ -41,18 +40,18 @@ export default async function Image({ params }: { params: Promise<{ id: string }
     );
   }
 
-  const [interBold, interRegular] = await Promise.all([
-    readFile(join(process.cwd(), "assets/Inter-Bold.ttf")),
-    readFile(join(process.cwd(), "assets/Inter-Regular.ttf")),
-  ]);
+  const fonts = await loadOGFonts();
 
   const isStdio = isStdioConfig(server.config);
   const transport = isStdio ? "stdio" : "remote";
 
-  // Truncate description
-  let description = server.description;
-  if (description.length > 160) {
-    description = description.slice(0, 157) + "...";
+  const name = stripEmoji(server.name);
+
+  // Truncate description (use Array.from to handle multi-byte characters safely)
+  let description = stripEmoji(server.description);
+  const chars = Array.from(description);
+  if (chars.length > 160) {
+    description = chars.slice(0, 157).join("") + "...";
   }
 
   const categories = (server.categories ?? []).slice(0, 4);
@@ -67,7 +66,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         flexDirection: "column",
         backgroundColor: "#0a0a0a",
         padding: "60px",
-        fontFamily: "Inter",
+        fontFamily: OG_FONT_FAMILY,
         position: "relative",
         overflow: "hidden",
       }}
@@ -176,7 +175,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
               display: "flex",
             }}
           >
-            {server.name}
+            {name}
           </div>
           <span
             style={{
@@ -276,20 +275,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
     </div>,
     {
       ...size,
-      fonts: [
-        {
-          name: "Inter",
-          data: interBold,
-          style: "normal",
-          weight: 700,
-        },
-        {
-          name: "Inter",
-          data: interRegular,
-          style: "normal",
-          weight: 400,
-        },
-      ],
+      fonts,
     },
   );
 }

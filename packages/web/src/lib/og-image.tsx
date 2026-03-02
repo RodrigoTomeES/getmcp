@@ -5,6 +5,40 @@ import { ReactNode } from "react";
 
 export const OG_SIZE = { width: 1200, height: 630 };
 export const OG_CONTENT_TYPE = "image/png" as const;
+export const OG_FONT_FAMILY = "Inter, Noto Sans SC, Noto Sans KR, Noto Sans JP, Noto Sans Hebrew";
+
+/** Strip emoji and other astral-plane characters that no bundled font covers. */
+export function stripEmoji(text: string): string {
+  return Array.from(text)
+    .filter((c) => (c.codePointAt(0) as number) <= 0xffff)
+    .join("")
+    .trim();
+}
+
+export async function loadOGFonts() {
+  const [interBold, interRegular, notoSansSC, notoSansKR, notoSansJP, notoSansHebrew] =
+    await Promise.all([
+      readFile(join(process.cwd(), "assets/Inter-Bold.ttf")),
+      readFile(join(process.cwd(), "assets/Inter-Regular.ttf")),
+      readFile(join(process.cwd(), "assets/NotoSansSC-Regular.ttf")),
+      readFile(join(process.cwd(), "assets/NotoSansKR-Regular.ttf")),
+      readFile(join(process.cwd(), "assets/NotoSansJP-Regular.ttf")),
+      readFile(join(process.cwd(), "assets/NotoSansHebrew-Regular.ttf")),
+    ]);
+  return [
+    { name: "Inter", data: interBold, style: "normal" as const, weight: 700 as const },
+    { name: "Inter", data: interRegular, style: "normal" as const, weight: 400 as const },
+    { name: "Noto Sans SC", data: notoSansSC, style: "normal" as const, weight: 400 as const },
+    { name: "Noto Sans KR", data: notoSansKR, style: "normal" as const, weight: 400 as const },
+    { name: "Noto Sans JP", data: notoSansJP, style: "normal" as const, weight: 400 as const },
+    {
+      name: "Noto Sans Hebrew",
+      data: notoSansHebrew,
+      style: "normal" as const,
+      weight: 400 as const,
+    },
+  ];
+}
 
 interface OGImageOptions {
   heading: ReactNode[] | ReactNode;
@@ -13,8 +47,7 @@ interface OGImageOptions {
 }
 
 export async function createOGImage({ heading, description, pills }: OGImageOptions) {
-  const interBold = await readFile(join(process.cwd(), "assets/Inter-Bold.ttf"));
-  const interRegular = await readFile(join(process.cwd(), "assets/Inter-Regular.ttf"));
+  const fonts = await loadOGFonts();
 
   return new ImageResponse(
     <div
@@ -25,7 +58,7 @@ export async function createOGImage({ heading, description, pills }: OGImageOpti
         flexDirection: "column",
         backgroundColor: "#0a0a0a",
         padding: "60px",
-        fontFamily: "Inter",
+        fontFamily: OG_FONT_FAMILY,
         position: "relative",
         overflow: "hidden",
       }}
@@ -180,20 +213,7 @@ export async function createOGImage({ heading, description, pills }: OGImageOpti
     </div>,
     {
       ...OG_SIZE,
-      fonts: [
-        {
-          name: "Inter",
-          data: interBold,
-          style: "normal" as const,
-          weight: 700 as const,
-        },
-        {
-          name: "Inter",
-          data: interRegular,
-          style: "normal" as const,
-          weight: 400 as const,
-        },
-      ],
+      fonts,
     },
   );
 }
