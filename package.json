@@ -17,6 +17,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "lint": "npm run lint --workspaces --if-present",
+    "refresh": "npm run build -w @getmcp/registry && rm -rf packages/web/.next && npm run build -w @getmcp/web",
     "getmcp": "npx tsx packages/cli/src/bin.ts"
   },
   "devDependencies": {

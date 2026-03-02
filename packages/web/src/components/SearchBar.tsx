@@ -15,6 +15,7 @@ export function SearchBar({
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedRuntime, setSelectedRuntime] = useState<string | null>(null);
   const [selectedTransport, setSelectedTransport] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<"relevance" | "stars" | "downloads">("relevance");
 
   const filtered = useMemo(() => {
     let result = servers;
@@ -45,8 +46,14 @@ export function SearchBar({
       });
     }
 
+    if (sortBy === "stars") {
+      result = [...result].sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0));
+    } else if (sortBy === "downloads") {
+      result = [...result].sort((a, b) => (b.downloads ?? 0) - (a.downloads ?? 0));
+    }
+
     return result;
-  }, [servers, query, selectedCategory, selectedRuntime, selectedTransport]);
+  }, [servers, query, selectedCategory, selectedRuntime, selectedTransport, sortBy]);
 
   return (
     <div>
@@ -135,6 +142,22 @@ export function SearchBar({
         </Pill>
       </div>
 
+      {/* Sort controls */}
+      <p className="text-[11px] text-text-secondary uppercase tracking-wider font-medium mb-1.5">
+        Sort by
+      </p>
+      <div className="flex flex-wrap gap-2 mb-6" role="group" aria-label="Sort servers">
+        <Pill active={sortBy === "relevance"} onClick={() => setSortBy("relevance")}>
+          Relevance
+        </Pill>
+        <Pill active={sortBy === "stars"} onClick={() => setSortBy("stars")}>
+          Stars
+        </Pill>
+        <Pill active={sortBy === "downloads"} onClick={() => setSortBy("downloads")}>
+          Downloads
+        </Pill>
+      </div>
+
       <h2 className="absolute hidden">servers</h2>
 
       {/* Results count */}
@@ -167,6 +190,7 @@ export function SearchBar({
               setSelectedCategory(null);
               setSelectedRuntime(null);
               setSelectedTransport(null);
+              setSortBy("relevance");
             }}
             className="text-sm text-accent hover:underline"
           >

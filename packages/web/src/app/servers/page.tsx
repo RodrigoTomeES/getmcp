@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllServers, getCategories, getServerCount } from "@getmcp/registry";
+import { getAllServers, getCategories, getServerCount, getServerMetrics } from "@getmcp/registry";
 import { SearchBar } from "@/components/SearchBar";
 
 export const metadata: Metadata = {
@@ -29,15 +29,20 @@ export default function ServersPage() {
   const categories = getCategories();
   const count = getServerCount();
 
-  const minimalServers = servers.map((s) => ({
-    id: s.id,
-    name: s.name,
-    description: s.description,
-    categories: s.categories,
-    runtime: s.runtime,
-    isRemote: "url" in s.config,
-    envCount: s.requiredEnvVars.length,
-  }));
+  const minimalServers = servers.map((s) => {
+    const metrics = getServerMetrics(s.id);
+    return {
+      id: s.id,
+      name: s.name,
+      description: s.description,
+      categories: s.categories,
+      runtime: s.runtime,
+      isRemote: "url" in s.config,
+      envCount: s.requiredEnvVars.length,
+      stars: metrics?.github?.stars,
+      downloads: metrics?.npm?.weeklyDownloads ?? metrics?.pypi?.monthlyDownloads,
+    };
+  });
 
   const jsonLd = [
     {
