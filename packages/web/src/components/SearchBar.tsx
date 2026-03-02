@@ -7,6 +7,7 @@ import { Pagination } from "./Pagination";
 import { useDebounce } from "@/hooks/use-debounce";
 
 const PAGE_SIZE = 24;
+const VISIBLE_CATEGORIES = 8;
 
 type SortOption = "relevance" | "stars" | "downloads";
 
@@ -139,8 +140,10 @@ export function SearchBar({
   };
 
   const hasActiveFilters = query || selectedCategory || selectedRuntime || selectedTransport;
-  const visibleCategories = showAllCategories ? categories : categories.slice(0, 8);
-  const hasMoreCategories = categories.length > 8;
+  const visibleCategories = showAllCategories
+    ? categories
+    : categories.slice(0, VISIBLE_CATEGORIES);
+  const hasMoreCategories = categories.length > VISIBLE_CATEGORIES;
 
   const startItem = filtered.length > 0 ? (safePage - 1) * PAGE_SIZE + 1 : 0;
   const endItem = Math.min(safePage * PAGE_SIZE, filtered.length);
@@ -221,7 +224,7 @@ export function SearchBar({
             onClick={() => setShowAllCategories(true)}
             className="text-xs px-3 py-1.5 rounded-full border border-border text-text-secondary hover:text-text transition-colors"
           >
-            +{categories.length - 8} more
+            +{categories.length - VISIBLE_CATEGORIES} more
           </button>
         )}
       </div>

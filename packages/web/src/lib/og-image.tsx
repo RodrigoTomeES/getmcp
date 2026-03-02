@@ -10,7 +10,7 @@ export const OG_FONT_FAMILY = "Inter, Noto Sans SC, Noto Sans KR, Noto Sans JP, 
 /** Strip emoji and other astral-plane characters that no bundled font covers. */
 export function stripEmoji(text: string): string {
   return Array.from(text)
-    .filter((c) => (c.codePointAt(0) as number) <= 0xffff)
+    .filter((c) => (c.codePointAt(0) ?? 0) <= 0xffff)
     .join("")
     .trim();
 }

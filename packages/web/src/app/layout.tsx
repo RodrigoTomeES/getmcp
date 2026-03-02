@@ -84,6 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 width={32}
                 height={32}
                 className="h-6 w-auto"
+                priority
               />
               <span className="text-xl font-bold tracking-tight -mt-1.5">getmcp</span>
               <span className="text-xs px-2 py-0.5 rounded-full bg-accent text-white font-medium">
