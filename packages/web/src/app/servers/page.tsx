@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllServers, getCategories, getServerCount, getServerMetrics } from "@getmcp/registry";
+import { getAllServers, getCategories, getAllMetrics } from "@getmcp/registry";
 import { SearchBar } from "@/components/SearchBar";
+import { SITE_URL } from "@/lib/constants";
+
+export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "MCP Server Directory — Browse & Install",
@@ -27,20 +30,23 @@ export const metadata: Metadata = {
 export default function ServersPage() {
   const servers = getAllServers();
   const categories = getCategories();
-  const count = getServerCount();
+  const count = servers.length;
+  const metricsMap = getAllMetrics();
 
   const minimalServers = servers.map((s) => {
-    const metrics = getServerMetrics(s.id);
+    const metrics = metricsMap.get(s.id);
     return {
       id: s.id,
       name: s.name,
       description: s.description,
       categories: s.categories,
+      author: s.author,
       runtime: s.runtime,
       isRemote: "url" in s.config,
       envCount: s.requiredEnvVars.length,
       stars: metrics?.github?.stars,
       downloads: metrics?.npm?.weeklyDownloads ?? metrics?.pypi?.monthlyDownloads,
+      downloadsUnit: (metrics?.npm?.weeklyDownloads != null ? "week" : "month") as "week" | "month",
     };
   });
 
@@ -50,10 +56,10 @@ export default function ServersPage() {
       "@type": "CollectionPage",
       name: "MCP Server Directory",
       description: `Browse and install ${count}+ MCP servers for 19 AI applications.`,
-      url: "https://getmcp.es/servers",
+      url: `${SITE_URL}/servers`,
       mainEntityOfPage: {
         "@type": "WebPage",
-        "@id": "https://getmcp.es/servers",
+        "@id": `${SITE_URL}/servers`,
       },
     },
     {
@@ -64,13 +70,13 @@ export default function ServersPage() {
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://getmcp.es",
+          item: SITE_URL,
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Servers",
-          item: "https://getmcp.es/servers",
+          item: `${SITE_URL}/servers`,
         },
       ],
     },
@@ -84,17 +90,25 @@ export default function ServersPage() {
       />
 
       {/* Breadcrumb */}
-      <nav className="text-sm text-text-secondary mb-8" aria-label="Breadcrumb">
-        <Link href="/" className="hover:text-text transition-colors">
-          Home
-        </Link>
-        <span className="mx-2 text-text-secondary/50">/</span>
-        <span className="text-text">Servers</span>
+      <nav aria-label="Breadcrumb" className="text-sm text-text-secondary mb-8">
+        <ol className="flex items-center gap-2">
+          <li>
+            <Link href="/" className="hover:text-text transition-colors">
+              Home
+            </Link>
+          </li>
+          <li className="text-text-secondary/50" aria-hidden="true">
+            /
+          </li>
+          <li aria-current="page" className="text-text">
+            Servers
+          </li>
+        </ol>
       </nav>
 
       {/* Header */}
-      <div className="mb-10">
-        <h1 className="text-3xl font-bold tracking-tight mb-3">MCP Server Directory</h1>
+      <div className="mb-12">
+        <h1 className="text-4xl font-bold tracking-tight mb-3">MCP Server Directory</h1>
         <p className="text-lg text-text-secondary leading-relaxed max-w-2xl">
           Browse {count}+ MCP servers and install them into 19 AI applications with a single
           command.
