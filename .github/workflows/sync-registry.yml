@@ -3,7 +3,13 @@ name: Sync Official MCP Registry
 on:
   schedule:
     - cron: "0 6 * * *" # Daily at 6:00 UTC
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      full_sync:
+        description: "Force full sync (bypass incremental)"
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: sync-registry
@@ -26,7 +32,12 @@ jobs:
       - run: npm run build -w @getmcp/core
 
       - name: Run sync pipeline
-        run: npx tsx packages/registry/scripts/sync.ts
+        run: |
+          if [ "${{ inputs.full_sync }}" = "true" ]; then
+            npx tsx packages/registry/scripts/sync.ts --full
+          else
+            npx tsx packages/registry/scripts/sync.ts
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # PULSEMCP_API_KEY: ${{ secrets.PULSEMCP_API_KEY }}

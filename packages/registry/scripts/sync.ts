@@ -1,9 +1,12 @@
 /**
  * Sync pipeline: fetch from official MCP registry, enrich, and write data/servers.json.
  *
- * Usage: npx tsx packages/registry/scripts/sync.ts
+ * Usage: npx tsx packages/registry/scripts/sync.ts [--full]
  * Env:   GITHUB_TOKEN (required for GitHub enrichment)
  *        PULSEMCP_API_KEY (optional, for future PulseMCP source)
+ *
+ * By default, runs an incremental sync using `updated_since` from the last
+ * sync metadata. Pass `--full` to force a complete re-sync of all entries.
  */
 
 import * as fs from "node:fs";
@@ -23,26 +26,34 @@ const METADATA_FILE = path.join(DATA_DIR, "sync-metadata.json");
 const OFFICIAL_API = "https://registry.modelcontextprotocol.io/v0.1/servers";
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const CONCURRENCY = 10;
+const FORCE_FULL = process.argv.includes("--full");
 
 // ---------------------------------------------------------------------------
 // Registry source abstraction
 // ---------------------------------------------------------------------------
 
+interface FetchOptions {
+  version?: string;
+  updatedSince?: string;
+}
+
 interface RegistrySource {
   name: string;
-  fetchAll(): AsyncGenerator<OfficialServerResponseType>;
+  fetchAll(options?: FetchOptions): AsyncGenerator<OfficialServerResponseType>;
 }
 
 class OfficialRegistrySource implements RegistrySource {
   name = "official";
 
-  async *fetchAll(): AsyncGenerator<OfficialServerResponseType> {
+  async *fetchAll(options?: FetchOptions): AsyncGenerator<OfficialServerResponseType> {
     let cursor: string | undefined;
     let page = 0;
 
     while (true) {
       const url = new URL(OFFICIAL_API);
-      url.searchParams.set("count", "100");
+      url.searchParams.set("limit", "100");
+      if (options?.version) url.searchParams.set("version", options.version);
+      if (options?.updatedSince) url.searchParams.set("updated_since", options.updatedSince);
       if (cursor) url.searchParams.set("cursor", cursor);
 
       log(`  Fetching page ${++page} from official registry...`);
@@ -71,12 +82,35 @@ class OfficialRegistrySource implements RegistrySource {
 }
 
 // ---------------------------------------------------------------------------
-// Pipeline
+// Helpers
 // ---------------------------------------------------------------------------
 
 function log(msg: string): void {
   console.log(`[sync] ${msg}`);
 }
+
+function loadExistingServers(): OfficialServerResponseType[] {
+  if (!fs.existsSync(OUTPUT_FILE)) return [];
+  try {
+    return JSON.parse(fs.readFileSync(OUTPUT_FILE, "utf-8")) as OfficialServerResponseType[];
+  } catch {
+    log("WARNING: Could not parse existing servers.json, falling back to full sync.");
+    return [];
+  }
+}
+
+function loadSyncMetadata(): { syncedAt?: string } | null {
+  if (!fs.existsSync(METADATA_FILE)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(METADATA_FILE, "utf-8")) as { syncedAt?: string };
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Pipeline
+// ---------------------------------------------------------------------------
 
 async function main(): Promise<void> {
   const startTime = Date.now();
@@ -86,30 +120,46 @@ async function main(): Promise<void> {
     log("WARNING: GITHUB_TOKEN not set. GitHub enrichment will be rate-limited.");
   }
 
-  // Step 1: Fetch all entries
-  const sources: RegistrySource[] = [new OfficialRegistrySource()];
-  const rawEntries: OfficialServerResponseType[] = [];
+  // Determine sync mode
+  const previousMetadata = loadSyncMetadata();
+  const existingServers = loadExistingServers();
+  const isIncremental = !FORCE_FULL && !!previousMetadata?.syncedAt && existingServers.length > 0;
 
-  for (const source of sources) {
-    log(`Fetching from ${source.name}...`);
-    for await (const entry of source.fetchAll()) {
-      rawEntries.push(entry);
-    }
+  if (isIncremental) {
+    log(`Incremental sync (since ${previousMetadata!.syncedAt})`);
+  } else {
+    log("Full sync" + (FORCE_FULL ? " (forced)" : ""));
   }
 
-  log(`Fetched ${rawEntries.length} total entries.`);
+  // Step 1: Fetch entries from API
+  const source = new OfficialRegistrySource();
+  const fetchOptions: FetchOptions = { version: "latest" };
+  if (isIncremental) {
+    fetchOptions.updatedSince = previousMetadata!.syncedAt;
+  }
 
-  // Step 2: Deduplicate by server name and filter
-  const deduped = new Map<string, OfficialServerResponseType>();
+  const rawEntries: OfficialServerResponseType[] = [];
+  log(`Fetching from ${source.name}...`);
+  for await (const entry of source.fetchAll(fetchOptions)) {
+    rawEntries.push(entry);
+  }
+  log(`Fetched ${rawEntries.length} entries from API.`);
+
+  // Step 2: Filter fetched entries (dedup + active check + installable check)
+  const fetchedFiltered = new Map<string, OfficialServerResponseType>();
+  const inactiveNames = new Set<string>();
+
   for (const entry of rawEntries) {
     const name = entry.server.name;
     const meta = entry._meta?.["io.modelcontextprotocol.registry/official"] as
-      | { status?: string; isLatest?: boolean }
+      | { status?: string }
       | undefined;
 
-    // Only keep active, latest entries
-    if (meta?.status && meta.status !== "active") continue;
-    if (meta?.isLatest === false) continue;
+    // Track entries that became inactive (for incremental removal)
+    if (meta?.status && meta.status !== "active") {
+      inactiveNames.add(name);
+      continue;
+    }
 
     // Skip entries with no installable config
     if (
@@ -119,23 +169,69 @@ async function main(): Promise<void> {
       continue;
     }
 
-    deduped.set(name, entry);
+    fetchedFiltered.set(name, entry);
   }
 
-  log(`After dedup/filter: ${deduped.size} entries.`);
+  // Step 3: Build the complete dataset
+  let baseData: Map<string, OfficialServerResponseType>;
 
-  // Step 3: Generate slug IDs
-  const officialNames = Array.from(deduped.keys());
-  const slugMap = generateSlugs(officialNames);
+  if (isIncremental) {
+    // Start from existing data
+    baseData = new Map<string, OfficialServerResponseType>();
+    for (const entry of existingServers) {
+      baseData.set(entry.server.name, entry);
+    }
 
+    // Remove entries that became inactive
+    for (const name of inactiveNames) {
+      if (baseData.has(name)) {
+        log(`  Removing inactive server: ${name}`);
+        baseData.delete(name);
+      }
+    }
+
+    // Merge updated entries (update server data + official meta, preserve enrichment/metrics)
+    for (const [name, entry] of fetchedFiltered) {
+      const existing = baseData.get(name);
+      if (existing) {
+        const mergedMeta: Record<string, unknown> = { ...(existing._meta ?? {}) };
+        // Update official and publisher-provided meta from API response
+        if (entry._meta?.["io.modelcontextprotocol.registry/official"]) {
+          mergedMeta["io.modelcontextprotocol.registry/official"] =
+            entry._meta["io.modelcontextprotocol.registry/official"];
+        }
+        if (entry._meta?.["io.modelcontextprotocol.registry/publisher-provided"]) {
+          mergedMeta["io.modelcontextprotocol.registry/publisher-provided"] =
+            entry._meta["io.modelcontextprotocol.registry/publisher-provided"];
+        }
+        baseData.set(name, { server: entry.server, _meta: mergedMeta });
+      } else {
+        baseData.set(name, entry);
+      }
+    }
+
+    log(
+      `After merge: ${baseData.size} entries (${fetchedFiltered.size} updated, ${inactiveNames.size} removed).`,
+    );
+  } else {
+    baseData = fetchedFiltered;
+    log(`After filter: ${baseData.size} entries.`);
+  }
+
+  // Step 4: Generate slug IDs (from full dataset to maintain collision resolution)
+  const allNames = Array.from(baseData.keys());
+  const slugMap = generateSlugs(allNames);
   log(`Generated ${slugMap.size} slugs.`);
 
-  // Step 4: Enrich with GitHub data
-  log("Enriching with GitHub data...");
-  const entries = Array.from(deduped.entries());
+  // Step 5: Enrich with GitHub data (only for new/updated entries in incremental mode)
+  const entriesToEnrich = isIncremental
+    ? Array.from(fetchedFiltered.entries())
+    : Array.from(baseData.entries());
+
+  log(`Enriching ${entriesToEnrich.length} entries with GitHub data...`);
   let enrichCount = 0;
 
-  const enriched = await withConcurrency(entries, CONCURRENCY, async ([name, entry]) => {
+  const enriched = await withConcurrency(entriesToEnrich, CONCURRENCY, async ([name, entry]) => {
     const slug = slugMap.get(name) ?? name;
     const repoUrl = entry.server.repository?.url;
     const registryType = entry.server.packages?.[0]?.registryType;
@@ -176,8 +272,8 @@ async function main(): Promise<void> {
 
   log(`Enriched ${enrichCount} entries with GitHub data.`);
 
-  // Step 5: Fetch metrics
-  log("Fetching metrics...");
+  // Step 6: Fetch metrics (only for new/updated entries in incremental mode)
+  log(`Fetching metrics for ${enriched.length} entries...`);
   let metricsCount = 0;
 
   const withMetrics = await withConcurrency(enriched, CONCURRENCY, async (item) => {
@@ -198,14 +294,12 @@ async function main(): Promise<void> {
 
   log(`Fetched metrics for ${metricsCount} entries.`);
 
-  // Step 6: Assemble final output
-  const output: OfficialServerResponseType[] = withMetrics.map(({ entry, enrichment, metrics }) => {
-    const _meta: Record<string, unknown> = { ...(entry._meta ?? {}) };
+  // Step 7: Apply enrichment results back to baseData
+  for (const { name, entry, enrichment, metrics } of withMetrics) {
+    const _meta: Record<string, unknown> = { ...(baseData.get(name)?._meta ?? entry._meta ?? {}) };
 
-    // Add getmcp enrichment
     _meta["es.getmcp/enrichment"] = enrichment;
 
-    // Add metrics if available
     if (metrics) {
       _meta["es.getmcp/metrics"] = {
         ...metrics,
@@ -213,20 +307,19 @@ async function main(): Promise<void> {
       };
     }
 
-    return {
-      server: entry.server,
-      _meta,
-    };
-  });
+    baseData.set(name, { server: entry.server, _meta });
+  }
 
-  // Sort by slug for stable diffs
+  // Step 8: Assemble final sorted output
+  const output = Array.from(baseData.values());
+
   output.sort((a, b) => {
     const slugA = (a._meta?.["es.getmcp/enrichment"] as GetMCPEnrichmentType)?.slug ?? "";
     const slugB = (b._meta?.["es.getmcp/enrichment"] as GetMCPEnrichmentType)?.slug ?? "";
     return slugA.localeCompare(slugB);
   });
 
-  // Step 7: Write output
+  // Step 9: Write output
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
@@ -239,10 +332,13 @@ async function main(): Promise<void> {
   // Write metadata
   const metadata = {
     syncedAt: new Date().toISOString(),
+    syncMode: isIncremental ? ("incremental" as const) : ("full" as const),
     totalEntries: output.length,
+    updatedEntries: fetchedFiltered.size,
+    removedEntries: inactiveNames.size,
     enrichedWithGitHub: enrichCount,
     withMetrics: metricsCount,
-    sources: sources.map((s) => s.name),
+    sources: [source.name],
     duration: `${((Date.now() - startTime) / 1000).toFixed(1)}s`,
   };
   fs.writeFileSync(METADATA_FILE, JSON.stringify(metadata, null, 2));
