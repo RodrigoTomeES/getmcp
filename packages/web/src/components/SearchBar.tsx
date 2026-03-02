@@ -6,7 +6,8 @@ import { Pill } from "./Pill";
 import { Pagination } from "./Pagination";
 import { useDebounce } from "@/hooks/use-debounce";
 
-const PAGE_SIZE = 24;
+const PAGE_SIZES = [24, 48, 72] as const;
+const DEFAULT_PAGE_SIZE = 24;
 const VISIBLE_CATEGORIES = 8;
 
 type SortOption = "relevance" | "stars" | "downloads";
@@ -24,6 +25,7 @@ export function SearchBar({
   const [selectedRuntime, setSelectedRuntime] = useState<string | null>(null);
   const [selectedTransport, setSelectedTransport] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>("relevance");
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [showAllCategories, setShowAllCategories] = useState(false);
   const [page, setPage] = useState(1);
   const urlSyncReady = useRef(false);
@@ -36,6 +38,7 @@ export function SearchBar({
     const rt = params.get("runtime");
     const tp = params.get("transport");
     const sort = params.get("sort") as SortOption | null;
+    const pp = params.get("per_page");
     const p = params.get("page");
 
     if (q) setInputValue(q);
@@ -43,6 +46,10 @@ export function SearchBar({
     if (rt) setSelectedRuntime(rt);
     if (tp) setSelectedTransport(tp);
     if (sort === "stars" || sort === "downloads") setSortBy(sort);
+    if (pp) {
+      const parsed = Number(pp);
+      if ((PAGE_SIZES as readonly number[]).includes(parsed)) setPageSize(parsed);
+    }
     if (p) {
       const parsed = Number.parseInt(p, 10);
       if (parsed > 0 && Number.isFinite(parsed)) setPage(parsed);
@@ -63,12 +70,13 @@ export function SearchBar({
     if (selectedRuntime) params.set("runtime", selectedRuntime);
     if (selectedTransport) params.set("transport", selectedTransport);
     if (sortBy !== "relevance") params.set("sort", sortBy);
+    if (pageSize !== DEFAULT_PAGE_SIZE) params.set("per_page", String(pageSize));
     if (page > 1) params.set("page", String(page));
 
     const search = params.toString();
     const url = search ? `${window.location.pathname}?${search}` : window.location.pathname;
     window.history.replaceState(null, "", url);
-  }, [query, selectedCategory, selectedRuntime, selectedTransport, sortBy, page]);
+  }, [query, selectedCategory, selectedRuntime, selectedTransport, sortBy, pageSize, page]);
 
   // Pre-compute search strings (only rebuilds when servers change)
   const searchIndex = useMemo(
@@ -117,12 +125,12 @@ export function SearchBar({
     return sorted;
   }, [searchIndex, query, selectedCategory, selectedRuntime, selectedTransport, sortBy]);
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const totalPages = Math.ceil(filtered.length / pageSize);
   const safePage = Math.min(page, Math.max(totalPages, 1));
 
   const paginated = useMemo(
-    () => filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
-    [filtered, safePage],
+    () => filtered.slice((safePage - 1) * pageSize, safePage * pageSize),
+    [filtered, safePage, pageSize],
   );
 
   const handlePageChange = useCallback((newPage: number) => {
@@ -136,17 +144,24 @@ export function SearchBar({
     setSelectedRuntime(null);
     setSelectedTransport(null);
     setSortBy("relevance");
+    setPageSize(DEFAULT_PAGE_SIZE);
     setPage(1);
   };
 
-  const hasActiveFilters = query || selectedCategory || selectedRuntime || selectedTransport;
+  const hasActiveFilters =
+    query ||
+    selectedCategory ||
+    selectedRuntime ||
+    selectedTransport ||
+    sortBy !== "relevance" ||
+    pageSize !== DEFAULT_PAGE_SIZE;
   const visibleCategories = showAllCategories
     ? categories
     : categories.slice(0, VISIBLE_CATEGORIES);
   const hasMoreCategories = categories.length > VISIBLE_CATEGORIES;
 
-  const startItem = filtered.length > 0 ? (safePage - 1) * PAGE_SIZE + 1 : 0;
-  const endItem = Math.min(safePage * PAGE_SIZE, filtered.length);
+  const startItem = filtered.length > 0 ? (safePage - 1) * pageSize + 1 : 0;
+  const endItem = Math.min(safePage * pageSize, filtered.length);
 
   return (
     <div>
@@ -310,62 +325,101 @@ export function SearchBar({
         </Pill>
       </div>
 
-      {/* Sort controls */}
-      <p
-        id="sort-label"
-        className="text-xs text-text-secondary uppercase tracking-wider font-medium mb-2"
-      >
-        Sort by
-      </p>
-      <div className="flex flex-wrap gap-2 mb-6" role="radiogroup" aria-labelledby="sort-label">
-        <Pill
-          role="radio"
-          active={sortBy === "relevance"}
-          onClick={() => {
-            setSortBy("relevance");
-            setPage(1);
-          }}
-        >
-          {query.trim() ? "Relevance" : "Default"}
-        </Pill>
-        <Pill
-          role="radio"
-          active={sortBy === "stars"}
-          onClick={() => {
-            setSortBy("stars");
-            setPage(1);
-          }}
-        >
-          Stars
-        </Pill>
-        <Pill
-          role="radio"
-          active={sortBy === "downloads"}
-          onClick={() => {
-            setSortBy("downloads");
-            setPage(1);
-          }}
-        >
-          Downloads
-        </Pill>
+      {/* Sort & per page controls */}
+      <div className="flex flex-wrap items-end gap-x-8 gap-y-4 mb-6">
+        <div>
+          <p
+            id="sort-label"
+            className="text-xs text-text-secondary uppercase tracking-wider font-medium mb-2"
+          >
+            Sort by
+          </p>
+          <div className="flex flex-wrap gap-2" role="radiogroup" aria-labelledby="sort-label">
+            <Pill
+              role="radio"
+              active={sortBy === "relevance"}
+              onClick={() => {
+                setSortBy("relevance");
+                setPage(1);
+              }}
+            >
+              {query.trim() ? "Relevance" : "Default"}
+            </Pill>
+            <Pill
+              role="radio"
+              active={sortBy === "stars"}
+              onClick={() => {
+                setSortBy("stars");
+                setPage(1);
+              }}
+            >
+              Stars
+            </Pill>
+            <Pill
+              role="radio"
+              active={sortBy === "downloads"}
+              onClick={() => {
+                setSortBy("downloads");
+                setPage(1);
+              }}
+            >
+              Downloads
+            </Pill>
+          </div>
+        </div>
+
+        <div>
+          <p
+            id="per-page-label"
+            className="text-xs text-text-secondary uppercase tracking-wider font-medium mb-2"
+          >
+            Per page
+          </p>
+          <div className="flex flex-wrap gap-2" role="radiogroup" aria-labelledby="per-page-label">
+            {PAGE_SIZES.map((size) => (
+              <Pill
+                key={size}
+                role="radio"
+                active={pageSize === size}
+                onClick={() => {
+                  setPageSize(size);
+                  setPage(1);
+                }}
+              >
+                {size}
+              </Pill>
+            ))}
+          </div>
+        </div>
       </div>
 
       <h2 className="sr-only">Server listing</h2>
 
-      {/* Results count */}
-      <p
-        className="text-xs text-text-secondary mb-4 uppercase tracking-wider font-medium"
-        role="status"
-        aria-live="polite"
-      >
-        {totalPages > 1
-          ? `Showing ${startItem}–${endItem} of ${filtered.length} servers`
-          : `${filtered.length} server${filtered.length !== 1 ? "s" : ""}`}
-        {query && ` matching "${query}"`}
-        {selectedCategory && ` in ${selectedCategory}`}
-        {selectedRuntime && ` (${selectedRuntime})`}
-        {selectedTransport && ` (${selectedTransport})`}
-      </p>
+      {/* Results count + clear filters */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-4">
+        <p
+          className="text-xs text-text-secondary uppercase tracking-wider font-medium"
+          role="status"
+          aria-live="polite"
+        >
+          {totalPages > 1
+            ? `Showing ${startItem}–${endItem} of ${filtered.length} servers`
+            : `${filtered.length} server${filtered.length !== 1 ? "s" : ""}`}
+          {query && ` matching "${query}"`}
+          {selectedCategory && ` in ${selectedCategory}`}
+          {selectedRuntime && ` (${selectedRuntime})`}
+          {selectedTransport && ` (${selectedTransport})`}
+        </p>
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={handleClearAll}
+            className="text-xs border border-border text-text-secondary hover:border-text-secondary hover:text-text px-3 py-1 rounded-md transition-colors"
+          >
+            Clear all filters
+          </button>
+        )}
+      </div>
 
       {/* Server grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
