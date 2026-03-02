@@ -136,6 +136,9 @@ Improvements to the continuous integration pipeline and build process.
 - [x] **Add Dependabot configuration** — Created `.github/dependabot.yml` with npm and github-actions ecosystems, weekly schedule, grouped updates.
   - File: `.github/dependabot.yml`
 
+- [x] **Optimize sync script with API-side filtering and incremental sync** — Uses `version=latest` and `updated_since` query parameters from the official MCP registry API to reduce data transfer and enable incremental daily syncs. Added `--full` flag for complete re-syncs. Fixes `count` → `limit` query parameter name.
+  - Files: `packages/registry/scripts/sync.ts`, `.github/workflows/sync-registry.yml`, `packages/registry/package.json`
+
 - [x] **Publish packages to npm** — Auto-release workflow detects version bumps from conventional commits, bumps all workspace packages in sync, publishes to npm via OIDC trusted publishing, and creates a GitHub Release with changelog. Supports 3 trigger paths: push to main (auto-detect), tag push (legacy/fallback), and manual dispatch.
   - Files: `.github/workflows/publish.yml`, `.github/RELEASE_TEMPLATE.md`
 
