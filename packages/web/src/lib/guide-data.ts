@@ -32,28 +32,6 @@ export type GuideData = {
   popularServers: string[];
 };
 
-export const GUIDE_SLUGS: string[] = [
-  "claude-desktop",
-  "vscode",
-  "cursor",
-  "windsurf",
-  "goose",
-  "claude-code",
-  "cline",
-  "roo-code",
-  "opencode",
-  "zed",
-  "pycharm",
-  "codex",
-  "gemini-cli",
-  "continue",
-  "amazon-q",
-  "trae",
-  "bolt-ai",
-  "libre-chat",
-  "antigravity",
-];
-
 export const GUIDES: Record<string, GuideData> = {
   "claude-desktop": {
     name: "Claude Desktop",
@@ -560,3 +538,9 @@ export const GUIDES: Record<string, GuideData> = {
     popularServers: ["github", "filesystem", "brave-search", "sequential-thinking", "memory"],
   },
 };
+
+export const GUIDE_SLUGS: string[] = Object.keys(GUIDES);
+
+export const APP_LABELS: Record<string, string> = Object.fromEntries(
+  Object.values(GUIDES).map((g) => [g.slug, g.name]),
+);
