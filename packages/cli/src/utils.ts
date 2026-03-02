@@ -51,7 +51,6 @@ export interface CliFlags {
   fromNpm?: string;
   fromPypi?: string;
   fromUrl?: string;
-  output?: string;
   global: boolean;
   project: boolean;
   help: boolean;
@@ -124,14 +123,6 @@ export function parseFlags(argv: string[]): {
       flags.global = true;
     } else if (arg === "--project") {
       flags.project = true;
-    } else if (arg === "--output" && i + 1 < argv.length) {
-      i++;
-      flags.output = argv[i];
-    } else if (arg.startsWith("--output=")) {
-      flags.output = arg.slice("--output=".length);
-    } else if (arg === "-o" && i + 1 < argv.length) {
-      i++;
-      flags.output = argv[i];
     } else if (arg === "--help" || arg === "-h") {
       flags.help = true;
     } else if (arg === "--version" || arg === "-v") {
@@ -175,7 +166,6 @@ const COMMAND_ALIASES: Record<string, string> = {
   f: "find",
   check: "check",
   update: "update",
-  init: "init",
   doctor: "doctor",
   dr: "doctor",
   import: "import",
@@ -217,8 +207,6 @@ const KNOWN_FLAGS = [
   "--global",
   "-g",
   "--project",
-  "--output",
-  "-o",
   "--help",
   "-h",
   "--version",

@@ -43,6 +43,3 @@ export type {
 // Utilities
 export { isStdioConfig, isRemoteConfig, inferTransport } from "./utils.js";
 export { supportsBothScopes, getDefaultScope } from "./types.js";
-
-// JSON Schema
-export { getRegistryEntryJsonSchema } from "./json-schema.js";

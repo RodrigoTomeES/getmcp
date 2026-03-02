@@ -10,7 +10,6 @@
  *   getmcp find [query]            Interactive server search (aliases: search, s, f)
  *   getmcp check                   Check for registry updates
  *   getmcp update                  Update installed servers
- *   getmcp init                    Scaffold a new server entry
  */
 
 import { createRequire } from "node:module";
@@ -33,7 +32,6 @@ Usage:
   getmcp find [query]            Interactive fuzzy search
   getmcp check                   Check for registry updates
   getmcp update                  Update installed servers
-  getmcp init                    Scaffold a new server entry
   getmcp doctor                  Run health diagnostics
   getmcp import                  Import existing servers into tracking
   getmcp sync                    Sync servers from getmcp.json manifest
@@ -54,7 +52,6 @@ Options:
   --dry-run         Preview changes without writing files
   --json            Output machine-readable JSON
   --quiet, -q       Minimal output (one item per line)
-  --output, -o <dir>  Output directory for init (default: current directory)
   --global, -g      Install to global config (for dual-scope apps)
   --project         Install to project config (for dual-scope apps)
   --from-npm <pkg>  Install unverified npm package as MCP server
@@ -173,12 +170,6 @@ async function main(): Promise<void> {
         global: flags.global,
         project: flags.project,
       });
-      break;
-    }
-
-    case "init": {
-      const { initCommand } = await import("./commands/init.js");
-      await initCommand({ output: flags.output });
       break;
     }
 

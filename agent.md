@@ -20,13 +20,13 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22) with 5 
 @getmcp/web -----> @getmcp/core + @getmcp/generators + @getmcp/registry
 ```
 
-| Package               | npm Name             | Purpose                                                                                                                                                                                             |
-| --------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/core`       | `@getmcp/core`       | Zod schemas, TypeScript types, utility functions (type guards, transport inference), JSON Schema generation                                                                                         |
-| `packages/generators` | `@getmcp/generators` | 19 config generators (one per AI app), each transforms canonical format to app-native format                                                                                                        |
-| `packages/registry`   | `@getmcp/registry`   | Catalog of MCP server definitions with search/filter API                                                                                                                                            |
-| `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `init`, `doctor`, `import`, `sync` commands with app auto-detection, config merging, and installation tracking via `getmcp-lock.json` |
-| `packages/web`        | `@getmcp/web`        | Next.js (App Router) web directory for browsing servers and generating config snippets, with Vercel Analytics and Speed Insights                                                                    |
+| Package               | npm Name             | Purpose                                                                                                                                                                                     |
+| --------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/core`       | `@getmcp/core`       | Zod schemas, TypeScript types, utility functions (type guards, transport inference)                                                                                                         |
+| `packages/generators` | `@getmcp/generators` | 19 config generators (one per AI app), each transforms canonical format to app-native format                                                                                                |
+| `packages/registry`   | `@getmcp/registry`   | Catalog of MCP server definitions with search/filter API                                                                                                                                    |
+| `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `doctor`, `import`, `sync` commands with app auto-detection, config merging, and installation tracking via `getmcp-lock.json` |
+| `packages/web`        | `@getmcp/web`        | Next.js (App Router) web directory for browsing servers and generating config snippets, with Vercel Analytics and Speed Insights                                                            |
 
 **Tech stack**: TypeScript 5.7+, Zod 4.0+, Vitest 3.0+, Next.js 15.3+ (web), Tailwind CSS 4.0+ (web), `@inquirer/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
 
@@ -75,12 +75,11 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 
 ### `@getmcp/core` (`packages/core/src/`)
 
-| File             | Purpose                                                                                                                                                                                                                                                                                              |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `schemas.ts`     | All Zod schemas: `StdioServerConfig`, `RemoteServerConfig`, `ServerConfig`, `CanonicalMCPConfig`, `RegistryEntry`, `AppId`, `ManifestServerEntry`, `ProjectManifest`                                                                                                                                 |
-| `types.ts`       | TypeScript types inferred from Zod; `ConfigGenerator` and `AppMetadata` interfaces (`configPaths: string \| null` for project-scoped, `globalConfigPaths: PlatformPaths \| null` for global-scoped); exported `PlatformPaths` type and `supportsBothScopes()`, `getDefaultScope()` utility functions |
-| `utils.ts`       | Type guards (`isStdioConfig`, `isRemoteConfig`) and `inferTransport()`                                                                                                                                                                                                                               |
-| `json-schema.ts` | Runtime JSON Schema generation via Zod v4 built-in `z.toJSONSchema()`: `getRegistryEntryJsonSchema()`. Injects `$schema` property so JSON files can reference the published schema URL for IDE autocompletion                                                                                        |
+| File         | Purpose                                                                                                                                                                                                                                                                                              |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `schemas.ts` | All Zod schemas: `StdioServerConfig`, `RemoteServerConfig`, `ServerConfig`, `CanonicalMCPConfig`, `RegistryEntry`, `AppId`, `ManifestServerEntry`, `ProjectManifest`                                                                                                                                 |
+| `types.ts`   | TypeScript types inferred from Zod; `ConfigGenerator` and `AppMetadata` interfaces (`configPaths: string \| null` for project-scoped, `globalConfigPaths: PlatformPaths \| null` for global-scoped); exported `PlatformPaths` type and `supportsBothScopes()`, `getDefaultScope()` utility functions |
+| `utils.ts`   | Type guards (`isStdioConfig`, `isRemoteConfig`) and `inferTransport()`                                                                                                                                                                                                                               |
 
 ### `@getmcp/generators` (`packages/generators/src/`)
 
@@ -103,19 +102,16 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 
 ### `@getmcp/registry` (`packages/registry/`)
 
-| File                          | Purpose                                                                                                                                                                                                                                            |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/index.ts`                | Registry engine: lazy-loads JSON files from `servers/`, validates via Zod, exposes `getServer()`, `getAllServers()`, `searchServers()`, `getServersByCategory()`, `getCategories()`, `findServerByCommand()`. Caches sorted arrays for performance |
-| `servers/*.json`              | Individual server definitions (one JSON file per server), auto-discovered at startup. Each file includes a `$schema` field for IDE autocompletion                                                                                                  |
-| `scripts/sync.ts`             | Sync pipeline: fetches from official MCP registry API with `version=latest` and `updated_since` for incremental sync, enriches with GitHub data, fetches metrics, writes `data/servers.json`. Supports `--full` flag to force complete re-sync     |
-| `scripts/validate-servers.js` | Build script that validates all JSON server files against the Zod schema                                                                                                                                                                           |
-| `scripts/copy-servers.js`     | Build script that copies JSON server files to the dist output                                                                                                                                                                                      |
+| File              | Purpose                                                                                                                                                                                                                                            |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/index.ts`    | Registry engine: lazy-loads JSON files from `servers/`, validates via Zod, exposes `getServer()`, `getAllServers()`, `searchServers()`, `getServersByCategory()`, `getCategories()`, `findServerByCommand()`. Caches sorted arrays for performance |
+| `scripts/sync.ts` | Sync pipeline: fetches from official MCP registry API with `version=latest` and `updated_since` for incremental sync, enriches with GitHub data, fetches metrics, writes `data/servers.json`. Supports `--full` flag to force complete re-sync     |
 
 ### `@getmcp/cli` (`packages/cli/src/`)
 
 | File                 | Purpose                                                                                                                                                                                                                                                                                               |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bin.ts`             | Entry point; parses argv, dispatches to commands via `resolveAlias()` with dynamic imports. Passes `--output` flag to `initCommand`                                                                                                                                                                   |
+| `bin.ts`             | Entry point; parses argv, dispatches to commands via `resolveAlias()` with dynamic imports                                                                                                                                                                                                            |
 | `detect.ts`          | `resolvePath()`, `getConfigPath()` (accepts optional `requestedScope`), `detectApps()` (delegates to `generator.detectInstalled()`), `detectInstalledApps()`, `resolveAppForScope()`. `DetectedApp` includes `supportsBothScopes` and optional `globalConfigPath` fields                              |
 | `format.ts`          | `detectConfigFormat()` — infers config file format (json/jsonc/yaml/toml) from file extension                                                                                                                                                                                                         |
 | `config-file.ts`     | Multi-format config file I/O: `readConfigFile()`, `writeConfigFile()`, `mergeServerIntoConfig()`, `removeServerFromConfig()`, `listServersInConfig()` (accepts path or pre-parsed config), `stripJsoncComments()`. Auto-detects format (JSON, JSONC, YAML, TOML) from file extension.                 |
@@ -129,44 +125,37 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 | `commands/find.ts`   | Interactive fuzzy server search with inline add flow (aliases: `search`, `s`, `f`)                                                                                                                                                                                                                    |
 | `commands/check.ts`  | Validate tracked installations against registry and app configs                                                                                                                                                                                                                                       |
 | `commands/update.ts` | Re-generate and merge configs for all tracked installations                                                                                                                                                                                                                                           |
-| `commands/init.ts`   | Interactive wizard to scaffold a new JSON server registry entry. Supports `--output`/`-o`, prompts for `homepage`, validates URLs on `repository`/`homepage` via `validateUrl()` helper                                                                                                               |
 | `commands/doctor.ts` | Health diagnostics: installed apps, config parsing, registry status, orphaned servers, env vars, runtime dependencies                                                                                                                                                                                 |
 | `commands/import.ts` | Scan app configs for existing servers and adopt them into getmcp tracking                                                                                                                                                                                                                             |
 | `commands/sync.ts`   | Read `getmcp.json` manifest and install all declared servers into detected apps                                                                                                                                                                                                                       |
 
 ### `@getmcp/web` (`packages/web/src/`)
 
-| File                                      | Purpose                                                                                                                                        |
-| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `app/layout.tsx`                          | Root layout with Vercel Analytics and Speed Insights                                                                                           |
-| `app/not-found.tsx`                       | Custom 404 page with ASCII art and terminal simulation                                                                                         |
-| `app/page.tsx`                            | Homepage with hero section and search                                                                                                          |
-| `app/docs/page.tsx`                       | Documentation page with getting started, supported apps, library usage, and more                                                               |
-| `app/docs/loading.tsx`                    | Loading skeleton for the docs page                                                                                                             |
-| `app/servers/page.tsx`                    | Server directory index page with search and filters                                                                                            |
-| `app/servers/[id]/page.tsx`               | Dynamic server detail page (statically generated from registry)                                                                                |
-| `app/category/[slug]/page.tsx`            | 14 category landing pages with per-category server grids                                                                                       |
-| `app/guides/[app]/page.tsx`               | 19 app-specific MCP setup guides                                                                                                               |
-| `app/registry-entry.schema.json/route.ts` | API route serving the JSON Schema for registry entries (enables `$schema` URL resolution)                                                      |
-| `lib/guide-data.ts`                       | Guide content data module (names, overviews, config details, troubleshooting)                                                                  |
-| `components/AsciiArt.tsx`                 | Animated ASCII art hero with character-by-character reveal, uses Fira Mono font                                                                |
-| `components/ConfigViewer.tsx`             | Client component: tab selector for all 19 apps with mobile dropdown, shows generated config snippet with copy button, localStorage persistence |
-| `components/Pill.tsx`                     | Shared pill/tab button with `aria-pressed` support                                                                                             |
-| `components/SearchBar.tsx`                | Search, category, runtime, and transport filter component                                                                                      |
-| `components/ServerCard.tsx`               | Server listing card with runtime badge and author display                                                                                      |
+| File                           | Purpose                                                                                                                                        |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/layout.tsx`               | Root layout with Vercel Analytics and Speed Insights                                                                                           |
+| `app/not-found.tsx`            | Custom 404 page with ASCII art and terminal simulation                                                                                         |
+| `app/page.tsx`                 | Homepage with hero section and search                                                                                                          |
+| `app/docs/page.tsx`            | Documentation page with getting started, supported apps, library usage, and more                                                               |
+| `app/docs/loading.tsx`         | Loading skeleton for the docs page                                                                                                             |
+| `app/servers/page.tsx`         | Server directory index page with search and filters                                                                                            |
+| `app/servers/[id]/page.tsx`    | Dynamic server detail page (statically generated from registry)                                                                                |
+| `app/category/[slug]/page.tsx` | 14 category landing pages with per-category server grids                                                                                       |
+| `app/guides/[app]/page.tsx`    | 19 app-specific MCP setup guides                                                                                                               |
+| `lib/guide-data.ts`            | Guide content data module (names, overviews, config details, troubleshooting)                                                                  |
+| `components/AsciiArt.tsx`      | Animated ASCII art hero with character-by-character reveal, uses Fira Mono font                                                                |
+| `components/ConfigViewer.tsx`  | Client component: tab selector for all 19 apps with mobile dropdown, shows generated config snippet with copy button, localStorage persistence |
+| `components/Pill.tsx`          | Shared pill/tab button with `aria-pressed` support                                                                                             |
+| `components/SearchBar.tsx`     | Search, category, runtime, and transport filter component                                                                                      |
+| `components/ServerCard.tsx`    | Server listing card with runtime badge and author display                                                                                      |
 
 ---
 
 ## Common Tasks
 
-### Adding a new MCP server to the registry
+### MCP server registry
 
-1. Create `packages/registry/servers/<id>.json` with `"$schema": "https://getmcp.es/registry-entry.schema.json"` and the server definition
-2. Ensure the filename matches the `id` field (e.g., `my-server.json` contains `"id": "my-server"`)
-3. Run `npx vitest run packages/registry` — the registry auto-discovers all JSON files, no manual imports needed
-4. The server will automatically appear in CLI search, web directory, and all generators
-
-> See `.agents/docs/SPECIFICATION.md` Section 6 for the `RegistryEntry` schema and an example.
+Server data is synced from the [official MCP registry](https://registry.modelcontextprotocol.io) via `packages/registry/scripts/sync.ts`. To add a new server, submit it to the official registry — getmcp syncs automatically via the daily GitHub Actions workflow.
 
 ### Adding a new generator (supporting a new AI app)
 
@@ -215,7 +204,7 @@ This is not optional — documentation drift causes confusion and wastes time. T
 - Run all tests: `npx vitest` (from repo root)
 - Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc.
 - Test locations:
-  - `packages/core/tests/` — schema validation, type guards, transport inference, JSON Schema, ProjectManifest
+  - `packages/core/tests/` — schema validation, type guards, transport inference, ProjectManifest
   - `packages/generators/tests/` — all 19 generators (stdio + remote + multi-server + serialization + detectInstalled)
   - `packages/registry/tests/` — entry validation, lookup, search, categories, content integrity
   - `packages/cli/tests/` — path resolution, app detection, config read/write/merge/remove, lock file, errors, preferences, utils, bin flags

@@ -409,59 +409,25 @@ getServersByCategory("web");
         <section id="adding-a-server" className="mb-16 scroll-mt-24">
           <h2 className="text-2xl font-bold mb-5">Adding a server to the registry</h2>
           <div className="space-y-4 text-text-secondary leading-relaxed">
-            <p>Want to add your MCP server to the getmcp registry? Here{"'"}s how:</p>
-            <ol className="list-decimal list-inside space-y-2 ml-1">
-              <li>
-                Create a new JSON file at{" "}
-                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
-                  packages/registry/servers/your-server.json
-                </code>
-              </li>
-              <li>
-                Add a{" "}
-                <code className="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
-                  $schema
-                </code>{" "}
-                field for IDE autocompletion
-              </li>
-              <li>Define your server{"'"}s metadata and config</li>
-              <li>
-                Run the tests to validate your entry (the registry auto-discovers all JSON files)
-              </li>
-            </ol>
-            <p>Here{"'"}s an example registry entry:</p>
-            <CodeBlock label="JSON">{`{
-  "$schema": "https://getmcp.es/registry-entry.schema.json",
-  "id": "my-server",
-  "name": "My Server",
-  "description": "What your server does",
-  "categories": ["productivity"],
-  "author": "your-name",
-  "runtime": "node",
-  "package": "@scope/my-mcp-server",
-  "repository": "https://github.com/you/my-mcp-server",
-  "requiredEnvVars": ["MY_API_KEY"],
-  "config": {
-    "command": "npx",
-    "args": ["-y", "@scope/my-mcp-server"],
-    "env": { "MY_API_KEY": "" }
-  }
-}`}</CodeBlock>
             <p>
-              Once added, your server will automatically appear in the{" "}
-              <Link href="/" className="text-accent hover:underline">
-                web directory
-              </Link>
-              , CLI search, and all {appCount} config generators. Open a pull request on{" "}
+              getmcp syncs server data from the{" "}
               <a
-                href="https://github.com/RodrigoTomeES/getmcp"
+                href="https://registry.modelcontextprotocol.io"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-accent hover:underline"
               >
-                GitHub
-              </a>{" "}
-              to submit your server.
+                official MCP registry
+              </a>
+              . To add your MCP server, submit it to the official registry — getmcp will pick it up
+              automatically during the next sync.
+            </p>
+            <p>
+              Once your server is in the official registry, it will appear in the{" "}
+              <Link href="/" className="text-accent hover:underline">
+                web directory
+              </Link>
+              , CLI search, and all {appCount} config generators.
             </p>
           </div>
         </section>
