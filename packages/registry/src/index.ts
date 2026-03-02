@@ -28,6 +28,7 @@ let _rawEntries: RegistryEntryType[] = [];
 let _loaded = false;
 let _sortedCache: InternalRegistryEntry[] | null = null;
 let _sortedIdsCache: string[] | null = null;
+let _metricsCache: Map<string, GetMCPMetricsType> | null = null;
 
 function ensureLoaded(): void {
   if (!_loaded) {
@@ -39,6 +40,7 @@ function ensureLoaded(): void {
 function invalidateCache(): void {
   _sortedCache = null;
   _sortedIdsCache = null;
+  _metricsCache = null;
 }
 
 function loadServers(): void {
@@ -216,19 +218,30 @@ export function findServerByCommand(
 }
 
 /**
- * Get metrics for a server by slug ID.
- * Reads from the raw data's _meta["es.getmcp/metrics"].
+ * Get all metrics as a Map keyed by slug ID.
+ * Builds and caches the index on first call.
  */
-export function getServerMetrics(id: string): GetMCPMetricsType | undefined {
+export function getAllMetrics(): Map<string, GetMCPMetricsType> {
   ensureLoaded();
-  const slug = id;
-  for (const raw of _rawEntries) {
-    const enrichment = raw._meta?.["es.getmcp/enrichment"] as { slug?: string } | undefined;
-    if (enrichment?.slug === slug) {
-      return raw._meta?.["es.getmcp/metrics"] as GetMCPMetricsType | undefined;
+  if (!_metricsCache) {
+    _metricsCache = new Map();
+    for (const raw of _rawEntries) {
+      const enrichment = raw._meta?.["es.getmcp/enrichment"] as { slug?: string } | undefined;
+      if (enrichment?.slug) {
+        const m = raw._meta?.["es.getmcp/metrics"] as GetMCPMetricsType | undefined;
+        if (m) _metricsCache.set(enrichment.slug, m);
+      }
     }
   }
-  return undefined;
+  return _metricsCache;
+}
+
+/**
+ * Get metrics for a server by slug ID.
+ * Uses the cached metrics index for O(1) lookup.
+ */
+export function getServerMetrics(id: string): GetMCPMetricsType | undefined {
+  return getAllMetrics().get(id);
 }
 
 /**
