@@ -4,11 +4,11 @@ export function compactNumber(n: number): string {
   return String(n);
 }
 
-export function relativeTime(isoDate: string): string {
+export function relativeTime(isoDate: string, now = Date.now()): string {
   const then = new Date(isoDate).getTime();
-  if (Number.isNaN(then)) return "—";
+  if (Number.isNaN(then)) return "\u2014";
 
-  const seconds = Math.floor((Date.now() - then) / 1000);
+  const seconds = Math.floor((now - then) / 1000);
 
   if (seconds < 60) return "just now";
 

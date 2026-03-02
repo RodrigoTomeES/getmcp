@@ -42,7 +42,9 @@ export function ConfigViewer({ configs }: { configs: Record<string, PreGenerated
     if (saved && configs[saved]) {
       setSelectedApp(saved);
     }
-  }, [configs]);
+    // configs is stable per mount (pre-generated in server component)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSelectApp = (appId: string) => {
     setSelectedApp(appId);
