@@ -139,15 +139,18 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 | `app/docs/page.tsx`            | Documentation page with getting started, supported apps, library usage, and more                                                               |
 | `app/docs/loading.tsx`         | Loading skeleton for the docs page                                                                                                             |
 | `app/servers/page.tsx`         | Server directory index page with search and filters                                                                                            |
-| `app/servers/[id]/page.tsx`    | Dynamic server detail page (statically generated from registry)                                                                                |
+| `app/servers/[id]/page.tsx`    | Dynamic server detail page with two-column layout (main + sidebar), hero with inline stats, rich metrics display                               |
 | `app/category/[slug]/page.tsx` | 14 category landing pages with per-category server grids                                                                                       |
 | `app/guides/[app]/page.tsx`    | 19 app-specific MCP setup guides                                                                                                               |
 | `lib/guide-data.ts`            | Guide content data module (names, overviews, config details, troubleshooting)                                                                  |
+| `lib/format.ts`                | Shared formatting utilities: `compactNumber()`, `relativeTime()`                                                                               |
 | `components/AsciiArt.tsx`      | Animated ASCII art hero with character-by-character reveal, uses Fira Mono font                                                                |
 | `components/ConfigViewer.tsx`  | Client component: tab selector for all 19 apps with mobile dropdown, shows generated config snippet with copy button, localStorage persistence |
 | `components/Pill.tsx`          | Shared pill/tab button with `aria-pressed` support                                                                                             |
 | `components/SearchBar.tsx`     | Search, category, runtime, and transport filter component                                                                                      |
 | `components/ServerCard.tsx`    | Server listing card with runtime badge and author display                                                                                      |
+| `components/ServerSidebar.tsx` | Server detail sidebar: stats grid (stars/forks/downloads/issues), details, links, tags                                                         |
+| `components/StatBadge.tsx`     | Inline stat pill with icon + value + optional label suffix                                                                                     |
 
 ---
 

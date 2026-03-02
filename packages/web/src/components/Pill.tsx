@@ -1,11 +1,14 @@
-interface PillProps {
+type PillProps = {
   active: boolean;
   onClick: () => void;
   children: React.ReactNode;
   role?: "tab";
-}
+} & Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "onClick" | "role" | "className" | "children"
+>;
 
-export function Pill({ active, onClick, children, role }: PillProps) {
+export function Pill({ active, onClick, children, role, ...rest }: PillProps) {
   return (
     <button
       onClick={onClick}
@@ -16,6 +19,7 @@ export function Pill({ active, onClick, children, role }: PillProps) {
           ? "border-accent bg-accent/10 text-accent"
           : "border-border text-text-secondary hover:border-text-secondary hover:text-text"
       }`}
+      {...rest}
     >
       {children}
     </button>

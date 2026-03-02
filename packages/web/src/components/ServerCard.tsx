@@ -1,22 +1,18 @@
 import Link from "next/link";
+import { compactNumber } from "@/lib/format";
 
 export type ServerCardData = {
   id: string;
   name: string;
   description: string;
   categories: string[];
+  author?: string;
   runtime?: string;
   isRemote: boolean;
   envCount: number;
   stars?: number;
   downloads?: number;
 };
-
-function compactNumber(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
-  return String(n);
-}
 
 export function ServerCard({ server }: { server: ServerCardData }) {
   const transport = server.isRemote ? "remote" : "stdio";
