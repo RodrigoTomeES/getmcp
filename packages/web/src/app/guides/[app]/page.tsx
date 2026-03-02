@@ -15,39 +15,38 @@ export function generateStaticParams() {
   return GUIDE_SLUGS.map((app) => ({ app }));
 }
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
   params: Promise<{ app: string }>;
 }): Promise<Metadata> {
-  return params.then(({ app }) => {
-    const guide = GUIDES[app];
-    if (!guide) return { title: "Not Found" };
+  const { app } = await params;
+  const guide = GUIDES[app];
+  if (!guide) notFound();
 
-    return {
-      title: `How to Install MCP Servers in ${guide.name}`,
-      description: `Step-by-step guide to install and configure MCP servers in ${guide.name}. Covers config format, file location, quick install with getmcp CLI, and troubleshooting.`,
-      keywords: [
-        `${guide.name} MCP`,
-        `${guide.name} MCP server`,
-        `${guide.name} MCP setup`,
-        `install MCP ${guide.name}`,
-        "MCP server",
-        "getmcp",
-      ],
-      alternates: { canonical: `/guides/${app}` },
-      openGraph: {
-        title: `How to Install MCP Servers in ${guide.name} \u2014 getmcp`,
-        description: `Step-by-step guide to install and configure MCP servers in ${guide.name}.`,
-        type: "website",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: `How to Install MCP Servers in ${guide.name} \u2014 getmcp`,
-        description: `Step-by-step guide to install and configure MCP servers in ${guide.name}.`,
-      },
-    };
-  });
+  return {
+    title: `How to Install MCP Servers in ${guide.name}`,
+    description: `Step-by-step guide to install and configure MCP servers in ${guide.name}. Covers config format, file location, quick install with getmcp CLI, and troubleshooting.`,
+    keywords: [
+      `${guide.name} MCP`,
+      `${guide.name} MCP server`,
+      `${guide.name} MCP setup`,
+      `install MCP ${guide.name}`,
+      "MCP server",
+      "getmcp",
+    ],
+    alternates: { canonical: `/guides/${app}` },
+    openGraph: {
+      title: `How to Install MCP Servers in ${guide.name} \u2014 getmcp`,
+      description: `Step-by-step guide to install and configure MCP servers in ${guide.name}.`,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `How to Install MCP Servers in ${guide.name} \u2014 getmcp`,
+      description: `Step-by-step guide to install and configure MCP servers in ${guide.name}.`,
+    },
+  };
 }
 
 /**
