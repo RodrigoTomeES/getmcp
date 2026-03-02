@@ -38,7 +38,7 @@
   "scripts": {
     "sync": "tsx --env-file=.env scripts/sync.ts",
     "sync:full": "tsx --env-file=.env scripts/sync.ts --full",
-    "build": "tsc && node scripts/copy-data.js",
+    "build": "tsc && tsx scripts/copy-data.ts",
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
