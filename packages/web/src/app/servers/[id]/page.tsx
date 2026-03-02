@@ -9,6 +9,7 @@ import { PackageManagerCommand } from "@/components/PackageManagerCommand";
 import { ServerCard, type ServerCardData } from "@/components/ServerCard";
 import { ServerSidebar } from "@/components/ServerSidebar";
 import { GUIDE_SLUGS } from "@/lib/guide-data";
+import { SITE_URL } from "@/lib/constants";
 
 export const dynamicParams = false;
 
@@ -111,6 +112,7 @@ export default async function ServerPage({ params }: { params: Promise<{ id: str
             envCount: s.requiredEnvVars.length,
             stars: m?.github?.stars,
             downloads: m?.npm?.weeklyDownloads ?? m?.pypi?.monthlyDownloads,
+            downloadsUnit: (m?.npm?.weeklyDownloads != null ? "week" : "month") as "week" | "month",
           };
         })
     : [];
@@ -172,11 +174,11 @@ function ServerDetail({
       ...(server.author && {
         author: { "@type": "Organization", name: server.author },
       }),
-      url: `https://getmcp.es/servers/${server.id}`,
+      url: `${SITE_URL}/servers/${server.id}`,
       ...(server.repository && { downloadUrl: server.repository }),
       mainEntityOfPage: {
         "@type": "WebPage",
-        "@id": `https://getmcp.es/servers/${server.id}`,
+        "@id": `${SITE_URL}/servers/${server.id}`,
       },
     },
     {
@@ -187,19 +189,19 @@ function ServerDetail({
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://getmcp.es",
+          item: SITE_URL,
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Servers",
-          item: "https://getmcp.es/servers",
+          item: `${SITE_URL}/servers`,
         },
         {
           "@type": "ListItem",
           position: 3,
           name: server.name,
-          item: `https://getmcp.es/servers/${server.id}`,
+          item: `${SITE_URL}/servers/${server.id}`,
         },
       ],
     },
