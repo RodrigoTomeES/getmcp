@@ -10,7 +10,7 @@ Server data in getmcp comes from the [official MCP registry](https://registry.mo
 
 ### Prerequisites
 
-- Node.js >= 22
+- Node.js >= 22.17
 - npm >= 10
 
 ### Install & Build

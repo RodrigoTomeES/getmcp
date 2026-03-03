@@ -12,7 +12,7 @@
 
 ## Architecture Overview
 
-This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22) with 5 packages:
+This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22.17) with 5 packages:
 
 ```
 @getmcp/cli -----> @getmcp/generators -----> @getmcp/core
