@@ -1,13 +1,14 @@
-import { StarIcon, DownloadIcon, ForkIcon, IssueIcon, DockerIcon } from "./icons";
+import { Star, Download, GitFork, CircleDot } from "lucide-react";
+import { SiDocker } from "@icons-pack/react-simple-icons";
 
 type IconType = "star" | "download" | "fork" | "issue" | "docker";
 
 const iconComponents: Record<IconType, React.ComponentType<{ className?: string }>> = {
-  star: StarIcon,
-  download: DownloadIcon,
-  fork: ForkIcon,
-  issue: IssueIcon,
-  docker: DockerIcon,
+  star: Star,
+  download: Download,
+  fork: GitFork,
+  issue: CircleDot,
+  docker: SiDocker,
 };
 
 const iconLabels: Record<IconType, string> = {

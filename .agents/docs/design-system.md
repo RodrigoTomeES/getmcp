@@ -401,13 +401,15 @@ text-text-secondary hover:text-text transition-colors rounded-md
 
 ## Icons
 
-No icon library. All icons are inline SVGs with consistent styling:
+Icons come from two libraries: **lucide-react** (generic UI icons) and **@icons-pack/react-simple-icons** (brand icons).
 
-- Size: `w-4 h-4`
-- Style: stroke-based (`fill="none"`, `strokeWidth={2}`, `strokeLinecap="round"`, `strokeLinejoin="round"`)
+- Size: `w-4 h-4` (default), `w-3.5 h-3.5` (compact metrics), `w-3 h-3` (checkbox check)
+- Style: stroke-based (lucide defaults: `strokeWidth={2}`, `strokeLinecap="round"`, `strokeLinejoin="round"`)
 - Color: `text-text-secondary` (inherits via `currentColor`)
 
-Icons used: search (magnifying glass), terminal (command prompt), clipboard (copy), checkmark (copied), custom logo.
+No wrapper file — consumers import directly from `lucide-react` and `@icons-pack/react-simple-icons`. Pass `aria-hidden="true"` on each usage.
+
+Icons used: `Search`, `SlidersHorizontal`, `Terminal`, `Copy`, `Check`, `X`, `Lock`, `Star`, `Download`, `GitFork`, `CircleDot`, `ExternalLink`, `BadgeCheck`, `SiGithub`, `SiDocker`, custom logo.
 
 ### Logo
 

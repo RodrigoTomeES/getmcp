@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Terminal, Check, Copy } from "lucide-react";
 import { useClipboard } from "@/hooks/use-clipboard";
 
 function subscribeToReducedMotion(callback: () => void) {
@@ -77,20 +78,7 @@ export function AnimatedCommand() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-border">
         <div className="flex items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-4 h-4 text-text-secondary shrink-0"
-            aria-hidden="true"
-          >
-            <polyline points="4 17 10 11 4 5" />
-            <line x1="12" x2="20" y1="19" y2="19" />
-          </svg>
+          <Terminal className="w-4 h-4 text-text-secondary shrink-0" aria-hidden="true" />
           <span className="text-xs font-mono text-text-secondary select-none">terminal</span>
         </div>
 
@@ -100,34 +88,7 @@ export function AnimatedCommand() {
           className="text-text-secondary hover:text-text transition-colors shrink-0 p-1"
           aria-label={copied ? "Copied!" : "Copy command"}
         >
-          {copied ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-4 h-4 text-success"
-            >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-4 h-4"
-            >
-              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-            </svg>
-          )}
+          {copied ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
         </button>
       </div>
 

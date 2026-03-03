@@ -13,19 +13,7 @@ type FilterPanelProps = {
 const RUNTIMES = ["node", "python", "docker", "binary"] as const;
 const TRANSPORTS = ["stdio", "remote"] as const;
 
-function CheckIcon() {
-  return (
-    <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-      <path
-        d="M2.5 6l2.5 2.5 4.5-5"
-        stroke="currentColor"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+import { Check } from "lucide-react";
 
 function Checkbox({ checked }: { checked: boolean }) {
   return (
@@ -35,7 +23,7 @@ function Checkbox({ checked }: { checked: boolean }) {
       }`}
       aria-hidden="true"
     >
-      {checked && <CheckIcon />}
+      {checked && <Check className="w-3 h-3 text-white" aria-hidden="true" />}
     </span>
   );
 }

@@ -107,4 +107,4 @@
 | `components/ServerSidebar.tsx`         | Server detail sidebar: stats grid (stars/forks/downloads/issues), details, links, tags                                                         |
 | `components/StatBadge.tsx`             | Inline stat pill with icon + value + optional label suffix                                                                                     |
 | `components/SupportedApps.tsx`         | Grid of all 19 supported apps with format badges linking to setup guides                                                                       |
-| `components/icons.tsx`                 | SVG icon components: StarIcon, DownloadIcon, ForkIcon, IssueIcon, DockerIcon, GitHubIcon, VerifiedIcon, ExternalLinkIcon                       |
+| _(icons)_                              | No wrapper file — icons imported directly from `lucide-react` and `@icons-pack/react-simple-icons` at each usage site                          |

@@ -5,6 +5,7 @@ import { ServerCard, type ServerCardData } from "./ServerCard";
 import { Pagination } from "./Pagination";
 import { FilterPanel } from "./FilterPanel";
 import { FilterSheet } from "./FilterSheet";
+import { Search, SlidersHorizontal } from "lucide-react";
 import { useDebounce } from "@/hooks/use-debounce";
 
 const PAGE_SIZES = [24, 48, 72] as const;
@@ -241,20 +242,10 @@ export function SearchBar({
         <label htmlFor="server-search" className="sr-only">
           Search MCP servers
         </label>
-        <svg
+        <Search
           className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
           aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
-        </svg>
+        />
         <input
           id="server-search"
           type="search"
@@ -278,9 +269,7 @@ export function SearchBar({
           aria-controls="filter-sheet"
           className="text-xs px-3 py-1.5 rounded-full border border-border text-text-secondary hover:border-text-secondary hover:text-text font-medium transition-colors inline-flex items-center gap-1.5"
         >
-          <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-            <path d="M1 3a1 1 0 011-1h12a1 1 0 010 2H2a1 1 0 01-1-1zm2 4a1 1 0 011-1h8a1 1 0 010 2H4a1 1 0 01-1-1zm2 4a1 1 0 011-1h4a1 1 0 010 2H6a1 1 0 01-1-1z" />
-          </svg>
+          <SlidersHorizontal className="w-3.5 h-3.5" aria-hidden="true" />
           Filters{activeFilterCount > 0 && ` (${activeFilterCount})`}
         </button>
 

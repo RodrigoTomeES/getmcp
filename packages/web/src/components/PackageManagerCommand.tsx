@@ -8,6 +8,7 @@ import {
   DEFAULT_PM,
   getCommand,
 } from "@/lib/package-manager";
+import { Terminal, Check, Copy } from "lucide-react";
 import { useClipboard } from "@/hooks/use-clipboard";
 
 const pmListeners = new Set<() => void>();
@@ -54,20 +55,7 @@ export function PackageManagerCommand({ serverId }: { serverId?: string }) {
       {/* Header: terminal icon + tabs + copy button */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-border">
         {/* Terminal icon */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="w-4 h-4 text-text-secondary shrink-0"
-          aria-hidden="true"
-        >
-          <polyline points="4 17 10 11 4 5" />
-          <line x1="12" x2="20" y1="19" y2="19" />
-        </svg>
+        <Terminal className="w-4 h-4 text-text-secondary shrink-0" aria-hidden="true" />
 
         {/* Package manager tabs */}
         <div className="flex gap-1 flex-1" role="group" aria-label="Select package manager">
@@ -90,34 +78,7 @@ export function PackageManagerCommand({ serverId }: { serverId?: string }) {
           className="text-text-secondary hover:text-text transition-colors shrink-0 p-1 rounded-md"
           aria-label="Copy command"
         >
-          {copied ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-4 h-4 text-success"
-            >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-4 h-4"
-            >
-              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-            </svg>
-          )}
+          {copied ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
         </button>
       </div>
 

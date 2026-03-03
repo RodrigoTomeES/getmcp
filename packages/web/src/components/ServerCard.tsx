@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { compactNumber } from "@/lib/format";
-import { StarIcon, DownloadIcon, VerifiedIcon } from "./icons";
+import { Star, Download, BadgeCheck } from "lucide-react";
 
 export type ServerCardData = {
   id: string;
@@ -30,11 +30,13 @@ export function ServerCard({ server }: { server: ServerCardData }) {
       className="group flex flex-col rounded-lg border border-border bg-surface p-5 hover:bg-surface-hover hover:border-accent/50 transition-all"
     >
       <div className="flex items-baseline justify-between gap-3 mb-2">
-        <h3 className="font-semibold text-lg group-hover:text-accent transition-colors leading-snug inline-flex gap-2 items-baseline">
+        <h3 className="font-semibold text-lg group-hover:text-accent transition-colors leading-snug inline-flex items-baseline">
           {server.name}
 
           {server.isOfficial && (
-            <VerifiedIcon className="h-[1ch] text-official shrink-0" title="Official MCP server" />
+            <span role="img" aria-label="Official MCP server" title="Official MCP server">
+              <BadgeCheck className="h-[1ch] text-official shrink-0" aria-hidden="true" />
+            </span>
           )}
         </h3>
         <span
@@ -63,7 +65,7 @@ export function ServerCard({ server }: { server: ServerCardData }) {
                   className="text-xs px-2 py-0.5 rounded-full bg-surface-hover text-text-secondary inline-flex items-center gap-1"
                   aria-label={`${server.stars.toLocaleString()} GitHub stars`}
                 >
-                  <StarIcon className="w-3 h-3" />
+                  <Star className="w-3 h-3" aria-hidden="true" />
                   <span aria-hidden="true">{compactNumber(server.stars)}</span>
                 </span>
               )}
@@ -72,7 +74,7 @@ export function ServerCard({ server }: { server: ServerCardData }) {
                   className="text-xs px-2 py-0.5 rounded-full bg-surface-hover text-text-secondary inline-flex items-center gap-1"
                   aria-label={`${server.downloads.toLocaleString()} downloads per week`}
                 >
-                  <DownloadIcon className="w-3 h-3" />
+                  <Download className="w-3 h-3" aria-hidden="true" />
                   <span aria-hidden="true">
                     {compactNumber(server.downloads)}
                     <span className="opacity-60">/w</span>

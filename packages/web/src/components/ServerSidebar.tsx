@@ -1,15 +1,8 @@
 import type { InternalRegistryEntry } from "@getmcp/registry";
 import { getServerMetrics } from "@getmcp/registry";
 import { compactNumber, relativeTime } from "@/lib/format";
-import {
-  StarIcon,
-  DownloadIcon,
-  ForkIcon,
-  IssueIcon,
-  DockerIcon,
-  GitHubIcon,
-  ExternalLinkIcon,
-} from "./icons";
+import { Star, Download, GitFork, CircleDot, ExternalLink } from "lucide-react";
+import { SiGithub, SiDocker } from "@icons-pack/react-simple-icons";
 
 type Metrics = NonNullable<ReturnType<typeof getServerMetrics>>;
 
@@ -42,11 +35,11 @@ function DetailRow({ label, children }: { label: string; children: React.ReactNo
   );
 }
 
-const StarIconEl = <StarIcon className="w-4 h-4" />;
-const ForkIconEl = <ForkIcon className="w-4 h-4" />;
-const DownloadIconEl = <DownloadIcon className="w-4 h-4" />;
-const IssueIconEl = <IssueIcon className="w-4 h-4" />;
-const DockerIconEl = <DockerIcon className="w-4 h-4" />;
+const StarIconEl = <Star className="w-4 h-4" aria-hidden="true" />;
+const ForkIconEl = <GitFork className="w-4 h-4" aria-hidden="true" />;
+const DownloadIconEl = <Download className="w-4 h-4" aria-hidden="true" />;
+const IssueIconEl = <CircleDot className="w-4 h-4" aria-hidden="true" />;
+const DockerIconEl = <SiDocker className="w-4 h-4" aria-hidden="true" />;
 
 function extractDomain(url: string): string {
   try {
@@ -168,7 +161,7 @@ export function ServerSidebar({
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm text-accent hover:underline transition-colors"
             >
-              <GitHubIcon className="w-4 h-4" />
+              <SiGithub className="w-4 h-4" aria-hidden="true" />
               <span className="truncate">{extractDomain(server.repository)}</span>
               <span className="sr-only"> (opens in new tab)</span>
             </a>
@@ -180,7 +173,7 @@ export function ServerSidebar({
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm text-accent hover:underline transition-colors"
             >
-              <ExternalLinkIcon className="w-4 h-4" />
+              <ExternalLink className="w-4 h-4" aria-hidden="true" />
               <span className="truncate">{extractDomain(server.homepage)}</span>
               <span className="sr-only"> (opens in new tab)</span>
             </a>
