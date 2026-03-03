@@ -36,149 +36,13 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22) with 5 
 
 ## Key Concepts
 
-### Canonical Format
+- **Canonical Format**: Single FastMCP-aligned format (root key `mcpServers`). Stdio: `command`, `args`, `env`, `cwd`, `timeout`, `description`. Remote: `url`, `transport`, `headers`, `timeout`, `description`. Transport auto-inferred from URL.
+- **Generators**: Extend `BaseGenerator` (`packages/generators/src/base.ts`), implement `generate()` to transform canonical → app-native format. Each implements `detectInstalled()` for platform-specific app detection.
+- **Registry**: `Map<string, RegistryEntry>` of server definitions with lookup, search, and filtering functions.
+- **CLI**: Auto-detects installed apps, prompts for env vars, generates app-specific configs, and **merges** into existing files (never overwrites). Tracks installations in `getmcp-lock.json`.
+- **Design Principles**: (1) Never overwrite (2) Canonical format as single source of truth (3) Auto-detect apps (4) Platform-aware path resolution (5) Schema-validated via Zod
 
-All server configs are defined in a single FastMCP-aligned format. Root key: `mcpServers`.
-
-- **Stdio servers**: `command`, `args`, `env`, `cwd`, `timeout`, `description`
-- **Remote servers**: `url`, `transport` (`http` | `streamable-http` | `sse`), `headers`, `timeout`, `description`
-
-Transport is auto-inferred: URLs with `/sse` default to SSE, others to HTTP.
-
-> See `.agents/docs/SPECIFICATION.md` Section 4 for full schema definitions.
-
-### Generators
-
-Each generator implements the `ConfigGenerator` interface (defined in `packages/core/src/types.ts`) and extends `BaseGenerator` (in `packages/generators/src/base.ts`). A generator transforms the canonical format into one app's native format — renaming fields, changing root keys, adding app-specific fields, or switching file formats (e.g., YAML for Goose). Each generator also implements `detectInstalled()` which checks if the app is installed on the current system using platform-specific heuristics (e.g., `existsSync()` on known config directories). Shared path constants (`home`, `configHome`, `appData`, `claudeHome`, `codexHome`) are exported from `base.ts` and support env var overrides (`XDG_CONFIG_HOME`, `APPDATA`, `CLAUDE_CONFIG_DIR`, `CODEX_HOME`).
-
-> See `.agents/docs/SPECIFICATION.md` Section 5 for all transformation rules per app.
-
-### Registry
-
-A `Map<string, RegistryEntry>` of server definitions. Each entry contains metadata (id, name, description, categories, author, runtime) plus the canonical `ServerConfig`. The registry exposes lookup, search, and filtering functions.
-
-### CLI
-
-The CLI auto-detects installed AI apps by checking platform-specific config paths, prompts for required environment variables, generates app-specific configs, and **merges** them into existing config files (never overwrites). It handles JSON, JSONC, YAML, and TOML formats. Installations are tracked in a project-level `getmcp-lock.json` file, enabling `check` and `update` workflows.
-
-### Design Principles
-
-1. **Never overwrite** — always merge into existing config files
-2. **Canonical format** — one source of truth, generators handle transformations
-3. **Auto-detect** — each generator's `detectInstalled()` checks if the app exists on the current system
-4. **Platform-aware** — resolves `~`, `%AppData%`, `%UserProfile%`, `%LocalAppData%`
-5. **Schema-validated** — all data flows through Zod schemas at runtime
-
----
-
-## Package Map — Key Files
-
-### `@getmcp/core` (`packages/core/src/`)
-
-| File         | Purpose                                                                                                                                                                                                                                                                                              |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `schemas.ts` | All Zod schemas: `StdioServerConfig`, `RemoteServerConfig`, `ServerConfig`, `CanonicalMCPConfig`, `RegistryEntry`, `AppId`, `ManifestServerEntry`, `ProjectManifest`                                                                                                                                 |
-| `types.ts`   | TypeScript types inferred from Zod; `ConfigGenerator` and `AppMetadata` interfaces (`configPaths: string \| null` for project-scoped, `globalConfigPaths: PlatformPaths \| null` for global-scoped); exported `PlatformPaths` type and `supportsBothScopes()`, `getDefaultScope()` utility functions |
-| `utils.ts`   | Type guards (`isStdioConfig`, `isRemoteConfig`) and `inferTransport()`                                                                                                                                                                                                                               |
-
-### `@getmcp/generators` (`packages/generators/src/`)
-
-| File                | Purpose                                                                                                                                                                                                                                                                             |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `base.ts`           | `BaseGenerator` abstract class with `generate()`, `generateAll()`, `serialize()`, `detectInstalled()`, `deepMerge()` (with prototype pollution guard), field extraction helpers, shared path constants (`home`, `configHome`, `appData`, `localAppData`, `claudeHome`, `codexHome`) |
-| `claude-desktop.ts` | Passthrough — canonical IS the native format                                                                                                                                                                                                                                        |
-| `claude-code.ts`    | Near-passthrough; renames `transport` to `type` for remote                                                                                                                                                                                                                          |
-| `vscode.ts`         | Root key `servers`; adds `type` field on every server; maps `streamable-http` to `http`                                                                                                                                                                                             |
-| `cursor.ts`         | Passthrough (same as Claude Desktop)                                                                                                                                                                                                                                                |
-| `cline.ts`          | Adds `alwaysAllow: []` and `disabled: false`                                                                                                                                                                                                                                        |
-| `roo-code.ts`       | Adds `alwaysAllow: []`, `disabled: false`; maps `http` to `streamable-http`                                                                                                                                                                                                         |
-| `goose.ts`          | YAML output; root key `extensions`; renames `command` to `cmd`, `env` to `envs`; timeout ms to seconds                                                                                                                                                                              |
-| `windsurf.ts`       | Remote uses `serverUrl` instead of `url`                                                                                                                                                                                                                                            |
-| `opencode.ts`       | Root key `mcp`; merges `command`+`args` into array; renames `env` to `environment`                                                                                                                                                                                                  |
-| `zed.ts`            | Root key `context_servers`                                                                                                                                                                                                                                                          |
-| `pycharm.ts`        | Passthrough; project-level config at `.ai/mcp/mcp.json` (requires JetBrains AI Assistant plugin)                                                                                                                                                                                    |
-| `codex.ts`          | TOML output; root key `mcp_servers`; renames `headers` to `http_headers`; timeout ms to seconds (`startup_timeout_sec`)                                                                                                                                                             |
-| `gemini-cli.ts`     | Passthrough; Google Gemini CLI (`mcpServers` root key, JSON); global config at `~/.gemini/settings.json`                                                                                                                                                                            |
-| `continue.ts`       | Passthrough; Continue AI code assistant (`mcpServers` root key, JSON); global config at `~/.continue/config.json`                                                                                                                                                                   |
-| `amazon-q.ts`       | Passthrough; Amazon Q Developer (`mcpServers` root key, JSON); global config at `~/.aws/amazonq/mcp.json`                                                                                                                                                                           |
-| `trae.ts`           | Passthrough; ByteDance Trae IDE (`mcpServers` root key, JSON); project config at `.trae/mcp.json`                                                                                                                                                                                   |
-| `bolt-ai.ts`        | Passthrough; BoltAI macOS client (`mcpServers` root key, JSON); macOS-only at `~/Library/Application Support/BoltAI/mcp_config.json`                                                                                                                                                |
-| `libre-chat.ts`     | YAML output; LibreChat platform (`mcpServers` root key); custom `serialize()` for YAML; project config at `librechat.yaml`                                                                                                                                                          |
-| `antigravity.ts`    | Passthrough; Google Antigravity IDE (`mcpServers` root key, JSON)                                                                                                                                                                                                                   |
-| `index.ts`          | Generator registry: maps `AppId` to generator instances; exports `generateConfig()`, `getGenerator()`, `getAppIds()`                                                                                                                                                                |
-
-### `@getmcp/registry` (`packages/registry/`)
-
-| File                        | Purpose                                                                                                                                                                                                                                        |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/index.ts`              | Registry engine: loads `data/servers.json`, validates via Zod, exposes `getServer()`, `getAllServers()`, `searchServers()`, `getServersByCategory()`, `getCategories()`, `findServerByCommand()`. Caches sorted arrays for performance         |
-| `src/enrich.ts`             | GitHub enrichment: maps GitHub topics to getmcp categories, infers runtime from registry type/language, fetches GitHub repo info, builds enrichment metadata                                                                                   |
-| `src/enrichment-types.ts`   | Zod schemas for enrichment (`GetMCPEnrichment`) and metrics (`GetMCPMetrics` with GitHub/npm/PyPI/Docker sub-schemas); category and runtime enums                                                                                              |
-| `src/extract-config.ts`     | Extracts canonical `ServerConfig` from official MCP registry format; transforms `packages[]`/`remotes[]` into `StdioServerConfig` or `RemoteServerConfig`                                                                                      |
-| `src/fetch-metrics.ts`      | Metrics fetchers for the sync pipeline: GitHub stars/forks, npm weekly downloads, PyPI monthly downloads, Docker Hub/GHCR pulls; includes retry logic and concurrency control                                                                  |
-| `src/id-mapping.ts`         | ID slug generation from official reverse-DNS names (e.g. `io.github.owner/name-mcp` to `name`); collision resolution by org-prefixing                                                                                                          |
-| `src/official-api-types.ts` | Zod schemas matching the official MCP registry API format: `OfficialServer`, `OfficialPackage`, `OfficialRemote`, response wrappers                                                                                                            |
-| `src/transform.ts`          | Transforms official MCP registry entries into the internal `InternalRegistryEntry` format used by the registry engine, CLI, and web                                                                                                            |
-| `scripts/sync.ts`           | Sync pipeline: fetches from official MCP registry API with `version=latest` and `updated_since` for incremental sync, enriches with GitHub data, fetches metrics, writes `data/servers.json`. Supports `--full` flag to force complete re-sync |
-
-### `@getmcp/cli` (`packages/cli/src/`)
-
-| File                 | Purpose                                                                                                                                                                                                                                                                                               |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bin.ts`             | Entry point; parses argv, dispatches to commands via `resolveAlias()` with dynamic imports                                                                                                                                                                                                            |
-| `detect.ts`          | `resolvePath()`, `getConfigPath()` (accepts optional `requestedScope`), `detectApps()` (delegates to `generator.detectInstalled()`), `detectInstalledApps()`, `resolveAppForScope()`. `DetectedApp` includes `supportsBothScopes` and optional `globalConfigPath` fields                              |
-| `format.ts`          | `detectConfigFormat()` — infers config file format (json/jsonc/yaml/toml) from file extension                                                                                                                                                                                                         |
-| `config-file.ts`     | Multi-format config file I/O: `readConfigFile()`, `writeConfigFile()`, `mergeServerIntoConfig()`, `removeServerFromConfig()`, `listServersInConfig()` (accepts path or pre-parsed config), `stripJsoncComments()`. Auto-detects format (JSON, JSONC, YAML, TOML) from file extension.                 |
-| `lock.ts`            | Installation tracking via `./getmcp-lock.json`: `readLockFile()`, `writeLockFile()`, `trackInstallation()` (accepts optional per-app `scopes` map), `trackRemoval()` (cleans up per-app scopes), `getTrackedServers()`. `LockInstallation` has optional `scopes` field (per-app scope tracking)       |
-| `errors.ts`          | Error types (`CliError`, `ConfigParseError`, `AppNotDetectedError`, `InvalidAppError`, `ServerNotFoundError`, `NonInteractiveError`) and `formatError()` utility                                                                                                                                      |
-| `utils.ts`           | `parseFlags()` for CLI flag parsing (supports `--global`/`-g`, `--project`, `--output`/`-o` flags), `resolveAlias()` for command alias resolution, `shortenPath()` for display, `exitIfCancelled()` for prompt cancellation, unknown flag warnings with Levenshtein-based "did you mean?" suggestions |
-| `preferences.ts`     | Global user preferences at `~/.config/getmcp/preferences.json` (remembers selected apps across invocations)                                                                                                                                                                                           |
-| `commands/add.ts`    | Interactive add workflow: pick server, prompt env vars, detect apps, generate + merge configs                                                                                                                                                                                                         |
-| `commands/remove.ts` | Interactive remove workflow with server picker when no args, `--dry-run` and `--yes` support                                                                                                                                                                                                          |
-| `commands/list.ts`   | List/search/filter servers                                                                                                                                                                                                                                                                            |
-| `commands/find.ts`   | Interactive fuzzy server search with inline add flow (aliases: `search`, `s`, `f`)                                                                                                                                                                                                                    |
-| `commands/check.ts`  | Validate tracked installations against registry and app configs                                                                                                                                                                                                                                       |
-| `commands/update.ts` | Re-generate and merge configs for all tracked installations                                                                                                                                                                                                                                           |
-| `commands/doctor.ts` | Health diagnostics: installed apps, config parsing, registry status, orphaned servers, env vars, runtime dependencies                                                                                                                                                                                 |
-| `commands/import.ts` | Scan app configs for existing servers and adopt them into getmcp tracking                                                                                                                                                                                                                             |
-| `commands/sync.ts`   | Read `getmcp.json` manifest and install all declared servers into detected apps                                                                                                                                                                                                                       |
-
-### `@getmcp/web` (`packages/web/src/`)
-
-| File                                   | Purpose                                                                                                                                        |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `app/layout.tsx`                       | Root layout with Vercel Analytics and Speed Insights                                                                                           |
-| `app/not-found.tsx`                    | Custom 404 page with ASCII art and terminal simulation                                                                                         |
-| `app/page.tsx`                         | Homepage with hero section and search                                                                                                          |
-| `app/docs/page.tsx`                    | Documentation page with getting started, supported apps, library usage, and more                                                               |
-| `app/docs/loading.tsx`                 | Loading skeleton for the docs page                                                                                                             |
-| `app/servers/page.tsx`                 | Server directory index page with search and filters                                                                                            |
-| `app/servers/[id]/page.tsx`            | Dynamic server detail page with two-column layout (main + sidebar), hero with inline stats, rich metrics display                               |
-| `app/servers/loading.tsx`              | Loading skeleton for the servers directory page                                                                                                |
-| `app/category/[slug]/page.tsx`         | 14 category landing pages with per-category server grids                                                                                       |
-| `app/guides/page.tsx`                  | Guides index page listing all 19 app-specific MCP setup guides                                                                                 |
-| `app/guides/[app]/page.tsx`            | 19 app-specific MCP setup guides                                                                                                               |
-| `app/guides/loading.tsx`               | Loading skeleton for the guides pages                                                                                                          |
-| `lib/guide-data.ts`                    | Guide content data module (names, overviews, config details, troubleshooting)                                                                  |
-| `lib/format.ts`                        | Shared formatting utilities: `compactNumber()`, `relativeTime()`                                                                               |
-| `components/AnimatedCommand.tsx`       | Client component: typewriter-style CLI command animation cycling through getmcp commands with copy-to-clipboard support                        |
-| `components/AsciiArt.tsx`              | Animated ASCII art hero with character-by-character reveal, uses Fira Mono font                                                                |
-| `components/CategoryGrid.tsx`          | Grid of category cards with server counts linking to category pages                                                                            |
-| `components/CodeBlock.tsx`             | Client component: syntax-highlighted code block with copy button                                                                               |
-| `components/ConfigViewer.tsx`          | Client component: tab selector for all 19 apps with mobile dropdown, shows generated config snippet with copy button, localStorage persistence |
-| `components/DocsSidebar.tsx`           | Sticky docs table-of-contents sidebar with CSS scroll-spy highlighting                                                                         |
-| `components/FormatShowcase.tsx`        | Grid showcasing config format differences across apps (JSON, YAML, TOML)                                                                       |
-| `components/MetaItem.tsx`              | Label-value metadata display pair with optional monospace styling                                                                              |
-| `components/PackageManagerCommand.tsx` | Client component: package manager command with npm/npx/bunx/pnpx tabs and copy button, persisted selection via localStorage                    |
-| `components/Pagination.tsx`            | Paginated navigation with page numbers, ellipsis, and prev/next buttons                                                                        |
-| `components/Pill.tsx`                  | Shared pill/tab button with `aria-pressed` support                                                                                             |
-| `components/PopularServers.tsx`        | Curated grid of 12 popular server cards for the homepage                                                                                       |
-| `components/SearchBar.tsx`             | Search, category, runtime, and transport filter component                                                                                      |
-| `components/ServerCard.tsx`            | Server listing card with runtime badge and author display                                                                                      |
-| `components/ServerSidebar.tsx`         | Server detail sidebar: stats grid (stars/forks/downloads/issues), details, links, tags                                                         |
-| `components/StatBadge.tsx`             | Inline stat pill with icon + value + optional label suffix                                                                                     |
-| `components/SupportedApps.tsx`         | Grid of all 19 supported apps with format badges linking to setup guides                                                                       |
-| `components/icons.tsx`                 | SVG icon components: StarIcon, DownloadIcon, ForkIcon, IssueIcon, DockerIcon, GitHubIcon, ExternalLinkIcon                                     |
+> See [file-map.md](./.agents/docs/file-map.md) for the complete file-by-file reference.
 
 ---
 
@@ -245,126 +109,37 @@ This is not optional — documentation drift causes confusion and wastes time. T
 
 ## Publishing
 
-This project uses an **auto-release workflow** (`.github/workflows/publish.yml`) that detects version bumps from conventional commits, bumps all workspace packages in sync, publishes to npm via OIDC trusted publishing, and creates a GitHub Release with changelog.
-
-### Trigger Paths
-
-| Trigger                        | Behavior                                                                                                           |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| **Push to `main`** (non-docs)  | Scans conventional commits since last tag: `feat:` → minor, `fix:`/`perf:`/etc. → patch, `docs:`/`ci:` only → skip |
-| **Tag push `v*`**              | Validates package versions match the tag, publishes directly (no version bump)                                     |
-| **Manual `workflow_dispatch`** | Choose `patch` or `minor` explicitly from the Actions UI                                                           |
-
-### How it works
-
-1. **Version detection** — Conventional commits are scanned to determine bump type (minor/patch/none)
-2. **Version bump** — `npm version $BUMP --no-git-tag-version --workspaces` bumps all 4 publishable packages in sync
-3. **Commit & tag** — Creates `chore(release): vX.Y.Z [skip ci]` commit + tag, pushes with `--follow-tags`
-4. **Build & test** — Runs `npm run build` and `npm run test` before publishing
-5. **Publish** — Each package checks if already published (idempotent), then publishes in dependency order: `core` → `generators` → `registry` → `cli`
-6. **GitHub Release** — Creates a release with changelog from merged PRs (falls back to commit log) using `.github/RELEASE_TEMPLATE.md`
-
-### OIDC Trusted Publishing
-
-Authentication uses [npm trusted publishing with OIDC](https://docs.npmjs.com/trusted-publishers) — a tokenless flow.
-
-### Rules
+Auto-release via conventional commits (`.github/workflows/publish.yml`). Uses OIDC trusted publishing — no tokens.
 
 - **NEVER** add `NODE_AUTH_TOKEN` or `NPM_TOKEN` environment variables to the publish workflow
 - **NEVER** create or store npm access tokens in repository secrets for publishing
-- **DO** keep `permissions: id-token: write` in the publish workflow — this is what enables OIDC
-- **DO** keep `registry-url: https://registry.npmjs.org` in the `actions/setup-node` step — this is required for the npm CLI to detect the OIDC environment
-- Provenance attestations are generated automatically when publishing via trusted publishing
 
-### Edge Cases
-
-| Scenario                                        | How it's handled                                                                 |
-| ----------------------------------------------- | -------------------------------------------------------------------------------- |
-| Infinite loop (version bump commit re-triggers) | `[skip ci]` in commit message + HEAD commit message guard                        |
-| Double trigger (commit + tag push)              | `git push --follow-tags` atomic push + concurrency group                         |
-| Partial publish failure                         | Each publish step checks `npm view` before attempting; safe to re-run            |
-| No tags exist yet (first release)               | `git describe` fallback to empty string; scans all commits                       |
-| Docs-only commits                               | `paths-ignore: ['**/*.md']` skips workflow; commit detection also outputs `none` |
-
-### References
-
-- [npm trusted publishing docs](https://docs.npmjs.com/trusted-publishers)
-- [GitHub Actions OIDC documentation](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect)
-- [npm trusted publishing announcement](https://github.blog/changelog/2025-07-31-npm-trusted-publishing-with-oidc-is-generally-available/)
+> See [publishing.md](./.agents/docs/publishing.md) for trigger paths, workflow steps, OIDC rules, and edge cases.
 
 ---
 
 ## Commit Convention
 
-This project follows the [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) specification. All commit messages must be structured as:
+Follows [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/). Scopes: `core`, `generators`, `registry`, `cli`, `web`. Breaking changes use `!` or `BREAKING CHANGE:` footer.
 
-```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-### Types
-
-| Type       | Purpose                                               |
-| ---------- | ----------------------------------------------------- |
-| `feat`     | A new feature                                         |
-| `fix`      | A bug fix                                             |
-| `docs`     | Documentation-only changes                            |
-| `style`    | Code style changes (formatting, whitespace, etc.)     |
-| `refactor` | Code changes that neither fix a bug nor add a feature |
-| `perf`     | Performance improvements                              |
-| `test`     | Adding or updating tests                              |
-| `build`    | Changes to the build system or dependencies           |
-| `ci`       | Changes to CI configuration                           |
-| `chore`    | Other changes that don't modify src or test files     |
-
-### Scopes
-
-Use the package name as scope when the change is specific to one package:
-
-- `core`, `generators`, `registry`, `cli`, `web`
-
-### Examples
-
-```
-feat(generators): add support for new AI app
-fix(cli): handle missing config file gracefully
-docs: update CLAUDE.md with commit convention
-test(registry): add search edge case tests
-refactor(core): simplify transport inference logic
-chore: update dependencies
-feat(web)!: redesign server detail page layout
-```
-
-Breaking changes must include `!` after the type/scope or a `BREAKING CHANGE:` footer.
+> See [commit-convention.md](./.agents/docs/commit-convention.md) for full types table and examples.
 
 ---
 
 ## Installed Skills
 
-Skills are installed under `.agents/skills/` and provide specialized capabilities:
-
-| Skill                         | Description                                                                           | Trigger                                                                                          |
-| ----------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `agent-browser`               | Browser automation CLI (navigate, snapshot, interact, screenshot, scrape)             | User needs to interact with websites, fill forms, take screenshots, test web apps                |
-| `vercel-composition-patterns` | React composition patterns (compound components, context providers, state management) | Refactoring components with boolean props, building component libraries, designing reusable APIs |
-| `frontend-design`             | Create distinctive, production-grade frontend interfaces with high design quality     | Building web components, pages, dashboards, or styling/beautifying any web UI                    |
-| `web-design-guidelines`       | Review UI code for Web Interface Guidelines compliance                                | "Review my UI", "check accessibility", "audit design", "review UX"                               |
-| `vercel-react-best-practices` | React/Next.js performance optimization (57 rules across 8 categories)                 | Writing, reviewing, or refactoring React/Next.js code for performance                            |
-| `react-doctor`                | Scan React code for security, performance, correctness, and architecture issues       | Run after making React changes, reviewing code, finishing a feature, or fixing bugs              |
-| `tailwind-design-system`      | Build scalable design systems with Tailwind CSS v4, design tokens, and components     | Creating component libraries, implementing design systems, or standardizing UI patterns          |
-| `find-skills`                 | Discover and install agent skills from the ecosystem                                  | "How do I do X", "find a skill for X", extending agent capabilities                              |
+Skills are installed under `.agents/skills/`. See the skill files for triggers and descriptions.
 
 ---
 
 ## References
 
-- **[`SPECIFICATION.md`](./.agents/docs/SPECIFICATION.md)** — Complete project specification: schemas, transformation rules per app, registry format, CLI behavior, research appendix with every app's config format documented
+- **[`SPECIFICATION.md`](./.agents/docs/SPECIFICATION.md)** — Complete project specification: schemas, transformation rules per app, registry format, CLI behavior, research appendix
 - **[`ROADMAP.md`](./.agents/docs/ROADMAP.md)** — Planned improvements and open tasks
 - **[`design-system.md`](./.agents/docs/design-system.md)** — Web package design system: colors, fonts, typography, components, layout patterns, and OG image specs
 - **[`competence.md`](./.agents/docs/competence.md)** — Competence analysis
 - **[`css-scroll-spy.md`](./.agents/docs/css-scroll-spy.md)** — CSS scroll spy pattern: inline `<style>` technique required by Turbopack constraint
+- **[`file-map.md`](./.agents/docs/file-map.md)** — Complete file-by-file reference for all 5 packages
+- **[`publishing.md`](./.agents/docs/publishing.md)** — Auto-release workflow, OIDC trusted publishing, trigger paths, edge cases
+- **[`commit-convention.md`](./.agents/docs/commit-convention.md)** — Conventional Commits types, scopes, and examples
 - **Repository**: `https://github.com/RodrigoTomeES/getmcp`
