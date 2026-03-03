@@ -2,15 +2,19 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { ServerCard, type ServerCardData } from "./ServerCard";
-import { Pill } from "./Pill";
 import { Pagination } from "./Pagination";
+import { FilterPanel } from "./FilterPanel";
+import { FilterSheet } from "./FilterSheet";
 import { useDebounce } from "@/hooks/use-debounce";
 
 const PAGE_SIZES = [24, 48, 72] as const;
 const DEFAULT_PAGE_SIZE = 24;
-const VISIBLE_CATEGORIES = 8;
 
 type SortOption = "relevance" | "stars" | "downloads";
+
+function parseMulti(param: string | null): string[] {
+  return param ? param.split(",").filter(Boolean) : [];
+}
 
 export function SearchBar({
   servers,
@@ -21,13 +25,13 @@ export function SearchBar({
 }) {
   const [inputValue, setInputValue] = useState("");
   const query = useDebounce(inputValue, 300);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedRuntime, setSelectedRuntime] = useState<string | null>(null);
-  const [selectedTransport, setSelectedTransport] = useState<string | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedRuntimes, setSelectedRuntimes] = useState<string[]>([]);
+  const [selectedTransports, setSelectedTransports] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("relevance");
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const [showAllCategories, setShowAllCategories] = useState(false);
   const [page, setPage] = useState(1);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const urlSyncReady = useRef(false);
 
   // Initialize from URL on mount
@@ -42,9 +46,9 @@ export function SearchBar({
     const p = params.get("page");
 
     if (q) setInputValue(q);
-    if (cat && categories.includes(cat)) setSelectedCategory(cat);
-    if (rt) setSelectedRuntime(rt);
-    if (tp) setSelectedTransport(tp);
+    if (cat) setSelectedCategories(parseMulti(cat).filter((c) => categories.includes(c)));
+    if (rt) setSelectedRuntimes(parseMulti(rt));
+    if (tp) setSelectedTransports(parseMulti(tp));
     if (sort === "stars" || sort === "downloads") setSortBy(sort);
     if (pp) {
       const parsed = Number(pp);
@@ -66,9 +70,9 @@ export function SearchBar({
     }
     const params = new URLSearchParams();
     if (query) params.set("q", query);
-    if (selectedCategory) params.set("category", selectedCategory);
-    if (selectedRuntime) params.set("runtime", selectedRuntime);
-    if (selectedTransport) params.set("transport", selectedTransport);
+    if (selectedCategories.length) params.set("category", selectedCategories.join(","));
+    if (selectedRuntimes.length) params.set("runtime", selectedRuntimes.join(","));
+    if (selectedTransports.length) params.set("transport", selectedTransports.join(","));
     if (sortBy !== "relevance") params.set("sort", sortBy);
     if (pageSize !== DEFAULT_PAGE_SIZE) params.set("per_page", String(pageSize));
     if (page > 1) params.set("page", String(page));
@@ -76,7 +80,7 @@ export function SearchBar({
     const search = params.toString();
     const url = search ? `${window.location.pathname}?${search}` : window.location.pathname;
     window.history.replaceState(null, "", url);
-  }, [query, selectedCategory, selectedRuntime, selectedTransport, sortBy, pageSize, page]);
+  }, [query, selectedCategories, selectedRuntimes, selectedTransports, sortBy, pageSize, page]);
 
   // Pre-compute search strings (only rebuilds when servers change)
   const searchIndex = useMemo(
@@ -93,20 +97,21 @@ export function SearchBar({
   const filtered = useMemo(() => {
     let result = searchIndex;
 
-    if (selectedCategory) {
-      result = result.filter((item) => item.server.categories?.includes(selectedCategory));
+    if (selectedCategories.length > 0) {
+      result = result.filter((item) =>
+        selectedCategories.some((cat) => item.server.categories?.includes(cat)),
+      );
     }
 
-    if (selectedRuntime) {
-      result = result.filter((item) => item.server.runtime === selectedRuntime);
+    if (selectedRuntimes.length > 0) {
+      result = result.filter((item) => selectedRuntimes.includes(item.server.runtime ?? ""));
     }
 
-    if (selectedTransport) {
-      if (selectedTransport === "remote") {
-        result = result.filter((item) => item.server.isRemote);
-      } else {
-        result = result.filter((item) => !item.server.isRemote);
-      }
+    if (selectedTransports.length > 0) {
+      result = result.filter((item) => {
+        const transport = item.server.isRemote ? "remote" : "stdio";
+        return selectedTransports.includes(transport);
+      });
     }
 
     if (query.trim()) {
@@ -123,7 +128,7 @@ export function SearchBar({
     }
 
     return sorted;
-  }, [searchIndex, query, selectedCategory, selectedRuntime, selectedTransport, sortBy]);
+  }, [searchIndex, query, selectedCategories, selectedRuntimes, selectedTransports, sortBy]);
 
   const totalPages = Math.ceil(filtered.length / pageSize);
   const safePage = Math.min(page, Math.max(totalPages, 1));
@@ -140,32 +145,62 @@ export function SearchBar({
 
   const handleClearAll = () => {
     setInputValue("");
-    setSelectedCategory(null);
-    setSelectedRuntime(null);
-    setSelectedTransport(null);
+    setSelectedCategories([]);
+    setSelectedRuntimes([]);
+    setSelectedTransports([]);
     setSortBy("relevance");
     setPageSize(DEFAULT_PAGE_SIZE);
     setPage(1);
   };
 
+  // Reset page when filters change
+  const handleCategoriesChange = (v: string[]) => {
+    setSelectedCategories(v);
+    setPage(1);
+  };
+  const handleRuntimesChange = (v: string[]) => {
+    setSelectedRuntimes(v);
+    setPage(1);
+  };
+  const handleTransportsChange = (v: string[]) => {
+    setSelectedTransports(v);
+    setPage(1);
+  };
+
   const hasActiveFilters =
-    query ||
-    selectedCategory ||
-    selectedRuntime ||
-    selectedTransport ||
+    query.length > 0 ||
+    selectedCategories.length > 0 ||
+    selectedRuntimes.length > 0 ||
+    selectedTransports.length > 0 ||
     sortBy !== "relevance" ||
     pageSize !== DEFAULT_PAGE_SIZE;
-  const visibleCategories = showAllCategories
-    ? categories
-    : categories.slice(0, VISIBLE_CATEGORIES);
-  const hasMoreCategories = categories.length > VISIBLE_CATEGORIES;
+
+  const activeFilterCount =
+    selectedCategories.length + selectedRuntimes.length + selectedTransports.length;
 
   const startItem = filtered.length > 0 ? (safePage - 1) * pageSize + 1 : 0;
   const endItem = Math.min(safePage * pageSize, filtered.length);
 
+  const resultsSummary =
+    totalPages > 1
+      ? `Showing ${startItem}\u2013${endItem} of ${filtered.length} servers`
+      : `${filtered.length} server${filtered.length !== 1 ? "s" : ""}`;
+
+  const filterPanel = (
+    <FilterPanel
+      categories={categories}
+      selectedCategories={selectedCategories}
+      onCategoriesChange={handleCategoriesChange}
+      selectedRuntimes={selectedRuntimes}
+      onRuntimesChange={handleRuntimesChange}
+      selectedTransports={selectedTransports}
+      onTransportsChange={handleTransportsChange}
+    />
+  );
+
   return (
     <div>
-      {/* Search input */}
+      {/* Search input - full width */}
       <div className="relative mb-4">
         <label htmlFor="server-search" className="sr-only">
           Search MCP servers
@@ -198,279 +233,216 @@ export function SearchBar({
         />
       </div>
 
-      {/* Category filters */}
-      <p
-        id="category-filter-label"
-        className="text-xs text-text-secondary uppercase tracking-wider font-medium mb-2"
-      >
-        Category
-      </p>
-      <div
-        className="flex flex-wrap gap-2 mb-4"
-        role="radiogroup"
-        aria-labelledby="category-filter-label"
-      >
-        <Pill
-          role="radio"
-          active={!selectedCategory}
-          onClick={() => {
-            setSelectedCategory(null);
+      {/* Mobile: filter button + sort/per-page toolbar */}
+      <div className="flex flex-wrap items-center gap-2 mb-3 lg:hidden">
+        <button
+          type="button"
+          onClick={() => setIsFilterOpen(true)}
+          aria-expanded={isFilterOpen}
+          aria-controls="filter-sheet"
+          className="text-xs px-3 py-1.5 rounded-full border border-border text-text-secondary hover:border-text-secondary hover:text-text font-medium transition-colors inline-flex items-center gap-1.5"
+        >
+          <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M1 3a1 1 0 011-1h12a1 1 0 010 2H2a1 1 0 01-1-1zm2 4a1 1 0 011-1h8a1 1 0 010 2H4a1 1 0 01-1-1zm2 4a1 1 0 011-1h4a1 1 0 010 2H6a1 1 0 01-1-1z" />
+          </svg>
+          Filters{activeFilterCount > 0 && ` (${activeFilterCount})`}
+        </button>
+
+        {/* Sort */}
+        <select
+          aria-label="Sort by"
+          value={sortBy}
+          onChange={(e) => {
+            setSortBy(e.target.value as SortOption);
             setPage(1);
           }}
+          className="select-custom text-xs rounded-lg border border-border bg-surface text-text py-1.5 px-2 focus:outline-none focus:border-accent transition-colors appearance-none"
         >
-          All
-        </Pill>
-        {visibleCategories.map((cat) => (
-          <Pill
-            key={cat}
-            role="radio"
-            active={selectedCategory === cat}
-            onClick={() => {
-              setSelectedCategory((prev) => (prev === cat ? null : cat));
-              setPage(1);
-            }}
-          >
-            {cat}
-          </Pill>
-        ))}
-        {hasMoreCategories && !showAllCategories && (
-          <button
-            type="button"
-            onClick={() => setShowAllCategories(true)}
-            className="text-xs px-3 py-1.5 rounded-full border border-border text-text-secondary hover:text-text transition-colors"
-          >
-            +{categories.length - VISIBLE_CATEGORIES} more
-          </button>
-        )}
+          <option value="relevance">{query.trim() ? "Relevance" : "Default"}</option>
+          <option value="stars">Stars</option>
+          <option value="downloads">Downloads</option>
+        </select>
+
+        {/* Per page */}
+        <select
+          aria-label="Per page"
+          value={pageSize}
+          onChange={(e) => {
+            setPageSize(Number(e.target.value));
+            setPage(1);
+          }}
+          className="select-custom text-xs rounded-lg border border-border bg-surface text-text py-1.5 px-2 focus:outline-none focus:border-accent transition-colors appearance-none"
+        >
+          {PAGE_SIZES.map((size) => (
+            <option key={size} value={size}>
+              {size} / page
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* Runtime filters */}
-      <p
-        id="runtime-filter-label"
-        className="text-xs text-text-secondary uppercase tracking-wider font-medium mb-2"
+      {/* Mobile filter sheet */}
+      <FilterSheet
+        open={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        onClearAll={handleClearAll}
+        resultCount={filtered.length}
       >
-        Runtime
-      </p>
-      <div
-        className="flex flex-wrap gap-2 mb-4"
-        role="radiogroup"
-        aria-labelledby="runtime-filter-label"
-      >
-        <Pill
-          role="radio"
-          active={!selectedRuntime}
-          onClick={() => {
-            setSelectedRuntime(null);
-            setPage(1);
-          }}
-        >
-          All runtimes
-        </Pill>
-        {["node", "python", "docker", "binary"].map((rt) => (
-          <Pill
-            key={rt}
-            role="radio"
-            active={selectedRuntime === rt}
-            onClick={() => {
-              setSelectedRuntime((prev) => (prev === rt ? null : rt));
-              setPage(1);
-            }}
-          >
-            {rt}
-          </Pill>
-        ))}
-      </div>
+        {filterPanel}
+      </FilterSheet>
 
-      {/* Transport filters */}
-      <p
-        id="transport-filter-label"
-        className="text-xs text-text-secondary uppercase tracking-wider font-medium mb-2"
-      >
-        Transport
-      </p>
-      <div
-        className="flex flex-wrap gap-2 mb-6"
-        role="radiogroup"
-        aria-labelledby="transport-filter-label"
-      >
-        <Pill
-          role="radio"
-          active={!selectedTransport}
-          onClick={() => {
-            setSelectedTransport(null);
-            setPage(1);
-          }}
-        >
-          All transports
-        </Pill>
-        <Pill
-          role="radio"
-          active={selectedTransport === "stdio"}
-          onClick={() => {
-            setSelectedTransport((prev) => (prev === "stdio" ? null : "stdio"));
-            setPage(1);
-          }}
-        >
-          stdio
-        </Pill>
-        <Pill
-          role="radio"
-          active={selectedTransport === "remote"}
-          onClick={() => {
-            setSelectedTransport((prev) => (prev === "remote" ? null : "remote"));
-            setPage(1);
-          }}
-        >
-          remote
-        </Pill>
-      </div>
+      {/* Two-column layout */}
+      <div className="lg:flex lg:gap-8">
+        {/* Sidebar - desktop only */}
+        <aside className="hidden lg:block w-56 shrink-0">{filterPanel}</aside>
 
-      {/* Sort & per page controls */}
-      <div className="flex flex-wrap items-end gap-x-8 gap-y-4 mb-6">
-        <div>
-          <p
-            id="sort-label"
-            className="text-xs text-text-secondary uppercase tracking-wider font-medium mb-2"
-          >
-            Sort by
-          </p>
-          <div className="flex flex-wrap gap-2" role="radiogroup" aria-labelledby="sort-label">
-            <Pill
-              role="radio"
-              active={sortBy === "relevance"}
-              onClick={() => {
-                setSortBy("relevance");
-                setPage(1);
-              }}
+        {/* Main content */}
+        <div className="flex-1 min-w-0">
+          <h2 className="sr-only">Server listing</h2>
+
+          {/* Desktop toolbar: results count + sort + per page + clear */}
+          <div className="hidden lg:flex flex-wrap items-center gap-x-4 gap-y-2 mb-4">
+            <p
+              className="text-xs text-text-secondary uppercase tracking-wider font-medium"
+              role="status"
+              aria-live="polite"
             >
-              {query.trim() ? "Relevance" : "Default"}
-            </Pill>
-            <Pill
-              role="radio"
-              active={sortBy === "stars"}
-              onClick={() => {
-                setSortBy("stars");
-                setPage(1);
-              }}
-            >
-              Stars
-            </Pill>
-            <Pill
-              role="radio"
-              active={sortBy === "downloads"}
-              onClick={() => {
-                setSortBy("downloads");
-                setPage(1);
-              }}
-            >
-              Downloads
-            </Pill>
+              {resultsSummary}
+            </p>
+
+            <div className="ml-auto flex flex-wrap items-center gap-x-4 gap-y-2">
+              {/* Sort */}
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="sort-select"
+                  className="text-xs text-text-secondary uppercase tracking-wider font-medium"
+                >
+                  Sort
+                </label>
+                <select
+                  id="sort-select"
+                  value={sortBy}
+                  onChange={(e) => {
+                    setSortBy(e.target.value as SortOption);
+                    setPage(1);
+                  }}
+                  className="select-custom text-xs rounded-lg border border-border bg-surface text-text py-1.5 px-2 focus:outline-none focus:border-accent transition-colors appearance-none"
+                >
+                  <option value="relevance">{query.trim() ? "Relevance" : "Default"}</option>
+                  <option value="stars">Stars</option>
+                  <option value="downloads">Downloads</option>
+                </select>
+              </div>
+
+              {/* Per page */}
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="per-page-select"
+                  className="text-xs text-text-secondary uppercase tracking-wider font-medium"
+                >
+                  Per page
+                </label>
+                <select
+                  id="per-page-select"
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setPage(1);
+                  }}
+                  className="select-custom text-xs rounded-lg border border-border bg-surface text-text py-1.5 px-2 focus:outline-none focus:border-accent transition-colors appearance-none"
+                >
+                  {PAGE_SIZES.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={handleClearAll}
+                  className="text-xs border border-border text-text-secondary hover:border-text-secondary hover:text-text px-3 py-1 rounded-md transition-colors"
+                >
+                  Clear all
+                </button>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div>
-          <p
-            id="per-page-label"
-            className="text-xs text-text-secondary uppercase tracking-wider font-medium mb-2"
-          >
-            Per page
-          </p>
-          <div className="flex flex-wrap gap-2" role="radiogroup" aria-labelledby="per-page-label">
-            {PAGE_SIZES.map((size) => (
-              <Pill
-                key={size}
-                role="radio"
-                active={pageSize === size}
-                onClick={() => {
-                  setPageSize(size);
-                  setPage(1);
-                }}
+          {/* Mobile results count + clear */}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3 lg:hidden">
+            <p
+              className="text-xs text-text-secondary uppercase tracking-wider font-medium"
+              role="status"
+              aria-live="polite"
+            >
+              {resultsSummary}
+            </p>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={handleClearAll}
+                className="text-xs border border-border text-text-secondary hover:border-text-secondary hover:text-text px-3 py-1 rounded-md transition-colors"
               >
-                {size}
-              </Pill>
+                Clear all
+              </button>
+            )}
+          </div>
+
+          {/* Server grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {paginated.map((server) => (
+              <ServerCard key={server.id} server={server} />
             ))}
           </div>
+
+          {/* Pagination */}
+          <Pagination page={safePage} totalPages={totalPages} onPageChange={handlePageChange} />
+
+          {filtered.length === 0 && (
+            <div role="alert" className="text-center py-24 text-text-secondary">
+              <p className="text-lg mb-2">No servers found</p>
+              <p className="text-sm mb-4">
+                No results
+                {query && (
+                  <>
+                    {" "}
+                    for <strong className="text-text">&quot;{query}&quot;</strong>
+                  </>
+                )}
+                {selectedCategories.length > 0 && (
+                  <>
+                    {" "}
+                    in <strong className="text-text">{selectedCategories.join(", ")}</strong>
+                  </>
+                )}
+                {selectedRuntimes.length > 0 && (
+                  <>
+                    {" "}
+                    running on <strong className="text-text">{selectedRuntimes.join(", ")}</strong>
+                  </>
+                )}
+                {selectedTransports.length > 0 && (
+                  <>
+                    {" "}
+                    via <strong className="text-text">{selectedTransports.join(", ")}</strong>
+                  </>
+                )}
+                {!hasActiveFilters && <>. Try adjusting your search or filters</>}.
+              </p>
+              <button
+                type="button"
+                onClick={handleClearAll}
+                className="text-sm border border-border text-text-secondary hover:border-text-secondary hover:text-text px-4 py-2 rounded-md transition-colors"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
         </div>
       </div>
-
-      <h2 className="sr-only">Server listing</h2>
-
-      {/* Results count + clear filters */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-4">
-        <p
-          className="text-xs text-text-secondary uppercase tracking-wider font-medium"
-          role="status"
-          aria-live="polite"
-        >
-          {totalPages > 1
-            ? `Showing ${startItem}–${endItem} of ${filtered.length} servers`
-            : `${filtered.length} server${filtered.length !== 1 ? "s" : ""}`}
-          {query && ` matching "${query}"`}
-          {selectedCategory && ` in ${selectedCategory}`}
-          {selectedRuntime && ` (${selectedRuntime})`}
-          {selectedTransport && ` (${selectedTransport})`}
-        </p>
-        {hasActiveFilters && (
-          <button
-            type="button"
-            onClick={handleClearAll}
-            className="text-xs border border-border text-text-secondary hover:border-text-secondary hover:text-text px-3 py-1 rounded-md transition-colors"
-          >
-            Clear all filters
-          </button>
-        )}
-      </div>
-
-      {/* Server grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {paginated.map((server) => (
-          <ServerCard key={server.id} server={server} />
-        ))}
-      </div>
-
-      {/* Pagination */}
-      <Pagination page={safePage} totalPages={totalPages} onPageChange={handlePageChange} />
-
-      {filtered.length === 0 && (
-        <div role="alert" className="text-center py-24 text-text-secondary">
-          <p className="text-lg mb-2">No servers found</p>
-          <p className="text-sm mb-4">
-            No results
-            {query && (
-              <>
-                {" "}
-                for <strong className="text-text">&quot;{query}&quot;</strong>
-              </>
-            )}
-            {selectedCategory && (
-              <>
-                {" "}
-                in <strong className="text-text">{selectedCategory}</strong>
-              </>
-            )}
-            {selectedRuntime && (
-              <>
-                {" "}
-                running on <strong className="text-text">{selectedRuntime}</strong>
-              </>
-            )}
-            {selectedTransport && (
-              <>
-                {" "}
-                via <strong className="text-text">{selectedTransport}</strong>
-              </>
-            )}
-            {!hasActiveFilters && <>. Try adjusting your search or filters</>}.
-          </p>
-          <button
-            type="button"
-            onClick={handleClearAll}
-            className="text-sm border border-border text-text-secondary hover:border-text-secondary hover:text-text px-4 py-2 rounded-md transition-colors"
-          >
-            Clear all filters
-          </button>
-        </div>
-      )}
     </div>
   );
 }
