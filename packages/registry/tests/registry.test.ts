@@ -1,4 +1,7 @@
 import { describe, it, expect } from "vitest";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import * as os from "node:os";
 import {
   getServer,
   getServerOrThrow,
@@ -11,6 +14,8 @@ import {
   getServerMetrics,
   getServerByOfficialName,
   findServerByCommand,
+  resetRegistry,
+  loadFromPath,
 } from "../src/index.js";
 
 // ---------------------------------------------------------------------------
@@ -243,5 +248,86 @@ describe("findServerByCommand", () => {
 
   it("returns undefined for unknown command", () => {
     expect(findServerByCommand("nonexistent-cmd", ["arg1"])).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// resetRegistry / loadFromPath
+// ---------------------------------------------------------------------------
+
+describe("resetRegistry", () => {
+  it("clears registry and re-triggers load from bundled on next access", () => {
+    // Ensure registry is loaded first
+    const countBefore = getServerCount();
+    expect(countBefore).toBeGreaterThan(0);
+
+    resetRegistry();
+
+    // Next access should re-trigger loadServers() from bundled data
+    const countAfter = getServerCount();
+    expect(countAfter).toBe(countBefore);
+  });
+});
+
+describe("loadFromPath", () => {
+  it("loads data from a custom file path", () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "getmcp-test-"));
+    const tmpFile = path.join(tmpDir, "servers.json");
+
+    // Write a minimal servers.json with one entry matching official registry schema
+    const minimalEntry = [
+      {
+        server: {
+          name: "io.test/test-server",
+          description: "A test server",
+          packages: [
+            {
+              registryType: "npm",
+              identifier: "test-server",
+            },
+          ],
+        },
+        _meta: { "es.getmcp/enrichment": { slug: "test-server" } },
+      },
+    ];
+    fs.writeFileSync(tmpFile, JSON.stringify(minimalEntry), "utf-8");
+
+    loadFromPath(tmpFile);
+
+    expect(getServerCount()).toBe(1);
+    expect(getServer("test-server")).toBeDefined();
+
+    // Clean up: restore bundled data for other tests
+    resetRegistry();
+
+    fs.rmSync(tmpDir, { recursive: true });
+  });
+
+  it("results in empty registry when file does not exist", () => {
+    loadFromPath("/nonexistent/path/servers.json");
+
+    expect(getServerCount()).toBe(0);
+    expect(getAllServers()).toEqual([]);
+
+    // Clean up: restore bundled data for other tests
+    resetRegistry();
+  });
+
+  it("does not fall back to bundled data after loading", () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "getmcp-test-"));
+    const tmpFile = path.join(tmpDir, "servers.json");
+
+    // Write an empty array
+    fs.writeFileSync(tmpFile, "[]", "utf-8");
+
+    loadFromPath(tmpFile);
+
+    // Should have 0 servers, NOT fall back to bundled
+    expect(getServerCount()).toBe(0);
+
+    // Clean up: restore bundled data for other tests
+    resetRegistry();
+
+    fs.rmSync(tmpDir, { recursive: true });
   });
 });

@@ -55,6 +55,7 @@ export interface CliFlags {
   project: boolean;
   help: boolean;
   version: boolean;
+  refresh: boolean;
 }
 
 export function parseFlags(argv: string[]): {
@@ -74,6 +75,7 @@ export function parseFlags(argv: string[]): {
     project: false,
     help: false,
     version: false,
+    refresh: false,
   };
 
   let command: string | undefined;
@@ -127,6 +129,8 @@ export function parseFlags(argv: string[]): {
       flags.help = true;
     } else if (arg === "--version" || arg === "-v") {
       flags.version = true;
+    } else if (arg === "--refresh") {
+      flags.refresh = true;
     } else if (arg.startsWith("-")) {
       // Unknown flag — warn the user
       const flagName = arg.split("=")[0];
@@ -211,6 +215,7 @@ const KNOWN_FLAGS = [
   "-h",
   "--version",
   "-v",
+  "--refresh",
 ];
 
 function findSimilarFlag(input: string): string | undefined {

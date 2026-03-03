@@ -209,6 +209,7 @@ getmcp sync --json
 | `--from-npm <pkg>`  | Install unverified npm package as MCP server (for `add` command)      |
 | `--from-pypi <pkg>` | Install unverified PyPI package as MCP server (for `add` command)     |
 | `--from-url <url>`  | Install unverified remote URL as MCP server (for `add` command)       |
+| `--refresh`         | Force-refresh the registry cache from GitHub                          |
 
 ## Installation Tracking
 

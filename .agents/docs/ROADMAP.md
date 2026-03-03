@@ -324,6 +324,8 @@ Longer-term roadmap items from the specification.
 ### Registry Enhancements
 
 - [x] ~~**JSON Schema for server definitions**~~ — Removed. Was providing IDE autocompletion for manually-authored server JSON files; obsolete after migration to official MCP registry sync.
+- [x] **Decouple registry data from npm package versions** — CLI auto-fetches fresh `servers.json` from `raw.githubusercontent.com` with TTL-based caching (1 hour), atomic writes, and a fallback chain (remote → local cache → bundled npm data). Added `--refresh` flag for force-refresh. Publish workflow ignores `packages/registry/data/**` changes. Added `resetRegistry()` and `loadFromPath()` to `@getmcp/registry`.
+  - Files: `packages/registry/src/index.ts`, `packages/cli/src/registry-cache.ts` (new), `packages/cli/src/bin.ts`, `packages/cli/src/utils.ts`, `.github/workflows/publish.yml`
 - [ ] **Version tracking per server** — Track and display server package versions
 - [ ] **Server compatibility matrix** — Surface which servers work with which apps
 - [x] ~~**Community submission workflow**~~ — Removed local server submission pipeline (PR template, validation workflow). Server data now syncs from the official MCP registry. `CONTRIBUTING.md` updated to point contributors to the official registry.

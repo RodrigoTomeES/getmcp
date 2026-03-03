@@ -17,6 +17,7 @@
 
 import { createRequire } from "node:module";
 import { parseFlags, resolveAlias } from "./utils.js";
+import { initRegistryCache, refreshRegistryCache } from "./registry-cache.js";
 
 const require = createRequire(import.meta.url);
 const { version: VERSION } = require("../package.json") as { version: string };
@@ -60,6 +61,7 @@ Options:
   --from-npm <pkg>  Install unverified npm package as MCP server
   --from-pypi <pkg> Install unverified PyPI package as MCP server
   --from-url <url>  Install unverified remote URL as MCP server
+  --refresh         Force-refresh the registry cache
 
 Examples:
   getmcp add                                   # Interactive server selection
@@ -81,7 +83,17 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const { command: rawCommand, serverId, flags } = parseFlags(args);
 
-  if (!rawCommand || flags.help) {
+  if (!rawCommand && !flags.refresh) {
+    if (flags.help || flags.version) {
+      if (flags.version) console.log(VERSION);
+      else printHelp();
+      return;
+    }
+    printHelp();
+    return;
+  }
+
+  if (flags.help) {
     printHelp();
     return;
   }
@@ -91,7 +103,20 @@ async function main(): Promise<void> {
     return;
   }
 
-  const command = resolveAlias(rawCommand);
+  // Refresh or initialise registry cache before command dispatch
+  if (flags.refresh) {
+    const ok = await refreshRegistryCache();
+    console.log(
+      ok
+        ? "Registry cache refreshed."
+        : "Registry cache refresh failed (using cached or bundled data).",
+    );
+    if (!rawCommand) return;
+  } else {
+    await initRegistryCache();
+  }
+
+  const command = resolveAlias(rawCommand!);
 
   if (!command) {
     console.error(`Unknown command: ${rawCommand}`);
