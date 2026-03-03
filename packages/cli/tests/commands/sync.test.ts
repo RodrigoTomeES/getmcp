@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach, type MockInstance } from "vitest";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
@@ -40,7 +40,7 @@ vi.mock("../../src/preferences.js", () => ({
   saveSelectedApps: vi.fn(),
 }));
 
-let consoleSpy: ReturnType<typeof vi.spyOn>;
+let consoleSpy: MockInstance;
 let tmpDir: string;
 
 beforeEach(() => {
