@@ -39,7 +39,7 @@ export function inferTransport(config: LooseServerConfig): TransportType {
     if (config.transport) {
       return config.transport;
     }
-    // Infer from URL (matches FastMCP's logic)
+    // Infer from URL
     try {
       const url = new URL(config.url);
       if (/\/sse(\/|\?|&|$)/.test(url.pathname)) {

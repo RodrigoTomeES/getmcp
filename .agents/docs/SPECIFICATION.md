@@ -27,7 +27,7 @@ getmcp is a tool that solves a fundamental problem in the AI tooling ecosystem: 
 
 getmcp provides:
 
-- **A canonical configuration format** aligned with [FastMCP](https://github.com/jlowin/fastmcp)'s standard
+- **A canonical configuration format** aligned with the [official MCP registry schema](https://registry.modelcontextprotocol.io/)
 - **Config generators** that transform the canonical format into 19 app-specific formats
 - **A registry** of popular MCP server definitions
 - **A CLI tool** for one-command installation into any detected AI app
@@ -40,7 +40,7 @@ Inspired by [skills.sh](https://skills.sh/) — a platform that provides one-com
 ### Key Design Principles
 
 1. **Never overwrite** — always read existing configs, merge new servers in, write back
-2. **Canonical format** — one source of truth (FastMCP-aligned), generators handle the rest
+2. **Canonical format** — one source of truth ([official MCP registry schema](https://registry.modelcontextprotocol.io/)), generators handle the rest
 3. **Auto-detect** — find installed AI apps by checking known config file paths
 4. **Platform-aware** — resolve `~`, `%AppData%`, `%UserProfile%` per OS
 5. **Schema-validated** — all data flows through Zod schemas at runtime
@@ -217,17 +217,6 @@ All packages use:
 - Vitest for testing
 - npm workspaces for monorepo management
 
-### Design Decision: FastMCP Alignment
-
-[FastMCP](https://github.com/jlowin/fastmcp) (22.9k+ stars) defines a `CanonicalMCPConfig` format in its Python SDK. We align our canonical format with theirs:
-
-- Root key: `mcpServers`
-- Stdio: `command`, `args`, `env`, `cwd`, `timeout`, `description`
-- Remote: `url`, `transport`, `headers`, `timeout`, `description`
-- `extra="allow"` pattern — unknown fields pass through
-
-This means our canonical format is directly compatible with the most widely-used MCP framework. Our generators then transform _from_ this standard _to_ each app's specific format.
-
 ---
 
 ## 4. Canonical Schema
@@ -258,7 +247,7 @@ For servers accessible via HTTP, Streamable HTTP, or SSE.
 | `timeout`     | `number`                               | No       | —        | Max response time in milliseconds                 |
 | `description` | `string`                               | No       | —        | Human-readable description                        |
 
-**Transport inference**: URLs containing `/sse` in the path are inferred as SSE; all others default to HTTP. This matches FastMCP's logic.
+**Transport inference**: URLs containing `/sse` in the path are inferred as SSE; all others default to HTTP.
 
 ### CanonicalMCPConfig (Root Format)
 

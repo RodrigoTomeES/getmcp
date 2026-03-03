@@ -2,7 +2,7 @@
  * @getmcp/core
  *
  * Core types, schemas, and validation for the getmcp canonical configuration format.
- * Aligned with FastMCP's CanonicalMCPConfig standard.
+ * Aligned with the official MCP registry schema.
  */
 
 // Zod schemas (runtime validation)
