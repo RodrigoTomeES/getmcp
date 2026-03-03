@@ -83,12 +83,12 @@ export async function fetchPyPIMetrics(packageName: string): Promise<PyPIMetrics
       fetchWithRetry(`https://pypi.org/pypi/${encodeURIComponent(packageName)}/json`),
     ]);
 
-    let monthlyDownloads: number | undefined;
+    let weeklyDownloads: number | undefined;
     let latestVersion: string | undefined;
 
     if (statsResp.ok) {
-      const stats = (await statsResp.json()) as { data: { last_month: number } };
-      monthlyDownloads = stats.data?.last_month;
+      const stats = (await statsResp.json()) as { data: { last_week: number } };
+      weeklyDownloads = stats.data?.last_week;
     }
 
     if (pkgResp.ok) {
@@ -96,9 +96,9 @@ export async function fetchPyPIMetrics(packageName: string): Promise<PyPIMetrics
       latestVersion = pkg.info?.version;
     }
 
-    if (!monthlyDownloads && !latestVersion) return null;
+    if (!weeklyDownloads && !latestVersion) return null;
 
-    return { monthlyDownloads, latestVersion };
+    return { weeklyDownloads, latestVersion };
   } catch {
     return null;
   }
