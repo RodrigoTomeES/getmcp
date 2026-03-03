@@ -172,6 +172,13 @@ export function getAllServers(): InternalRegistryEntry[] {
 }
 
 /**
+ * Get all official (first-party) servers.
+ */
+export function getOfficialServers(): InternalRegistryEntry[] {
+  return getAllServers().filter((entry) => entry.isOfficial === true);
+}
+
+/**
  * Search servers by text query.
  * Matches against id, name, description, categories, author, and tags.
  */

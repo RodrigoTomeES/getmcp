@@ -22,6 +22,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.resolve(__dirname, "..", "data");
 const OUTPUT_FILE = path.join(DATA_DIR, "servers.json");
 const METADATA_FILE = path.join(DATA_DIR, "sync-metadata.json");
+const OFFICIAL_SERVERS_FILE = path.join(DATA_DIR, "official-servers.json");
 
 const OFFICIAL_API = "https://registry.modelcontextprotocol.io/v0.1/servers";
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
@@ -308,6 +309,34 @@ async function main(): Promise<void> {
     }
 
     baseData.set(name, { server: entry.server, _meta });
+  }
+
+  // Step 7b: Stamp official status from curated list
+  const officialNames = new Set<string>();
+  if (fs.existsSync(OFFICIAL_SERVERS_FILE)) {
+    const officialData = JSON.parse(fs.readFileSync(OFFICIAL_SERVERS_FILE, "utf-8")) as {
+      servers: string[];
+    };
+    for (const name of officialData.servers) {
+      officialNames.add(name);
+    }
+    log(`Loaded ${officialNames.size} official server names.`);
+  }
+
+  for (const [name, entry] of baseData) {
+    const _meta = (entry._meta ?? {}) as Record<string, unknown>;
+    const enrichment = _meta["es.getmcp/enrichment"] as GetMCPEnrichmentType | undefined;
+    if (enrichment) {
+      const isOfficial = officialNames.has(name);
+      if (isOfficial) {
+        _meta["es.getmcp/enrichment"] = { ...enrichment, isOfficial: true };
+      } else if (enrichment.isOfficial) {
+        // Clear stale official flag
+        const { isOfficial: _, ...rest } = enrichment;
+        _meta["es.getmcp/enrichment"] = rest;
+      }
+      baseData.set(name, { server: entry.server, _meta });
+    }
   }
 
   // Step 8: Assemble final sorted output

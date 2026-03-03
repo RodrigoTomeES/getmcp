@@ -212,6 +212,60 @@ describe("transformToInternal", () => {
     expect(transformToInternal(entry)).toBeNull();
   });
 
+  it("propagates isOfficial from enrichment", () => {
+    const entry: RegistryEntryType = {
+      server: {
+        name: "com.stripe/mcp",
+        description: "Stripe MCP server",
+        packages: [
+          {
+            registryType: "npm",
+            identifier: "@stripe/mcp",
+            transport: { type: "stdio" },
+          },
+        ],
+      },
+      _meta: {
+        "es.getmcp/enrichment": {
+          slug: "stripe-mcp",
+          categories: ["developer-tools"],
+          isOfficial: true,
+        },
+      },
+    };
+
+    const result = transformToInternal(entry);
+    expect(result).not.toBeNull();
+    expect(result!.isOfficial).toBe(true);
+  });
+
+  it("defaults isOfficial to undefined when absent", () => {
+    const entry: RegistryEntryType = {
+      server: {
+        name: "io.github.test/my-server",
+        title: "My Server",
+        description: "A test server",
+        packages: [
+          {
+            registryType: "npm",
+            identifier: "@test/my-server",
+            transport: { type: "stdio" },
+          },
+        ],
+      },
+      _meta: {
+        "es.getmcp/enrichment": {
+          slug: "my-server",
+          categories: ["developer-tools"],
+        },
+      },
+    };
+
+    const result = transformToInternal(entry);
+    expect(result).not.toBeNull();
+    expect(result!.isOfficial).toBeUndefined();
+  });
+
   it("returns null when no installable config", () => {
     const entry: RegistryEntryType = {
       server: {

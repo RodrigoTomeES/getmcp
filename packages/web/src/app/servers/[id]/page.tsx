@@ -8,6 +8,7 @@ import { ConfigViewer, type PreGeneratedConfig } from "@/components/ConfigViewer
 import { PackageManagerCommand } from "@/components/PackageManagerCommand";
 import { ServerCard, type ServerCardData } from "@/components/ServerCard";
 import { ServerSidebar } from "@/components/ServerSidebar";
+import { VerifiedIcon } from "@/components/icons";
 import { GUIDE_SLUGS } from "@/lib/guide-data";
 import { SITE_URL } from "@/lib/constants";
 
@@ -112,6 +113,7 @@ export default async function ServerPage({ params }: { params: Promise<{ id: str
             envCount: s.requiredEnvVars.length,
             stars: m?.github?.stars,
             downloads: m?.npm?.weeklyDownloads ?? m?.pypi?.weeklyDownloads,
+            isOfficial: s.isOfficial,
           };
         })
     : [];
@@ -242,7 +244,15 @@ function ServerDetail({
               className="w-12 h-12 rounded-lg shrink-0"
             />
           )}
-          <h1 className="text-3xl font-bold tracking-tight">{server.name}</h1>
+          <h1 className="text-3xl font-bold tracking-tight inline-flex items-baseline gap-2">
+            {server.name}
+            {server.isOfficial && (
+              <VerifiedIcon
+                className="h-[1ch] text-official shrink-0"
+                title="Official MCP server"
+              />
+            )}
+          </h1>
           <span
             className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
               isRemote
@@ -288,7 +298,10 @@ function ServerDetail({
             <h2 className="text-lg font-semibold mb-3">Getting Started</h2>
             <PackageManagerCommand serverId={server.id} />
             <p className="text-xs text-text-secondary mt-2">
-              Requires {runtimeToRequirements(server.runtime)}. Community-contributed server.{" "}
+              Requires {runtimeToRequirements(server.runtime)}.{" "}
+              {server.isOfficial
+                ? `Official server${server.author ? ` by ${server.author}` : ""}.`
+                : "Community-contributed server."}{" "}
               <Link href="/docs#security-disclaimer" className="text-accent hover:underline">
                 Review source before installing
               </Link>
