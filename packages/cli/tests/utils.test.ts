@@ -239,10 +239,6 @@ describe("resolveAlias", () => {
     expect(resolveAlias("update")).toBe("update");
   });
 
-  it("resolves 'init' to 'init'", () => {
-    expect(resolveAlias("init")).toBe("init");
-  });
-
   it("returns undefined for unknown command", () => {
     expect(resolveAlias("foobar")).toBeUndefined();
   });

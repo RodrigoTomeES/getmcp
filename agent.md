@@ -95,7 +95,7 @@ This is not optional — documentation drift causes confusion and wastes time. T
 
 ## Testing
 
-- **515 tests** across 25 test files
+- **511 tests** across 25 test files
 - Run all tests: `npx vitest` (from repo root)
 - Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc.
 - Test locations:

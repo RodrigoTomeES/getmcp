@@ -1176,8 +1176,8 @@ Detailed documentation of every app's MCP config format, gathered from official 
 | `@getmcp/core`       | 2          | 39      | Schema validation, type guards, transport inference, ProjectManifest                                                                                                     |
 | `@getmcp/generators` | 1          | 119     | All 19 generators (stdio + remote), multi-server, serialization                                                                                                          |
 | `@getmcp/registry`   | 4          | 60      | Entry validation, lookup, search, categories, content integrity, enrichment, ID mapping, transform                                                                       |
-| `@getmcp/cli`        | 18         | 297     | Path resolution, app detection/selection, config I/O, lock file, errors, format, preferences, utils, flags, add, check, doctor, find, import, list, remove, sync, update |
-| **Total**            | **25**     | **515** |                                                                                                                                                                          |
+| `@getmcp/cli`        | 18         | 293     | Path resolution, app detection/selection, config I/O, lock file, errors, format, preferences, utils, flags, add, check, doctor, find, import, list, remove, sync, update |
+| **Total**            | **25**     | **511** |                                                                                                                                                                          |
 
 ---
 
