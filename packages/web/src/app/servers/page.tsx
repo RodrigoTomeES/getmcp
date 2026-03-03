@@ -45,8 +45,7 @@ export default function ServersPage() {
       isRemote: "url" in s.config,
       envCount: s.requiredEnvVars.length,
       stars: metrics?.github?.stars,
-      downloads: metrics?.npm?.weeklyDownloads ?? metrics?.pypi?.monthlyDownloads,
-      downloadsUnit: (metrics?.npm?.weeklyDownloads != null ? "week" : "month") as "week" | "month",
+      downloads: metrics?.npm?.weeklyDownloads ?? metrics?.pypi?.weeklyDownloads,
     };
   });
 

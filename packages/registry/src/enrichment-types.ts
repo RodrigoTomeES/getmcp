@@ -61,7 +61,7 @@ export const NpmMetrics = z.object({
 });
 
 export const PyPIMetrics = z.object({
-  monthlyDownloads: z.number().optional(),
+  weeklyDownloads: z.number().optional(),
   latestVersion: z.string().optional(),
 });
 

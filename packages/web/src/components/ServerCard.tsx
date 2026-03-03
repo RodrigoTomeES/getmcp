@@ -13,7 +13,6 @@ export type ServerCardData = {
   envCount: number;
   stars?: number;
   downloads?: number;
-  downloadsUnit?: "week" | "month";
 };
 
 export function ServerCard({ server }: { server: ServerCardData }) {
@@ -66,14 +65,12 @@ export function ServerCard({ server }: { server: ServerCardData }) {
               {server.downloads != null && server.downloads > 0 && (
                 <span
                   className="text-xs px-2 py-0.5 rounded-full bg-surface-hover text-text-secondary inline-flex items-center gap-1"
-                  aria-label={`${server.downloads.toLocaleString()} downloads per ${server.downloadsUnit === "month" ? "month" : "week"}`}
+                  aria-label={`${server.downloads.toLocaleString()} downloads per week`}
                 >
                   <DownloadIcon className="w-3 h-3" />
                   <span aria-hidden="true">
                     {compactNumber(server.downloads)}
-                    <span className="opacity-60">
-                      /{server.downloadsUnit === "month" ? "mo" : "w"}
-                    </span>
+                    <span className="opacity-60">/w</span>
                   </span>
                 </span>
               )}

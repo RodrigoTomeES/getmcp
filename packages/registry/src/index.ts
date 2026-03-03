@@ -321,9 +321,9 @@ export function getServersSortedBy(
         return (b.metrics?.github?.stars ?? 0) - (a.metrics?.github?.stars ?? 0);
       case "downloads": {
         const aDownloads =
-          (a.metrics?.npm?.weeklyDownloads ?? 0) + (a.metrics?.pypi?.monthlyDownloads ?? 0);
+          (a.metrics?.npm?.weeklyDownloads ?? 0) + (a.metrics?.pypi?.weeklyDownloads ?? 0);
         const bDownloads =
-          (b.metrics?.npm?.weeklyDownloads ?? 0) + (b.metrics?.pypi?.monthlyDownloads ?? 0);
+          (b.metrics?.npm?.weeklyDownloads ?? 0) + (b.metrics?.pypi?.weeklyDownloads ?? 0);
         return bDownloads - aDownloads;
       }
       case "recent":

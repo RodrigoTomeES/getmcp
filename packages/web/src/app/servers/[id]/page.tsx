@@ -111,8 +111,7 @@ export default async function ServerPage({ params }: { params: Promise<{ id: str
             isRemote: "url" in s.config,
             envCount: s.requiredEnvVars.length,
             stars: m?.github?.stars,
-            downloads: m?.npm?.weeklyDownloads ?? m?.pypi?.monthlyDownloads,
-            downloadsUnit: (m?.npm?.weeklyDownloads != null ? "week" : "month") as "week" | "month",
+            downloads: m?.npm?.weeklyDownloads ?? m?.pypi?.weeklyDownloads,
           };
         })
     : [];

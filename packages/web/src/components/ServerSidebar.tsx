@@ -63,12 +63,8 @@ export function ServerSidebar({
   server: InternalRegistryEntry;
   metrics?: Metrics;
 }) {
-  const downloads = metrics?.npm?.weeklyDownloads ?? metrics?.pypi?.monthlyDownloads;
-  const downloadLabel = metrics?.npm?.weeklyDownloads
-    ? "/week"
-    : metrics?.pypi?.monthlyDownloads
-      ? "/month"
-      : "";
+  const downloads = metrics?.npm?.weeklyDownloads ?? metrics?.pypi?.weeklyDownloads;
+  const downloadLabel = downloads != null ? "/week" : "";
   const version = metrics?.npm?.latestVersion ?? metrics?.pypi?.latestVersion;
   const isRemote = "url" in server.config;
 
