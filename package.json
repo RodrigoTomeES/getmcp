@@ -11,13 +11,12 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @getmcp/core && npm run build -w @getmcp/generators && npm run build -w @getmcp/registry && npm run build -w @getmcp/cli && npm run build -w @getmcp/web",
+    "build": "npm run build -w @getmcp/core && npm run build -w @getmcp/generators && npm run build -w @getmcp/registry && npm run build -w @getmcp/cli",
     "website": "npm run dev -w @getmcp/web",
     "sync": "npm run sync -w @getmcp/registry",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "lint": "npm run lint --workspaces --if-present",
-    "refresh": "npm run build -w @getmcp/registry && rm -rf packages/web/.next && npm run build -w @getmcp/web",
     "getmcp": "npx tsx packages/cli/src/bin.ts"
   },
   "devDependencies": {
