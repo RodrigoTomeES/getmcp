@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach, type MockInstance } from "vitest";
 import { removeCommand } from "../../src/commands/remove.js";
 
 vi.mock("@clack/prompts", () => ({
@@ -28,8 +28,8 @@ vi.mock("../../src/lock.js", () => ({
   trackRemoval: vi.fn(),
 }));
 
-let consoleSpy: ReturnType<typeof vi.spyOn>;
-let exitSpy: ReturnType<typeof vi.spyOn>;
+let consoleSpy: MockInstance;
+let exitSpy: MockInstance;
 
 class ExitError extends Error {
   code: number;

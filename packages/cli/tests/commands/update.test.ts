@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach, type MockInstance } from "vitest";
 import { updateCommand } from "../../src/commands/update.js";
 
 vi.mock("@clack/prompts", () => ({
@@ -29,7 +29,7 @@ vi.mock("../../src/lock.js", () => ({
   trackInstallation: vi.fn(),
 }));
 
-let consoleSpy: ReturnType<typeof vi.spyOn>;
+let consoleSpy: MockInstance;
 
 beforeEach(() => {
   consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
