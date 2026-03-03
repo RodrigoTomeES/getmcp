@@ -207,13 +207,6 @@ function ServerDetail({
     },
   ];
 
-  const serverCommand =
-    !isRemote && "command" in server.config
-      ? [server.config.command, ...(server.config.args ?? [])].join(" ")
-      : null;
-
-  const serverUrl = isRemote && "url" in server.config ? server.config.url : null;
-
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
       <script
@@ -291,17 +284,28 @@ function ServerDetail({
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
         {/* Main content */}
         <div className="min-w-0 flex-1 space-y-10">
-          {/* Install command */}
+          {/* Getting Started */}
           <section>
-            <h2 className="text-lg font-semibold mb-3">Install</h2>
+            <h2 className="text-lg font-semibold mb-3">Getting Started</h2>
             <PackageManagerCommand serverId={server.id} />
             <p className="text-xs text-text-secondary mt-2">
-              Community-contributed server.{" "}
+              Requires {runtimeToRequirements(server.runtime)}. Community-contributed server.{" "}
               <Link href="/docs#security-disclaimer" className="text-accent hover:underline">
                 Review source before installing
               </Link>
               .
             </p>
+            <div className="mt-3 flex flex-wrap gap-3">
+              {GUIDE_SLUGS.slice(0, 4).map((slug) => (
+                <Link
+                  key={slug}
+                  href={`/guides/${slug}`}
+                  className="text-xs text-accent hover:underline"
+                >
+                  {slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())} guide &rarr;
+                </Link>
+              ))}
+            </div>
           </section>
 
           {/* Required env vars */}
@@ -346,38 +350,6 @@ function ServerDetail({
 
           {/* Config generator */}
           <ConfigViewer configs={configs} />
-
-          {/* Getting started */}
-          <section>
-            <h2 className="text-lg font-semibold mb-3">Getting Started</h2>
-            <p className="text-sm text-text-secondary">
-              Requires {runtimeToRequirements(server.runtime)}. Run the install command above and
-              getmcp will auto-detect your installed AI apps.
-            </p>
-            <div className="mt-3 flex flex-wrap gap-3">
-              {GUIDE_SLUGS.slice(0, 4).map((slug) => (
-                <Link
-                  key={slug}
-                  href={`/guides/${slug}`}
-                  className="text-xs text-accent hover:underline"
-                >
-                  {slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())} guide &rarr;
-                </Link>
-              ))}
-            </div>
-          </section>
-
-          {/* Server command/URL detail */}
-          {(serverCommand || serverUrl) && (
-            <section className="rounded-lg border border-border bg-surface p-5">
-              <h3 className="text-xs font-medium uppercase tracking-wider text-text-secondary mb-3">
-                {serverCommand ? "Server Command" : "Server URL"}
-              </h3>
-              <code className="text-sm font-mono text-text break-all">
-                {serverCommand ?? serverUrl}
-              </code>
-            </section>
-          )}
         </div>
 
         {/* Sidebar */}
