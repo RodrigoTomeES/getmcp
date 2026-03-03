@@ -10,7 +10,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 const PAGE_SIZES = [24, 48, 72] as const;
 const DEFAULT_PAGE_SIZE = 24;
 
-type SortOption = "relevance" | "stars" | "downloads";
+type SortOption = "alphabetical" | "stars" | "downloads";
 
 function parseMulti(param: string | null): string[] {
   return param ? param.split(",").filter(Boolean) : [];
@@ -28,7 +28,7 @@ export function SearchBar({
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedRuntimes, setSelectedRuntimes] = useState<string[]>([]);
   const [selectedTransports, setSelectedTransports] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState<SortOption>("relevance");
+  const [sortBy, setSortBy] = useState<SortOption>("stars");
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [page, setPage] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -49,7 +49,7 @@ export function SearchBar({
     if (cat) setSelectedCategories(parseMulti(cat).filter((c) => categories.includes(c)));
     if (rt) setSelectedRuntimes(parseMulti(rt));
     if (tp) setSelectedTransports(parseMulti(tp));
-    if (sort === "stars" || sort === "downloads") setSortBy(sort);
+    if (sort === "alphabetical" || sort === "downloads") setSortBy(sort);
     if (pp) {
       const parsed = Number(pp);
       if ((PAGE_SIZES as readonly number[]).includes(parsed)) setPageSize(parsed);
@@ -73,7 +73,7 @@ export function SearchBar({
     if (selectedCategories.length) params.set("category", selectedCategories.join(","));
     if (selectedRuntimes.length) params.set("runtime", selectedRuntimes.join(","));
     if (selectedTransports.length) params.set("transport", selectedTransports.join(","));
-    if (sortBy !== "relevance") params.set("sort", sortBy);
+    if (sortBy !== "stars") params.set("sort", sortBy);
     if (pageSize !== DEFAULT_PAGE_SIZE) params.set("per_page", String(pageSize));
     if (page > 1) params.set("page", String(page));
 
@@ -148,7 +148,7 @@ export function SearchBar({
     setSelectedCategories([]);
     setSelectedRuntimes([]);
     setSelectedTransports([]);
-    setSortBy("relevance");
+    setSortBy("stars");
     setPageSize(DEFAULT_PAGE_SIZE);
     setPage(1);
   };
@@ -172,7 +172,7 @@ export function SearchBar({
     selectedCategories.length > 0 ||
     selectedRuntimes.length > 0 ||
     selectedTransports.length > 0 ||
-    sortBy !== "relevance" ||
+    sortBy !== "stars" ||
     pageSize !== DEFAULT_PAGE_SIZE;
 
   const activeFilterCount =
@@ -258,9 +258,9 @@ export function SearchBar({
           }}
           className="select-custom text-xs rounded-lg border border-border bg-surface text-text py-1.5 px-2 focus:outline-none focus:border-accent transition-colors appearance-none"
         >
-          <option value="relevance">{query.trim() ? "Relevance" : "Default"}</option>
           <option value="stars">Stars</option>
           <option value="downloads">Downloads</option>
+          <option value="alphabetical">Alphabetical</option>
         </select>
 
         {/* Per page */}
@@ -328,9 +328,9 @@ export function SearchBar({
                   }}
                   className="select-custom text-xs rounded-lg border border-border bg-surface text-text py-1.5 px-2 focus:outline-none focus:border-accent transition-colors appearance-none"
                 >
-                  <option value="relevance">{query.trim() ? "Relevance" : "Default"}</option>
                   <option value="stars">Stars</option>
                   <option value="downloads">Downloads</option>
+                  <option value="alphabetical">Alphabetical</option>
                 </select>
               </div>
 
