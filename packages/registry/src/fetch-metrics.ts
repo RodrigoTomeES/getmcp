@@ -105,90 +105,19 @@ export async function fetchPyPIMetrics(packageName: string): Promise<PyPIMetrics
 }
 
 // ---------------------------------------------------------------------------
-// Docker Hub / GHCR
+// Docker Hub metrics (pulls, size)
 // ---------------------------------------------------------------------------
-
-/**
- * Fetch metrics for a GHCR (GitHub Container Registry) image.
- * Uses the GitHub Packages API with GITHUB_TOKEN from the environment.
- */
-async function fetchGhcrMetrics(imageNoTag: string): Promise<DockerMetricsType | null> {
-  const token = process.env.GITHUB_TOKEN;
-  if (!token) return null;
-
-  // ghcr.io/{owner}/{name} — extract owner and package name
-  const match = imageNoTag.match(/^ghcr\.io\/([^/]+)\/(.+)$/);
-  if (!match) return null;
-
-  const [, owner, packageName] = match;
-
-  try {
-    const resp = await fetchWithRetry(
-      `https://api.github.com/users/${owner}/packages/container/${encodeURIComponent(packageName)}`,
-      {
-        headers: {
-          Accept: "application/vnd.github+json",
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-
-    if (!resp.ok) return null;
-
-    // The GitHub Packages API doesn't directly expose pull counts,
-    // but we can get version count as a proxy metric
-    const data = (await resp.json()) as {
-      id: number;
-      name: string;
-      html_url?: string;
-    };
-
-    if (!data.id) return null;
-
-    // Fetch versions to get total download count across all versions
-    const versionsResp = await fetchWithRetry(
-      `https://api.github.com/users/${owner}/packages/container/${encodeURIComponent(packageName)}/versions?per_page=1`,
-      {
-        headers: {
-          Accept: "application/vnd.github+json",
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-
-    if (!versionsResp.ok) return null;
-
-    const versions = (await versionsResp.json()) as Array<{
-      metadata?: { container?: { tags?: string[] } };
-    }>;
-
-    // Return basic metrics — GHCR doesn't expose pull counts publicly
-    return {
-      pulls: 0,
-      imageSize: undefined,
-      ...(versions.length > 0 ? {} : {}),
-    };
-  } catch {
-    return null;
-  }
-}
 
 export async function fetchDockerMetrics(image: string): Promise<DockerMetricsType | null> {
   try {
     // Strip version tag
     const imageNoTag = image.replace(/:[\w.-]+$/, "");
 
-    // GHCR images — use GitHub Packages API
-    if (imageNoTag.startsWith("ghcr.io/")) {
-      return fetchGhcrMetrics(imageNoTag);
-    }
-
-    // Skip unsupported registries
-    if (
-      !imageNoTag.startsWith("docker.io/") &&
-      imageNoTag.includes(".") &&
-      !imageNoTag.includes("/")
-    ) {
+    // Skip unsupported registries (e.g. quay.io, GAR, ECR).
+    // Any identifier with a dot that isn't docker.io/ prefixed is a
+    // non-Docker-Hub registry. Bare Docker Hub identifiers (namespace/repo)
+    // never contain dots.
+    if (!imageNoTag.startsWith("docker.io/") && imageNoTag.includes(".")) {
       return null;
     }
 
@@ -250,16 +179,17 @@ export async function fetchMetricsForEntry(
     }
   }
 
-  // Package-specific metrics
-  if (packages && packages.length > 0) {
-    const pkg = packages[0];
-
-    if (pkg.registryType === "npm") {
-      results.npm = (await fetchNpmMetrics(pkg.identifier)) ?? undefined;
-    } else if (pkg.registryType === "pypi") {
-      results.pypi = (await fetchPyPIMetrics(pkg.identifier)) ?? undefined;
-    } else if (pkg.registryType === "oci") {
-      results.docker = (await fetchDockerMetrics(pkg.identifier)) ?? undefined;
+  // Package-specific metrics — iterate all packages so entries with OCI
+  // at index 1+ (e.g. npm at [0], docker.io at [1]) get Docker metrics.
+  if (packages) {
+    for (const pkg of packages) {
+      if (!results.npm && pkg.registryType === "npm") {
+        results.npm = (await fetchNpmMetrics(pkg.identifier)) ?? undefined;
+      } else if (!results.pypi && pkg.registryType === "pypi") {
+        results.pypi = (await fetchPyPIMetrics(pkg.identifier)) ?? undefined;
+      } else if (!results.docker && pkg.registryType === "oci") {
+        results.docker = (await fetchDockerMetrics(pkg.identifier)) ?? undefined;
+      }
     }
   }
 

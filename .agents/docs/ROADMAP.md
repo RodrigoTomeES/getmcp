@@ -46,6 +46,9 @@ Bugs and incorrect behavior that affect users.
 - [x] **Fix npm/Docker metrics extraction in sync pipeline** — npm metrics had 87% failure rate due to rate limiting; Docker metrics had 100% failure rate due to OCI identifiers with registry prefixes (`ghcr.io/`, `docker.io/`) and version tags. Added `fetchWithRetry()` with exponential backoff for npm/PyPI, fixed Docker identifier parsing (strip tags, strip `docker.io/` prefix), added GHCR support via GitHub Packages API reading `GITHUB_TOKEN` from environment.
   - File: `packages/registry/src/fetch-metrics.ts`
 
+- [x] **Fix broken Docker metrics coverage in registry sync** — Only 42/150 OCI entries had Docker metrics due to three bugs: (1) `packages[0]` shadowing skipped OCI packages at index 1+, (2) skip-filter `!includes("/")` let registries with paths through to Docker Hub API, (3) GHCR fetcher wasted 2 API calls per entry but always returned `{ pulls: 0 }`. Fixed all three and added 16 tests.
+  - Files: `packages/registry/src/fetch-metrics.ts`, `packages/registry/tests/fetch-metrics.test.ts`
+
 - [ ] **Fix filesystem server placeholder arg** — The `args` array includes `/path/to/allowed/directory`, a placeholder the user must customize. There is no mechanism to prompt for this or indicate it needs customization. Consider adding it to `requiredEnvVars` or introducing a `requiredArgs` field.
   - File: `packages/registry/servers/filesystem.json`
 
