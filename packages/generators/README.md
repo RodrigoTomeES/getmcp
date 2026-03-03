@@ -1,6 +1,6 @@
 # @getmcp/generators
 
-Config generators that transform canonical MCP server definitions into app-specific configuration formats for 10 AI applications.
+Config generators that transform canonical MCP server definitions into app-specific configuration formats for 19 AI applications.
 
 ## Install
 
@@ -43,7 +43,7 @@ const configs = generateAllConfigs("github", {
 // configs["claude-desktop"] => JSON string
 // configs["goose"]          => YAML string
 // configs["vscode"]         => JSON string (different root key + type field)
-// ... all 10 apps
+// ... all 19 apps
 ```
 
 ### Individual generator classes
@@ -60,6 +60,15 @@ import {
   WindsurfGenerator,
   OpenCodeGenerator,
   ZedGenerator,
+  PyCharmGenerator,
+  CodexGenerator,
+  GeminiCliGenerator,
+  ContinueGenerator,
+  AmazonQGenerator,
+  TraeGenerator,
+  BoltAiGenerator,
+  LibreChatGenerator,
+  AntigravityGenerator,
 } from "@getmcp/generators";
 
 const goose = new GooseGenerator();
@@ -88,6 +97,15 @@ goose.serialize(config);
 | Windsurf          | `mcpServers`      | JSON   | `serverUrl` for remote    |
 | OpenCode          | `mcp`             | JSONC  | `command` is array        |
 | Zed               | `context_servers` | JSON   | Standard fields           |
+| PyCharm           | `mcpServers`      | JSON   | Project-level config      |
+| Codex             | `mcp_servers`     | TOML   | Array-style command       |
+| Gemini CLI        | `mcpServers`      | JSON   | Near-passthrough          |
+| Continue          | `mcpServers`      | JSON   | Near-passthrough          |
+| Amazon Q          | `mcpServers`      | JSON   | Near-passthrough          |
+| Trae              | `mcpServers`      | JSON   | Project-scoped            |
+| BoltAI            | `mcpServers`      | JSON   | macOS only                |
+| LibreChat         | `mcpServers`      | YAML   | YAML format               |
+| Antigravity       | `mcpServers`      | JSON   | Passthrough               |
 
 ## API
 

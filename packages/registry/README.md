@@ -38,18 +38,18 @@ import {
   getServerCount,
 } from "@getmcp/registry";
 
-getAllServers(); // All 106 server entries, sorted by ID
+getAllServers(); // All server entries, sorted by ID
 getServerIds(); // ["airtable", "anthropic", "apify", ...]
 getServersByCategory("web"); // Servers tagged with "web"
 getCategories(); // All unique categories
-getServerCount(); // 106
+getServerCount(); // Total number of registered servers
 ```
 
 ## Architecture
 
-Server definitions are stored as individual JSON files in `servers/` and auto-discovered at build time. Each file is validated against the `RegistryEntry` Zod schema during `npm run build`. No manual imports or registration needed — just add a `.json` file.
+Server definitions are stored in a single `data/servers.json` file, synced from the [official MCP registry](https://registry.modelcontextprotocol.io) via an automated sync pipeline (`npm run sync`). Each entry is validated against the `RegistryEntry` Zod schema at load time. To add a new server, submit it to the official MCP registry — getmcp syncs automatically via a daily GitHub Actions workflow.
 
-Browse all 106 servers at [getmcp.es](https://getmcp.es) or from the CLI:
+Browse all servers at [getmcp.es](https://getmcp.es) or from the CLI:
 
 ```bash
 npx @getmcp/cli list

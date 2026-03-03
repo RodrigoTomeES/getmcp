@@ -28,7 +28,7 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22) with 5 
 | `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `doctor`, `import`, `sync` commands with app auto-detection, config merging, and installation tracking via `getmcp-lock.json` |
 | `packages/web`        | `@getmcp/web`        | Next.js (App Router) web directory for browsing servers and generating config snippets, with Vercel Analytics and Speed Insights                                                            |
 
-**Tech stack**: TypeScript 5.7+, Zod 4.0+, Vitest 3.0+, Next.js 15.3+ (web), Tailwind CSS 4.0+ (web), `@inquirer/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
+**Tech stack**: TypeScript 5.7+, Zod 4.0+, Vitest 3.0+, Next.js 15.3+ (web), Tailwind CSS 4.0+ (web), `@clack/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
 
 > See `.agents/docs/SPECIFICATION.md` Section 3 for the full architecture breakdown.
 
@@ -97,15 +97,29 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 | `opencode.ts`       | Root key `mcp`; merges `command`+`args` into array; renames `env` to `environment`                                                                                                                                                                                                  |
 | `zed.ts`            | Root key `context_servers`                                                                                                                                                                                                                                                          |
 | `pycharm.ts`        | Passthrough; project-level config at `.ai/mcp/mcp.json` (requires JetBrains AI Assistant plugin)                                                                                                                                                                                    |
+| `codex.ts`          | TOML output; root key `mcp_servers`; renames `headers` to `http_headers`; timeout ms to seconds (`startup_timeout_sec`)                                                                                                                                                             |
+| `gemini-cli.ts`     | Passthrough; Google Gemini CLI (`mcpServers` root key, JSON); global config at `~/.gemini/settings.json`                                                                                                                                                                            |
+| `continue.ts`       | Passthrough; Continue AI code assistant (`mcpServers` root key, JSON); global config at `~/.continue/config.json`                                                                                                                                                                   |
+| `amazon-q.ts`       | Passthrough; Amazon Q Developer (`mcpServers` root key, JSON); global config at `~/.aws/amazonq/mcp.json`                                                                                                                                                                           |
+| `trae.ts`           | Passthrough; ByteDance Trae IDE (`mcpServers` root key, JSON); project config at `.trae/mcp.json`                                                                                                                                                                                   |
+| `bolt-ai.ts`        | Passthrough; BoltAI macOS client (`mcpServers` root key, JSON); macOS-only at `~/Library/Application Support/BoltAI/mcp_config.json`                                                                                                                                                |
+| `libre-chat.ts`     | YAML output; LibreChat platform (`mcpServers` root key); custom `serialize()` for YAML; project config at `librechat.yaml`                                                                                                                                                          |
 | `antigravity.ts`    | Passthrough; Google Antigravity IDE (`mcpServers` root key, JSON)                                                                                                                                                                                                                   |
 | `index.ts`          | Generator registry: maps `AppId` to generator instances; exports `generateConfig()`, `getGenerator()`, `getAppIds()`                                                                                                                                                                |
 
 ### `@getmcp/registry` (`packages/registry/`)
 
-| File              | Purpose                                                                                                                                                                                                                                            |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/index.ts`    | Registry engine: lazy-loads JSON files from `servers/`, validates via Zod, exposes `getServer()`, `getAllServers()`, `searchServers()`, `getServersByCategory()`, `getCategories()`, `findServerByCommand()`. Caches sorted arrays for performance |
-| `scripts/sync.ts` | Sync pipeline: fetches from official MCP registry API with `version=latest` and `updated_since` for incremental sync, enriches with GitHub data, fetches metrics, writes `data/servers.json`. Supports `--full` flag to force complete re-sync     |
+| File                        | Purpose                                                                                                                                                                                                                                        |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/index.ts`              | Registry engine: loads `data/servers.json`, validates via Zod, exposes `getServer()`, `getAllServers()`, `searchServers()`, `getServersByCategory()`, `getCategories()`, `findServerByCommand()`. Caches sorted arrays for performance         |
+| `src/enrich.ts`             | GitHub enrichment: maps GitHub topics to getmcp categories, infers runtime from registry type/language, fetches GitHub repo info, builds enrichment metadata                                                                                   |
+| `src/enrichment-types.ts`   | Zod schemas for enrichment (`GetMCPEnrichment`) and metrics (`GetMCPMetrics` with GitHub/npm/PyPI/Docker sub-schemas); category and runtime enums                                                                                              |
+| `src/extract-config.ts`     | Extracts canonical `ServerConfig` from official MCP registry format; transforms `packages[]`/`remotes[]` into `StdioServerConfig` or `RemoteServerConfig`                                                                                      |
+| `src/fetch-metrics.ts`      | Metrics fetchers for the sync pipeline: GitHub stars/forks, npm weekly downloads, PyPI monthly downloads, Docker Hub/GHCR pulls; includes retry logic and concurrency control                                                                  |
+| `src/id-mapping.ts`         | ID slug generation from official reverse-DNS names (e.g. `io.github.owner/name-mcp` to `name`); collision resolution by org-prefixing                                                                                                          |
+| `src/official-api-types.ts` | Zod schemas matching the official MCP registry API format: `OfficialServer`, `OfficialPackage`, `OfficialRemote`, response wrappers                                                                                                            |
+| `src/transform.ts`          | Transforms official MCP registry entries into the internal `InternalRegistryEntry` format used by the registry engine, CLI, and web                                                                                                            |
+| `scripts/sync.ts`           | Sync pipeline: fetches from official MCP registry API with `version=latest` and `updated_since` for incremental sync, enriches with GitHub data, fetches metrics, writes `data/servers.json`. Supports `--full` flag to force complete re-sync |
 
 ### `@getmcp/cli` (`packages/cli/src/`)
 
@@ -131,26 +145,40 @@ The CLI auto-detects installed AI apps by checking platform-specific config path
 
 ### `@getmcp/web` (`packages/web/src/`)
 
-| File                           | Purpose                                                                                                                                        |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `app/layout.tsx`               | Root layout with Vercel Analytics and Speed Insights                                                                                           |
-| `app/not-found.tsx`            | Custom 404 page with ASCII art and terminal simulation                                                                                         |
-| `app/page.tsx`                 | Homepage with hero section and search                                                                                                          |
-| `app/docs/page.tsx`            | Documentation page with getting started, supported apps, library usage, and more                                                               |
-| `app/docs/loading.tsx`         | Loading skeleton for the docs page                                                                                                             |
-| `app/servers/page.tsx`         | Server directory index page with search and filters                                                                                            |
-| `app/servers/[id]/page.tsx`    | Dynamic server detail page with two-column layout (main + sidebar), hero with inline stats, rich metrics display                               |
-| `app/category/[slug]/page.tsx` | 14 category landing pages with per-category server grids                                                                                       |
-| `app/guides/[app]/page.tsx`    | 19 app-specific MCP setup guides                                                                                                               |
-| `lib/guide-data.ts`            | Guide content data module (names, overviews, config details, troubleshooting)                                                                  |
-| `lib/format.ts`                | Shared formatting utilities: `compactNumber()`, `relativeTime()`                                                                               |
-| `components/AsciiArt.tsx`      | Animated ASCII art hero with character-by-character reveal, uses Fira Mono font                                                                |
-| `components/ConfigViewer.tsx`  | Client component: tab selector for all 19 apps with mobile dropdown, shows generated config snippet with copy button, localStorage persistence |
-| `components/Pill.tsx`          | Shared pill/tab button with `aria-pressed` support                                                                                             |
-| `components/SearchBar.tsx`     | Search, category, runtime, and transport filter component                                                                                      |
-| `components/ServerCard.tsx`    | Server listing card with runtime badge and author display                                                                                      |
-| `components/ServerSidebar.tsx` | Server detail sidebar: stats grid (stars/forks/downloads/issues), details, links, tags                                                         |
-| `components/StatBadge.tsx`     | Inline stat pill with icon + value + optional label suffix                                                                                     |
+| File                                   | Purpose                                                                                                                                        |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/layout.tsx`                       | Root layout with Vercel Analytics and Speed Insights                                                                                           |
+| `app/not-found.tsx`                    | Custom 404 page with ASCII art and terminal simulation                                                                                         |
+| `app/page.tsx`                         | Homepage with hero section and search                                                                                                          |
+| `app/docs/page.tsx`                    | Documentation page with getting started, supported apps, library usage, and more                                                               |
+| `app/docs/loading.tsx`                 | Loading skeleton for the docs page                                                                                                             |
+| `app/servers/page.tsx`                 | Server directory index page with search and filters                                                                                            |
+| `app/servers/[id]/page.tsx`            | Dynamic server detail page with two-column layout (main + sidebar), hero with inline stats, rich metrics display                               |
+| `app/servers/loading.tsx`              | Loading skeleton for the servers directory page                                                                                                |
+| `app/category/[slug]/page.tsx`         | 14 category landing pages with per-category server grids                                                                                       |
+| `app/guides/page.tsx`                  | Guides index page listing all 19 app-specific MCP setup guides                                                                                 |
+| `app/guides/[app]/page.tsx`            | 19 app-specific MCP setup guides                                                                                                               |
+| `app/guides/loading.tsx`               | Loading skeleton for the guides pages                                                                                                          |
+| `lib/guide-data.ts`                    | Guide content data module (names, overviews, config details, troubleshooting)                                                                  |
+| `lib/format.ts`                        | Shared formatting utilities: `compactNumber()`, `relativeTime()`                                                                               |
+| `components/AnimatedCommand.tsx`       | Client component: typewriter-style CLI command animation cycling through getmcp commands with copy-to-clipboard support                        |
+| `components/AsciiArt.tsx`              | Animated ASCII art hero with character-by-character reveal, uses Fira Mono font                                                                |
+| `components/CategoryGrid.tsx`          | Grid of category cards with server counts linking to category pages                                                                            |
+| `components/CodeBlock.tsx`             | Client component: syntax-highlighted code block with copy button                                                                               |
+| `components/ConfigViewer.tsx`          | Client component: tab selector for all 19 apps with mobile dropdown, shows generated config snippet with copy button, localStorage persistence |
+| `components/DocsSidebar.tsx`           | Sticky docs table-of-contents sidebar with CSS scroll-spy highlighting                                                                         |
+| `components/FormatShowcase.tsx`        | Grid showcasing config format differences across apps (JSON, YAML, TOML)                                                                       |
+| `components/MetaItem.tsx`              | Label-value metadata display pair with optional monospace styling                                                                              |
+| `components/PackageManagerCommand.tsx` | Client component: package manager command with npm/npx/bunx/pnpx tabs and copy button, persisted selection via localStorage                    |
+| `components/Pagination.tsx`            | Paginated navigation with page numbers, ellipsis, and prev/next buttons                                                                        |
+| `components/Pill.tsx`                  | Shared pill/tab button with `aria-pressed` support                                                                                             |
+| `components/PopularServers.tsx`        | Curated grid of 12 popular server cards for the homepage                                                                                       |
+| `components/SearchBar.tsx`             | Search, category, runtime, and transport filter component                                                                                      |
+| `components/ServerCard.tsx`            | Server listing card with runtime badge and author display                                                                                      |
+| `components/ServerSidebar.tsx`         | Server detail sidebar: stats grid (stars/forks/downloads/issues), details, links, tags                                                         |
+| `components/StatBadge.tsx`             | Inline stat pill with icon + value + optional label suffix                                                                                     |
+| `components/SupportedApps.tsx`         | Grid of all 19 supported apps with format badges linking to setup guides                                                                       |
+| `components/icons.tsx`                 | SVG icon components: StarIcon, DownloadIcon, ForkIcon, IssueIcon, DockerIcon, GitHubIcon, ExternalLinkIcon                                     |
 
 ---
 
@@ -203,15 +231,15 @@ This is not optional — documentation drift causes confusion and wastes time. T
 
 ## Testing
 
-- **588 tests** across 24 test files
+- **515 tests** across 25 test files
 - Run all tests: `npx vitest` (from repo root)
 - Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc.
 - Test locations:
   - `packages/core/tests/` — schema validation, type guards, transport inference, ProjectManifest
   - `packages/generators/tests/` — all 19 generators (stdio + remote + multi-server + serialization + detectInstalled)
   - `packages/registry/tests/` — entry validation, lookup, search, categories, content integrity
-  - `packages/cli/tests/` — path resolution, app detection, config read/write/merge/remove, lock file, errors, preferences, utils, bin flags
-  - `packages/cli/tests/commands/` — list (JSON/quiet output), doctor, import, sync command tests
+  - `packages/cli/tests/` — app-selection, bin flags, config-file I/O, detect, errors, format, lock file, preferences, utils
+  - `packages/cli/tests/commands/` — add, check, doctor, find, import, list, remove, sync, update command tests
 
 ---
 

@@ -1,6 +1,6 @@
 # Competitive Analysis — getmcp
 
-> Last updated: 2026-02-22
+> **Note:** This report was generated on 2026-02-22 and may be outdated. The codebase has evolved since this analysis was written. Cross-reference with actual source files for current state.
 
 ---
 

@@ -130,14 +130,6 @@ getmcp update --app vscode --app cursor
 getmcp update --dry-run
 ```
 
-### `getmcp init`
-
-Interactive wizard to scaffold a new MCP server registry entry. Prompts for metadata (ID, name, description, transport, command/URL, env vars, categories, runtime) and generates a TypeScript file ready for registration.
-
-```bash
-getmcp init
-```
-
 ### `getmcp doctor`
 
 Health diagnostics for your MCP setup. Checks installed apps, config file parsing, registry status, orphaned servers, env vars, and runtime dependencies.

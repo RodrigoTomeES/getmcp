@@ -176,7 +176,7 @@
 
 ### 5.1 Extract cancellation helper ✅
 
-- **Fix:** Added `exitIfCancelled(value)` to utils.ts; applied in `init.ts` (reduced 15 cancellation blocks to one-liners)
+- **Fix:** Added `exitIfCancelled(value)` to utils.ts; applied across command files (reduced cancellation blocks to one-liners)
 
 ### 5.2 Replace `process.exit()` in library functions with thrown errors — Deferred
 
@@ -213,7 +213,6 @@
 | `cli/src/commands/update.ts` | Preserve env var values from existing configs                                   |
 | `cli/src/commands/find.ts`   | Forward flags to `addCommand`                                                   |
 | `cli/src/commands/doctor.ts` | `execFileSync`, dead ternary fix, cached config reads                           |
-| `cli/src/commands/init.ts`   | `exitIfCancelled` usage                                                         |
 | `cli/src/commands/sync.ts`   | Fixed misleading `--manifest` suggestion                                        |
 | `cli/src/commands/import.ts` | `isNonInteractive` from utils; batch lock writes                                |
 | `registry/src/index.ts`      | Lazy loading; cached sorted arrays                                              |

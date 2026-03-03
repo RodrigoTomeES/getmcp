@@ -2,7 +2,7 @@
  * @getmcp/cli
  *
  * CLI tool to install MCP servers into any AI application.
- * Supports: add, remove, list, find, check, update commands.
+ * Supports: add, remove, list, find, check, update, doctor, import, sync commands.
  */
 
 export { addCommand } from "./commands/add.js";
