@@ -4,8 +4,6 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "lib": ["ES2024"],
-    "outDir": "dist",
-    "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -14,5 +12,12 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true
-  }
+  },
+  "include": [],
+  "references": [
+    { "path": "packages/core" },
+    { "path": "packages/generators" },
+    { "path": "packages/registry" },
+    { "path": "packages/cli" }
+  ]
 }
