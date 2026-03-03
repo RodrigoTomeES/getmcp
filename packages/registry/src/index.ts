@@ -71,6 +71,49 @@ function loadServers(): void {
 }
 
 // ---------------------------------------------------------------------------
+// State management
+// ---------------------------------------------------------------------------
+
+/**
+ * Reset all registry state to unloaded.
+ * Next call to any public API will re-trigger `loadServers()` from the bundled data.
+ */
+export function resetRegistry(): void {
+  _registry.clear();
+  _officialNameIndex.clear();
+  _rawEntries = [];
+  _loaded = false;
+  invalidateCache();
+}
+
+/**
+ * Load registry data from an arbitrary `servers.json` path.
+ * Resets all existing state first. If the file does not exist, the registry
+ * stays empty (no fallback to bundled data).
+ */
+export function loadFromPath(serversJsonPath: string): void {
+  resetRegistry();
+
+  if (!fs.existsSync(serversJsonPath)) {
+    _loaded = true; // mark loaded so ensureLoaded() won't fall back to bundled
+    return;
+  }
+
+  _rawEntries = JSON.parse(fs.readFileSync(serversJsonPath, "utf-8")) as RegistryEntryType[];
+
+  for (const raw of _rawEntries) {
+    const entry = transformToInternal(raw);
+    if (entry) {
+      _registry.set(entry.id, entry);
+      _officialNameIndex.set(entry.officialName, entry.id);
+    }
+  }
+
+  invalidateCache();
+  _loaded = true;
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
