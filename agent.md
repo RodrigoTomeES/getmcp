@@ -6,7 +6,7 @@
 
 ## Project Summary
 
-**getmcp** is a universal installer and configuration tool for MCP (Model Context Protocol) servers across all AI applications. Every AI app (Claude Desktop, VS Code, Cursor, Goose, Windsurf, Zed, etc.) uses a different config format for MCP servers — different root keys, field names, file formats, and conventions. getmcp solves this by defining a single canonical format (aligned with FastMCP), then using generators to transform it into each app's native format. A registry of popular servers, a CLI for automated installation, and a web directory complete the toolchain.
+**getmcp** is a universal installer and configuration tool for MCP (Model Context Protocol) servers across all AI applications. Every AI app (Claude Desktop, VS Code, Cursor, Goose, Windsurf, Zed, etc.) uses a different config format for MCP servers — different root keys, field names, file formats, and conventions. getmcp solves this by defining a single canonical format (aligned with the [official MCP registry schema](https://registry.modelcontextprotocol.io/)), then using generators to transform it into each app's native format. A registry of popular servers, a CLI for automated installation, and a web directory complete the toolchain.
 
 ---
 
@@ -36,7 +36,7 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22) with 5 
 
 ## Key Concepts
 
-- **Canonical Format**: Single FastMCP-aligned format (root key `mcpServers`). Stdio: `command`, `args`, `env`, `cwd`, `timeout`, `description`. Remote: `url`, `transport`, `headers`, `timeout`, `description`. Transport auto-inferred from URL.
+- **Canonical Format**: Single format aligned with the [official MCP registry schema](https://registry.modelcontextprotocol.io/) (root key `mcpServers`). Stdio: `command`, `args`, `env`, `cwd`, `timeout`, `description`. Remote: `url`, `transport`, `headers`, `timeout`, `description`. Transport auto-inferred from URL.
 - **Generators**: Extend `BaseGenerator` (`packages/generators/src/base.ts`), implement `generate()` to transform canonical → app-native format. Each implements `detectInstalled()` for platform-specific app detection.
 - **Registry**: `Map<string, RegistryEntry>` of server definitions with lookup, search, and filtering functions.
 - **CLI**: Auto-detects installed apps, prompts for env vars, generates app-specific configs, and **merges** into existing files (never overwrites). Tracks installations in `getmcp-lock.json`.

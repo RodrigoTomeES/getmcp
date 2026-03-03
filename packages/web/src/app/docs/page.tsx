@@ -280,19 +280,19 @@ npx @getmcp/cli list --json`}</CodeBlock>
           <div className="space-y-4 text-text-secondary leading-relaxed">
             <p>
               Server definitions are stored in a{" "}
-              <span className="text-text font-medium">canonical format</span> aligned with{" "}
+              <span className="text-text font-medium">canonical format</span> aligned with the{" "}
               <a
-                href="https://github.com/jlowin/fastmcp"
+                href="https://registry.modelcontextprotocol.io/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-accent hover:underline"
               >
-                FastMCP
+                official MCP registry schema
               </a>
               . Config generators transform this into each app{"'"}s native format — renaming
               fields, changing root keys, switching file formats.
             </p>
-            <CodeBlock>{`Canonical Format (FastMCP-aligned)
+            <CodeBlock>{`Canonical Format
         |
 +-------+-------+-------+-------+
 |       |       |       |       |

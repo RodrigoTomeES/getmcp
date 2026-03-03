@@ -1,12 +1,10 @@
 /**
  * Zod schemas for the canonical MCP configuration format.
  *
- * Aligned with FastMCP's CanonicalMCPConfig:
+ * Aligned with the official MCP registry schema:
  *   - Root key: "mcpServers"
  *   - Stdio: command, args, env, cwd, timeout, description
  *   - Remote: url, transport, headers, timeout, description
- *
- * Extended with the official MCP registry format for RegistryEntry.
  */
 
 import { z } from "zod";
@@ -18,7 +16,7 @@ import { z } from "zod";
 export const TransportType = z.enum(["stdio", "http", "streamable-http", "sse"]);
 
 // ---------------------------------------------------------------------------
-// Canonical server configs (FastMCP-compatible)
+// Canonical server configs
 // ---------------------------------------------------------------------------
 
 /**
@@ -88,12 +86,12 @@ export const ServerConfig = z.discriminatedUnion("transport", [
 export const LooseServerConfig = z.union([StdioServerConfig, RemoteServerConfig]);
 
 // ---------------------------------------------------------------------------
-// Canonical MCP config (FastMCP-compatible root format)
+// Canonical MCP config (root format)
 // ---------------------------------------------------------------------------
 
 /**
  * The canonical MCP configuration format.
- * This mirrors FastMCP's CanonicalMCPConfig: { mcpServers: { name: config } }
+ * Root format: { mcpServers: { name: config } }
  */
 export const CanonicalMCPConfig = z.object({
   mcpServers: z.record(z.string(), LooseServerConfig),

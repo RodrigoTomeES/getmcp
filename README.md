@@ -51,7 +51,6 @@ npx @getmcp/cli remove github
 
 ```
                       Canonical Format
-                     (FastMCP-aligned)
                            |
     +----------+-----------+-----------+----------+
     |          |           |           |          |
@@ -60,7 +59,7 @@ npx @getmcp/cli remove github
 (mcpServers)          (extensions)(mcp_servers)
 ```
 
-1. Server definitions are stored in a **canonical format** (aligned with [FastMCP](https://github.com/jlowin/fastmcp))
+1. Server definitions are stored in a **canonical format** (aligned with the [official MCP registry schema](https://registry.modelcontextprotocol.io/))
 2. **Config generators** transform the canonical format into each app's specific format
 3. The **CLI** auto-detects installed apps, prompts for env vars, and merges configs into existing files (never overwrites)
 
