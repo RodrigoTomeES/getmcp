@@ -46,7 +46,7 @@ export function ConfigViewer({ configs }: { configs: Record<string, PreGenerated
 
       {/* Mobile app selector */}
       <select
-        className="md:hidden w-full mb-4 rounded-lg border border-border bg-surface text-text py-2.5 px-3 focus:outline-none focus:border-accent transition-colors"
+        className="select-custom md:hidden w-full mb-4 rounded-lg border border-border bg-surface text-text py-2.5 px-3 focus:outline-none focus:border-accent transition-colors"
         value={selectedApp}
         onChange={(e) => handleSelectApp(e.target.value)}
         aria-label="Select AI application"
