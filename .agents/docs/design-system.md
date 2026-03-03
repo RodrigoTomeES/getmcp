@@ -47,11 +47,11 @@ All colors are defined as CSS custom properties in `globals.css` via Tailwind v4
 | Token                    | Value                                          | Usage                           |
 | ------------------------ | ---------------------------------------------- | ------------------------------- |
 | `--color-tag-bg`         | `#1e293b`                                      | Category tag background         |
-| `--color-tag-text`       | `#94a3b8`                                      | Category tag text               |
+| `--color-tag-text`       | `#a1b2c8`                                      | Category tag text               |
 | `--color-code-bg`        | `#111111`                                      | Code block background           |
 | `--color-warning-bg`     | `color-mix(in srgb, #f59e0b 10%, transparent)` | Warning badge background        |
-| `--color-warning-border` | `color-mix(in srgb, #f59e0b 20%, transparent)` | Warning box border              |
-| `--color-warning-subtle` | `color-mix(in srgb, #f59e0b 5%, transparent)`  | Warning box background          |
+| `--color-warning-border` | `color-mix(in srgb, #f59e0b 30%, transparent)` | Warning box border              |
+| `--color-warning-subtle` | `color-mix(in srgb, #f59e0b 12%, transparent)` | Warning box background          |
 | `--color-warning-light`  | `color-mix(in srgb, #f59e0b 80%, white)`       | Light amber (warning code text) |
 
 ### Depth Layering (no shadows)

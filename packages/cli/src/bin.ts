@@ -10,6 +10,9 @@
  *   getmcp find [query]            Interactive server search (aliases: search, s, f)
  *   getmcp check                   Check for registry updates
  *   getmcp update                  Update installed servers
+ *   getmcp doctor                  Run health diagnostics (alias: dr)
+ *   getmcp import                  Import existing servers into tracking
+ *   getmcp sync                    Sync servers from getmcp.json manifest
  */
 
 import { createRequire } from "node:module";

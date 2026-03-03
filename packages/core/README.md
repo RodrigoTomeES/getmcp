@@ -86,7 +86,7 @@ import type {
 
 ## Supported Apps
 
-`AppId` includes: `claude-desktop`, `claude-code`, `vscode`, `cursor`, `cline`, `roo-code`, `goose`, `windsurf`, `opencode`, `zed`
+`AppId` includes: `claude-desktop`, `claude-code`, `vscode`, `cursor`, `cline`, `roo-code`, `goose`, `windsurf`, `opencode`, `zed`, `pycharm`, `codex`, `gemini-cli`, `continue`, `amazon-q`, `trae`, `bolt-ai`, `libre-chat`, `antigravity`
 
 ## License
 

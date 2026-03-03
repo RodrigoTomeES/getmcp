@@ -22,7 +22,7 @@ These issues should be addressed immediately.
 - [x] **Add `publishConfig` for public access** — Added `"publishConfig": { "access": "public" }` to all 4 package.json files (`core`, `generators`, `registry`, `cli`) so scoped `@getmcp/*` packages publish as public.
   - **Note:** This project uses [npm trusted publishing with OIDC](https://docs.npmjs.com/trusted-publishers) for authentication. `NODE_AUTH_TOKEN` must **never** be added to the workflow — the `permissions: id-token: write` in `publish.yml` handles authentication via short-lived OIDC tokens. See the Publishing section in `CLAUDE.md` for details.
 
-- [x] **Mask sensitive env var prompts** — The CLI now uses `password()` from `@inquirer/prompts` for env vars whose names match common secret patterns (`TOKEN`, `KEY`, `SECRET`, `PASSWORD`, `CREDENTIAL`, `AUTH`, `PAT`, `PRIVATE`). Non-sensitive vars (e.g., `GITHUB_OWNER`) still use cleartext `input()`.
+- [x] **Mask sensitive env var prompts** — The CLI now uses `password()` from `@clack/prompts` for env vars whose names match common secret patterns (`TOKEN`, `KEY`, `SECRET`, `PASSWORD`, `CREDENTIAL`, `AUTH`, `PAT`, `PRIVATE`). Non-sensitive vars (e.g., `GITHUB_OWNER`) still use cleartext `input()`.
   - File: `packages/cli/src/commands/add.ts`
 
 ---
@@ -94,7 +94,7 @@ Features that improve the developer experience.
 - [x] **Interactive server picker for `remove` command** — When `remove` is called without arguments, shows an interactive picker of all configured servers. In non-interactive mode, still requires the server name argument.
   - File: `packages/cli/src/commands/remove.ts` (lines 62-90)
 
-- [ ] **Handle empty registry gracefully** — If `getAllServers()` returns an empty array, `select()` from `@inquirer/prompts` receives empty `choices` and may crash. Add a guard with a clear error message.
+- [ ] **Handle empty registry gracefully** — If `getAllServers()` returns an empty array, `select()` from `@clack/prompts` receives empty `choices` and may crash. Add a guard with a clear error message.
   - File: `packages/cli/src/commands/add.ts` (lines 54-62)
 
 - [ ] **Filter project-scoped apps by CWD context** — Project-scoped apps (VS Code, Cursor, Claude Code, OpenCode, PyCharm) always appear as options even when CWD is not a project directory. Should check for project indicators (e.g., `package.json`, `.git`, `pyproject.toml`) before offering project-scoped apps.
