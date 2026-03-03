@@ -40,6 +40,7 @@ export const GetMCPEnrichment = z.object({
   language: z.string().optional(),
   tags: z.array(z.string()).optional(),
   runtime: Runtime.optional(),
+  isOfficial: z.boolean().optional(),
 });
 
 // ---------------------------------------------------------------------------

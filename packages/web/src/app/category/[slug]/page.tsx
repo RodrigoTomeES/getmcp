@@ -58,6 +58,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     categories: s.categories,
     isRemote: "url" in s.config,
     envCount: s.requiredEnvVars.length,
+    isOfficial: s.isOfficial,
   }));
 
   const jsonLd = [

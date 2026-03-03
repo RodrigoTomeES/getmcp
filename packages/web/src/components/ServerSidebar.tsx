@@ -76,6 +76,7 @@ export function ServerSidebar({
     (metrics?.docker?.pulls ?? 0) > 0;
 
   const details: Array<{ label: string; value: string; mono?: boolean }> = [];
+  if (server.isOfficial) details.push({ label: "Status", value: "Official" });
   if (server.author) details.push({ label: "Author", value: server.author });
   if (version) details.push({ label: "Version", value: version, mono: true });
   if (server.license) details.push({ label: "License", value: server.license });

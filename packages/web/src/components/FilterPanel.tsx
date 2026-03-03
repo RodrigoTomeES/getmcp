@@ -6,6 +6,8 @@ type FilterPanelProps = {
   onRuntimesChange: (v: string[]) => void;
   selectedTransports: string[];
   onTransportsChange: (v: string[]) => void;
+  officialOnly: boolean;
+  onOfficialChange: (v: boolean) => void;
 };
 
 const RUNTIMES = ["node", "python", "docker", "binary"] as const;
@@ -73,11 +75,27 @@ export function FilterPanel({
   onRuntimesChange,
   selectedTransports,
   onTransportsChange,
+  officialOnly,
+  onOfficialChange,
 }: FilterPanelProps) {
   return (
     <div>
-      {/* Category */}
+      {/* Status */}
       <fieldset>
+        <legend className="text-xs h-7.5 text-text-secondary uppercase tracking-wider font-medium mb-3 flex items-center">
+          Status
+        </legend>
+        <div className="space-y-0.5">
+          <FilterOption
+            label="Official only"
+            checked={officialOnly}
+            onClick={() => onOfficialChange(!officialOnly)}
+          />
+        </div>
+      </fieldset>
+
+      {/* Category */}
+      <fieldset className="mt-6">
         <legend className="text-xs h-7.5 text-text-secondary uppercase tracking-wider font-medium mb-3 flex items-center">
           Category
         </legend>

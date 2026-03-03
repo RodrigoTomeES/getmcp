@@ -50,6 +50,24 @@ export function GitHubIcon({ className = "w-4 h-4" }: IconProps) {
   );
 }
 
+export function VerifiedIcon({ className = "w-4 h-4", title }: IconProps & { title?: string }) {
+  return (
+    <svg
+      className={className}
+      fill="currentColor"
+      viewBox="0 0 16 16"
+      aria-hidden={!title}
+      role={title ? "img" : undefined}
+    >
+      {title && <title>{title}</title>}
+      <path
+        fillRule="evenodd"
+        d="M9.585.52a2.678 2.678 0 0 0-3.17 0l-.928.68a1.178 1.178 0 0 1-.518.215L3.83 1.59a2.678 2.678 0 0 0-2.24 2.24l-.175 1.14a1.178 1.178 0 0 1-.215.518l-.68.928a2.678 2.678 0 0 0 0 3.17l.68.928c.113.153.19.328.215.518l.175 1.138a2.678 2.678 0 0 0 2.24 2.24l1.138.175c.19.025.365.102.518.215l.928.68a2.678 2.678 0 0 0 3.17 0l.928-.68a1.17 1.17 0 0 1 .518-.215l1.138-.175a2.678 2.678 0 0 0 2.241-2.24l.175-1.138c.025-.19.102-.365.215-.518l.68-.928a2.678 2.678 0 0 0 0-3.17l-.68-.928a1.179 1.179 0 0 1-.215-.518L14.41 3.83a2.678 2.678 0 0 0-2.24-2.24l-1.138-.175a1.179 1.179 0 0 1-.518-.215L9.585.52ZM7.303 7.498l3.056-3.05a.75.75 0 1 1 1.06 1.06L7.834 9.094a.75.75 0 0 1-1.06 0L5.18 7.498a.75.75 0 1 1 1.06-1.06l1.064 1.06Z"
+      />
+    </svg>
+  );
+}
+
 export function ExternalLinkIcon({ className = "w-4 h-4" }: IconProps) {
   return (
     <svg className={className} fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">

@@ -13,6 +13,7 @@ import {
   getServerCount,
   getServerMetrics,
   getServerByOfficialName,
+  getOfficialServers,
   findServerByCommand,
   resetRegistry,
   loadFromPath,
@@ -184,6 +185,27 @@ describe("getCategories", () => {
     expect(categories).toEqual(sorted);
     const unique = new Set(categories);
     expect(unique.size).toBe(categories.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Official servers
+// ---------------------------------------------------------------------------
+
+describe("getOfficialServers", () => {
+  it("returns only servers with isOfficial === true", () => {
+    const officials = getOfficialServers();
+    for (const server of officials) {
+      expect(server.isOfficial).toBe(true);
+    }
+  });
+
+  it("is a subset of getAllServers", () => {
+    const officials = getOfficialServers();
+    const allIds = new Set(getAllServers().map((s) => s.id));
+    for (const server of officials) {
+      expect(allIds.has(server.id)).toBe(true);
+    }
   });
 });
 

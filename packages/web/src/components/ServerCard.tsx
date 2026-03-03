@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { compactNumber } from "@/lib/format";
-import { StarIcon, DownloadIcon } from "./icons";
+import { StarIcon, DownloadIcon, VerifiedIcon } from "./icons";
 
 export type ServerCardData = {
   id: string;
@@ -13,6 +13,7 @@ export type ServerCardData = {
   envCount: number;
   stars?: number;
   downloads?: number;
+  isOfficial?: boolean;
 };
 
 export function ServerCard({ server }: { server: ServerCardData }) {
@@ -29,8 +30,12 @@ export function ServerCard({ server }: { server: ServerCardData }) {
       className="group flex flex-col rounded-lg border border-border bg-surface p-5 hover:bg-surface-hover hover:border-accent/50 transition-all"
     >
       <div className="flex items-baseline justify-between gap-3 mb-2">
-        <h3 className="font-semibold text-lg group-hover:text-accent transition-colors leading-snug">
+        <h3 className="font-semibold text-lg group-hover:text-accent transition-colors leading-snug inline-flex gap-2 items-baseline">
           {server.name}
+
+          {server.isOfficial && (
+            <VerifiedIcon className="h-[1ch] text-official shrink-0" title="Official MCP server" />
+          )}
         </h3>
         <span
           className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${

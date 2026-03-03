@@ -28,6 +28,7 @@ export function SearchBar({
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedRuntimes, setSelectedRuntimes] = useState<string[]>([]);
   const [selectedTransports, setSelectedTransports] = useState<string[]>([]);
+  const [officialOnly, setOfficialOnly] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>("stars");
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [page, setPage] = useState(1);
@@ -41,6 +42,7 @@ export function SearchBar({
     const cat = params.get("category");
     const rt = params.get("runtime");
     const tp = params.get("transport");
+    const off = params.get("official");
     const sort = params.get("sort") as SortOption | null;
     const pp = params.get("per_page");
     const p = params.get("page");
@@ -49,6 +51,7 @@ export function SearchBar({
     if (cat) setSelectedCategories(parseMulti(cat).filter((c) => categories.includes(c)));
     if (rt) setSelectedRuntimes(parseMulti(rt));
     if (tp) setSelectedTransports(parseMulti(tp));
+    if (off === "true") setOfficialOnly(true);
     if (sort === "alphabetical" || sort === "downloads") setSortBy(sort);
     if (pp) {
       const parsed = Number(pp);
@@ -73,6 +76,7 @@ export function SearchBar({
     if (selectedCategories.length) params.set("category", selectedCategories.join(","));
     if (selectedRuntimes.length) params.set("runtime", selectedRuntimes.join(","));
     if (selectedTransports.length) params.set("transport", selectedTransports.join(","));
+    if (officialOnly) params.set("official", "true");
     if (sortBy !== "stars") params.set("sort", sortBy);
     if (pageSize !== DEFAULT_PAGE_SIZE) params.set("per_page", String(pageSize));
     if (page > 1) params.set("page", String(page));
@@ -80,7 +84,16 @@ export function SearchBar({
     const search = params.toString();
     const url = search ? `${window.location.pathname}?${search}` : window.location.pathname;
     window.history.replaceState(null, "", url);
-  }, [query, selectedCategories, selectedRuntimes, selectedTransports, sortBy, pageSize, page]);
+  }, [
+    query,
+    selectedCategories,
+    selectedRuntimes,
+    selectedTransports,
+    officialOnly,
+    sortBy,
+    pageSize,
+    page,
+  ]);
 
   // Pre-compute search strings (only rebuilds when servers change)
   const searchIndex = useMemo(
@@ -114,6 +127,10 @@ export function SearchBar({
       });
     }
 
+    if (officialOnly) {
+      result = result.filter((item) => item.server.isOfficial === true);
+    }
+
     if (query.trim()) {
       const q = query.toLowerCase();
       result = result.filter((item) => item.searchable.includes(q));
@@ -128,7 +145,15 @@ export function SearchBar({
     }
 
     return sorted;
-  }, [searchIndex, query, selectedCategories, selectedRuntimes, selectedTransports, sortBy]);
+  }, [
+    searchIndex,
+    query,
+    selectedCategories,
+    selectedRuntimes,
+    selectedTransports,
+    officialOnly,
+    sortBy,
+  ]);
 
   const totalPages = Math.ceil(filtered.length / pageSize);
   const safePage = Math.min(page, Math.max(totalPages, 1));
@@ -148,6 +173,7 @@ export function SearchBar({
     setSelectedCategories([]);
     setSelectedRuntimes([]);
     setSelectedTransports([]);
+    setOfficialOnly(false);
     setSortBy("stars");
     setPageSize(DEFAULT_PAGE_SIZE);
     setPage(1);
@@ -166,17 +192,25 @@ export function SearchBar({
     setSelectedTransports(v);
     setPage(1);
   };
+  const handleOfficialChange = (v: boolean) => {
+    setOfficialOnly(v);
+    setPage(1);
+  };
 
   const hasActiveFilters =
     query.length > 0 ||
     selectedCategories.length > 0 ||
     selectedRuntimes.length > 0 ||
     selectedTransports.length > 0 ||
+    officialOnly ||
     sortBy !== "stars" ||
     pageSize !== DEFAULT_PAGE_SIZE;
 
   const activeFilterCount =
-    selectedCategories.length + selectedRuntimes.length + selectedTransports.length;
+    selectedCategories.length +
+    selectedRuntimes.length +
+    selectedTransports.length +
+    (officialOnly ? 1 : 0);
 
   const startItem = filtered.length > 0 ? (safePage - 1) * pageSize + 1 : 0;
   const endItem = Math.min(safePage * pageSize, filtered.length);
@@ -195,6 +229,8 @@ export function SearchBar({
       onRuntimesChange={handleRuntimesChange}
       selectedTransports={selectedTransports}
       onTransportsChange={handleTransportsChange}
+      officialOnly={officialOnly}
+      onOfficialChange={handleOfficialChange}
     />
   );
 

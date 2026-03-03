@@ -51,6 +51,8 @@ export interface InternalRegistryEntry {
   language?: string;
   /** Tags */
   tags?: string[];
+  /** Whether this is an official (first-party) server */
+  isOfficial?: boolean;
 }
 
 /**
@@ -102,5 +104,6 @@ export function transformToInternal(entry: RegistryEntryType): InternalRegistryE
     license: enrichment.license,
     language: enrichment.language,
     tags: enrichment.tags,
+    isOfficial: enrichment.isOfficial,
   };
 }

@@ -49,6 +49,8 @@ All colors are defined as CSS custom properties in `globals.css` via Tailwind v4
 | `--color-tag-bg`         | `#1e293b`                                      | Category tag background         |
 | `--color-tag-text`       | `#a1b2c8`                                      | Category tag text               |
 | `--color-code-bg`        | `#111111`                                      | Code block background           |
+| `--color-official`       | `#3b82f6`                                      | Official badge text             |
+| `--color-official-bg`    | `color-mix(in srgb, #3b82f6 10%, transparent)` | Official badge background       |
 | `--color-warning-bg`     | `color-mix(in srgb, #f59e0b 10%, transparent)` | Warning badge background        |
 | `--color-warning-border` | `color-mix(in srgb, #f59e0b 30%, transparent)` | Warning box border              |
 | `--color-warning-subtle` | `color-mix(in srgb, #f59e0b 12%, transparent)` | Warning box background          |

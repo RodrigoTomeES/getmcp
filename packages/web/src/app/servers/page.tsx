@@ -46,6 +46,7 @@ export default function ServersPage() {
       envCount: s.requiredEnvVars.length,
       stars: metrics?.github?.stars,
       downloads: metrics?.npm?.weeklyDownloads ?? metrics?.pypi?.weeklyDownloads,
+      isOfficial: s.isOfficial,
     };
   });
 
