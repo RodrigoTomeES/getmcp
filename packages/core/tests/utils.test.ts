@@ -1,20 +1,20 @@
 import { describe, it, expect } from "vitest";
 import { isStdioConfig, isRemoteConfig, inferTransport } from "../src/utils.js";
-import type { LooseServerConfigType } from "../src/types.js";
+import type { LooseServerConfig } from "../src/types.js";
 
-const stdioConfig: LooseServerConfigType = {
+const stdioConfig: LooseServerConfig = {
   command: "npx",
   args: ["-y", "my-server"],
   env: {},
   transport: "stdio",
 };
 
-const remoteHttpConfig: LooseServerConfigType = {
+const remoteHttpConfig: LooseServerConfig = {
   url: "https://mcp.example.com/mcp",
   headers: {},
 };
 
-const remoteSseConfig: LooseServerConfigType = {
+const remoteSseConfig: LooseServerConfig = {
   url: "https://mcp.example.com/sse",
   transport: "sse",
   headers: {},
@@ -56,7 +56,7 @@ describe("inferTransport", () => {
   });
 
   it("infers 'sse' from URL path /sse", () => {
-    const config: LooseServerConfigType = {
+    const config: LooseServerConfig = {
       url: "https://mcp.example.com/sse",
       headers: {},
     };
@@ -64,7 +64,7 @@ describe("inferTransport", () => {
   });
 
   it("infers 'sse' from URL path /sse/", () => {
-    const config: LooseServerConfigType = {
+    const config: LooseServerConfig = {
       url: "https://mcp.example.com/sse/",
       headers: {},
     };
@@ -72,7 +72,7 @@ describe("inferTransport", () => {
   });
 
   it("infers 'http' for non-sse URLs", () => {
-    const config: LooseServerConfigType = {
+    const config: LooseServerConfig = {
       url: "https://mcp.example.com/mcp",
       headers: {},
     };
@@ -80,7 +80,7 @@ describe("inferTransport", () => {
   });
 
   it("uses explicit transport over URL inference", () => {
-    const config: LooseServerConfigType = {
+    const config: LooseServerConfig = {
       url: "https://mcp.example.com/sse",
       transport: "streamable-http",
       headers: {},
