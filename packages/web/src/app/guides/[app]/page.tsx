@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { generators } from "@getmcp/generators";
 import type { AppIdType } from "@getmcp/core";
-import { getServer } from "@getmcp/registry";
+import { getServerBySlug } from "@getmcp/registry";
 import { SITE_URL } from "@/lib/constants";
 import { CodeBlock } from "@/components/CodeBlock";
 import { PackageManagerCommand } from "@/components/PackageManagerCommand";
@@ -58,7 +58,7 @@ function getSampleConfig(appSlug: string, guide: GuideData): string | null {
   if (!gen) return null;
 
   for (const serverId of guide.popularServers) {
-    const server = getServer(serverId);
+    const server = getServerBySlug(serverId);
     if (server) {
       const config = gen.generate(serverId, server.config);
       return gen.serialize(config);
@@ -239,7 +239,7 @@ export default async function GuidePage({ params }: { params: Promise<{ app: str
         <h2 className="text-xl font-semibold mb-4">Popular Servers for {guide.name}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {guide.popularServers.map((id) => {
-            const server = getServer(id);
+            const server = getServerBySlug(id);
             if (!server) return null;
             return (
               <Link
