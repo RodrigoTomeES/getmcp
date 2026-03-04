@@ -169,6 +169,9 @@ getmcp/
         utils.ts                   # Flag parsing, alias resolution, path shortening
         preferences.ts             # Global user preferences persistence
         format.ts                  # Config format detection from file extension
+        registry-cache.ts          # Multi-registry cache with paginated API fetching
+        registry-config.ts         # Registry source CRUD (~/.config/getmcp/registries.json)
+        credentials.ts             # Credential storage for private registries
         commands/
           add.ts                   # getmcp add [server-id]
           remove.ts                # getmcp remove [server-name]
@@ -179,17 +182,21 @@ getmcp/
           doctor.ts                # getmcp doctor (health diagnostics)
           import.ts                # getmcp import (adopt existing servers)
           sync.ts                  # getmcp sync (project manifest)
+          registry.ts              # getmcp registry (add/remove/list/login/logout)
         index.ts                   # Public API barrel
       tests/
-        detect.test.ts             # 14 tests
+        detect.test.ts             # 14 tests (2 skipped on non-matching platforms)
         config-file.test.ts        # 60 tests
-        lock.test.ts               # 23 tests (includes per-app scope tracking tests)
+        lock.test.ts               # 28 tests (includes per-app scope tracking, v2 migration)
         errors.test.ts             # 25 tests
-        utils.test.ts              # 43 tests (parseFlags + resolveAlias + shortenPath)
+        utils.test.ts              # 42 tests (parseFlags + resolveAlias + shortenPath)
         preferences.test.ts        # 21 tests
         format.test.ts             # 8 tests
         bin.test.ts                # 22 tests (flag parsing and alias tests)
         app-selection.test.ts      # 9 tests (resolveAppsFromFlags + resolveScope)
+        credentials.test.ts        # 43 tests
+        registry-cache.test.ts     # 42 tests
+        registry-config.test.ts    # 47 tests
         commands/
           add.test.ts              # 13 tests
           remove.test.ts           # 9 tests
@@ -200,6 +207,7 @@ getmcp/
           doctor.test.ts           # 5 tests
           import.test.ts           # 5 tests
           sync.test.ts             # 7 tests
+          registry.test.ts         # 40 tests
 ```
 
 ### Dependency Graph
@@ -264,26 +272,119 @@ For servers accessible via HTTP, Streamable HTTP, or SSE.
 }
 ```
 
-### RegistryEntry (Metadata Layer)
+### RegistryEntry (Official Registry Format)
 
-Extends the canonical server config with discovery and display metadata.
+Aligned with the [official MCP registry schema](https://registry.modelcontextprotocol.io/). This is the format stored in `data/servers.json` and shipped in the npm package.
 
-| Field             | Type                                         | Required | Description                                                       |
-| ----------------- | -------------------------------------------- | -------- | ----------------------------------------------------------------- |
-| `id`              | `string`                                     | Yes      | Unique ID, lowercase alphanumeric with hyphens (e.g., `"github"`) |
-| `name`            | `string`                                     | Yes      | Display name (e.g., `"GitHub"`)                                   |
-| `description`     | `string`                                     | Yes      | What the server does                                              |
-| `config`          | `StdioServerConfig \| RemoteServerConfig`    | Yes      | The canonical server configuration                                |
-| `package`         | `string`                                     | No       | npm/pypi package name                                             |
-| `runtime`         | `"node" \| "python" \| "docker" \| "binary"` | No       | Execution runtime                                                 |
-| `repository`      | `string` (URL)                               | No       | Source code URL                                                   |
-| `homepage`        | `string` (URL)                               | No       | Homepage URL                                                      |
-| `author`          | `string`                                     | No       | Author or organization                                            |
-| `categories`      | `string[]`                                   | No       | Discovery categories                                              |
-| `requiredEnvVars` | `string[]`                                   | No       | Env vars the user must provide                                    |
-| `windows`         | `PlatformOverride`                           | No       | Windows-specific command overrides                                |
-| `linux`           | `PlatformOverride`                           | No       | Linux-specific command overrides                                  |
-| `macos`           | `PlatformOverride`                           | No       | macOS-specific command overrides                                  |
+```typescript
+RegistryEntry = {
+  server: {
+    name: string,              // Official reverse-DNS ID (e.g. "io.github.github/github-mcp-server")
+    description: string,
+    version?: string,
+    title?: string,
+    websiteUrl?: string,
+    repository?: {
+      url: string,
+      source: string,
+      id?: string,
+      subfolder?: string,
+    },
+    icons?: Array<{
+      src: string,
+      mimeType?: string,
+      sizes?: string[] | string,
+      theme?: "light" | "dark",
+    }>,
+    packages?: Array<{
+      registryType: "npm" | "pypi" | "oci" | "nuget" | "mcpb",
+      identifier: string,       // Package identifier (e.g. "@modelcontextprotocol/server-github")
+      version?: string,
+      runtimeHint?: string,
+      transport: {
+        type: "stdio" | "streamable-http" | "sse",
+        url?: string,
+      },
+      packageArguments?: Array<Argument>,
+      runtimeArguments?: Array<Argument>,
+      environmentVariables?: Array<{
+        name: string,
+        description?: string,
+        value?: string,
+        default?: string,
+        format?: "string" | "number" | "boolean" | "filepath",
+        isRequired?: boolean,
+        isSecret?: boolean,
+      }>,
+    }>,
+    remotes?: Array<{
+      type: "streamable-http" | "sse",
+      url: string,
+      headers?: Array<{ name, description?, value?, default?, format?, isRequired?, isSecret? }>,
+      variables?: Record<string, { description?, format?, default? }>,
+    }>,
+    _meta?: Record<string, unknown>,
+  },
+  _meta?: Record<string, unknown>,   // Extension field for enrichment data
+}
+
+// Argument schema (used in packageArguments and runtimeArguments):
+Argument = {
+  name?: string,
+  description?: string,
+  value?: string,
+  default?: string,
+  format?: "string" | "number" | "boolean" | "filepath",
+  isRequired?: boolean,
+  isSecret?: boolean,
+  type?: "named" | "positional",
+  variables?: Record<string, {
+    description?, format?, isRequired?, isSecret?, default?, placeholder?, value?, choices?,
+  }>,
+  isRepeated?: boolean,
+  valueHint?: string,
+  choices?: string[],
+  placeholder?: string,
+}
+```
+
+### Registry Source Schemas
+
+Three additional core schemas support multi-registry configuration (`packages/core/src/schemas.ts`):
+
+#### RegistryAuthMethod
+
+```typescript
+RegistryAuthMethod = "bearer" | "basic" | "header";
+```
+
+Authentication method for private registries.
+
+#### RegistrySource
+
+```typescript
+RegistrySource = {
+  name: string, // Unique name (lowercase alphanumeric + hyphens)
+  url: string, // Base URL of the registry API
+  type: "public" | "private", // Default: "public"
+  priority: number, // Conflict resolution priority (lower wins, default: 100)
+};
+```
+
+Stored in `~/.config/getmcp/registries.json`. Managed via `getmcp registry add/remove/list`.
+
+#### RegistryCredential
+
+```typescript
+RegistryCredential = {
+  method: RegistryAuthMethod,
+  token?: string,        // Token for bearer or basic auth
+  username?: string,     // Username for basic auth
+  headerName?: string,   // Custom header name for header auth
+}
+```
+
+Stored in `~/.config/getmcp/credentials.json`. Env var override: `GETMCP_REGISTRY_<NAME>_TOKEN`.
 
 ### Supported App IDs
 
@@ -550,22 +651,15 @@ interface AppMetadata {
 
 ## 6. Registry
 
-### Built-in Servers (106)
+### Built-in Servers
 
-| #   | ID                    | Name                | Transport     | Runtime | Required Env Vars                  | Categories                                  |
-| --- | --------------------- | ------------------- | ------------- | ------- | ---------------------------------- | ------------------------------------------- |
-| 1   | `brave-search`        | Brave Search        | stdio         | node    | `BRAVE_API_KEY`                    | search, web                                 |
-| 2   | `context7`            | Context7            | remote (HTTP) | node    | —                                  | documentation, search, developer-tools      |
-| 3   | `fetch`               | Fetch               | stdio         | python  | —                                  | web, utilities                              |
-| 4   | `filesystem`          | Filesystem          | stdio         | node    | —                                  | filesystem, utilities                       |
-| 5   | `github`              | GitHub              | stdio         | node    | `GITHUB_PERSONAL_ACCESS_TOKEN`     | developer-tools, git, version-control       |
-| 6   | `google-maps`         | Google Maps         | stdio         | node    | `GOOGLE_MAPS_API_KEY`              | maps, location, utilities                   |
-| 7   | `memory`              | Memory              | stdio         | node    | —                                  | memory, knowledge-graph                     |
-| 8   | `postgres`            | PostgreSQL          | stdio         | node    | `POSTGRES_CONNECTION_STRING`       | database, sql                               |
-| 9   | `puppeteer`           | Puppeteer           | stdio         | node    | —                                  | browser, automation, web-scraping           |
-| 10  | `sequential-thinking` | Sequential Thinking | stdio         | node    | —                                  | reasoning, utilities                        |
-| 11  | `sentry`              | Sentry              | remote (SSE)  | node    | —                                  | monitoring, error-tracking, developer-tools |
-| 12  | `slack`               | Slack               | stdio         | node    | `SLACK_BOT_TOKEN`, `SLACK_TEAM_ID` | communication, messaging                    |
+The registry syncs ~1000+ servers from the [official MCP registry](https://registry.modelcontextprotocol.io/) via a daily GitHub Actions workflow. Servers use official reverse-DNS IDs (e.g. `io.github.github/github-mcp-server`). Representative examples:
+
+| Official ID                                    | Name         | Transport | Categories                            |
+| ---------------------------------------------- | ------------ | --------- | ------------------------------------- |
+| `io.github.github/github-mcp-server`           | GitHub       | stdio     | developer-tools, git, version-control |
+| `io.github.anthropics/brave-search`            | Brave Search | stdio     | search, web                           |
+| `io.github.modelcontextprotocol/server-memory` | Memory       | stdio     | memory, knowledge-graph               |
 
 ### Registry API
 
@@ -604,7 +698,7 @@ The sync pipeline fetches entries, enriches them with GitHub metadata and metric
 ### Installation
 
 ```bash
-npx @getmcp/cli add github
+npx @getmcp/cli add io.github.github/github-mcp-server
 ```
 
 ### Commands
@@ -623,10 +717,11 @@ Interactive installation workflow:
 8. Merges into existing config files (preserves all existing servers)
 9. Reports success per app
 
-| Flag        | Short | Description                                             |
-| ----------- | ----- | ------------------------------------------------------- |
-| `--global`  | `-g`  | Install to global config for dual-scope apps            |
-| `--project` |       | Install to project config for dual-scope apps (default) |
+| Flag                | Short | Description                                             |
+| ------------------- | ----- | ------------------------------------------------------- |
+| `--global`          | `-g`  | Install to global config for dual-scope apps            |
+| `--project`         |       | Install to project config for dual-scope apps (default) |
+| `--registry <name>` |       | Target a specific registry source                       |
 
 #### `getmcp remove [server-name]`
 
@@ -694,6 +789,7 @@ Health diagnostics for your MCP setup. Checks:
 4. Check for orphaned servers (in config but not in lock file)
 5. Verify required env vars are set
 6. Check runtime dependencies (Node.js, npx, uvx)
+7. Check registry connectivity and authentication status
 
 | Option   | Description            |
 | -------- | ---------------------- |
@@ -737,15 +833,38 @@ getmcp sync -y --all-apps
 ```json
 {
   "servers": {
-    "github": {},
-    "brave-search": { "env": { "BRAVE_API_KEY": "my-key" } },
-    "memory": { "apps": ["claude-desktop", "vscode"] },
-    "filesystem": { "scope": "global" }
-  }
+    "io.github.github/github-mcp-server": {},
+    "io.github.anthropics/brave-search": { "env": { "BRAVE_API_KEY": "my-key" } },
+    "io.github.modelcontextprotocol/server-memory": { "apps": ["claude-desktop", "vscode"] }
+  },
+  "registries": [{ "name": "my-team", "url": "https://mcp.example.com", "type": "private" }]
 }
 ```
 
-Each server entry can optionally specify `env` overrides, `apps` restrictions, and `scope` (`"project"` or `"global"`) for dual-scope apps.
+Each server entry (`ManifestServerEntry`) can optionally specify:
+
+- `env` — Override environment variables
+- `apps` — Restrict to specific apps (defaults to all detected)
+- `scope` — Override installation scope (`"project"` or `"global"`) for dual-scope apps
+- `registry` — Registry source name (defaults to searching all registries)
+
+The top-level `registries` array can declare additional `RegistrySource` entries for the project.
+
+#### `getmcp registry <subcommand>`
+
+Manage custom registry sources for discovering MCP servers beyond the official registry.
+
+| Subcommand | Arguments/Flags                             | Description                              |
+| ---------- | ------------------------------------------- | ---------------------------------------- |
+| `add`      | `<url>` `--name <name>` `--type <type>`     | Add a registry source                    |
+| `remove`   | `<name>`                                    | Remove a registry source by name         |
+| `list`     | `--json`                                    | List configured registries               |
+| `login`    | `<name>` `--method <bearer\|basic\|header>` | Authenticate to a private registry       |
+| `logout`   | `<name>`                                    | Remove stored credentials for a registry |
+
+**Aliases**: `reg`
+
+Registry sources are stored in `~/.config/getmcp/registries.json`. Credentials are stored in `~/.config/getmcp/credentials.json` with env var override support (`GETMCP_REGISTRY_<NAME>_TOKEN`).
 
 ### App Auto-Detection
 
@@ -1216,9 +1335,9 @@ Detailed documentation of every app's MCP config format, gathered from official 
 | -------------------- | ---------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@getmcp/core`       | 2          | 51      | Schema validation, type guards, transport inference, ProjectManifest                                                                                                                                                             |
 | `@getmcp/generators` | 1          | 113     | All 19 generators (stdio + remote), multi-server, serialization                                                                                                                                                                  |
-| `@getmcp/registry`   | 5          | 85      | Entry validation, lookup, search, categories, content integrity, enrichment, ID mapping, transform, fetch-metrics, loadFromPath, resetRegistry                                                                                   |
+| `@getmcp/registry`   | 5          | 86      | Entry validation, lookup, search, categories, content integrity, enrichment, ID mapping, transform, fetch-metrics, loadFromPath, resetRegistry                                                                                   |
 | `@getmcp/cli`        | 22         | 470     | Path resolution, app detection/selection, config I/O, credentials, lock file, errors, format, preferences, registry-cache, registry-config, utils, flags, add, check, doctor, find, import, list, registry, remove, sync, update |
-| **Total**            | **30**     | **719** |                                                                                                                                                                                                                                  |
+| **Total**            | **30**     | **720** |                                                                                                                                                                                                                                  |
 
 ---
 
@@ -1254,7 +1373,7 @@ npm publish --workspace=@getmcp/cli --access=public
 ### Usage after publishing:
 
 ```bash
-npx @getmcp/cli add github
+npx @getmcp/cli add io.github.github/github-mcp-server
 npx @getmcp/cli list
 npx @getmcp/cli list --search=database
 ```

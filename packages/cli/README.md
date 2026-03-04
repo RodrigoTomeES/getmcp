@@ -172,7 +172,7 @@ getmcp sync --dry-run
 getmcp sync --json
 ```
 
-**Manifest format** (`getmcp.json`):
+**Manifest format** (`getmcp.json`) — servers use official reverse-DNS IDs, and `registries` can declare additional sources:
 
 ```json
 {
@@ -180,19 +180,53 @@ getmcp sync --json
     "io.github.github/github-mcp-server": {},
     "io.github.anthropics/brave-search": { "env": { "BRAVE_API_KEY": "my-key" } },
     "io.github.modelcontextprotocol/server-memory": { "apps": ["claude-desktop", "vscode"] }
-  }
+  },
+  "registries": [{ "name": "my-team", "url": "https://mcp.example.com", "type": "private" }]
 }
 ```
 
+### `getmcp registry <subcommand>`
+
+Manage custom registry sources for discovering MCP servers.
+
+```bash
+# Add a custom registry
+getmcp registry add https://mcp.example.com --name my-team
+
+# List configured registries
+getmcp registry list
+
+# List registries as JSON
+getmcp registry list --json
+
+# Authenticate to a private registry
+getmcp registry login my-team
+
+# Remove credentials
+getmcp registry logout my-team
+
+# Remove a registry
+getmcp registry remove my-team
+```
+
+| Subcommand | Description                                      |
+| ---------- | ------------------------------------------------ |
+| `add`      | Add a registry source (`--name`, `--type` flags) |
+| `remove`   | Remove a registry source by name                 |
+| `list`     | List configured registries (`--json` flag)       |
+| `login`    | Authenticate to a private registry (`--method`)  |
+| `logout`   | Remove stored credentials for a registry         |
+
 ## Command Aliases
 
-| Command  | Aliases                |
-| -------- | ---------------------- |
-| `add`    | `install`, `i`         |
-| `remove` | `rm`, `r`, `uninstall` |
-| `list`   | `ls`                   |
-| `find`   | `search`, `s`, `f`     |
-| `doctor` | `dr`                   |
+| Command    | Aliases                |
+| ---------- | ---------------------- |
+| `add`      | `install`, `i`         |
+| `remove`   | `rm`, `r`, `uninstall` |
+| `list`     | `ls`                   |
+| `find`     | `search`, `s`, `f`     |
+| `doctor`   | `dr`                   |
+| `registry` | `reg`                  |
 
 ## Options
 
@@ -212,6 +246,7 @@ getmcp sync --json
 | `--from-npm <pkg>`  | Install unverified npm package as MCP server (for `add` command)                                      |
 | `--from-pypi <pkg>` | Install unverified PyPI package as MCP server (for `add` command)                                     |
 | `--from-url <url>`  | Install unverified remote URL as MCP server (for `add` command)                                       |
+| `--registry <name>` | Target a specific registry source (for `add` command)                                                 |
 | `--refresh`         | Force-refresh the registry cache (prompts for incremental or full; defaults to incremental with `-y`) |
 
 ## Installation Tracking
@@ -280,6 +315,24 @@ import {
   readPreferences,
   saveSelectedApps,
   getSavedSelectedApps,
+  // Registry management
+  registryCommand,
+  addRegistry,
+  removeRegistry,
+  getAllRegistries,
+  getEffectiveRegistries,
+  getRegistriesConfigPath,
+  // Credentials
+  storeCredential,
+  removeCredential,
+  resolveCredential,
+  buildAuthHeaders,
+  getCredentialStorePath,
+  // Registry cache
+  initRegistryCache,
+  refreshRegistryCache,
+  clearRegistryCache,
+  getRegistryCacheDir,
   // Utilities
   shortenPath,
   parseFlags,
