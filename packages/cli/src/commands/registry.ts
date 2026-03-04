@@ -24,6 +24,16 @@ import { RegistryNotFoundError, RegistryReservedNameError, formatError } from ".
 import { exitIfCancelled } from "../utils.js";
 
 // ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+/** Timeout for the registry ping check (ms) */
+const PING_TIMEOUT_MS = 5_000;
+
+/** Timeout for credential validation request (ms) */
+const VALIDATION_TIMEOUT_MS = 10_000;
+
+// ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
@@ -66,7 +76,7 @@ export function deriveRegistryName(url: string): string {
 async function pingRegistry(url: string): Promise<boolean> {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5_000);
+    const timeoutId = setTimeout(() => controller.abort(), PING_TIMEOUT_MS);
 
     const response = await fetch(`${url.replace(/\/$/, "")}/v0.1/ping`, {
       signal: controller.signal,
@@ -93,7 +103,7 @@ async function pingRegistry(url: string): Promise<boolean> {
 async function testCredential(url: string, headers: Record<string, string>): Promise<boolean> {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10_000);
+    const timeoutId = setTimeout(() => controller.abort(), VALIDATION_TIMEOUT_MS);
 
     const response = await fetch(`${url.replace(/\/$/, "")}/v0.1/servers?limit=1`, {
       headers,
