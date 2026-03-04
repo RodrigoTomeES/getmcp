@@ -6,7 +6,7 @@ CLI tool to install MCP servers into any AI application with one command. Auto-d
 
 ```bash
 # Run directly with npx (no install needed)
-npx @getmcp/cli add github
+npx @getmcp/cli add io.github.github/github-mcp-server
 
 # Or install globally
 npm install -g @getmcp/cli
@@ -18,30 +18,33 @@ npm install -g @getmcp/cli
 
 ### `getmcp add [server-id]`
 
-Install an MCP server into your AI apps.
+Install an MCP server into your AI apps. The `server-id` is an official reverse-DNS name (e.g. `io.github.github/github-mcp-server`). If the input doesn't match an exact ID, the CLI performs a fuzzy search.
 
 ```bash
 # Interactive mode — select a server and target apps
 getmcp add
 
-# Install a specific server
+# Install a specific server by official ID
+getmcp add io.github.github/github-mcp-server
+
+# Fuzzy search — unrecognized input triggers search
 getmcp add github
 
 # Install with environment variables prompted interactively
-getmcp add brave-search
+getmcp add io.github.anthropics/brave-search
 # => Prompts: Enter BRAVE_API_KEY: ****
 
 # Install to a specific app (non-interactive)
-getmcp add github --app claude-desktop
+getmcp add io.github.github/github-mcp-server --app claude-desktop
 
 # Install to multiple apps
-getmcp add github --app vscode --app cursor
+getmcp add io.github.github/github-mcp-server --app vscode --app cursor
 
 # Install to all detected apps without prompts
-getmcp add github -y --all-apps
+getmcp add io.github.github/github-mcp-server -y --all-apps
 
 # Preview what would be written
-getmcp add github --dry-run
+getmcp add io.github.github/github-mcp-server --dry-run
 ```
 
 The `add` command will:
@@ -59,14 +62,14 @@ The `add` command will:
 Remove an MCP server from your AI app configs.
 
 ```bash
-# Interactive removal
-getmcp remove github
+# Interactive removal — select which server to remove
+getmcp remove
 
 # Remove without confirmation
-getmcp remove github --yes
+getmcp remove --yes
 
 # Preview what would change
-getmcp remove github --dry-run
+getmcp remove --dry-run
 ```
 
 ### `getmcp list`
@@ -174,9 +177,9 @@ getmcp sync --json
 ```json
 {
   "servers": {
-    "github": {},
-    "brave-search": { "env": { "BRAVE_API_KEY": "my-key" } },
-    "memory": { "apps": ["claude-desktop", "vscode"] }
+    "io.github.github/github-mcp-server": {},
+    "io.github.anthropics/brave-search": { "env": { "BRAVE_API_KEY": "my-key" } },
+    "io.github.modelcontextprotocol/server-memory": { "apps": ["claude-desktop", "vscode"] }
   }
 }
 ```
@@ -193,27 +196,29 @@ getmcp sync --json
 
 ## Options
 
-| Flag                | Description                                                           |
-| ------------------- | --------------------------------------------------------------------- |
-| `--help`, `-h`      | Show help message                                                     |
-| `--version`, `-v`   | Show version number                                                   |
-| `--yes`, `-y`       | Skip confirmation prompts (use defaults)                              |
-| `--app <id>`        | Target a specific app (repeatable for multiple apps)                  |
-| `--all-apps`        | Target all detected apps                                              |
-| `--dry-run`         | Preview changes without writing files                                 |
-| `--installed`       | List servers installed in detected apps (for `list` command)          |
-| `--search=<query>`  | Search the registry (for `list` command)                              |
-| `--category=<cat>`  | Filter by category (for `list` command)                               |
-| `--json`            | Output structured JSON (for `list`, `add`, `check`, `doctor`, `sync`) |
-| `--quiet`, `-q`     | Output one server ID per line (for `list` command)                    |
-| `--from-npm <pkg>`  | Install unverified npm package as MCP server (for `add` command)      |
-| `--from-pypi <pkg>` | Install unverified PyPI package as MCP server (for `add` command)     |
-| `--from-url <url>`  | Install unverified remote URL as MCP server (for `add` command)       |
-| `--refresh`         | Force-refresh the registry cache from GitHub                          |
+| Flag                | Description                                                                                           |
+| ------------------- | ----------------------------------------------------------------------------------------------------- |
+| `--help`, `-h`      | Show help message                                                                                     |
+| `--version`, `-v`   | Show version number                                                                                   |
+| `--yes`, `-y`       | Skip confirmation prompts (use defaults)                                                              |
+| `--app <id>`        | Target a specific app (repeatable for multiple apps)                                                  |
+| `--all-apps`        | Target all detected apps                                                                              |
+| `--dry-run`         | Preview changes without writing files                                                                 |
+| `--installed`       | List servers installed in detected apps (for `list` command)                                          |
+| `--search=<query>`  | Search the registry (for `list` command)                                                              |
+| `--category=<cat>`  | Filter by category (for `list` command)                                                               |
+| `--json`            | Output structured JSON (for `list`, `add`, `check`, `doctor`, `sync`)                                 |
+| `--quiet`, `-q`     | Output one server ID per line (for `list` command)                                                    |
+| `--from-npm <pkg>`  | Install unverified npm package as MCP server (for `add` command)                                      |
+| `--from-pypi <pkg>` | Install unverified PyPI package as MCP server (for `add` command)                                     |
+| `--from-url <url>`  | Install unverified remote URL as MCP server (for `add` command)                                       |
+| `--refresh`         | Force-refresh the registry cache (prompts for incremental or full; defaults to incremental with `-y`) |
 
 ## Installation Tracking
 
-When you install or remove servers, getmcp records the action in a `getmcp-lock.json` file in the current working directory. This file:
+When you install or remove servers, getmcp records the action in a `getmcp-lock.json` file in the current working directory. The lock file uses version 2, which stores official reverse-DNS names as keys. Lock files from v1 (slug-keyed) are automatically migrated on first read.
+
+This file:
 
 - Tracks which servers are installed to which apps
 - Records which environment variable names were set (values are **not** stored for security)
@@ -297,7 +302,11 @@ const updated = mergeServerIntoConfig(config, "github", serverConfig, "claude-de
 await writeConfigFile("/path/to/config.json", updated);
 
 // Track the installation
-trackInstallation("github", ["claude-desktop"], ["GITHUB_PERSONAL_ACCESS_TOKEN"]);
+trackInstallation(
+  "io.github.github/github-mcp-server",
+  ["claude-desktop"],
+  ["GITHUB_PERSONAL_ACCESS_TOKEN"],
+);
 ```
 
 ## License
