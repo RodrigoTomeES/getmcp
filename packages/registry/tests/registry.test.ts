@@ -31,10 +31,10 @@ describe("registry loads from data/servers.json", () => {
   it("all entries have required fields", () => {
     for (const server of getAllServers()) {
       expect(server.id).toBeTruthy();
+      expect(server.slug).toBeTruthy();
       expect(server.name).toBeTruthy();
       expect(server.description).toBeTruthy();
       expect(server.config).toBeDefined();
-      expect(server.officialName).toBeTruthy();
     }
   });
 
@@ -50,7 +50,7 @@ describe("registry loads from data/servers.json", () => {
 // ---------------------------------------------------------------------------
 
 describe("getServer", () => {
-  it("returns a server by slug ID", () => {
+  it("returns a server by official name (ID)", () => {
     const servers = getAllServers();
     if (servers.length > 0) {
       const first = servers[0];
@@ -60,13 +60,24 @@ describe("getServer", () => {
     }
   });
 
+  it("does not fall back to slug lookup", () => {
+    const servers = getAllServers();
+    if (servers.length > 0) {
+      const first = servers[0];
+      // Slug should NOT resolve via getServer — use getServerBySlug instead
+      if (first.slug !== first.id) {
+        expect(getServer(first.slug)).toBeUndefined();
+      }
+    }
+  });
+
   it("returns undefined for unknown ID", () => {
     expect(getServer("nonexistent-server-xyz")).toBeUndefined();
   });
 });
 
 describe("getServerOrThrow", () => {
-  it("returns a server by slug ID", () => {
+  it("returns a server by official name (ID)", () => {
     const servers = getAllServers();
     if (servers.length > 0) {
       const first = servers[0];
@@ -81,12 +92,12 @@ describe("getServerOrThrow", () => {
   });
 });
 
-describe("getServerByOfficialName", () => {
-  it("looks up server by reverse-DNS name", () => {
+describe("getServerByOfficialName (deprecated)", () => {
+  it("looks up server by reverse-DNS name (delegates to getServer)", () => {
     const servers = getAllServers();
     if (servers.length > 0) {
       const first = servers[0];
-      const result = getServerByOfficialName(first.officialName);
+      const result = getServerByOfficialName(first.id);
       expect(result).toBeDefined();
       expect(result!.id).toBe(first.id);
     }
@@ -105,7 +116,7 @@ describe("getServerIds", () => {
   it("returns all IDs sorted alphabetically", () => {
     const ids = getServerIds();
     expect(ids.length).toBeGreaterThan(100);
-    const sorted = [...ids].sort();
+    const sorted = [...ids].sort((a, b) => a.localeCompare(b));
     expect(ids).toEqual(sorted);
   });
 });
@@ -115,7 +126,7 @@ describe("getAllServers", () => {
     const servers = getAllServers();
     expect(servers.length).toBeGreaterThan(100);
     const ids = servers.map((s) => s.id);
-    const sorted = [...ids].sort();
+    const sorted = [...ids].sort((a, b) => a.localeCompare(b));
     expect(ids).toEqual(sorted);
   });
 });
@@ -317,7 +328,10 @@ describe("loadFromPath", () => {
     loadFromPath(tmpFile);
 
     expect(getServerCount()).toBe(1);
-    expect(getServer("test-server")).toBeDefined();
+    // Lookup by official name (ID)
+    expect(getServer("io.test/test-server")).toBeDefined();
+    // Slug does NOT resolve via getServer — use getServerBySlug
+    expect(getServer("test-server")).toBeUndefined();
 
     // Clean up: restore bundled data for other tests
     resetRegistry();

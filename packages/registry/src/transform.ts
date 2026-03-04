@@ -12,8 +12,10 @@ import { extractServerConfig } from "./extract-config.js";
  * This is what consumers get from getServer(), getAllServers(), etc.
  */
 export interface InternalRegistryEntry {
-  /** Slug ID (URL-friendly) */
+  /** Canonical ID — the official reverse-DNS server name */
   id: string;
+  /** URL-friendly slug for web routes and config keys */
+  slug: string;
   /** Display name */
   name: string;
   /** Description */
@@ -43,8 +45,6 @@ export interface InternalRegistryEntry {
   }>;
   /** Icons from official format */
   icons?: Array<{ src: string; mimeType?: string }>;
-  /** Official reverse-DNS name (for cross-referencing) */
-  officialName: string;
   /** License SPDX ID */
   license?: string;
   /** Primary language */
@@ -53,6 +53,8 @@ export interface InternalRegistryEntry {
   tags?: string[];
   /** Whether this is an official (first-party) server */
   isOfficial?: boolean;
+  /** Registry source name this entry came from */
+  registrySource?: string;
 }
 
 /**
@@ -87,7 +89,8 @@ export function transformToInternal(entry: RegistryEntryType): InternalRegistryE
   }
 
   return {
-    id: enrichment.slug,
+    id: server.name,
+    slug: enrichment.slug,
     name,
     description: server.description,
     config: extracted.config,
@@ -100,7 +103,6 @@ export function transformToInternal(entry: RegistryEntryType): InternalRegistryE
     requiredEnvVars: extracted.requiredEnvVars,
     envVarDetails: extracted.envVarDetails,
     icons: server.icons?.map((i) => ({ src: i.src, mimeType: i.mimeType })),
-    officialName: server.name,
     license: enrichment.license,
     language: enrichment.language,
     tags: enrichment.tags,
