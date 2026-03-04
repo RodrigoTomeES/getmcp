@@ -44,6 +44,29 @@ export function getCredentialStorePath(): string {
 
 const VALID_METHODS = new Set(["bearer", "basic", "header"]);
 
+/** Valid HTTP header name pattern (RFC 7230) */
+const VALID_HEADER_PATTERN = /^[A-Za-z][A-Za-z0-9-]*$/;
+
+/** Headers that must never be set via custom auth to prevent injection */
+const BLOCKED_HEADERS = new Set([
+  "host",
+  "content-length",
+  "transfer-encoding",
+  "cookie",
+  "authorization",
+]);
+
+/**
+ * Validate that a header name is safe for use as a custom auth header.
+ * Rejects names that don't match the valid pattern or that could hijack
+ * sensitive HTTP headers.
+ */
+export function isValidHeaderName(name: string): boolean {
+  if (!VALID_HEADER_PATTERN.test(name)) return false;
+  if (BLOCKED_HEADERS.has(name.toLowerCase())) return false;
+  return true;
+}
+
 /**
  * Validate that a value looks like a RegistryCredential.
  * Uses structural checks rather than Zod to avoid runtime import issues.
@@ -61,7 +84,10 @@ function isValidCredential(value: unknown): value is RegistryCredentialType {
 
   if (obj["token"] !== undefined && typeof obj["token"] !== "string") return false;
   if (obj["username"] !== undefined && typeof obj["username"] !== "string") return false;
-  if (obj["headerName"] !== undefined && typeof obj["headerName"] !== "string") return false;
+  if (obj["headerName"] !== undefined) {
+    if (typeof obj["headerName"] !== "string") return false;
+    if (!isValidHeaderName(obj["headerName"])) return false;
+  }
 
   return true;
 }
@@ -235,6 +261,7 @@ export function buildAuthHeaders(name: string, filePath?: string): Record<string
 
     case "header": {
       if (!credential.headerName || !credential.token) return {};
+      if (!isValidHeaderName(credential.headerName)) return {};
       return { [credential.headerName]: credential.token };
     }
 

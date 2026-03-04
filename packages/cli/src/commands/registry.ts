@@ -19,6 +19,7 @@ import {
   removeCredential,
   resolveCredential,
   buildAuthHeaders,
+  isValidHeaderName,
 } from "../credentials.js";
 import { RegistryNotFoundError, RegistryReservedNameError, formatError } from "../errors.js";
 import { exitIfCancelled } from "../utils.js";
@@ -307,7 +308,14 @@ async function loginSubcommand(name: string | undefined, options: RegistryOption
     }
 
     case "header": {
-      const headerName = await p.text({ message: "Enter header name:" });
+      const headerName = await p.text({
+        message: "Enter header name:",
+        validate: (val) => {
+          if (!val || !val.trim()) return "Header name is required";
+          if (!isValidHeaderName(val.trim()))
+            return "Invalid header name. Must be alphanumeric/hyphens and cannot be a restricted header (Host, Cookie, Authorization, etc.).";
+        },
+      });
       exitIfCancelled(headerName);
       const headerValue = await p.password({ message: "Enter header value:" });
       exitIfCancelled(headerValue);
