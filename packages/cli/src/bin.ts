@@ -18,7 +18,7 @@
 
 import { createRequire } from "node:module";
 import * as p from "@clack/prompts";
-import { exitIfCancelled, parseFlags, resolveAlias } from "./utils.js";
+import { exitIfCancelled, isPromptCancellation, parseFlags, resolveAlias } from "./utils.js";
 import { initRegistryCache, refreshRegistryCache } from "./registry-cache.js";
 
 const require = createRequire(import.meta.url);
@@ -313,12 +313,7 @@ async function main(): Promise<void> {
 
 main().catch((err) => {
   // Graceful exit on Ctrl+C / prompt cancellation
-  if (
-    err instanceof Error &&
-    (err.message.includes("User force closed") ||
-      err.message.includes("prompt was canceled") ||
-      err.message.includes("Operation cancelled"))
-  ) {
+  if (isPromptCancellation(err)) {
     console.log("\nCancelled.");
     process.exit(0);
   }

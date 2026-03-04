@@ -219,6 +219,19 @@ export function exitIfCancelled<T>(value: T | symbol): asserts value is T {
   }
 }
 
+/**
+ * Detect if an error is a prompt cancellation (Ctrl+C or user force-close).
+ * Centralises the fragile string-matching logic used in the top-level catch.
+ */
+export function isPromptCancellation(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  return (
+    err.message.includes("User force closed") ||
+    err.message.includes("prompt was canceled") ||
+    err.message.includes("Operation cancelled")
+  );
+}
+
 const KNOWN_FLAGS = [
   "--yes",
   "-y",
