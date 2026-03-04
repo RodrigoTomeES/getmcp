@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function TeamFeatures() {
   return (
     <section className="mb-12">
@@ -33,13 +35,21 @@ export function TeamFeatures() {
         <div className="rounded-lg border border-border bg-surface p-5">
           <h3 className="font-bold text-text mb-2">Your servers, your registry</h3>
           <p className="text-sm text-text-secondary">
-            Connect the official registry, your company&apos;s private registry, or both. Bearer,
-            basic, and custom header auth built in.
+            Add multiple registries - public or private. Authenticate with bearer tokens, basic
+            auth, or custom headers. Use env vars for CI/CD.
           </p>
           <pre className="bg-code-bg rounded-md p-3 font-mono text-xs text-text-secondary mt-3 overflow-x-auto">
             {`$ getmcp registry add \\
-    https://mcp.company.com`}
+    https://mcp.company.com
+$ getmcp registry login company \\
+    --method bearer`}
           </pre>
+          <Link
+            href="/docs#custom-registries"
+            className="inline-block mt-3 text-sm text-accent hover:underline"
+          >
+            Learn more →
+          </Link>
         </div>
 
         {/* Card 3 — Lock File */}
