@@ -8,7 +8,6 @@ export type ServerCardData = {
   name: string;
   description: string;
   categories?: string[];
-  author?: string;
   runtime?: string;
   isRemote: boolean;
   envCount: number;
