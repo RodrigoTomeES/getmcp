@@ -218,8 +218,8 @@ export function SearchBar({
 
   const resultsSummary =
     totalPages > 1
-      ? `Showing ${startItem}\u2013${endItem} of ${filtered.length} servers`
-      : `${filtered.length} server${filtered.length !== 1 ? "s" : ""}`;
+      ? `Showing ${startItem}\u2013${endItem} of ${filtered.length} servers found`
+      : `${filtered.length} server${filtered.length !== 1 ? "s" : ""} found`;
 
   const filterPanel = (
     <FilterPanel
@@ -256,7 +256,7 @@ export function SearchBar({
             setInputValue(e.target.value);
             setPage(1);
           }}
-          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-surface text-text placeholder-text-secondary focus:outline-none focus:border-accent transition-colors"
+          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-surface text-text placeholder-text-secondary focus:outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/50 transition-colors"
         />
       </div>
 

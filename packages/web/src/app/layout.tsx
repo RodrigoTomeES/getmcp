@@ -87,7 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/" className="flex items-center gap-2.5" aria-label="getmcp home">
               <Image
                 src="/icon.svg"
-                alt="getmcp logo"
+                alt="getmcp — Universal MCP Installer"
                 width={32}
                 height={32}
                 className="h-6 w-auto"

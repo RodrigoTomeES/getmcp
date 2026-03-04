@@ -19,7 +19,7 @@ export function CodeBlock({ children, label }: { children: string; label?: strin
         </button>
       </div>
       <pre className="p-4 overflow-x-auto text-sm font-mono leading-relaxed text-text">
-        <code>{children}</code>
+        <code data-language={label?.toLowerCase()}>{children}</code>
       </pre>
     </div>
   );

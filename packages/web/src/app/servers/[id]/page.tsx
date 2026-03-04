@@ -238,7 +238,8 @@ function ServerDetail({
           {server.icons?.[0]?.src && (
             <img
               src={server.icons[0].src}
-              alt=""
+              alt={`${server.name} icon`}
+              loading="lazy"
               width={48}
               height={48}
               className="w-12 h-12 rounded-lg shrink-0"

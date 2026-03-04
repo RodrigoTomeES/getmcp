@@ -35,16 +35,20 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
   if (totalPages <= 1) return null;
 
   const pages = getPageNumbers(page, totalPages);
+  const isPrevDisabled = page <= 1;
+  const isNextDisabled = page >= totalPages;
 
   return (
     <nav aria-label="Pagination" className="flex justify-center items-center gap-1.5 mt-8">
       <button
         type="button"
-        onClick={() => onPageChange(page - 1)}
-        disabled={page <= 1}
+        onClick={() => {
+          if (!isPrevDisabled) onPageChange(page - 1);
+        }}
+        aria-disabled={isPrevDisabled}
         aria-label="Previous page"
         className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
-          page <= 1
+          isPrevDisabled
             ? "border-border text-text-secondary opacity-40 cursor-not-allowed"
             : "border-border text-text-secondary hover:border-text-secondary hover:text-text"
         }`}
@@ -54,12 +58,9 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
 
       {pages.map((p, i) =>
         p === "ellipsis" ? (
-          <span
-            key={`ellipsis-${i}`}
-            aria-hidden="true"
-            className="text-xs px-1.5 text-text-secondary select-none"
-          >
-            &hellip;
+          <span key={`ellipsis-${i}`} className="text-xs px-1.5 text-text-secondary select-none">
+            <span aria-hidden="true">&hellip;</span>
+            <span className="sr-only">Pages skipped</span>
           </span>
         ) : (
           <button
@@ -81,11 +82,13 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
 
       <button
         type="button"
-        onClick={() => onPageChange(page + 1)}
-        disabled={page >= totalPages}
+        onClick={() => {
+          if (!isNextDisabled) onPageChange(page + 1);
+        }}
+        aria-disabled={isNextDisabled}
         aria-label="Next page"
         className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
-          page >= totalPages
+          isNextDisabled
             ? "border-border text-text-secondary opacity-40 cursor-not-allowed"
             : "border-border text-text-secondary hover:border-text-secondary hover:text-text"
         }`}

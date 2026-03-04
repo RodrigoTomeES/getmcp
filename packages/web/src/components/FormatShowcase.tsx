@@ -33,7 +33,7 @@ export function FormatShowcase() {
             </span>
           </div>
           <pre className="text-[11px] leading-relaxed text-text-secondary font-mono whitespace-pre overflow-hidden">
-            {f.code}
+            <code data-language={f.format.toLowerCase()}>{f.code}</code>
           </pre>
         </div>
       ))}

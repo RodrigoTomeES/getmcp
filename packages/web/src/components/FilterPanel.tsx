@@ -71,7 +71,7 @@ export function FilterPanel({
       {/* Status */}
       <fieldset>
         <legend className="text-xs h-7.5 text-text-secondary uppercase tracking-wider font-medium mb-3 flex items-center">
-          Status
+          Filter by status
         </legend>
         <div className="space-y-0.5">
           <FilterOption
@@ -85,7 +85,7 @@ export function FilterPanel({
       {/* Category */}
       <fieldset className="mt-6">
         <legend className="text-xs h-7.5 text-text-secondary uppercase tracking-wider font-medium mb-3 flex items-center">
-          Category
+          Filter by category
         </legend>
         <div className="space-y-0.5">
           <FilterOption
@@ -107,7 +107,7 @@ export function FilterPanel({
       {/* Runtime */}
       <fieldset className="mt-6">
         <legend className="text-xs text-text-secondary uppercase tracking-wider font-medium mb-3">
-          Runtime
+          Filter by runtime
         </legend>
         <div className="space-y-0.5">
           <FilterOption
@@ -129,7 +129,7 @@ export function FilterPanel({
       {/* Transport */}
       <fieldset className="mt-6">
         <legend className="text-xs text-text-secondary uppercase tracking-wider font-medium mb-3">
-          Transport
+          Filter by transport
         </legend>
         <div className="space-y-0.5">
           <FilterOption

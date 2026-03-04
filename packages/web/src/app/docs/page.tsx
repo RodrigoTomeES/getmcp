@@ -240,9 +240,15 @@ npx @getmcp/cli list --json`}</CodeBlock>
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-surface">
-                  <th className="text-left px-4 py-3 font-medium">App</th>
-                  <th className="text-left px-4 py-3 font-medium">Root Key</th>
-                  <th className="text-left px-4 py-3 font-medium">Format</th>
+                  <th scope="col" className="text-left px-4 py-3 font-medium">
+                    App
+                  </th>
+                  <th scope="col" className="text-left px-4 py-3 font-medium">
+                    Root Key
+                  </th>
+                  <th scope="col" className="text-left px-4 py-3 font-medium">
+                    Format
+                  </th>
                 </tr>
               </thead>
               <tbody className="text-text-secondary">

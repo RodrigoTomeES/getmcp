@@ -88,17 +88,19 @@ export function AsciiArt() {
           )}
         </pre>
 
-        {/* Static CRT scanlines */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px)",
-            WebkitMaskImage: "radial-gradient(ellipse at center, black 50%, transparent 100%)",
-            maskImage: "radial-gradient(ellipse at center, black 50%, transparent 100%)",
-          }}
-          aria-hidden="true"
-        />
+        {/* Static CRT scanlines — hidden for reduced motion */}
+        {!reducedMotion && (
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px)",
+              WebkitMaskImage: "radial-gradient(ellipse at center, black 50%, transparent 100%)",
+              maskImage: "radial-gradient(ellipse at center, black 50%, transparent 100%)",
+            }}
+            aria-hidden="true"
+          />
+        )}
       </div>
 
       <p className="font-mono text-sm lg:text-base uppercase tracking-wider text-text font-medium mt-4">

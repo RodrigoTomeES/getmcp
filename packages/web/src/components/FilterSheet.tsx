@@ -21,9 +21,35 @@ export function FilterSheet({
   const sheetRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
 
-  const handleEscape = useCallback(
+  const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+
+      // Focus trap: cycle Tab within the sheet
+      if (e.key === "Tab" && sheetRef.current) {
+        const focusable = sheetRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        );
+        if (focusable.length === 0) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
     },
     [onClose],
   );
@@ -32,20 +58,20 @@ export function FilterSheet({
     if (open) {
       previousFocus.current = document.activeElement as HTMLElement | null;
       document.body.style.overflow = "hidden";
-      document.addEventListener("keydown", handleEscape);
+      document.addEventListener("keydown", handleKeyDown);
       // Focus the sheet for screen readers
       sheetRef.current?.focus();
     } else {
       document.body.style.overflow = "";
-      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("keydown", handleKeyDown);
       previousFocus.current?.focus();
     }
 
     return () => {
       document.body.style.overflow = "";
-      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open, handleEscape]);
+  }, [open, handleKeyDown]);
 
   return (
     <>
@@ -61,6 +87,7 @@ export function FilterSheet({
       {/* Sheet */}
       <div
         ref={sheetRef}
+        id="filter-sheet"
         role="dialog"
         aria-modal="true"
         aria-label="Filters"
