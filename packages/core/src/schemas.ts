@@ -177,6 +177,27 @@ export const RegistryEntry = z.object({
                 default: z.string().optional(),
                 format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
                 isRequired: z.boolean().optional(),
+                isSecret: z.boolean().optional(),
+                type: z.enum(["named", "positional"]).optional(),
+                variables: z
+                  .record(
+                    z.string(),
+                    z.object({
+                      description: z.string().optional(),
+                      format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
+                      isRequired: z.boolean().optional(),
+                      isSecret: z.boolean().optional(),
+                      default: z.string().optional(),
+                      placeholder: z.string().optional(),
+                      value: z.string().optional(),
+                      choices: z.array(z.string()).optional(),
+                    }),
+                  )
+                  .optional(),
+                isRepeated: z.boolean().optional(),
+                valueHint: z.string().optional(),
+                choices: z.array(z.string()).optional(),
+                placeholder: z.string().optional(),
               }),
             )
             .optional(),
@@ -189,6 +210,27 @@ export const RegistryEntry = z.object({
                 default: z.string().optional(),
                 format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
                 isRequired: z.boolean().optional(),
+                isSecret: z.boolean().optional(),
+                type: z.enum(["named", "positional"]).optional(),
+                variables: z
+                  .record(
+                    z.string(),
+                    z.object({
+                      description: z.string().optional(),
+                      format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
+                      isRequired: z.boolean().optional(),
+                      isSecret: z.boolean().optional(),
+                      default: z.string().optional(),
+                      placeholder: z.string().optional(),
+                      value: z.string().optional(),
+                      choices: z.array(z.string()).optional(),
+                    }),
+                  )
+                  .optional(),
+                isRepeated: z.boolean().optional(),
+                valueHint: z.string().optional(),
+                choices: z.array(z.string()).optional(),
+                placeholder: z.string().optional(),
               }),
             )
             .optional(),

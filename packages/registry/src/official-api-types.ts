@@ -19,6 +19,17 @@ export const KeyValueInput = z.object({
   isSecret: z.boolean().optional(),
 });
 
+export const ArgumentVariableInput = z.object({
+  description: z.string().optional(),
+  format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
+  isRequired: z.boolean().optional(),
+  isSecret: z.boolean().optional(),
+  default: z.string().optional(),
+  placeholder: z.string().optional(),
+  value: z.string().optional(),
+  choices: z.array(z.string()).optional(),
+});
+
 export const Argument = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
@@ -26,6 +37,13 @@ export const Argument = z.object({
   default: z.string().optional(),
   format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
   isRequired: z.boolean().optional(),
+  isSecret: z.boolean().optional(),
+  type: z.enum(["named", "positional"]).optional(),
+  variables: z.record(z.string(), ArgumentVariableInput).optional(),
+  isRepeated: z.boolean().optional(),
+  valueHint: z.string().optional(),
+  choices: z.array(z.string()).optional(),
+  placeholder: z.string().optional(),
 });
 
 // ---------------------------------------------------------------------------

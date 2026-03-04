@@ -69,6 +69,26 @@ function extractFromPackage(
   // Add runtime arguments first
   if (pkg.runtimeArguments) {
     for (const arg of pkg.runtimeArguments) {
+      // Extract env vars from docker -e flags
+      if (arg.name === "-e" && arg.variables && arg.value) {
+        const eqIdx = arg.value.indexOf("=");
+        if (eqIdx !== -1) {
+          const envName = arg.value.slice(0, eqIdx);
+          const varEntries = Object.values(arg.variables);
+          const varMeta = varEntries[0];
+          envVarDetails.push({
+            name: envName,
+            description: arg.description,
+            isSecret: varMeta?.isSecret,
+            isRequired: varMeta?.isRequired ?? arg.isRequired,
+          });
+          env[envName] = "";
+          if (varMeta?.isRequired ?? arg.isRequired) {
+            requiredEnvVars.push(envName);
+          }
+          continue;
+        }
+      }
       if (arg.value) args.push(arg.value);
       else if (arg.default) args.push(arg.default);
     }

@@ -124,6 +124,53 @@ describe("extractServerConfig", () => {
     expect(extractServerConfig(entry)).toBeNull();
   });
 
+  it("extracts env vars from oci runtimeArguments with -e flags", () => {
+    const entry: RegistryEntryType = {
+      server: {
+        name: "com.github/github-mcp-server",
+        description: "GitHub MCP Server",
+        packages: [
+          {
+            registryType: "oci",
+            identifier: "ghcr.io/github/github-mcp-server",
+            transport: { type: "stdio" },
+            runtimeArguments: [
+              {
+                name: "-e",
+                value: "GITHUB_PERSONAL_ACCESS_TOKEN={token}",
+                isRequired: true,
+                variables: {
+                  token: { isRequired: true, format: "string", isSecret: true },
+                },
+              },
+            ],
+          },
+        ],
+      },
+      _meta: {},
+    };
+
+    const result = extractServerConfig(entry);
+    expect(result).not.toBeNull();
+    expect(result!.config).toHaveProperty("command", "docker");
+    const args = (result!.config as { args: string[] }).args;
+    expect(args).toContain("run");
+    expect(args).toContain("-e");
+    expect(args).toContain("GITHUB_PERSONAL_ACCESS_TOKEN");
+    expect(args).toContain("ghcr.io/github/github-mcp-server");
+    // -e flag value should NOT be in args directly
+    expect(args).not.toContain("GITHUB_PERSONAL_ACCESS_TOKEN={token}");
+    expect(result!.requiredEnvVars).toEqual(["GITHUB_PERSONAL_ACCESS_TOKEN"]);
+    expect(result!.envVarDetails[0]).toEqual({
+      name: "GITHUB_PERSONAL_ACCESS_TOKEN",
+      description: undefined,
+      isSecret: true,
+      isRequired: true,
+    });
+    const env = (result!.config as { env: Record<string, string> }).env;
+    expect(env).toHaveProperty("GITHUB_PERSONAL_ACCESS_TOKEN", "");
+  });
+
   it("uses runtimeHint for command when provided", () => {
     const entry: RegistryEntryType = {
       server: {
