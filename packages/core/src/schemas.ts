@@ -121,6 +121,43 @@ export const Category = z.enum([
 export const Runtime = z.enum(["node", "python", "docker", "binary"]);
 
 // ---------------------------------------------------------------------------
+// Shared argument schemas (used by packageArguments and runtimeArguments)
+// ---------------------------------------------------------------------------
+
+/**
+ * Variables within an argument — keyed by variable name.
+ */
+export const ArgumentVariableSchema = z.object({
+  description: z.string().optional(),
+  format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
+  isRequired: z.boolean().optional(),
+  isSecret: z.boolean().optional(),
+  default: z.string().optional(),
+  placeholder: z.string().optional(),
+  value: z.string().optional(),
+  choices: z.array(z.string()).optional(),
+});
+
+/**
+ * A single argument definition — shared between packageArguments and runtimeArguments.
+ */
+export const ArgumentSchema = z.object({
+  name: z.string().optional(),
+  description: z.string().optional(),
+  value: z.string().optional(),
+  default: z.string().optional(),
+  format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
+  isRequired: z.boolean().optional(),
+  isSecret: z.boolean().optional(),
+  type: z.enum(["named", "positional"]).optional(),
+  variables: z.record(z.string(), ArgumentVariableSchema).optional(),
+  isRepeated: z.boolean().optional(),
+  valueHint: z.string().optional(),
+  choices: z.array(z.string()).optional(),
+  placeholder: z.string().optional(),
+});
+
+// ---------------------------------------------------------------------------
 // Registry entry (official MCP registry format + getmcp _meta extensions)
 // ---------------------------------------------------------------------------
 
@@ -168,72 +205,8 @@ export const RegistryEntry = z.object({
             type: z.enum(["stdio", "streamable-http", "sse"]),
             url: z.string().optional(),
           }),
-          packageArguments: z
-            .array(
-              z.object({
-                name: z.string().optional(),
-                description: z.string().optional(),
-                value: z.string().optional(),
-                default: z.string().optional(),
-                format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
-                isRequired: z.boolean().optional(),
-                isSecret: z.boolean().optional(),
-                type: z.enum(["named", "positional"]).optional(),
-                variables: z
-                  .record(
-                    z.string(),
-                    z.object({
-                      description: z.string().optional(),
-                      format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
-                      isRequired: z.boolean().optional(),
-                      isSecret: z.boolean().optional(),
-                      default: z.string().optional(),
-                      placeholder: z.string().optional(),
-                      value: z.string().optional(),
-                      choices: z.array(z.string()).optional(),
-                    }),
-                  )
-                  .optional(),
-                isRepeated: z.boolean().optional(),
-                valueHint: z.string().optional(),
-                choices: z.array(z.string()).optional(),
-                placeholder: z.string().optional(),
-              }),
-            )
-            .optional(),
-          runtimeArguments: z
-            .array(
-              z.object({
-                name: z.string().optional(),
-                description: z.string().optional(),
-                value: z.string().optional(),
-                default: z.string().optional(),
-                format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
-                isRequired: z.boolean().optional(),
-                isSecret: z.boolean().optional(),
-                type: z.enum(["named", "positional"]).optional(),
-                variables: z
-                  .record(
-                    z.string(),
-                    z.object({
-                      description: z.string().optional(),
-                      format: z.enum(["string", "number", "boolean", "filepath"]).optional(),
-                      isRequired: z.boolean().optional(),
-                      isSecret: z.boolean().optional(),
-                      default: z.string().optional(),
-                      placeholder: z.string().optional(),
-                      value: z.string().optional(),
-                      choices: z.array(z.string()).optional(),
-                    }),
-                  )
-                  .optional(),
-                isRepeated: z.boolean().optional(),
-                valueHint: z.string().optional(),
-                choices: z.array(z.string()).optional(),
-                placeholder: z.string().optional(),
-              }),
-            )
-            .optional(),
+          packageArguments: z.array(ArgumentSchema).optional(),
+          runtimeArguments: z.array(ArgumentSchema).optional(),
           environmentVariables: z
             .array(
               z.object({
