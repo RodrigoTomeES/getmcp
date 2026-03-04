@@ -271,6 +271,47 @@ export const AppId = z.enum([
 ]);
 
 // ---------------------------------------------------------------------------
+// Registry source configuration
+// ---------------------------------------------------------------------------
+
+/**
+ * Authentication method for private registries.
+ */
+export const RegistryAuthMethod = z.enum(["bearer", "basic", "header"]);
+
+/**
+ * A registry source definition.
+ * Describes where to fetch MCP server definitions from.
+ */
+export const RegistrySource = z.object({
+  /** Unique name for this registry (lowercase alphanumeric + hyphens) */
+  name: z
+    .string()
+    .min(1)
+    .regex(/^[a-z0-9-]+$/),
+  /** Base URL of the registry API */
+  url: z.string().url(),
+  /** Registry type */
+  type: z.enum(["public", "private"]).default("public"),
+  /** Priority for conflict resolution (lower number wins) */
+  priority: z.number().int().nonnegative().default(100),
+});
+
+/**
+ * Credentials for authenticating to a private registry.
+ */
+export const RegistryCredential = z.object({
+  /** Authentication method */
+  method: RegistryAuthMethod,
+  /** Token for bearer or basic auth */
+  token: z.string().optional(),
+  /** Username for basic auth */
+  username: z.string().optional(),
+  /** Custom header name for header auth */
+  headerName: z.string().optional(),
+});
+
+// ---------------------------------------------------------------------------
 // Project manifest (getmcp.json)
 // ---------------------------------------------------------------------------
 
@@ -285,6 +326,8 @@ export const ManifestServerEntry = z.object({
   apps: z.array(AppId).optional(),
   /** Override installation scope (project or global) */
   scope: z.enum(["project", "global"]).optional(),
+  /** Registry source name (defaults to searching all registries) */
+  registry: z.string().optional(),
 });
 
 /**
@@ -294,4 +337,6 @@ export const ManifestServerEntry = z.object({
 export const ProjectManifest = z.object({
   /** Map of server ID to optional overrides */
   servers: z.record(z.string(), ManifestServerEntry.or(z.object({}))),
+  /** Additional registry sources for this project */
+  registries: z.array(RegistrySource).optional(),
 });

@@ -17,6 +17,9 @@ import {
   Runtime,
   RegistryEntry,
   AppId,
+  RegistryAuthMethod,
+  RegistrySource,
+  RegistryCredential,
   ManifestServerEntry,
   ProjectManifest,
 } from "./schemas.js";
@@ -50,6 +53,9 @@ export type Category = z.infer<typeof Category>;
 export type Runtime = z.infer<typeof Runtime>;
 export type RegistryEntry = z.infer<typeof RegistryEntry>;
 export type AppId = z.infer<typeof AppId>;
+export type RegistryAuthMethod = z.infer<typeof RegistryAuthMethod>;
+export type RegistrySource = z.infer<typeof RegistrySource>;
+export type RegistryCredential = z.infer<typeof RegistryCredential>;
 export type ManifestServerEntry = z.infer<typeof ManifestServerEntry>;
 export type ProjectManifest = z.infer<typeof ProjectManifest>;
 
