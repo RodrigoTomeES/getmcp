@@ -311,6 +311,18 @@ async function main(): Promise<void> {
     baseData.set(name, { server: entry.server, _meta });
   }
 
+  // Step 7a: Update slugs for ALL entries (not just enriched ones)
+  // This ensures slug changes from id-mapping fixes apply to existing entries too
+  for (const [name, entry] of baseData) {
+    const _meta = (entry._meta ?? {}) as Record<string, unknown>;
+    const enrichment = _meta["es.getmcp/enrichment"] as Record<string, unknown> | undefined;
+    const newSlug = slugMap.get(name);
+    if (enrichment && newSlug && enrichment.slug !== newSlug) {
+      _meta["es.getmcp/enrichment"] = { ...enrichment, slug: newSlug };
+      baseData.set(name, { server: entry.server, _meta });
+    }
+  }
+
   // Step 7b: Stamp official status from curated list
   const officialNames = new Set<string>();
   if (fs.existsSync(OFFICIAL_SERVERS_FILE)) {

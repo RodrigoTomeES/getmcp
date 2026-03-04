@@ -56,8 +56,15 @@ export function extractOrg(officialName: string): string {
   if (parts.length < 2) return "";
 
   const namespace = parts[0];
-  // Reverse DNS: io.github.owner -> owner is the last segment
+  const repoSegment = parts[parts.length - 1].toLowerCase();
   const segments = namespace.split(".");
+
+  // Walk backwards, skip segments matching the repo name to find the real org
+  for (let i = segments.length - 1; i >= 0; i--) {
+    if (segments[i].toLowerCase() !== repoSegment) {
+      return segments[i];
+    }
+  }
   return segments[segments.length - 1];
 }
 
