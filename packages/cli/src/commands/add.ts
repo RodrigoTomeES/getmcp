@@ -122,6 +122,16 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
   const config = structuredClone(entry.config) as LooseServerConfigType;
 
   if (entry.requiredEnvVars.length > 0 && isStdioConfig(config)) {
+    // Warn about dangerous env var names from registry entries
+    const dangerousVars = entry.requiredEnvVars.filter((v) => DANGEROUS_ENV_VARS.has(v));
+    if (dangerousVars.length > 0) {
+      p.log.warn(
+        `This server requests potentially dangerous environment variables:\n` +
+          dangerousVars.map((v) => `  ${v}`).join("\n") +
+          `\n  These variables can affect system behavior. Proceed with caution.`,
+      );
+    }
+
     config.env ??= {};
     if (isNonInteractive) {
       // In non-interactive mode, check if env vars are already set in the environment
@@ -463,6 +473,14 @@ async function addUnverifiedServer(options: AddOptions): Promise<void> {
     return;
   }
 
+  // Validate the derived server name
+  if (UNSAFE_KEYS.has(serverName) || !VALID_SERVER_NAME.test(serverName)) {
+    p.log.error(
+      `Invalid server name: "${serverName}". Must be alphanumeric with dots, hyphens, or underscores.`,
+    );
+    process.exit(1);
+  }
+
   p.log.info(`Server name: ${serverName}`);
 
   // Detect apps and select using shared helper
@@ -595,4 +613,40 @@ function printManualConfig(entry: InternalRegistryEntry, config: LooseServerConf
 /**
  * Heuristic to detect if an environment variable name likely holds a secret.
  */
+/**
+ * Heuristic to detect if an environment variable name likely holds a secret.
+ */
 const SENSITIVE_PATTERNS = /TOKEN|KEY|SECRET|PASSWORD|CREDENTIAL|AUTH|PAT|PRIVATE/i;
+
+/**
+ * Keys that could cause prototype pollution if used as server names.
+ */
+const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+/**
+ * Pattern for valid server names — alphanumeric, dots, hyphens, underscores.
+ */
+const VALID_SERVER_NAME = /^[a-z0-9][a-z0-9._-]*$/i;
+
+/**
+ * Environment variable names that could be dangerous if injected via
+ * registry entries into config files.
+ */
+const DANGEROUS_ENV_VARS = new Set([
+  "PATH",
+  "LD_PRELOAD",
+  "LD_LIBRARY_PATH",
+  "DYLD_INSERT_LIBRARIES",
+  "DYLD_LIBRARY_PATH",
+  "NODE_OPTIONS",
+  "NODE_PATH",
+  "PYTHONPATH",
+  "PYTHONSTARTUP",
+  "RUBYOPT",
+  "PERL5OPT",
+  "SHELL",
+  "COMSPEC",
+  "HOME",
+  "USERPROFILE",
+  "SYSTEMROOT",
+]);
