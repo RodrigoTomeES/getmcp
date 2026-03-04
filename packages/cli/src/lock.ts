@@ -169,7 +169,9 @@ export function writeLockFile(lock: LockFile, filePath?: string): void {
     fs.mkdirSync(dir, { recursive: true });
   }
 
-  fs.writeFileSync(lockPath, JSON.stringify(lock, null, 2) + "\n", "utf-8");
+  const tmpPath = lockPath + ".tmp";
+  fs.writeFileSync(tmpPath, JSON.stringify(lock, null, 2) + "\n", "utf-8");
+  fs.renameSync(tmpPath, lockPath);
 }
 
 // ---------------------------------------------------------------------------

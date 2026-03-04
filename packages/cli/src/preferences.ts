@@ -81,7 +81,9 @@ export function saveSelectedApps(appIds: AppIdType[], filePath?: string): void {
     fs.mkdirSync(dir, { recursive: true });
   }
 
-  fs.writeFileSync(prefsPath, JSON.stringify(existing, null, 2) + "\n", "utf-8");
+  const tmpPath = prefsPath + ".tmp";
+  fs.writeFileSync(tmpPath, JSON.stringify(existing, null, 2) + "\n", "utf-8");
+  fs.renameSync(tmpPath, prefsPath);
 }
 
 /**
