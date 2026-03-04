@@ -46,7 +46,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     })),
     ...servers.map((server) => ({
-      url: `${SITE_URL}/servers/${server.id}`,
+      url: `${SITE_URL}/servers/${server.slug}`,
       lastModified: BUILD_DATE,
       changeFrequency: "monthly" as const,
       priority: 0.8,

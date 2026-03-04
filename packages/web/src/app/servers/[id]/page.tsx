@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getServer, getAllServers, getServerMetrics } from "@getmcp/registry";
+import { getServerBySlug, getAllServers, getServerMetrics } from "@getmcp/registry";
 import { generators } from "@getmcp/generators";
 import type { AppIdType } from "@getmcp/core";
 import type { InternalRegistryEntry } from "@getmcp/registry";
@@ -15,16 +15,16 @@ import { SITE_URL } from "@/lib/constants";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return getAllServers().map((server) => ({ id: server.id }));
+  return getAllServers().map((server) => ({ id: server.slug }));
 }
 
 export function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   return params.then(({ id }) => {
-    const server = getServer(id);
+    const server = getServerBySlug(id);
     if (!server) return { title: "Not Found" };
 
     const title = `${server.name} MCP Server`;
-    const description = `${server.description}. Install with: npx @getmcp/cli add ${id}`;
+    const description = `${server.description}. Install with: npx @getmcp/cli add ${server.id}`;
 
     return {
       title,
@@ -86,7 +86,7 @@ function preGenerateConfigs(
 
 export default async function ServerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const server = getServer(id);
+  const server = getServerBySlug(id);
 
   if (!server) {
     notFound();
@@ -104,6 +104,7 @@ export default async function ServerPage({ params }: { params: Promise<{ id: str
           const m = getServerMetrics(s.id);
           return {
             id: s.id,
+            slug: s.slug,
             name: s.name,
             description: s.description,
             categories: s.categories,
@@ -175,11 +176,11 @@ function ServerDetail({
       ...(server.author && {
         author: { "@type": "Organization", name: server.author },
       }),
-      url: `${SITE_URL}/servers/${server.id}`,
+      url: `${SITE_URL}/servers/${server.slug}`,
       ...(server.repository && { downloadUrl: server.repository }),
       mainEntityOfPage: {
         "@type": "WebPage",
-        "@id": `${SITE_URL}/servers/${server.id}`,
+        "@id": `${SITE_URL}/servers/${server.slug}`,
       },
     },
     {
@@ -202,7 +203,7 @@ function ServerDetail({
           "@type": "ListItem",
           position: 3,
           name: server.name,
-          item: `${SITE_URL}/servers/${server.id}`,
+          item: `${SITE_URL}/servers/${server.slug}`,
         },
       ],
     },

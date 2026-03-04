@@ -37,6 +37,7 @@ export default function ServersPage() {
     const metrics = metricsMap.get(s.id);
     return {
       id: s.id,
+      slug: s.slug,
       name: s.name,
       description: s.description,
       categories: s.categories,

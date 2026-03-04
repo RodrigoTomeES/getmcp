@@ -1,11 +1,11 @@
 import { ImageResponse } from "next/og";
-import { getServer, getAllServers } from "@getmcp/registry";
+import { getServerBySlug, getAllServers } from "@getmcp/registry";
 import { isStdioConfig } from "@getmcp/core";
 import { getCommand, DEFAULT_PM } from "@/lib/package-manager";
 import { loadOGFonts, OG_FONT_FAMILY, stripEmoji } from "@/lib/og-image";
 
 export function generateStaticParams() {
-  return getAllServers().map((server) => ({ id: server.id }));
+  return getAllServers().map((server) => ({ id: server.slug }));
 }
 
 export const alt = "MCP Server Configuration";
@@ -17,7 +17,7 @@ export const contentType = "image/png";
 
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const server = getServer(id);
+  const server = getServerBySlug(id);
 
   if (!server) {
     return new ImageResponse(

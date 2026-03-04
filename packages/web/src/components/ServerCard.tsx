@@ -4,6 +4,7 @@ import { Star, Download, BadgeCheck } from "lucide-react";
 
 export type ServerCardData = {
   id: string;
+  slug: string;
   name: string;
   description: string;
   categories?: string[];
@@ -26,7 +27,7 @@ export function ServerCard({ server }: { server: ServerCardData }) {
 
   return (
     <Link
-      href={`/servers/${server.id}`}
+      href={`/servers/${server.slug}`}
       className="group flex flex-col rounded-lg border border-border bg-surface p-5 hover:bg-surface-hover hover:border-accent/50 transition-all"
     >
       <div className="flex items-baseline justify-between gap-3 mb-2">

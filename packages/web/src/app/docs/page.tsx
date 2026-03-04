@@ -139,7 +139,10 @@ export default function DocsPage() {
             <p>Install any MCP server into all your detected AI apps with a single command:</p>
             <CodeBlock label="CLI">{`npx @getmcp/cli add <server>`}</CodeBlock>
             <p>Here are the most common CLI commands:</p>
-            <CodeBlock label="CLI">{`# Install a server into all detected AI apps
+            <CodeBlock label="CLI">{`# Install a server by official ID
+npx @getmcp/cli add io.github.github/github-mcp-server
+
+# Fuzzy search — unrecognized input triggers search
 npx @getmcp/cli add github
 
 # Browse available servers
@@ -152,7 +155,7 @@ npx @getmcp/cli list --search=database
 npx @getmcp/cli find
 
 # Remove a server from all apps
-npx @getmcp/cli remove github
+npx @getmcp/cli remove
 
 # Check installation status
 npx @getmcp/cli check
@@ -176,6 +179,14 @@ npx @getmcp/cli list --json`}</CodeBlock>
               required environment variables, and merges the config into each app{"'"}s config file.
               It never overwrites your existing configuration.
             </p>
+            <p>
+              The CLI uses official server IDs (like{" "}
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+                io.github.github/github-mcp-server
+              </code>
+              ). If the input doesn{"'"}t match an exact ID, the CLI performs a fuzzy search across
+              server names, descriptions, and categories.
+            </p>
           </div>
         </section>
 
@@ -192,8 +203,8 @@ npx @getmcp/cli list --json`}</CodeBlock>
             </p>
             <CodeBlock label="JSON">{`{
   "servers": {
-    "github": {},
-    "postgres": {
+    "io.github.github/github-mcp-server": {},
+    "io.github.modelcontextprotocol/server-postgres": {
       "env": {
         "DATABASE_URL": "postgresql://localhost:5432/mydb"
       }
@@ -398,10 +409,10 @@ StdioServerConfig.parse({ command: "npx", args: ["server"] });
               <CodeBlock label="TS">{`import { searchServers, getServersByCategory } from "@getmcp/registry";
 
 searchServers("database");
-// => [{ id: "postgres", ... }]
+// => [{ id: "io.github.modelcontextprotocol/server-postgres", slug: "postgres", ... }]
 
 getServersByCategory("web");
-// => [{ id: "brave-search", ... }, { id: "fetch", ... }]`}</CodeBlock>
+// => [{ id: "io.github.anthropics/...", slug: "brave-search", ... }]`}</CodeBlock>
             </div>
           </div>
         </section>
