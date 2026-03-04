@@ -58,7 +58,10 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
 
       {pages.map((p, i) =>
         p === "ellipsis" ? (
-          <span key={`ellipsis-${i}`} className="text-xs px-1.5 text-text-secondary select-none">
+          <span
+            key={`ellipsis-${i < pages.length / 2 ? "start" : "end"}`}
+            className="text-xs px-1.5 text-text-secondary select-none"
+          >
             <span aria-hidden="true">&hellip;</span>
             <span className="sr-only">Pages skipped</span>
           </span>

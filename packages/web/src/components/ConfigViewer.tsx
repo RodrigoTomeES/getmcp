@@ -12,18 +12,22 @@ export type PreGeneratedConfig = {
   docsUrl: string;
 };
 
+function readPreferredApp(): string | null {
+  try {
+    return localStorage.getItem("getmcp-preferred-app");
+  } catch {
+    return null;
+  }
+}
+
 export function ConfigViewer({ configs }: { configs: Record<string, PreGeneratedConfig> }) {
   const appIds = Object.keys(configs);
   const [selectedApp, setSelectedApp] = useState(appIds[0]);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("getmcp-preferred-app");
-      if (saved && configs[saved]) {
-        setSelectedApp(saved);
-      }
-    } catch {
-      // localStorage unavailable (private browsing, restrictive CSP)
+    const saved = readPreferredApp();
+    if (saved && configs[saved]) {
+      setSelectedApp(saved);
     }
     // configs is stable per mount (pre-generated in server component)
     // eslint-disable-next-line react-hooks/exhaustive-deps

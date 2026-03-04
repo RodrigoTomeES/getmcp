@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getServerBySlug, getAllServers, getServerMetrics } from "@getmcp/registry";
@@ -236,13 +237,13 @@ function ServerDetail({
       <section className="mb-10">
         <div className="flex flex-wrap items-center gap-3 mb-4">
           {server.icons?.[0]?.src && (
-            <img
+            <Image
               src={server.icons[0].src}
               alt={`${server.name} icon`}
-              loading="lazy"
               width={48}
               height={48}
               className="w-12 h-12 rounded-lg shrink-0"
+              unoptimized
             />
           )}
           <h1 className="text-3xl font-bold tracking-tight inline-flex items-baseline gap-1">
