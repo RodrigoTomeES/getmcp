@@ -1,9 +1,8 @@
 /**
- * Registry cache — fetches registry data from MCP registry APIs.
+ * Registry cache — orchestration layer for multi-registry cache management.
  *
- * Supports multiple registries (official + custom). Each registry gets its
- * own subdirectory under the cache root. Incremental fetches use
- * `updated_since` to minimise download size.
+ * Coordinates per-registry cache initialization, refresh, and cleanup, then
+ * merges all cached data into the registry engine.
  *
  * Cache layout:
  *   ~/.config/getmcp/registry-cache/
@@ -19,7 +18,6 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import * as os from "node:os";
 import {
   loadFromEntries,
   generateSlug,
@@ -29,7 +27,20 @@ import {
 } from "@getmcp/registry";
 import type { RegistryEntryType } from "@getmcp/core";
 import { getAllRegistries, type RegistrySourceType } from "./registry-config.js";
-import { buildAuthHeaders } from "./credentials.js";
+
+// Re-export I/O and fetch utilities for backwards compatibility
+export { getRegistryCacheDir, getRegistryCacheSubdir } from "./registry-cache-io.js";
+export { fetchFromRegistryAPI } from "./registry-cache-fetch.js";
+
+import {
+  getRegistryCacheSubdir,
+  getRegistryCacheDir,
+  readCacheMetadata,
+  writeCacheMetadata,
+  atomicWriteJson,
+  readCachedServers,
+} from "./registry-cache-io.js";
+import { fetchFromRegistryAPI, mergeEntries } from "./registry-cache-fetch.js";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -37,170 +48,6 @@ import { buildAuthHeaders } from "./credentials.js";
 
 /** Check at most once per hour */
 const CACHE_TTL_MS = 3_600_000;
-
-/** 30-second timeout per API request */
-const DOWNLOAD_TIMEOUT_MS = 30_000;
-
-/** Number of servers to request per page */
-const PAGE_LIMIT = 100;
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-interface CacheMetadata {
-  /** ISO timestamp of last successful full/incremental sync */
-  syncedAt: string;
-  /** ISO timestamp of last TTL check */
-  lastCheckedAt: string;
-  /** Timestamp used as `updated_since` for the next incremental fetch */
-  lastUpdatedSince?: string;
-}
-
-interface ApiServerListResponse {
-  servers: RegistryEntryType[];
-  metadata: { nextCursor?: string; count: number };
-}
-
-// ---------------------------------------------------------------------------
-// Paths
-// ---------------------------------------------------------------------------
-
-/**
- * Get the platform-specific registry cache directory (root).
- */
-export function getRegistryCacheDir(): string {
-  // Respect XDG_CONFIG_HOME on all platforms (including Windows) — this is
-  // the standard override mechanism and also used by tests to isolate cache.
-  if (process.env.XDG_CONFIG_HOME) {
-    return path.join(process.env.XDG_CONFIG_HOME, "getmcp", "registry-cache");
-  }
-
-  if (process.platform === "win32") {
-    const appData = process.env.APPDATA ?? path.join(os.homedir(), "AppData", "Roaming");
-    return path.join(appData, "getmcp", "registry-cache");
-  }
-
-  return path.join(os.homedir(), ".config", "getmcp", "registry-cache");
-}
-
-/**
- * Get the cache subdirectory for a specific registry.
- */
-function getRegistryCacheSubdir(registryName: string): string {
-  return path.join(getRegistryCacheDir(), registryName);
-}
-
-// ---------------------------------------------------------------------------
-// File helpers
-// ---------------------------------------------------------------------------
-
-function readCacheMetadata(metaPath: string): CacheMetadata | null {
-  try {
-    if (!fs.existsSync(metaPath)) return null;
-    return JSON.parse(fs.readFileSync(metaPath, "utf-8")) as CacheMetadata;
-  } catch {
-    return null;
-  }
-}
-
-function writeCacheMetadata(metaPath: string, data: CacheMetadata): void {
-  const dir = path.dirname(metaPath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  const tmpPath = metaPath + ".tmp";
-  fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2) + "\n", "utf-8");
-  fs.renameSync(tmpPath, metaPath);
-}
-
-function atomicWriteJson(filePath: string, data: unknown): void {
-  const dir = path.dirname(filePath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  const tmpPath = filePath + ".tmp";
-  fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2) + "\n", "utf-8");
-  fs.renameSync(tmpPath, filePath);
-}
-
-function readCachedServers(serversPath: string): RegistryEntryType[] {
-  try {
-    if (!fs.existsSync(serversPath)) return [];
-    return JSON.parse(fs.readFileSync(serversPath, "utf-8")) as RegistryEntryType[];
-  } catch {
-    return [];
-  }
-}
-
-// ---------------------------------------------------------------------------
-// API fetch
-// ---------------------------------------------------------------------------
-
-/**
- * Fetch all servers from a registry API, following pagination cursors.
- * Optionally limits to entries updated after `updatedSince` (ISO timestamp).
- */
-export async function fetchFromRegistryAPI(
-  registry: RegistrySourceType,
-  updatedSince?: string,
-): Promise<RegistryEntryType[]> {
-  const authHeaders = buildAuthHeaders(registry.name);
-  const results: RegistryEntryType[] = [];
-  let cursor: string | undefined;
-
-  do {
-    const url = new URL(`${registry.url}/v0.1/servers`);
-    url.searchParams.set("limit", String(PAGE_LIMIT));
-    url.searchParams.set("version", "latest");
-    if (cursor) {
-      url.searchParams.set("cursor", cursor);
-    }
-    if (updatedSince) {
-      url.searchParams.set("updated_since", updatedSince);
-    }
-
-    const response = await fetch(url.toString(), {
-      signal: AbortSignal.timeout(DOWNLOAD_TIMEOUT_MS),
-      headers: { "Content-Type": "application/json", ...authHeaders },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status} fetching ${url.toString()}`);
-    }
-
-    const body = (await response.json()) as ApiServerListResponse;
-    results.push(...body.servers);
-    cursor = body.metadata.nextCursor;
-  } while (cursor);
-
-  return results;
-}
-
-// ---------------------------------------------------------------------------
-// Entry merging
-// ---------------------------------------------------------------------------
-
-/**
- * Merge incremental updates into an existing list of server entries.
- * Uses `server.name` (stable reverse-DNS name) as the identity key.
- * Updated entries replace existing ones; new entries are appended.
- */
-function mergeEntries(
-  existing: RegistryEntryType[],
-  updates: RegistryEntryType[],
-): RegistryEntryType[] {
-  const byName = new Map<string, RegistryEntryType>();
-
-  for (const entry of existing) {
-    byName.set(entry.server.name, entry);
-  }
-  for (const entry of updates) {
-    byName.set(entry.server.name, entry);
-  }
-
-  return Array.from(byName.values());
-}
 
 // ---------------------------------------------------------------------------
 // Per-registry cache management
