@@ -5,26 +5,50 @@
  * into app-specific configuration formats for 19 AI applications.
  */
 
-// Individual generators
-export { ClaudeDesktopGenerator } from "./claude-desktop.js";
-export { ClaudeCodeGenerator } from "./claude-code.js";
-export { VSCodeGenerator } from "./vscode.js";
-export { CursorGenerator } from "./cursor.js";
-export { ClineGenerator } from "./cline.js";
-export { RooCodeGenerator } from "./roo-code.js";
-export { GooseGenerator } from "./goose.js";
-export { WindsurfGenerator } from "./windsurf.js";
-export { OpenCodeGenerator } from "./opencode.js";
-export { ZedGenerator } from "./zed.js";
-export { PyCharmGenerator } from "./pycharm.js";
-export { CodexGenerator } from "./codex.js";
-export { GeminiCliGenerator } from "./gemini-cli.js";
-export { ContinueGenerator } from "./continue.js";
-export { AmazonQGenerator } from "./amazon-q.js";
-export { TraeGenerator } from "./trae.js";
-export { BoltAIGenerator } from "./bolt-ai.js";
-export { LibreChatGenerator } from "./libre-chat.js";
-export { AntigravityGenerator } from "./antigravity.js";
+import type { AppIdType, ConfigGenerator } from "@getmcp/core";
+
+// Individual generators — imported once, used for both re-export and registry map
+import { ClaudeDesktopGenerator } from "./claude-desktop.js";
+import { ClaudeCodeGenerator } from "./claude-code.js";
+import { VSCodeGenerator } from "./vscode.js";
+import { CursorGenerator } from "./cursor.js";
+import { ClineGenerator } from "./cline.js";
+import { RooCodeGenerator } from "./roo-code.js";
+import { GooseGenerator } from "./goose.js";
+import { WindsurfGenerator } from "./windsurf.js";
+import { OpenCodeGenerator } from "./opencode.js";
+import { ZedGenerator } from "./zed.js";
+import { PyCharmGenerator } from "./pycharm.js";
+import { CodexGenerator } from "./codex.js";
+import { GeminiCliGenerator } from "./gemini-cli.js";
+import { ContinueGenerator } from "./continue.js";
+import { AmazonQGenerator } from "./amazon-q.js";
+import { TraeGenerator } from "./trae.js";
+import { BoltAIGenerator } from "./bolt-ai.js";
+import { LibreChatGenerator } from "./libre-chat.js";
+import { AntigravityGenerator } from "./antigravity.js";
+
+export {
+  ClaudeDesktopGenerator,
+  ClaudeCodeGenerator,
+  VSCodeGenerator,
+  CursorGenerator,
+  ClineGenerator,
+  RooCodeGenerator,
+  GooseGenerator,
+  WindsurfGenerator,
+  OpenCodeGenerator,
+  ZedGenerator,
+  PyCharmGenerator,
+  CodexGenerator,
+  GeminiCliGenerator,
+  ContinueGenerator,
+  AmazonQGenerator,
+  TraeGenerator,
+  BoltAIGenerator,
+  LibreChatGenerator,
+  AntigravityGenerator,
+};
 
 // Base class and utilities
 export {
@@ -48,27 +72,6 @@ export type { AppIdType } from "@getmcp/core";
 // ---------------------------------------------------------------------------
 // Generator registry — map of AppId to generator instance
 // ---------------------------------------------------------------------------
-
-import type { AppIdType, ConfigGenerator } from "@getmcp/core";
-import { ClaudeDesktopGenerator } from "./claude-desktop.js";
-import { ClaudeCodeGenerator } from "./claude-code.js";
-import { VSCodeGenerator } from "./vscode.js";
-import { CursorGenerator } from "./cursor.js";
-import { ClineGenerator } from "./cline.js";
-import { RooCodeGenerator } from "./roo-code.js";
-import { GooseGenerator } from "./goose.js";
-import { WindsurfGenerator } from "./windsurf.js";
-import { OpenCodeGenerator } from "./opencode.js";
-import { ZedGenerator } from "./zed.js";
-import { PyCharmGenerator } from "./pycharm.js";
-import { CodexGenerator } from "./codex.js";
-import { GeminiCliGenerator } from "./gemini-cli.js";
-import { ContinueGenerator } from "./continue.js";
-import { AmazonQGenerator } from "./amazon-q.js";
-import { TraeGenerator } from "./trae.js";
-import { BoltAIGenerator } from "./bolt-ai.js";
-import { LibreChatGenerator } from "./libre-chat.js";
-import { AntigravityGenerator } from "./antigravity.js";
 
 /**
  * Map of all available generators, keyed by AppId.
