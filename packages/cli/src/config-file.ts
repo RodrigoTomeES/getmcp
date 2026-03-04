@@ -187,9 +187,14 @@ export function mergeServerIntoConfig(
     if (UNSAFE_KEYS.has(rootKey)) continue;
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
       const existingSection = (existing[rootKey] as Record<string, unknown>) ?? {};
+      // Filter UNSAFE_KEYS at the second level (server names)
+      const safeEntries: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+        if (!UNSAFE_KEYS.has(k)) safeEntries[k] = v;
+      }
       existing[rootKey] = {
         ...existingSection,
-        ...(value as Record<string, unknown>),
+        ...safeEntries,
       };
     } else {
       existing[rootKey] = value;

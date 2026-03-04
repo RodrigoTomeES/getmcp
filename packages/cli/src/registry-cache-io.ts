@@ -45,11 +45,24 @@ export function getRegistryCacheDir(): string {
   return path.join(os.homedir(), ".config", "getmcp", "registry-cache");
 }
 
+/** Valid registry name pattern — must match the schema in registry-config.ts */
+const VALID_REGISTRY_NAME = /^[a-z0-9-]+$/;
+
 /**
  * Get the cache subdirectory for a specific registry.
+ * Validates the registry name to prevent path traversal.
  */
 export function getRegistryCacheSubdir(registryName: string): string {
-  return path.join(getRegistryCacheDir(), registryName);
+  if (!VALID_REGISTRY_NAME.test(registryName)) {
+    throw new Error(`Invalid registry name for cache path: "${registryName}"`);
+  }
+  const cacheDir = getRegistryCacheDir();
+  const resolved = path.resolve(cacheDir, registryName);
+  // Ensure the resolved path is under the expected cache directory
+  if (!resolved.startsWith(cacheDir + path.sep) && resolved !== cacheDir) {
+    throw new Error(`Registry name resolves outside cache directory: "${registryName}"`);
+  }
+  return resolved;
 }
 
 // ---------------------------------------------------------------------------
