@@ -15,7 +15,8 @@ npm install @getmcp/generators
 ```ts
 import { generateConfig, getGenerator } from "@getmcp/generators";
 
-// Quick generation
+// The first argument is the app ID, the second is the config key name
+// (used as the key in the generated config object — typically a slug)
 const config = generateConfig("claude-desktop", "github", {
   command: "npx",
   args: ["-y", "@modelcontextprotocol/server-github"],

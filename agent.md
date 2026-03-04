@@ -20,13 +20,13 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22.17) with
 @getmcp/web -----> @getmcp/core + @getmcp/generators + @getmcp/registry
 ```
 
-| Package               | npm Name             | Purpose                                                                                                                                                                                     |
-| --------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/core`       | `@getmcp/core`       | Zod schemas, TypeScript types, utility functions (type guards, transport inference)                                                                                                         |
-| `packages/generators` | `@getmcp/generators` | 19 config generators (one per AI app), each transforms canonical format to app-native format                                                                                                |
-| `packages/registry`   | `@getmcp/registry`   | Catalog of MCP server definitions with search/filter API                                                                                                                                    |
-| `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `doctor`, `import`, `sync` commands with app auto-detection, config merging, and installation tracking via `getmcp-lock.json` |
-| `packages/web`        | `@getmcp/web`        | Next.js (App Router) web directory for browsing servers and generating config snippets, with Vercel Analytics and Speed Insights                                                            |
+| Package               | npm Name             | Purpose                                                                                                                                                                                                                         |
+| --------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/core`       | `@getmcp/core`       | Zod schemas, TypeScript types, utility functions (type guards, transport inference)                                                                                                                                             |
+| `packages/generators` | `@getmcp/generators` | 19 config generators (one per AI app), each transforms canonical format to app-native format                                                                                                                                    |
+| `packages/registry`   | `@getmcp/registry`   | Catalog of MCP server definitions with search/filter API                                                                                                                                                                        |
+| `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `doctor`, `import`, `sync`, `registry` commands with app auto-detection, config merging, multi-registry support, and installation tracking via `getmcp-lock.json` |
+| `packages/web`        | `@getmcp/web`        | Next.js (App Router) web directory for browsing servers and generating config snippets, with Vercel Analytics and Speed Insights                                                                                                |
 
 **Tech stack**: TypeScript 5.7+, Zod 4.0+, Vitest 3.0+, Next.js 15.3+ (web), Tailwind CSS 4.0+ (web), `@clack/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
 
@@ -38,7 +38,7 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22.17) with
 
 - **Canonical Format**: Single format aligned with the [official MCP registry schema](https://registry.modelcontextprotocol.io/) (root key `mcpServers`). Stdio: `command`, `args`, `env`, `cwd`, `timeout`, `description`. Remote: `url`, `transport`, `headers`, `timeout`, `description`. Transport auto-inferred from URL.
 - **Generators**: Extend `BaseGenerator` (`packages/generators/src/base.ts`), implement `generate()` to transform canonical → app-native format. Each implements `detectInstalled()` for platform-specific app detection.
-- **Registry**: `Map<string, RegistryEntry>` of server definitions with lookup, search, and filtering functions.
+- **Registry**: `Map<string, InternalRegistryEntry>` keyed by official reverse-DNS name (e.g. `io.github.github/github-mcp-server`), with search and filtering functions. `getServer()` is ID-only; use `getServerBySlug()` for slug lookups (web URLs).
 - **CLI**: Auto-detects installed apps, prompts for env vars, generates app-specific configs, and **merges** into existing files (never overwrites). Tracks installations in `getmcp-lock.json`.
 - **Design Principles**: (1) Never overwrite (2) Canonical format as single source of truth (3) Auto-detect apps (4) Platform-aware path resolution (5) Schema-validated via Zod
 
@@ -95,15 +95,15 @@ This is not optional — documentation drift causes confusion and wastes time. T
 
 ## Testing
 
-- **543 tests** across 27 test files
+- **719 tests** across 30 test files
 - Run all tests: `npx vitest` (from repo root)
 - Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc.
 - Test locations:
-  - `packages/core/tests/` — schema validation, type guards, transport inference, ProjectManifest
+  - `packages/core/tests/` — schema validation (including RegistrySource, RegistryCredential, RegistryAuthMethod), type guards, transport inference, ProjectManifest
   - `packages/generators/tests/` — all 19 generators (stdio + remote + multi-server + serialization + detectInstalled)
   - `packages/registry/tests/` — entry validation, lookup, search, categories, content integrity, fetch-metrics
-  - `packages/cli/tests/` — app-selection, bin flags, config-file I/O, detect, errors, format, lock file, preferences, registry-cache, utils
-  - `packages/cli/tests/commands/` — add, check, doctor, find, import, list, remove, sync, update command tests
+  - `packages/cli/tests/` — app-selection, bin flags, config-file I/O, credentials, detect, errors, format, lock file, preferences, registry-cache, registry-config, utils
+  - `packages/cli/tests/commands/` — add, check, doctor, find, import, list, registry, remove, sync, update command tests
 
 ---
 
