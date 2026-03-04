@@ -1,6 +1,6 @@
 {
   "name": "@getmcp/registry",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "Registry of MCP server definitions synced from the official MCP registry",
   "keywords": [
     "mcp",
