@@ -169,7 +169,9 @@ getmcp/
         utils.ts                   # Flag parsing, alias resolution, path shortening
         preferences.ts             # Global user preferences persistence
         format.ts                  # Config format detection from file extension
-        registry-cache.ts          # Multi-registry cache with paginated API fetching
+        registry-cache.ts          # Multi-registry cache orchestration + re-exports
+        registry-cache-io.ts       # Cache file I/O, paths, atomic writes
+        registry-cache-fetch.ts    # Paginated API fetching, entry merging
         registry-config.ts         # Registry source CRUD (~/.config/getmcp/registries.json)
         credentials.ts             # Credential storage for private registries
         commands/
@@ -854,13 +856,13 @@ The top-level `registries` array can declare additional `RegistrySource` entries
 
 Manage custom registry sources for discovering MCP servers beyond the official registry.
 
-| Subcommand | Arguments/Flags                             | Description                              |
-| ---------- | ------------------------------------------- | ---------------------------------------- |
-| `add`      | `<url>` `--name <name>` `--type <type>`     | Add a registry source                    |
-| `remove`   | `<name>`                                    | Remove a registry source by name         |
-| `list`     | `--json`                                    | List configured registries               |
-| `login`    | `<name>` `--method <bearer\|basic\|header>` | Authenticate to a private registry       |
-| `logout`   | `<name>`                                    | Remove stored credentials for a registry |
+| Subcommand | Arguments/Flags                                      | Description                                                      |
+| ---------- | ---------------------------------------------------- | ---------------------------------------------------------------- |
+| `add`      | `<url>` `--name <name>` `--type <type>` `--insecure` | Add a registry source (HTTPS required; `--insecure` allows HTTP) |
+| `remove`   | `<name>`                                             | Remove a registry source by name                                 |
+| `list`     | `--json`                                             | List configured registries                                       |
+| `login`    | `<name>` `--method <bearer\|basic\|header>`          | Authenticate to a private registry                               |
+| `logout`   | `<name>`                                             | Remove stored credentials for a registry                         |
 
 **Aliases**: `reg`
 
