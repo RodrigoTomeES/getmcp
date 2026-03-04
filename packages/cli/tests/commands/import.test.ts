@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach, type MockInstance } from "vitest";
 import { importCommand } from "../../src/commands/import.js";
-import { getServer } from "@getmcp/registry";
 
 vi.mock("@clack/prompts", () => ({
   intro: vi.fn(),
@@ -94,10 +93,9 @@ describe("importCommand", () => {
     const output = consoleSpy.mock.calls.map((c) => c.join(" ")).join("\n");
     const parsed = JSON.parse(output);
     expect(parsed.discovered.length).toBe(2);
-    // 1password should be matched to registry (via slug fallback or command match)
+    // 1password should be matched to registry (via command match)
     const matchedServer = parsed.discovered.find((s: { name: string }) => s.name === "1password");
-    const resolved = getServer("1password");
-    expect(matchedServer.registryId).toBe(resolved!.id);
+    expect(matchedServer.registryId).toBe("io.github.CakeRepository/1password");
     // custom-server should not be matched
     const customServer = parsed.discovered.find(
       (s: { name: string }) => s.name === "custom-server",
@@ -153,11 +151,10 @@ describe("importCommand", () => {
 
     await importCommand({ yes: true });
 
-    const resolved = getServer("1password");
     expect(writeLockFile).toHaveBeenCalledWith(
       expect.objectContaining({
         installations: expect.objectContaining({
-          [resolved!.id]: expect.objectContaining({
+          "io.github.CakeRepository/1password": expect.objectContaining({
             apps: ["claude-desktop"],
             envVars: [],
             scopes: { "claude-desktop": "project" },

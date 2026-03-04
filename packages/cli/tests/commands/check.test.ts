@@ -66,7 +66,7 @@ describe("checkCommand", () => {
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
       version: 1,
       installations: {
-        "github-github": {
+        "io.github.github/github-mcp-server": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -85,7 +85,9 @@ describe("checkCommand", () => {
       },
     ]);
 
-    (listServersInConfig as ReturnType<typeof vi.fn>).mockReturnValue(["github-github"]);
+    (listServersInConfig as ReturnType<typeof vi.fn>).mockReturnValue([
+      "io.github.github/github-mcp-server",
+    ]);
 
     await checkCommand();
 
@@ -101,7 +103,7 @@ describe("checkCommand", () => {
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
       version: 1,
       installations: {
-        "github-github": {
+        "io.github.github/github-mcp-server": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -157,7 +159,7 @@ describe("checkCommand", () => {
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
       version: 1,
       installations: {
-        "github-github": {
+        "io.github.github/github-mcp-server": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -176,14 +178,16 @@ describe("checkCommand", () => {
       },
     ]);
 
-    (listServersInConfig as ReturnType<typeof vi.fn>).mockReturnValue(["github-github"]);
+    (listServersInConfig as ReturnType<typeof vi.fn>).mockReturnValue([
+      "io.github.github/github-mcp-server",
+    ]);
 
     await checkCommand({ json: true });
 
     const output = consoleSpy.mock.calls.map((c) => c.join(" ")).join("\n");
     const parsed = JSON.parse(output);
     expect(Array.isArray(parsed)).toBe(true);
-    expect(parsed[0]).toHaveProperty("serverId", "github-github");
+    expect(parsed[0]).toHaveProperty("serverId", "io.github.github/github-mcp-server");
     expect(parsed[0]).toHaveProperty("inRegistry", true);
     expect(parsed[0].apps[0]).toHaveProperty("status", "present");
   });
@@ -195,7 +199,7 @@ describe("checkCommand", () => {
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
       version: 1,
       installations: {
-        "github-github": {
+        "io.github.github/github-mcp-server": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -222,7 +226,7 @@ describe("checkCommand", () => {
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
       version: 1,
       installations: {
-        "github-github": {
+        "io.github.github/github-mcp-server": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -257,7 +261,7 @@ describe("checkCommand", () => {
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
       version: 1,
       installations: {
-        "github-github": {
+        "io.github.github/github-mcp-server": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -276,7 +280,9 @@ describe("checkCommand", () => {
       },
     ]);
 
-    (listServersInConfig as ReturnType<typeof vi.fn>).mockReturnValue(["github-github"]);
+    (listServersInConfig as ReturnType<typeof vi.fn>).mockReturnValue([
+      "io.github.github/github-mcp-server",
+    ]);
 
     await checkCommand({ json: true });
 
@@ -294,7 +300,7 @@ describe("checkCommand", () => {
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
       version: 1,
       installations: {
-        "github-github": {
+        "io.github.github/github-mcp-server": {
           apps: ["claude-code"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -315,7 +321,9 @@ describe("checkCommand", () => {
       },
     ]);
 
-    (listServersInConfig as ReturnType<typeof vi.fn>).mockReturnValue(["github-github"]);
+    (listServersInConfig as ReturnType<typeof vi.fn>).mockReturnValue([
+      "io.github.github/github-mcp-server",
+    ]);
 
     await checkCommand({ json: true });
 
@@ -339,7 +347,7 @@ describe("checkCommand", () => {
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
       version: 1,
       installations: {
-        "github-github": {
+        "io.github.github/github-mcp-server": {
           apps: ["claude-desktop", "claude-code"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -367,7 +375,9 @@ describe("checkCommand", () => {
       },
     ]);
 
-    (listServersInConfig as ReturnType<typeof vi.fn>).mockReturnValue(["github-github"]);
+    (listServersInConfig as ReturnType<typeof vi.fn>).mockReturnValue([
+      "io.github.github/github-mcp-server",
+    ]);
 
     await checkCommand({ json: true });
 
