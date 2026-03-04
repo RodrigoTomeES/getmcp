@@ -172,6 +172,10 @@ npx @getmcp/cli import
 # Sync from project manifest (getmcp.json)
 npx @getmcp/cli sync
 
+# Manage custom registry sources
+npx @getmcp/cli registry list
+npx @getmcp/cli registry add https://mcp.example.com --name my-team
+
 # Machine-readable JSON output
 npx @getmcp/cli list --json`}</CodeBlock>
             <p>
@@ -209,16 +213,19 @@ npx @getmcp/cli list --json`}</CodeBlock>
         "DATABASE_URL": "postgresql://localhost:5432/mydb"
       }
     }
-  }
+  },
+  "registries": [
+    { "name": "my-team", "url": "https://mcp.example.com", "type": "private" }
+  ]
 }`}</CodeBlock>
             <p>
               Then any team member can install all declared servers into their detected apps with:
             </p>
             <CodeBlock label="CLI">{`npx @getmcp/cli sync`}</CodeBlock>
             <p>
-              The sync command reads the manifest, resolves each server from the registry, merges
-              any local overrides (like environment variables), and writes the correct config for
-              every detected app.
+              The sync command reads the manifest, resolves each server from configured registries,
+              merges any local overrides (like environment variables), and writes the correct config
+              for every detected app.
             </p>
           </div>
         </section>

@@ -18,7 +18,12 @@ function getReducedMotionServerSnapshot() {
   return false;
 }
 
-const COMMANDS = ["add github", "find search", "list --category ai", "remove github"];
+const COMMANDS = [
+  "add io.github.github/github-mcp-server",
+  "find search",
+  "list --category ai",
+  "registry list",
+];
 
 const TYPE_SPEED = 60; // ms per character when typing
 const ERASE_SPEED = 30; // ms per character when erasing
