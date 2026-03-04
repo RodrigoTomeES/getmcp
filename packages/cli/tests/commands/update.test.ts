@@ -25,7 +25,7 @@ vi.mock("../../src/config-file.js", () => ({
 
 // Mock lock file
 vi.mock("../../src/lock.js", () => ({
-  getTrackedServers: vi.fn(() => ({ version: 1, installations: {} })),
+  getTrackedServers: vi.fn(() => ({ version: 2, installations: {} })),
   trackInstallation: vi.fn(),
 }));
 
@@ -58,7 +58,7 @@ describe("updateCommand", () => {
     const { detectApps } = await import("../../src/detect.js");
 
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
-      version: 1,
+      version: 2,
       installations: {
         "nonexistent-server-xyz": {
           apps: ["claude-desktop"],
@@ -91,9 +91,9 @@ describe("updateCommand", () => {
     const { mergeServerIntoConfig, writeConfigFile } = await import("../../src/config-file.js");
 
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
-      version: 1,
+      version: 2,
       installations: {
-        "github-github": {
+        "io.github.github/github-mcp-server": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -123,9 +123,9 @@ describe("updateCommand", () => {
     const { detectApps } = await import("../../src/detect.js");
 
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
-      version: 1,
+      version: 2,
       installations: {
-        "github-github": {
+        "io.github.github/github-mcp-server": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -147,9 +147,10 @@ describe("updateCommand", () => {
     await updateCommand({ yes: true });
 
     expect(trackInstallation).toHaveBeenCalledWith(
-      "github-github",
+      "io.github.github/github-mcp-server",
       ["claude-desktop"],
       ["GITHUB_TOKEN"],
+      undefined,
       undefined,
       undefined,
     );
@@ -162,9 +163,9 @@ describe("updateCommand", () => {
     const { trackInstallation } = await import("../../src/lock.js");
 
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
-      version: 1,
+      version: 2,
       installations: {
-        "github-github": {
+        "io.github.github/github-mcp-server": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -194,9 +195,9 @@ describe("updateCommand", () => {
     const { detectApps } = await import("../../src/detect.js");
 
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
-      version: 1,
+      version: 2,
       installations: {
-        "github-github": {
+        "io.github.github/github-mcp-server": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",
@@ -221,9 +222,9 @@ describe("updateCommand", () => {
     const { detectApps } = await import("../../src/detect.js");
 
     (getTrackedServers as ReturnType<typeof vi.fn>).mockReturnValue({
-      version: 1,
+      version: 2,
       installations: {
-        "github-github": {
+        "io.github.github/github-mcp-server": {
           apps: ["claude-desktop"],
           installedAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T00:00:00.000Z",

@@ -141,9 +141,9 @@ describe("listCommand", () => {
 
     expect(consoleSpy).toHaveBeenCalled();
     const calls = consoleSpy.mock.calls.map((c) => c[0]);
-    // Each call should be a server ID (no spaces, no description)
+    // Each call should be an official ID (reverse-DNS format, no spaces, no description)
     for (const line of calls) {
-      expect(line).toMatch(/^[a-z0-9-]+$/);
+      expect(line).toMatch(/^[a-zA-Z0-9._/-]+$/);
     }
     expect(calls.length).toBeGreaterThan(0);
   });
