@@ -230,6 +230,146 @@ npx @getmcp/cli list --json`}</CodeBlock>
           </div>
         </section>
 
+        {/* Custom registries */}
+        <section id="custom-registries" className="mb-16 scroll-mt-24">
+          <h2 className="text-2xl font-bold mb-5">Custom registries</h2>
+          <div className="space-y-4 text-text-secondary leading-relaxed">
+            <p>
+              Beyond the official registry, getmcp supports multiple registry sources — teams can
+              host private registries or use third-party public ones.
+            </p>
+
+            <h3 id="adding-a-registry" className="text-lg font-semibold text-text scroll-mt-24">
+              Adding a registry
+            </h3>
+            <p>
+              Register a new source with the{" "}
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+                registry add
+              </code>{" "}
+              command. Use the{" "}
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+                --name
+              </code>{" "}
+              flag to give it a friendly alias:
+            </p>
+            <CodeBlock label="CLI">{`npx @getmcp/cli registry add https://mcp.example.com --name my-team`}</CodeBlock>
+            <p>
+              The CLI pings the registry{"'"}s{" "}
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+                /v0.1/ping
+              </code>{" "}
+              endpoint to detect whether it{"'"}s public or private. Private registries require
+              authentication (see below).
+            </p>
+
+            <h3 id="listing-registries" className="text-lg font-semibold text-text scroll-mt-24">
+              Listing registries
+            </h3>
+            <p>View all configured registries, including their type and status:</p>
+            <CodeBlock label="CLI">{`npx @getmcp/cli registry list
+
+# Machine-readable output
+npx @getmcp/cli registry list --json`}</CodeBlock>
+
+            <h3 id="removing-a-registry" className="text-lg font-semibold text-text scroll-mt-24">
+              Removing a registry
+            </h3>
+            <p>
+              Remove a registry by name. This also cleans up any stored credentials for that
+              registry:
+            </p>
+            <CodeBlock label="CLI">{`npx @getmcp/cli registry remove my-team`}</CodeBlock>
+
+            <h3
+              id="using-a-specific-registry"
+              className="text-lg font-semibold text-text scroll-mt-24"
+            >
+              Using a specific registry
+            </h3>
+            <p>
+              When adding a server, use the{" "}
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+                --registry
+              </code>{" "}
+              flag to install from a specific source:
+            </p>
+            <CodeBlock label="CLI">{`npx @getmcp/cli add my-server --registry my-team`}</CodeBlock>
+          </div>
+        </section>
+
+        {/* Authentication */}
+        <section id="authentication" className="mb-16 scroll-mt-24">
+          <h2 className="text-2xl font-bold mb-5">Authentication</h2>
+          <div className="space-y-4 text-text-secondary leading-relaxed">
+            <p>
+              Private registries require authentication. The CLI supports three auth methods:{" "}
+              <span className="text-text font-medium">bearer token</span>,{" "}
+              <span className="text-text font-medium">basic auth</span> (username/password), and{" "}
+              <span className="text-text font-medium">custom header</span>.
+            </p>
+
+            <h3 id="login" className="text-lg font-semibold text-text scroll-mt-24">
+              Login
+            </h3>
+            <p>
+              Authenticate with a registry using the{" "}
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+                --method
+              </code>{" "}
+              flag to choose your auth method:
+            </p>
+            <CodeBlock label="CLI">{`# Bearer token (default)
+npx @getmcp/cli registry login my-team --method bearer
+
+# Basic auth (username + password)
+npx @getmcp/cli registry login my-team --method basic
+
+# Custom header (key + value)
+npx @getmcp/cli registry login my-team --method header`}</CodeBlock>
+
+            <h3 id="logout" className="text-lg font-semibold text-text scroll-mt-24">
+              Logout
+            </h3>
+            <p>Remove stored credentials for a registry:</p>
+            <CodeBlock label="CLI">{`npx @getmcp/cli registry logout my-team`}</CodeBlock>
+
+            <h3 id="env-var-override" className="text-lg font-semibold text-text scroll-mt-24">
+              Environment variable override
+            </h3>
+            <p>
+              For CI/CD pipelines or automated environments, set an environment variable instead of
+              using interactive login. The variable{" "}
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+                GETMCP_REGISTRY_&lt;NAME&gt;_TOKEN
+              </code>{" "}
+              is resolved first and treated as a bearer token:
+            </p>
+            <CodeBlock label="CLI">{`# For a registry named "my-team"
+export GETMCP_REGISTRY_MY_TEAM_TOKEN=your-token-here
+npx @getmcp/cli add my-server --registry my-team`}</CodeBlock>
+
+            <h3 id="credential-storage" className="text-lg font-semibold text-text scroll-mt-24">
+              Credential storage
+            </h3>
+            <p>
+              Credentials are stored locally at{" "}
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+                ~/.config/getmcp/credentials.json
+              </code>{" "}
+              with{" "}
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+                0600
+              </code>{" "}
+              permissions (owner read/write only). Removing a registry with{" "}
+              <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+                registry remove
+              </code>{" "}
+              automatically cleans up its credentials.
+            </p>
+          </div>
+        </section>
+
         {/* Supported apps */}
         <section id="supported-apps" className="mb-16 scroll-mt-24">
           <h2 className="text-2xl font-bold mb-5">Supported apps</h2>
