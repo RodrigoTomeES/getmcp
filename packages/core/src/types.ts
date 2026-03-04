@@ -103,6 +103,9 @@ export interface AppMetadata {
 
   /** URL to the app's MCP documentation */
   docsUrl: string;
+
+  /** Whether the app requires a restart to pick up config changes */
+  requiresRestart?: boolean;
 }
 
 /**

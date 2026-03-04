@@ -28,6 +28,7 @@ export class WindsurfGenerator extends BaseGenerator {
     },
     configFormat: "json",
     docsUrl: "https://docs.windsurf.com/windsurf/cascade/mcp",
+    requiresRestart: true,
   };
 
   protected override transformRemote(config: LooseServerConfigType): Record<string, unknown> {

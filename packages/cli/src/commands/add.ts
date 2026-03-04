@@ -402,9 +402,7 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
   }
 
   // Reminder for apps that need restart
-  const needsRestart = selectedApps.some((a) =>
-    ["claude-desktop", "windsurf", "cursor"].includes(a.id),
-  );
+  const needsRestart = selectedApps.some((a) => generators[a.id].app.requiresRestart === true);
   if (needsRestart && !options.dryRun) {
     p.log.info("Some apps may need to be restarted to pick up changes.");
   }

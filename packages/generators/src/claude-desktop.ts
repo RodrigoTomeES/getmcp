@@ -25,6 +25,7 @@ export class ClaudeDesktopGenerator extends BaseGenerator {
     },
     configFormat: "json",
     docsUrl: "https://modelcontextprotocol.io/quickstart/user",
+    requiresRestart: true,
   };
 
   override detectInstalled(): boolean {
