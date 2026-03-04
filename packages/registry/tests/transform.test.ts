@@ -181,7 +181,8 @@ describe("transformToInternal", () => {
 
     const result = transformToInternal(entry);
     expect(result).not.toBeNull();
-    expect(result!.id).toBe("my-server");
+    expect(result!.id).toBe("io.github.test/my-server");
+    expect(result!.slug).toBe("my-server");
     expect(result!.name).toBe("My Server");
     expect(result!.description).toBe("A test server");
     expect(result!.categories).toEqual(["developer-tools"]);
@@ -190,7 +191,6 @@ describe("transformToInternal", () => {
     expect(result!.runtime).toBe("node");
     expect(result!.repository).toBe("https://github.com/test/my-server");
     expect(result!.homepage).toBe("https://myserver.com");
-    expect(result!.officialName).toBe("io.github.test/my-server");
   });
 
   it("returns null when no enrichment slug", () => {

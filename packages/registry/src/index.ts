@@ -16,14 +16,15 @@ import type { GetMCPMetricsType } from "./enrichment-types.js";
 
 // Re-export for consumers
 export { extractServerConfig, type ExtractedConfig } from "./extract-config.js";
-export { type InternalRegistryEntry } from "./transform.js";
+export { transformToInternal, type InternalRegistryEntry } from "./transform.js";
+export { generateSlug } from "./id-mapping.js";
 
 // ---------------------------------------------------------------------------
 // Registry state
 // ---------------------------------------------------------------------------
 
 const _registry: Map<string, InternalRegistryEntry> = new Map();
-const _officialNameIndex: Map<string, string> = new Map(); // officialName -> slug
+const _slugIndex: Map<string, string> = new Map(); // slug -> id
 let _rawEntries: RegistryEntryType[] = [];
 let _loaded = false;
 let _sortedCache: InternalRegistryEntry[] | null = null;
@@ -63,7 +64,7 @@ function loadServers(): void {
     const entry = transformToInternal(raw);
     if (entry) {
       _registry.set(entry.id, entry);
-      _officialNameIndex.set(entry.officialName, entry.id);
+      _slugIndex.set(entry.slug, entry.id);
     }
   }
 
@@ -80,7 +81,7 @@ function loadServers(): void {
  */
 export function resetRegistry(): void {
   _registry.clear();
-  _officialNameIndex.clear();
+  _slugIndex.clear();
   _rawEntries = [];
   _loaded = false;
   invalidateCache();
@@ -105,7 +106,7 @@ export function loadFromPath(serversJsonPath: string): void {
     const entry = transformToInternal(raw);
     if (entry) {
       _registry.set(entry.id, entry);
-      _officialNameIndex.set(entry.officialName, entry.id);
+      _slugIndex.set(entry.slug, entry.id);
     }
   }
 
@@ -118,7 +119,7 @@ export function loadFromPath(serversJsonPath: string): void {
 // ---------------------------------------------------------------------------
 
 /**
- * Get a server by its slug ID.
+ * Get a server by its ID (official reverse-DNS name).
  */
 export function getServer(id: string): InternalRegistryEntry | undefined {
   ensureLoaded();
@@ -126,7 +127,7 @@ export function getServer(id: string): InternalRegistryEntry | undefined {
 }
 
 /**
- * Get a server by its slug ID, throwing if not found.
+ * Get a server by its ID, throwing if not found.
  */
 export function getServerOrThrow(id: string): InternalRegistryEntry {
   ensureLoaded();
@@ -140,13 +141,21 @@ export function getServerOrThrow(id: string): InternalRegistryEntry {
 }
 
 /**
+ * Get a server by its slug.
+ */
+export function getServerBySlug(slug: string): InternalRegistryEntry | undefined {
+  ensureLoaded();
+  const id = _slugIndex.get(slug);
+  if (!id) return undefined;
+  return _registry.get(id);
+}
+
+/**
  * Get a server by its official reverse-DNS name.
+ * @deprecated Use getServer() directly — IDs are now official names.
  */
 export function getServerByOfficialName(name: string): InternalRegistryEntry | undefined {
-  ensureLoaded();
-  const slug = _officialNameIndex.get(name);
-  if (!slug) return undefined;
-  return _registry.get(slug);
+  return getServer(name);
 }
 
 /**
@@ -155,7 +164,7 @@ export function getServerByOfficialName(name: string): InternalRegistryEntry | u
 export function getServerIds(): string[] {
   ensureLoaded();
   if (!_sortedIdsCache) {
-    _sortedIdsCache = Array.from(_registry.keys()).sort();
+    _sortedIdsCache = Array.from(_registry.keys()).sort((a, b) => a.localeCompare(b));
   }
   return _sortedIdsCache;
 }
@@ -189,12 +198,12 @@ export function searchServers(query: string): InternalRegistryEntry[] {
   return getAllServers().filter((entry) => {
     const searchable = [
       entry.id,
+      entry.slug,
       entry.name,
       entry.description,
       ...(entry.categories ?? []),
       entry.author ?? "",
       ...(entry.tags ?? []),
-      entry.officialName,
     ]
       .join(" ")
       .toLowerCase();
@@ -268,7 +277,41 @@ export function findServerByCommand(
 }
 
 /**
- * Get all metrics as a Map keyed by slug ID.
+ * Load registry data from pre-built InternalRegistryEntry[].
+ * Used by multi-registry cache to load merged entries without going through
+ * the file-based transform pipeline.
+ */
+export function loadFromEntries(entries: InternalRegistryEntry[]): void {
+  resetRegistry();
+
+  for (const entry of entries) {
+    _registry.set(entry.id, entry);
+    _slugIndex.set(entry.slug, entry.id);
+  }
+
+  invalidateCache();
+  _loaded = true;
+}
+
+/**
+ * Get all servers from a specific registry source.
+ */
+export function getServersByRegistry(registryName: string): InternalRegistryEntry[] {
+  return getAllServers().filter((entry) => entry.registrySource === registryName);
+}
+
+/**
+ * Search servers within a specific registry source.
+ */
+export function searchServersInRegistry(
+  query: string,
+  registryName: string,
+): InternalRegistryEntry[] {
+  return searchServers(query).filter((entry) => entry.registrySource === registryName);
+}
+
+/**
+ * Get all metrics as a Map keyed by server ID (official name).
  * Builds and caches the index on first call.
  */
 export function getAllMetrics(): Map<string, GetMCPMetricsType> {
@@ -276,35 +319,48 @@ export function getAllMetrics(): Map<string, GetMCPMetricsType> {
   if (!_metricsCache) {
     _metricsCache = new Map();
     for (const raw of _rawEntries) {
-      const enrichment = raw._meta?.["es.getmcp/enrichment"] as { slug?: string } | undefined;
-      if (enrichment?.slug) {
-        const m = raw._meta?.["es.getmcp/metrics"] as GetMCPMetricsType | undefined;
-        if (m) _metricsCache.set(enrichment.slug, m);
-      }
+      const m = raw._meta?.["es.getmcp/metrics"] as GetMCPMetricsType | undefined;
+      if (m) _metricsCache.set(raw.server.name, m);
     }
   }
   return _metricsCache;
 }
 
 /**
- * Get metrics for a server by slug ID.
+ * Get metrics for a server by ID (official name) or slug.
  * Uses the cached metrics index for O(1) lookup.
  */
 export function getServerMetrics(id: string): GetMCPMetricsType | undefined {
-  return getAllMetrics().get(id);
+  const metrics = getAllMetrics();
+  const direct = metrics.get(id);
+  if (direct) return direct;
+
+  // Fallback: try resolving slug to official name
+  const officialId = _slugIndex.get(id);
+  if (officialId) return metrics.get(officialId);
+
+  return undefined;
 }
 
 /**
- * Get the full raw entry in official format by slug ID.
+ * Get the full raw entry in official format by ID (official name) or slug.
  */
 export function getRawServerData(id: string): RegistryEntryType | undefined {
   ensureLoaded();
+
+  // Direct match by official name
   for (const raw of _rawEntries) {
-    const enrichment = raw._meta?.["es.getmcp/enrichment"] as { slug?: string } | undefined;
-    if (enrichment?.slug === id) {
-      return raw;
+    if (raw.server.name === id) return raw;
+  }
+
+  // Fallback: resolve slug to official name
+  const officialId = _slugIndex.get(id);
+  if (officialId) {
+    for (const raw of _rawEntries) {
+      if (raw.server.name === officialId) return raw;
     }
   }
+
   return undefined;
 }
 
