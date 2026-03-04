@@ -25,6 +25,7 @@ export { generateSlug } from "./id-mapping.js";
 
 const _registry: Map<string, InternalRegistryEntry> = new Map();
 const _slugIndex: Map<string, string> = new Map(); // slug -> id
+const _rawIndex: Map<string, RegistryEntryType> = new Map(); // server.name -> raw entry
 let _rawEntries: RegistryEntryType[] = [];
 let _loaded = false;
 let _sortedCache: InternalRegistryEntry[] | null = null;
@@ -61,6 +62,7 @@ function loadServers(): void {
   _rawEntries = JSON.parse(fs.readFileSync(dataPath, "utf-8")) as RegistryEntryType[];
 
   for (const raw of _rawEntries) {
+    _rawIndex.set(raw.server.name, raw);
     const entry = transformToInternal(raw);
     if (entry) {
       _registry.set(entry.id, entry);
@@ -82,6 +84,7 @@ function loadServers(): void {
 export function resetRegistry(): void {
   _registry.clear();
   _slugIndex.clear();
+  _rawIndex.clear();
   _rawEntries = [];
   _loaded = false;
   invalidateCache();
@@ -103,6 +106,7 @@ export function loadFromPath(serversJsonPath: string): void {
   _rawEntries = JSON.parse(fs.readFileSync(serversJsonPath, "utf-8")) as RegistryEntryType[];
 
   for (const raw of _rawEntries) {
+    _rawIndex.set(raw.server.name, raw);
     const entry = transformToInternal(raw);
     if (entry) {
       _registry.set(entry.id, entry);
@@ -348,18 +352,13 @@ export function getServerMetrics(id: string): GetMCPMetricsType | undefined {
 export function getRawServerData(id: string): RegistryEntryType | undefined {
   ensureLoaded();
 
-  // Direct match by official name
-  for (const raw of _rawEntries) {
-    if (raw.server.name === id) return raw;
-  }
+  // Direct match by official name — O(1) via _rawIndex
+  const direct = _rawIndex.get(id);
+  if (direct) return direct;
 
   // Fallback: resolve slug to official name
   const officialId = _slugIndex.get(id);
-  if (officialId) {
-    for (const raw of _rawEntries) {
-      if (raw.server.name === officialId) return raw;
-    }
-  }
+  if (officialId) return _rawIndex.get(officialId);
 
   return undefined;
 }
