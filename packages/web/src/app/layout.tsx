@@ -39,6 +39,13 @@ export const metadata: Metadata = {
     "MCP config generator",
     "MCP CLI",
     "getmcp",
+    "MCP registry",
+    "MCP server installer",
+    "MCP configuration",
+    "Windsurf MCP",
+    "Codex MCP",
+    "team MCP setup",
+    "private MCP registry",
   ],
   icons: {
     icon: "/icon.svg",
