@@ -56,6 +56,10 @@ export interface CliFlags {
   help: boolean;
   version: boolean;
   refresh: boolean;
+  registry?: string;
+  name?: string;
+  type?: string;
+  method?: string;
 }
 
 export function parseFlags(argv: string[]): {
@@ -131,6 +135,26 @@ export function parseFlags(argv: string[]): {
       flags.version = true;
     } else if (arg === "--refresh") {
       flags.refresh = true;
+    } else if (arg.startsWith("--registry=")) {
+      flags.registry = arg.slice("--registry=".length);
+    } else if (arg === "--registry" && i + 1 < argv.length) {
+      i++;
+      flags.registry = argv[i];
+    } else if (arg.startsWith("--name=")) {
+      flags.name = arg.slice("--name=".length);
+    } else if (arg === "--name" && i + 1 < argv.length) {
+      i++;
+      flags.name = argv[i];
+    } else if (arg.startsWith("--type=")) {
+      flags.type = arg.slice("--type=".length);
+    } else if (arg === "--type" && i + 1 < argv.length) {
+      i++;
+      flags.type = argv[i];
+    } else if (arg.startsWith("--method=")) {
+      flags.method = arg.slice("--method=".length);
+    } else if (arg === "--method" && i + 1 < argv.length) {
+      i++;
+      flags.method = argv[i];
     } else if (arg.startsWith("-")) {
       // Unknown flag — warn the user
       const flagName = arg.split("=")[0];
@@ -174,6 +198,8 @@ const COMMAND_ALIASES: Record<string, string> = {
   dr: "doctor",
   import: "import",
   sync: "sync",
+  registry: "registry",
+  reg: "registry",
 };
 
 export function resolveAlias(command: string): string | undefined {
@@ -216,6 +242,10 @@ const KNOWN_FLAGS = [
   "--version",
   "-v",
   "--refresh",
+  "--registry",
+  "--name",
+  "--type",
+  "--method",
 ];
 
 function findSimilarFlag(input: string): string | undefined {

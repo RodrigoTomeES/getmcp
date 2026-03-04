@@ -6,7 +6,10 @@ export type CliErrorCode =
   | "APP_NOT_DETECTED"
   | "INVALID_APP"
   | "SERVER_NOT_FOUND"
-  | "NON_INTERACTIVE";
+  | "NON_INTERACTIVE"
+  | "REGISTRY_NOT_FOUND"
+  | "REGISTRY_AUTH_ERROR"
+  | "REGISTRY_RESERVED_NAME";
 
 /**
  * Base class for CLI errors that include remediation steps.
@@ -102,6 +105,54 @@ export class NonInteractiveError extends CliError {
       "NON_INTERACTIVE",
     );
     this.name = "NonInteractiveError";
+  }
+}
+
+/**
+ * Thrown when a registry source is not found.
+ */
+export class RegistryNotFoundError extends CliError {
+  readonly registryName: string;
+
+  constructor(name: string) {
+    super(
+      `Registry "${name}" not found.`,
+      `Run "getmcp registry list" to see configured registries.`,
+      "REGISTRY_NOT_FOUND",
+    );
+    this.name = "RegistryNotFoundError";
+    this.registryName = name;
+  }
+}
+
+/**
+ * Thrown when authentication to a private registry fails.
+ */
+export class RegistryAuthError extends CliError {
+  readonly registryName: string;
+
+  constructor(name: string) {
+    super(
+      `Authentication failed for registry "${name}".`,
+      `Run "getmcp registry login ${name}" to re-authenticate.`,
+      "REGISTRY_AUTH_ERROR",
+    );
+    this.name = "RegistryAuthError";
+    this.registryName = name;
+  }
+}
+
+/**
+ * Thrown when attempting to modify the reserved "official" registry name.
+ */
+export class RegistryReservedNameError extends CliError {
+  constructor() {
+    super(
+      `The "official" registry name is reserved and cannot be modified.`,
+      `Use a different name for your custom registry.`,
+      "REGISTRY_RESERVED_NAME",
+    );
+    this.name = "RegistryReservedNameError";
   }
 }
 
