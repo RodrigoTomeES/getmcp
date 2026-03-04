@@ -167,10 +167,15 @@ describe("getRegistryCacheDir", () => {
     expect(result).toBe(path.join("/custom/config", "getmcp", "registry-cache"));
   });
 
-  it("falls back to ~/.config when XDG_CONFIG_HOME is unset", () => {
+  it("falls back to platform default when XDG_CONFIG_HOME is unset", () => {
     delete process.env.XDG_CONFIG_HOME;
     const result = getRegistryCacheDir();
-    expect(result).toBe(path.join(os.homedir(), ".config", "getmcp", "registry-cache"));
+    if (process.platform === "win32") {
+      const appData = process.env.APPDATA ?? path.join(os.homedir(), "AppData", "Roaming");
+      expect(result).toBe(path.join(appData, "getmcp", "registry-cache"));
+    } else {
+      expect(result).toBe(path.join(os.homedir(), ".config", "getmcp", "registry-cache"));
+    }
   });
 });
 

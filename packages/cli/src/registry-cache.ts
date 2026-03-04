@@ -70,13 +70,18 @@ interface ApiServerListResponse {
  * Get the platform-specific registry cache directory (root).
  */
 export function getRegistryCacheDir(): string {
+  // Respect XDG_CONFIG_HOME on all platforms (including Windows) — this is
+  // the standard override mechanism and also used by tests to isolate cache.
+  if (process.env.XDG_CONFIG_HOME) {
+    return path.join(process.env.XDG_CONFIG_HOME, "getmcp", "registry-cache");
+  }
+
   if (process.platform === "win32") {
     const appData = process.env.APPDATA ?? path.join(os.homedir(), "AppData", "Roaming");
     return path.join(appData, "getmcp", "registry-cache");
   }
 
-  const configDir = process.env.XDG_CONFIG_HOME ?? path.join(os.homedir(), ".config");
-  return path.join(configDir, "getmcp", "registry-cache");
+  return path.join(os.homedir(), ".config", "getmcp", "registry-cache");
 }
 
 /**
