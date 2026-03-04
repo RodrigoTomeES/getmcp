@@ -7,6 +7,9 @@ import {
   RegistryEntry,
   AppId,
   ProjectManifest,
+  RegistryAuthMethod,
+  RegistrySource,
+  RegistryCredential,
 } from "../src/schemas.js";
 
 // ---------------------------------------------------------------------------
@@ -302,5 +305,133 @@ describe("ProjectManifest", () => {
 
   it("rejects manifest without servers key", () => {
     expect(() => ProjectManifest.parse({})).toThrow();
+  });
+
+  it("parses a manifest with registries", () => {
+    const result = ProjectManifest.parse({
+      servers: { github: {} },
+      registries: [
+        { name: "company", url: "https://registry.company.com", type: "private", priority: 50 },
+      ],
+    });
+    expect(result.registries).toHaveLength(1);
+    expect(result.registries![0].name).toBe("company");
+  });
+
+  it("parses a manifest with server registry override", () => {
+    const result = ProjectManifest.parse({
+      servers: {
+        "my-server": { registry: "company" },
+      },
+    });
+    const entry = result.servers["my-server"] as { registry?: string };
+    expect(entry.registry).toBe("company");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// RegistryAuthMethod
+// ---------------------------------------------------------------------------
+
+describe("RegistryAuthMethod", () => {
+  it("accepts valid auth methods", () => {
+    for (const method of ["bearer", "basic", "header"]) {
+      expect(RegistryAuthMethod.parse(method)).toBe(method);
+    }
+  });
+
+  it("rejects invalid auth methods", () => {
+    expect(() => RegistryAuthMethod.parse("oauth")).toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// RegistrySource
+// ---------------------------------------------------------------------------
+
+describe("RegistrySource", () => {
+  it("parses a valid public registry source", () => {
+    const result = RegistrySource.parse({
+      name: "company",
+      url: "https://registry.company.com",
+    });
+    expect(result.name).toBe("company");
+    expect(result.url).toBe("https://registry.company.com");
+    expect(result.type).toBe("public");
+    expect(result.priority).toBe(100);
+  });
+
+  it("parses a valid private registry source", () => {
+    const result = RegistrySource.parse({
+      name: "my-private",
+      url: "https://private.example.com",
+      type: "private",
+      priority: 50,
+    });
+    expect(result.type).toBe("private");
+    expect(result.priority).toBe(50);
+  });
+
+  it("rejects names with uppercase", () => {
+    expect(() => RegistrySource.parse({ name: "Company", url: "https://example.com" })).toThrow();
+  });
+
+  it("rejects names with spaces", () => {
+    expect(() =>
+      RegistrySource.parse({ name: "my registry", url: "https://example.com" }),
+    ).toThrow();
+  });
+
+  it("rejects empty name", () => {
+    expect(() => RegistrySource.parse({ name: "", url: "https://example.com" })).toThrow();
+  });
+
+  it("rejects invalid URL", () => {
+    expect(() => RegistrySource.parse({ name: "test", url: "not-a-url" })).toThrow();
+  });
+
+  it("rejects negative priority", () => {
+    expect(() =>
+      RegistrySource.parse({ name: "test", url: "https://example.com", priority: -1 }),
+    ).toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// RegistryCredential
+// ---------------------------------------------------------------------------
+
+describe("RegistryCredential", () => {
+  it("parses a bearer credential", () => {
+    const result = RegistryCredential.parse({
+      method: "bearer",
+      token: "my-token",
+    });
+    expect(result.method).toBe("bearer");
+    expect(result.token).toBe("my-token");
+  });
+
+  it("parses a basic credential", () => {
+    const result = RegistryCredential.parse({
+      method: "basic",
+      username: "user",
+      token: "pass",
+    });
+    expect(result.method).toBe("basic");
+    expect(result.username).toBe("user");
+  });
+
+  it("parses a header credential", () => {
+    const result = RegistryCredential.parse({
+      method: "header",
+      headerName: "X-API-Key",
+      token: "key123",
+    });
+    expect(result.method).toBe("header");
+    expect(result.headerName).toBe("X-API-Key");
+  });
+
+  it("rejects invalid method", () => {
+    expect(() => RegistryCredential.parse({ method: "oauth" })).toThrow();
   });
 });
