@@ -60,6 +60,7 @@ export interface CliFlags {
   name?: string;
   type?: string;
   method?: string;
+  insecure: boolean;
 }
 
 export function parseFlags(argv: string[]): {
@@ -80,6 +81,7 @@ export function parseFlags(argv: string[]): {
     help: false,
     version: false,
     refresh: false,
+    insecure: false,
   };
 
   let command: string | undefined;
@@ -155,6 +157,8 @@ export function parseFlags(argv: string[]): {
     } else if (arg === "--method" && i + 1 < argv.length) {
       i++;
       flags.method = argv[i];
+    } else if (arg === "--insecure") {
+      flags.insecure = true;
     } else if (arg.startsWith("-")) {
       // Unknown flag — warn the user
       const flagName = arg.split("=")[0];
@@ -259,6 +263,7 @@ const KNOWN_FLAGS = [
   "--name",
   "--type",
   "--method",
+  "--insecure",
 ];
 
 function findSimilarFlag(input: string): string | undefined {

@@ -300,6 +300,7 @@ async function main(): Promise<void> {
         name: flags.name,
         type: flags.type,
         method: flags.method,
+        insecure: flags.insecure,
       });
       break;
     }

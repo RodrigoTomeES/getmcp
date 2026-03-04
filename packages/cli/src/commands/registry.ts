@@ -43,6 +43,7 @@ export interface RegistryOptions {
   name?: string;
   type?: string;
   method?: string;
+  insecure?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -162,7 +163,7 @@ async function addSubcommand(url: string | undefined, options: RegistryOptions):
 
   // Persist
   try {
-    addRegistry({ name, url: normalised, type, priority: 100 });
+    addRegistry({ name, url: normalised, type, priority: 100 }, undefined, options.insecure);
   } catch (err) {
     p.log.error(formatError(err));
     process.exit(1);

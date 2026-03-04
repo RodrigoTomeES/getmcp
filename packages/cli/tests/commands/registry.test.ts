@@ -56,6 +56,7 @@ vi.mock("../../src/credentials.js", () => ({
   resolveCredential: vi.fn(() => null),
   buildAuthHeaders: vi.fn(() => ({ Authorization: "Bearer test-token" })),
   getEnvVarName: vi.fn((name: string) => `GETMCP_REGISTRY_${name.toUpperCase()}_TOKEN`),
+  isValidHeaderName: vi.fn(() => true),
 }));
 
 // ---------------------------------------------------------------------------
@@ -143,7 +144,11 @@ describe("registryCommand add", () => {
 
     await registryCommand("add", ["https://registry.example.com"], {});
 
-    expect(addRegistry).toHaveBeenCalledWith(expect.objectContaining({ name: "example" }));
+    expect(addRegistry).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "example" }),
+      undefined,
+      undefined,
+    );
   });
 
   it("uses explicit --name when provided", async () => {
@@ -151,7 +156,11 @@ describe("registryCommand add", () => {
 
     await registryCommand("add", ["https://registry.example.com"], { name: "my-reg" });
 
-    expect(addRegistry).toHaveBeenCalledWith(expect.objectContaining({ name: "my-reg" }));
+    expect(addRegistry).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "my-reg" }),
+      undefined,
+      undefined,
+    );
   });
 
   it("pings the registry during add", async () => {
@@ -183,6 +192,8 @@ describe("registryCommand add", () => {
 
     expect(addRegistry).toHaveBeenCalledWith(
       expect.objectContaining({ url: "https://registry.example.com" }),
+      undefined,
+      undefined,
     );
   });
 
@@ -191,7 +202,11 @@ describe("registryCommand add", () => {
 
     await registryCommand("add", ["https://registry.example.com"], {});
 
-    expect(addRegistry).toHaveBeenCalledWith(expect.objectContaining({ type: "public" }));
+    expect(addRegistry).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "public" }),
+      undefined,
+      undefined,
+    );
   });
 
   it("sets type to private when --type private is passed", async () => {
@@ -201,7 +216,11 @@ describe("registryCommand add", () => {
 
     await registryCommand("add", ["https://registry.example.com"], { type: "private" });
 
-    expect(addRegistry).toHaveBeenCalledWith(expect.objectContaining({ type: "private" }));
+    expect(addRegistry).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "private" }),
+      undefined,
+      undefined,
+    );
   });
 
   it("offers login prompt for private registry type", async () => {

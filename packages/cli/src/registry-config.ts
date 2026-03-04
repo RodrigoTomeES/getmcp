@@ -28,6 +28,40 @@ const RegistrySourceSchema = z.object({
     .string()
     .min(1)
     .regex(/^[a-z0-9-]+$/),
+  url: z
+    .string()
+    .url()
+    .refine(
+      (u) => {
+        try {
+          const parsed = new URL(u);
+          if (parsed.protocol === "https:") return true;
+          // Allow http for local development
+          if (
+            parsed.protocol === "http:" &&
+            (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1")
+          ) {
+            return true;
+          }
+          return false;
+        } catch {
+          return false;
+        }
+      },
+      { message: "Registry URL must use HTTPS (http allowed only for localhost/127.0.0.1)" },
+    ),
+  type: z.enum(["public", "private"]).default("public"),
+  priority: z.number().int().nonnegative().default(100),
+});
+
+/**
+ * Insecure variant — allows http:// URLs (used with --insecure flag).
+ */
+const RegistrySourceInsecureSchema = z.object({
+  name: z
+    .string()
+    .min(1)
+    .regex(/^[a-z0-9-]+$/),
   url: z.string().url(),
   type: z.enum(["public", "private"]).default("public"),
   priority: z.number().int().nonnegative().default(100),
@@ -134,7 +168,11 @@ export function writeRegistriesConfig(config: RegistrySourceType[], filePath?: s
  *   - A registry with the same name already exists.
  *   - The source fails Zod validation.
  */
-export function addRegistry(source: RegistrySourceType, filePath?: string): void {
+export function addRegistry(
+  source: RegistrySourceType,
+  filePath?: string,
+  insecure?: boolean,
+): void {
   if (source.name === OFFICIAL_REGISTRY_NAME) {
     throw new Error(
       `"official" is a reserved registry name and cannot be used for custom registries.`,
@@ -142,7 +180,9 @@ export function addRegistry(source: RegistrySourceType, filePath?: string): void
   }
 
   // Validate the incoming source through the schema
-  const parsed = RegistrySourceSchema.parse(source);
+  // When --insecure is set, skip the HTTPS enforcement
+  const schema = insecure ? RegistrySourceInsecureSchema : RegistrySourceSchema;
+  const parsed = schema.parse(source);
 
   const existing = readRegistriesConfig(filePath);
 
