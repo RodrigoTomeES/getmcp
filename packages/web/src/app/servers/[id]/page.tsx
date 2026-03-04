@@ -154,7 +154,7 @@ function ServerDetail({
 }) {
   const isRemote = "url" in server.config;
   const transport = isRemote ? "remote" : "stdio";
-  const version = metrics?.npm?.latestVersion ?? metrics?.pypi?.latestVersion;
+  const version = metrics?.npm?.latestVersion ?? metrics?.pypi?.latestVersion ?? server.version;
 
   const jsonLd = [
     {

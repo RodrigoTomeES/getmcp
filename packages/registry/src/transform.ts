@@ -53,6 +53,8 @@ export interface InternalRegistryEntry {
   tags?: string[];
   /** Whether this is an official (first-party) server */
   isOfficial?: boolean;
+  /** Server version from registry (fallback when no npm/pypi metrics) */
+  version?: string;
   /** Registry source name this entry came from */
   registrySource?: string;
 }
@@ -107,5 +109,6 @@ export function transformToInternal(entry: RegistryEntryType): InternalRegistryE
     language: enrichment.language,
     tags: enrichment.tags,
     isOfficial: enrichment.isOfficial,
+    version: server.version,
   };
 }

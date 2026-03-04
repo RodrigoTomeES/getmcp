@@ -58,7 +58,7 @@ export function ServerSidebar({
 }) {
   const downloads = metrics?.npm?.weeklyDownloads ?? metrics?.pypi?.weeklyDownloads;
   const downloadLabel = downloads != null ? "/week" : "";
-  const version = metrics?.npm?.latestVersion ?? metrics?.pypi?.latestVersion;
+  const version = metrics?.npm?.latestVersion ?? metrics?.pypi?.latestVersion ?? server.version;
   const isRemote = "url" in server.config;
 
   const hasStats =
