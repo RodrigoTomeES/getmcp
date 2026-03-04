@@ -1,42 +1,32 @@
 import Link from "next/link";
-import { getServerBySlug } from "@getmcp/registry";
+import { getOfficialServers, getServerMetrics } from "@getmcp/registry";
 import { ServerCard, type ServerCardData } from "./ServerCard";
 
-const POPULAR_SLUGS = [
-  "github",
-  "playwright",
-  "postgres",
-  "slack",
-  "docker",
-  "brave-search",
-  "notion",
-  "stripe",
-  "figma",
-  "sentry",
-  "supabase",
-  "filesystem",
-];
-
 export function PopularServers() {
-  const servers: ServerCardData[] = POPULAR_SLUGS.flatMap((slug) => {
-    const s = getServerBySlug(slug);
-    if (!s) return [];
-    return {
-      id: s.id,
-      slug: s.slug,
-      name: s.name,
-      description: s.description,
-      categories: s.categories as string[],
-      runtime: s.runtime as string | undefined,
-      isRemote: "url" in s.config,
-      envCount: s.requiredEnvVars.length,
-    };
-  });
+  const servers = getOfficialServers()
+    .map((s) => {
+      const metrics = getServerMetrics(s.id);
+      return {
+        id: s.id,
+        slug: s.slug,
+        name: s.name,
+        description: s.description,
+        categories: s.categories as string[],
+        runtime: s.runtime as string | undefined,
+        isRemote: "url" in s.config,
+        envCount: s.requiredEnvVars.length,
+        stars: metrics?.github?.stars,
+        downloads: metrics?.npm?.weeklyDownloads,
+        isOfficial: s.isOfficial || false,
+      };
+    })
+    .sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0))
+    .slice(0, 6) satisfies ServerCardData[];
 
   return (
     <section>
       <div className="flex items-baseline justify-between mb-4">
-        <h2 className="text-xl font-bold">Popular Servers</h2>
+        <h2 className="text-xl font-bold">Popular Official Servers</h2>
         <Link href="/servers" className="text-sm text-accent hover:underline transition-colors">
           Browse all servers &rarr;
         </Link>
