@@ -142,4 +142,5 @@ Skills are installed under `.agents/skills/`. See the skill files for triggers a
 - **[`file-map.md`](./.agents/docs/file-map.md)** — Complete file-by-file reference for all 5 packages
 - **[`publishing.md`](./.agents/docs/publishing.md)** — Auto-release workflow, OIDC trusted publishing, trigger paths, edge cases
 - **[`commit-convention.md`](./.agents/docs/commit-convention.md)** — Conventional Commits types, scopes, and examples
+- **[`external-apis.md`](./.agents/docs/external-apis.md)** — External API endpoints, data fetched, error handling, and official docs links
 - **Repository**: `https://github.com/RodrigoTomeES/getmcp`
