@@ -5,6 +5,10 @@
  * enabling check/update workflows.
  *
  * Lock file location: ./getmcp-lock.json (project root)
+ *
+ * Version history:
+ *   v1: Keys were slugs (e.g. "github-github")
+ *   v2: Keys are official reverse-DNS names (e.g. "io.github.modelcontextprotocol/servers-github")
  */
 
 import * as fs from "node:fs";
@@ -27,10 +31,12 @@ export interface LockInstallation {
   envVars: string[];
   /** Per-app installation scope (missing entry = "project" for backwards compat) */
   scopes?: Partial<Record<string, "project" | "global">>;
+  /** Registry source name this server was installed from */
+  registry?: string;
 }
 
 export interface LockFile {
-  version: 1;
+  version: 2;
   installations: Record<string, LockInstallation>;
 }
 
@@ -44,14 +50,20 @@ const LockInstallationSchema = z.object({
   updatedAt: z.string(),
   envVars: z.array(z.string()),
   scopes: z.record(z.string(), z.enum(["project", "global"])).optional(),
+  registry: z.string().optional(),
 });
 
-const LockFileSchema = z.object({
+const LockFileV2Schema = z.object({
+  version: z.literal(2),
+  installations: z.record(z.string(), LockInstallationSchema),
+});
+
+const LockFileV1Schema = z.object({
   version: z.literal(1),
   installations: z.record(z.string(), LockInstallationSchema),
 });
 
-export { LockFileSchema };
+export const LockFileSchema = LockFileV2Schema;
 
 // ---------------------------------------------------------------------------
 // Path resolution
@@ -65,32 +77,84 @@ export function getLockFilePath(): string {
 }
 
 // ---------------------------------------------------------------------------
+// V1 → V2 migration
+// ---------------------------------------------------------------------------
+
+/**
+ * Resolver function type for migrating v1 slug keys to v2 official name keys.
+ * Given a slug, returns the official name if found, or undefined.
+ */
+export type SlugResolver = (slug: string) => string | undefined;
+
+/**
+ * Migrate a v1 lock file (slug-keyed) to v2 (official name-keyed).
+ * If a resolver is provided, slugs are mapped to official names.
+ * Unresolvable slugs are kept as-is (best effort).
+ */
+function migrateV1ToV2(
+  v1: { version: 1; installations: Record<string, z.infer<typeof LockInstallationSchema>> },
+  resolver?: SlugResolver,
+): LockFile {
+  const installations: Record<string, LockInstallation> = {};
+
+  for (const [slug, installation] of Object.entries(v1.installations)) {
+    const officialName = resolver?.(slug) ?? slug;
+    // If multiple slugs resolve to the same official name, merge them
+    const existing = installations[officialName];
+    if (existing) {
+      const allApps = new Set([...existing.apps, ...installation.apps]);
+      existing.apps = [...allApps] as LockInstallation["apps"];
+      const allEnv = new Set([...existing.envVars, ...installation.envVars]);
+      existing.envVars = [...allEnv];
+      if (installation.scopes) {
+        existing.scopes = { ...existing.scopes, ...installation.scopes };
+      }
+    } else {
+      installations[officialName] = { ...installation } as LockInstallation;
+    }
+  }
+
+  return { version: 2, installations };
+}
+
+// ---------------------------------------------------------------------------
 // Read / Write
 // ---------------------------------------------------------------------------
 
 /**
  * Read the lock file. Returns a default empty lock if it doesn't exist.
+ * Automatically migrates v1 lock files to v2 format.
  */
-export function readLockFile(filePath?: string): LockFile {
+export function readLockFile(filePath?: string, slugResolver?: SlugResolver): LockFile {
   const lockPath = filePath ?? getLockFilePath();
 
   if (!fs.existsSync(lockPath)) {
-    return { version: 1, installations: {} };
+    return { version: 2, installations: {} };
   }
 
   try {
     const raw = fs.readFileSync(lockPath, "utf-8");
-    if (!raw.trim()) return { version: 1, installations: {} };
+    if (!raw.trim()) return { version: 2, installations: {} };
     const parsed = JSON.parse(raw);
 
-    const result = LockFileSchema.safeParse(parsed);
-    if (!result.success) {
-      return { version: 1, installations: {} };
+    // Try v2 first
+    const v2Result = LockFileV2Schema.safeParse(parsed);
+    if (v2Result.success) {
+      return v2Result.data as LockFile;
     }
 
-    return result.data as LockFile;
+    // Try v1 and migrate
+    const v1Result = LockFileV1Schema.safeParse(parsed);
+    if (v1Result.success) {
+      const migrated = migrateV1ToV2(v1Result.data, slugResolver);
+      // Write back migrated version
+      writeLockFile(migrated, filePath);
+      return migrated;
+    }
+
+    return { version: 2, installations: {} };
   } catch {
-    return { version: 1, installations: {} };
+    return { version: 2, installations: {} };
   }
 }
 
@@ -123,6 +187,7 @@ export function trackInstallation(
   envVarNames: string[],
   filePath?: string,
   scopes?: Partial<Record<string, "project" | "global">>,
+  registry?: string,
 ): void {
   const lock = readLockFile(filePath);
   const now = new Date().toISOString();
@@ -140,6 +205,10 @@ export function trackInstallation(
     if (scopes) {
       existing.scopes = { ...existing.scopes, ...scopes };
     }
+    // Update registry source if provided
+    if (registry) {
+      existing.registry = registry;
+    }
   } else {
     lock.installations[serverId] = {
       apps: appIds,
@@ -147,6 +216,7 @@ export function trackInstallation(
       updatedAt: now,
       envVars: envVarNames,
       ...(scopes && Object.keys(scopes).length > 0 ? { scopes } : {}),
+      ...(registry ? { registry } : {}),
     };
   }
 
