@@ -13,7 +13,7 @@
 
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
-import { BaseGenerator, home, safeExistsSync } from "./base.js";
+import { BaseGenerator, toRemoteFields, home, safeExistsSync } from "./base.js";
 
 export class WindsurfGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -32,17 +32,9 @@ export class WindsurfGenerator extends BaseGenerator {
   };
 
   protected override transformRemote(config: LooseServerConfigType): Record<string, unknown> {
-    if (!("url" in config)) {
-      throw new Error("Expected remote config but got stdio config");
-    }
-    // Windsurf uses "serverUrl" for HTTP servers
-    return {
-      serverUrl: config.url,
-      ...(config.headers && Object.keys(config.headers).length > 0
-        ? { headers: config.headers }
-        : {}),
-      ...(config.timeout ? { timeout: config.timeout } : {}),
-    };
+    const { url, transport: _transport, ...rest } = toRemoteFields(config);
+    // Windsurf uses "serverUrl" instead of "url"
+    return { serverUrl: url, ...rest };
   }
 
   override detectInstalled(): boolean {

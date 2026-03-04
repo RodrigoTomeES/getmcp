@@ -15,7 +15,15 @@
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
 import { inferTransport } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, home, appData, configHome, safeExistsSync } from "./base.js";
+import {
+  BaseGenerator,
+  toStdioFields,
+  toRemoteFields,
+  home,
+  appData,
+  configHome,
+  safeExistsSync,
+} from "./base.js";
 
 export class RooCodeGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -44,17 +52,13 @@ export class RooCodeGenerator extends BaseGenerator {
   }
 
   protected override transformRemote(config: LooseServerConfigType): Record<string, unknown> {
-    if (!("url" in config)) {
-      throw new Error("Expected remote config but got stdio config");
-    }
+    const base = toRemoteFields(config);
     const transport = inferTransport(config as Parameters<typeof inferTransport>[0]);
+    // Roo Code uses "type" instead of "transport" and requires "streamable-http" (not "http")
+    const { transport: _transport, description: _description, ...rest } = base;
     return {
       type: transport === "http" ? "streamable-http" : transport,
-      url: config.url,
-      ...(config.headers && Object.keys(config.headers).length > 0
-        ? { headers: config.headers }
-        : {}),
-      ...(config.timeout ? { timeout: config.timeout } : {}),
+      ...rest,
       alwaysAllow: [],
       disabled: false,
     };

@@ -11,7 +11,15 @@
 
 import { join } from "node:path";
 import type { AppMetadata, LooseServerConfigType } from "@getmcp/core";
-import { BaseGenerator, toStdioFields, home, appData, configHome, safeExistsSync } from "./base.js";
+import {
+  BaseGenerator,
+  toStdioFields,
+  toRemoteFields,
+  home,
+  appData,
+  configHome,
+  safeExistsSync,
+} from "./base.js";
 
 export class ClineGenerator extends BaseGenerator {
   app: AppMetadata = {
@@ -40,15 +48,8 @@ export class ClineGenerator extends BaseGenerator {
   }
 
   protected override transformRemote(config: LooseServerConfigType): Record<string, unknown> {
-    if (!("url" in config)) {
-      throw new Error("Expected remote config but got stdio config");
-    }
     return {
-      url: config.url,
-      ...(config.headers && Object.keys(config.headers).length > 0
-        ? { headers: config.headers }
-        : {}),
-      ...(config.timeout ? { timeout: config.timeout } : {}),
+      ...toRemoteFields(config),
       alwaysAllow: [],
       disabled: false,
     };
