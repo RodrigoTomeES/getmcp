@@ -52,8 +52,8 @@ Bugs and incorrect behavior that affect users.
 - [x] **Switch from slug IDs to official server names** — Canonical `id` is now the official reverse-DNS name (`server.name`, e.g. `io.github.github/github-mcp-server`), eliminating slug generation inconsistencies between CLI and sync pipeline. `slug` is a new derived field for URLs and config keys. Lock file upgraded to v2 with auto-migration from v1 slug-keyed format. Fixed pagination bug in registry cache (`body.metadata.nextCursor` instead of `body.nextCursor`). CLI accepts both official names and slugs via fallback lookup.
   - Files: `packages/registry/src/transform.ts`, `packages/registry/src/index.ts`, `packages/cli/src/registry-cache.ts`, `packages/cli/src/lock.ts`, `packages/cli/src/commands/add.ts`, `packages/cli/src/commands/update.ts`, `packages/cli/src/commands/sync.ts`, `packages/cli/src/commands/check.ts`, `packages/cli/src/commands/list.ts`, `packages/cli/src/commands/find.ts`, `packages/cli/src/commands/import.ts`, `packages/cli/src/commands/doctor.ts`, `packages/core/src/schemas.ts`, `packages/core/src/types.ts`
 
-- [ ] **Fix filesystem server placeholder arg** — The `args` array includes `/path/to/allowed/directory`, a placeholder the user must customize. There is no mechanism to prompt for this or indicate it needs customization. Consider adding it to `requiredEnvVars` or introducing a `requiredArgs` field.
-  - File: `packages/registry/servers/filesystem.json`
+- [ ] **Fix filesystem server placeholder arg** — The old `args` array included `/path/to/allowed/directory`, a placeholder the user had to customize. The official registry format now uses `packageArguments` to describe required arguments declaratively. This item is partially addressed by the schema migration but servers with positional args still need UX work in the CLI to prompt users.
+  - Reference: `packages/core/src/schemas.ts` (`packageArguments` in `RegistryEntry`)
 
 - [x] **Add missing `timeout` forwarding in generators** — Added timeout forwarding to all affected generators.
   - Files: `packages/generators/src/cline.ts`, `roo-code.ts`, `windsurf.ts`, `zed.ts`
@@ -73,11 +73,11 @@ Critical gaps in test coverage.
 - [x] **Add tests for `bin.ts` argument parsing** — Added tests for `--json`, `--quiet`/`-q`, `--from-npm`, `--from-pypi`, `--from-url` flag parsing, and `doctor`/`dr` alias resolution.
   - File: `packages/cli/tests/bin.test.ts`
 
-- [ ] **Add unit tests for `deepMerge`** — Used by `BaseGenerator.generateAll()` but has no standalone tests. Edge cases to cover: merging with `null`, arrays, nested objects of different shapes, empty objects.
-  - File: `packages/generators/src/base.ts` (lines 41-62)
+- [x] **Add unit tests for `deepMerge`** — Tests exist in `generators.test.ts` (`deepMerge > handles empty source`, `deepMerge > does not mutate original objects`).
+  - File: `packages/generators/tests/generators.test.ts`
 
-- [ ] **Add error path tests for `toStdioFields`/`toRemoteFields`** — These helper methods throw when passed the wrong config type, but those error paths have no test coverage.
-  - File: `packages/generators/src/base.ts`
+- [x] **Add error path tests for `toStdioFields`/`toRemoteFields`** — Tests exist in `generators.test.ts` (`toStdioFields error handling > throws for remote config`, `toRemoteFields error handling > throws for stdio config`).
+  - File: `packages/generators/tests/generators.test.ts`
 
 - [ ] **Add tests for web package** — The entire Next.js app has zero tests. Should add at minimum: component tests for `ConfigViewer`, `SearchBar`, `ServerCard`; integration tests for server detail pages; snapshot tests for key layouts.
   - Directory: `packages/web/`
@@ -285,8 +285,7 @@ Refactoring and hygiene improvements.
 - [x] **Update stale numbers in SPECIFICATION.md** — Updated all references to reflect the current state (12 apps, 331 tests, 11 test files).
   - File: `.agents/docs/SPECIFICATION.md`
 
-- [ ] **Implement platform override handling** — `RegistryEntry` schema supports `windows`/`linux`/`macos` override fields but no generator or CLI code uses them. The CLI should apply platform-specific `command`/`args`/`env` overrides when generating configs (e.g., `cmd /c npx` on Windows).
-  - Files: `packages/generators/src/base.ts`, `packages/cli/src/commands/add.ts`
+- [x] ~~**Implement platform override handling**~~ — Obsolete. The `PlatformOverride` schema (`windows`/`linux`/`macos` fields) was removed when migrating to the official MCP registry format. The official registry uses `packages[].packageArguments` and `packages[].runtimeArguments` instead of platform-specific command overrides.
 
 ---
 

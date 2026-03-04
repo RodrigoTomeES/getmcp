@@ -43,3 +43,24 @@ export {
   NonInteractiveError,
   formatError,
 } from "./errors.js";
+export { registryCommand } from "./commands/registry.js";
+export {
+  addRegistry,
+  removeRegistry,
+  getAllRegistries,
+  getEffectiveRegistries,
+  getRegistriesConfigPath,
+} from "./registry-config.js";
+export {
+  storeCredential,
+  removeCredential,
+  resolveCredential,
+  buildAuthHeaders,
+  getCredentialStorePath,
+} from "./credentials.js";
+export {
+  initRegistryCache,
+  refreshRegistryCache,
+  clearRegistryCache,
+  getRegistryCacheDir,
+} from "./registry-cache.js";
