@@ -101,7 +101,7 @@ export function SearchBar({
     () =>
       servers.map((s) => ({
         server: s,
-        searchable: [s.id, s.name, s.description, s.author ?? "", ...(s.categories ?? [])]
+        searchable: [s.id, s.slug, s.name, s.description, s.author ?? "", ...(s.categories ?? [])]
           .join(" ")
           .toLowerCase(),
       })),

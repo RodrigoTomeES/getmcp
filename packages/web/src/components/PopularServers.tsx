@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { getServer } from "@getmcp/registry";
+import { getServerBySlug } from "@getmcp/registry";
 import { ServerCard, type ServerCardData } from "./ServerCard";
 
-const POPULAR_IDS = [
+const POPULAR_SLUGS = [
   "github",
   "playwright",
   "postgres",
@@ -18,11 +18,12 @@ const POPULAR_IDS = [
 ];
 
 export function PopularServers() {
-  const servers: ServerCardData[] = POPULAR_IDS.flatMap((id) => {
-    const s = getServer(id);
+  const servers: ServerCardData[] = POPULAR_SLUGS.flatMap((slug) => {
+    const s = getServerBySlug(slug);
     if (!s) return [];
     return {
       id: s.id,
+      slug: s.slug,
       name: s.name,
       description: s.description,
       categories: s.categories as string[],

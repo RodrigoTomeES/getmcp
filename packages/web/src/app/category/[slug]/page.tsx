@@ -53,6 +53,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
   const minimalServers: ServerCardData[] = servers.map((s) => ({
     id: s.id,
+    slug: s.slug,
     name: s.name,
     description: s.description,
     categories: s.categories,
@@ -82,7 +83,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         "@type": "ListItem",
         position: i + 1,
         name: s.name,
-        url: `${SITE_URL}/servers/${s.id}`,
+        url: `${SITE_URL}/servers/${s.slug}`,
       })),
     },
     {
