@@ -47,7 +47,7 @@ export function DeveloperExperience() {
               {"\n"}
               <span className="text-accent">$</span>{" "}
               <span className="text-text">getmcp rm slack --yes</span>
-              {"            "}
+              {"          "}
               <span className="text-text-secondary"># Skip prompts</span>
               {"\n"}
               <span className="text-accent">$</span> <span className="text-text">getmcp dr</span>
@@ -56,7 +56,7 @@ export function DeveloperExperience() {
               {"\n"}
               <span className="text-accent">$</span>{" "}
               <span className="text-text">getmcp add pg --app=cursor</span>
-              {"       "}
+              {"     "}
               <span className="text-text-secondary"># Target one app</span>
             </code>
           </pre>

@@ -41,7 +41,12 @@ export default function HomePage() {
         "@type": "Organization",
         name: "getmcp",
         url: SITE_URL,
-        logo: { "@type": "ImageObject", url: `${SITE_URL}/icon.svg`, width: 32, height: 32 },
+        logo: {
+          "@type": "ImageObject",
+          url: `${SITE_URL}/icon.svg`,
+          width: 32,
+          height: 32,
+        },
         sameAs: [
           "https://github.com/RodrigoTomeES/getmcp",
           "https://www.npmjs.com/package/@getmcp/cli",
@@ -141,9 +146,9 @@ export default function HomePage() {
 
         {/* Right column: description + animated CLI */}
         <div className="relative flex flex-col justify-center text-center lg:text-left">
-          <p className="text-text-secondary text-xl sm:text-2xl lg:text-3xl leading-tight tracking-tight text-balance mb-8">
+          <p className="text-text-secondary text-xl sm:text-2xl leading-tight tracking-tight text-balance mb-8">
             One command. Every AI app. Install and configure MCP servers across{" "}
-            <span className="text-text font-medium">{appCount} applications</span> — from Claude
+            <span className="text-text font-medium">{appCount} applications</span> - from Claude
             Desktop to VS Code to Cursor.{" "}
             <span className="text-text font-medium">{count}+ servers</span> ready, with automatic
             config generation for JSON, JSONC, YAML, and TOML.
@@ -182,20 +187,6 @@ export default function HomePage() {
           getmcp solves this: define your servers once, and we generate the correct config for all{" "}
           {appCount} supported apps automatically.
         </p>
-        <ul className="text-text-secondary text-sm font-mono mb-4 space-y-1 list-none pl-0">
-          <li>
-            Claude Desktop → JSON with <code>mcpServers</code>
-          </li>
-          <li>
-            VS Code → JSON with <code>servers</code>
-          </li>
-          <li>
-            Goose → YAML with <code>extensions</code>
-          </li>
-          <li>
-            Codex → TOML with <code>mcp_servers</code>
-          </li>
-        </ul>
         <p className="font-medium text-text mb-6">
           No more copy-pasting from docs. No more format guessing.
         </p>
