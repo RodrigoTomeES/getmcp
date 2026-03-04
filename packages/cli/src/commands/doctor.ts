@@ -17,6 +17,8 @@ import { getServer } from "@getmcp/registry";
 import { detectInstalledApps } from "../detect.js";
 import { readConfigFile, listServersInConfig } from "../config-file.js";
 import { getTrackedServers } from "../lock.js";
+import { getAllRegistries } from "../registry-config.js";
+import { resolveCredential } from "../credentials.js";
 
 export interface DoctorOptions {
   json?: boolean;
@@ -151,6 +153,9 @@ export async function doctorCommand(options: DoctorOptions = {}): Promise<void> 
   checkRuntime("npx", "--version", results);
   checkRuntime("uvx", "--version", results);
 
+  // 8. Check registries
+  await checkRegistries(results);
+
   // Output
   if (options.json) {
     console.log(JSON.stringify(results, null, 2));
@@ -179,6 +184,67 @@ export async function doctorCommand(options: DoctorOptions = {}): Promise<void> 
     p.outro(`${warnings.length} warning(s) found. ${oks.length} check(s) passed.`);
   } else {
     p.outro(`All ${oks.length} check(s) passed.`);
+  }
+}
+
+async function checkRegistries(results: DiagnosticResult[]): Promise<void> {
+  const registries = getAllRegistries();
+
+  results.push({
+    category: "registries",
+    status: "ok",
+    message: `${registries.length} registry source(s) configured`,
+    details: registries.map((r) => r.name).join(", "),
+  });
+
+  for (const reg of registries) {
+    if (reg.type === "private") {
+      const cred = resolveCredential(reg.name);
+      if (!cred) {
+        results.push({
+          category: "registries",
+          status: "warn",
+          message: `"${reg.name}" is a private registry with no credentials`,
+          details: `Run "getmcp registry login ${reg.name}" to authenticate.`,
+        });
+      }
+    }
+
+    // Ping each registry
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5_000);
+      const response = await fetch(`${reg.url.replace(/\/$/, "")}/v0.1/ping`, {
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const body: unknown = await response.json();
+        const pong =
+          typeof body === "object" &&
+          body !== null &&
+          (body as Record<string, unknown>)["pong"] === true;
+        results.push({
+          category: "registries",
+          status: pong ? "ok" : "warn",
+          message: `"${reg.name}" (${reg.url}): ${pong ? "reachable" : "responded but no pong"}`,
+        });
+      } else {
+        results.push({
+          category: "registries",
+          status: "warn",
+          message: `"${reg.name}" (${reg.url}): HTTP ${response.status}`,
+        });
+      }
+    } catch {
+      results.push({
+        category: "registries",
+        status: "warn",
+        message: `"${reg.name}" (${reg.url}): unreachable`,
+        details: "Could not connect. The registry may be down or the URL may be incorrect.",
+      });
+    }
   }
 }
 

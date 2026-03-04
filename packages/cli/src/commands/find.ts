@@ -90,10 +90,12 @@ export async function findCommand(initialQuery?: string, options: FindOptions = 
       const envNote = envCount > 0 ? ` | ${envCount} env var${envCount > 1 ? "s" : ""}` : "";
       const categories =
         s.categories && s.categories.length > 0 ? ` | ${s.categories.join(", ")}` : "";
+      const registryTag =
+        s.registrySource && s.registrySource !== "official" ? ` [${s.registrySource}]` : "";
 
       return {
         label: s.name,
-        hint: `${transport}${envNote}${categories}`,
+        hint: `${transport}${envNote}${categories}${registryTag}`,
         value: s,
       };
     }),

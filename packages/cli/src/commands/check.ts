@@ -39,10 +39,11 @@ export async function checkCommand(options: CheckOptions = {}): Promise<void> {
         const resolvedApp = appScope === "global" ? resolveAppForScope(app, "global") : app;
         try {
           const servers = listServersInConfig(resolvedApp.configPath);
+          const found = servers.includes(serverId);
           return {
             app: appId,
             scope: appScope,
-            status: servers.includes(serverId) ? ("present" as const) : ("missing" as const),
+            status: found ? ("present" as const) : ("missing" as const),
           };
         } catch {
           return { app: appId, scope: appScope, status: "unreadable" as const };
@@ -54,6 +55,7 @@ export async function checkCommand(options: CheckOptions = {}): Promise<void> {
         name: registryEntry?.name ?? serverId,
         inRegistry,
         installedAt: installation.installedAt,
+        ...(installation.registry ? { registry: installation.registry } : {}),
         apps: appStatuses,
       };
     });
@@ -78,8 +80,9 @@ export async function checkCommand(options: CheckOptions = {}): Promise<void> {
     const registryEntry = getServer(serverId);
 
     if (!registryEntry) {
+      const registryNote = installation.registry ? ` (registry: ${installation.registry})` : "";
       p.log.warn(
-        `${serverId}: no longer in registry\n` +
+        `${serverId}: no longer in registry${registryNote}\n` +
           `  Installed in: ${installation.apps.join(", ")}\n` +
           `  Installed at: ${installation.installedAt}`,
       );

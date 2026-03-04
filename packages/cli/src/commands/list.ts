@@ -51,6 +51,7 @@ async function listRegistry(search?: string, opts: OutputOptions = {}): Promise<
       transport: "command" in s.config ? "stdio" : "remote",
       categories: s.categories ?? [],
       requiredEnvVars: s.requiredEnvVars,
+      ...(s.registrySource ? { registry: s.registrySource } : {}),
     }));
     console.log(JSON.stringify(data, null, 2));
     return;
@@ -81,8 +82,12 @@ async function listRegistry(search?: string, opts: OutputOptions = {}): Promise<
     const envNote = envCount > 0 ? ` [${envCount} env var${envCount > 1 ? "s" : ""} required]` : "";
     const categories =
       server.categories && server.categories.length > 0 ? ` (${server.categories.join(", ")})` : "";
+    const registryTag =
+      server.registrySource && server.registrySource !== "official"
+        ? ` [${server.registrySource}]`
+        : "";
 
-    lines.push(`${server.id} — ${server.name}`);
+    lines.push(`${server.id} — ${server.name}${registryTag}`);
     lines.push(`  ${server.description}`);
     lines.push(`  ${transport}${envNote}${categories}`);
     lines.push("");

@@ -45,6 +45,7 @@ export interface AddOptions {
   fromUrl?: string;
   global?: boolean;
   project?: boolean;
+  registry?: string;
 }
 
 export async function addCommand(serverIdArg?: string, options: AddOptions = {}): Promise<void> {
@@ -346,7 +347,15 @@ export async function addCommand(serverIdArg?: string, options: AddOptions = {})
       for (const r of successResults) {
         scopes[r.app.id] = r.app.supportsBothScopes ? chosenScope : "project";
       }
-      trackInstallation(entry.id, successAppIds, entry.requiredEnvVars, undefined, scopes);
+      const registrySource = options.registry ?? entry.registrySource;
+      trackInstallation(
+        entry.id,
+        successAppIds,
+        entry.requiredEnvVars,
+        undefined,
+        scopes,
+        registrySource,
+      );
     }
   }
 

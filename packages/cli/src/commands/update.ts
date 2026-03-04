@@ -132,7 +132,7 @@ export async function updateCommand(options: UpdateOptions = {}): Promise<void> 
 
       try {
         const generator = getGenerator(app.id);
-        const generatedConfig = generator.generate(serverId, config);
+        const generatedConfig = generator.generate(registryEntry.id, config);
 
         if (options.dryRun) {
           spin.stop(`Preview: ${registryEntry.name} → ${app.name}`);
@@ -161,6 +161,7 @@ export async function updateCommand(options: UpdateOptions = {}): Promise<void> 
         installation.envVars,
         undefined,
         installation.scopes,
+        installation.registry,
       );
     }
   }

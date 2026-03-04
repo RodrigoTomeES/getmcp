@@ -18,6 +18,7 @@ import { trackInstallation } from "../lock.js";
 import { getSavedSelectedApps, saveSelectedApps } from "../preferences.js";
 import { shortenPath, isNonInteractive as isNonInteractiveCheck } from "../utils.js";
 import { InvalidAppError, formatError } from "../errors.js";
+import { initProjectRegistries } from "../registry-cache.js";
 
 export interface SyncOptions {
   yes?: boolean;
@@ -66,6 +67,11 @@ export async function syncCommand(options: SyncOptions = {}): Promise<void> {
       p.outro("Done");
     }
     return;
+  }
+
+  // Initialize project-level registries from manifest
+  if (manifest.registries && manifest.registries.length > 0) {
+    await initProjectRegistries(manifest.registries);
   }
 
   const serverIds = Object.keys(manifest.servers);
@@ -247,12 +253,14 @@ export async function syncCommand(options: SyncOptions = {}): Promise<void> {
         const app = targetApps.find((a) => a.id === appId);
         scopes[appId] = app?.supportsBothScopes ? (serverScope as "project" | "global") : "project";
       }
+      const registrySource = serverOverrides?.registry ?? registryEntry.registrySource;
       trackInstallation(
         registryEntry.id,
         configuredApps as AppIdType[],
         registryEntry.requiredEnvVars,
         undefined,
         scopes,
+        registrySource,
       );
     }
 
