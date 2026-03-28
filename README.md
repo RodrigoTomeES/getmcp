@@ -32,7 +32,7 @@ npx @getmcp/cli list --search=database
 npx @getmcp/cli remove github
 ```
 
-> **Note:** If you run into issues with `npx`, try `npx @getmcp/cli@latest` — npx can cache stale versions, and v0.7.0 had a broken release.
+> **Note:** If you run into issues with `npx`, try `npx @getmcp/cli@latest` вЂ” npx can cache stale versions, and v0.7.0 had a broken release.
 
 ## Why getmcp?
 
@@ -149,6 +149,27 @@ const all = generateAllConfigs("github", {
 // all["goose"]          => YAML string
 // all["codex"]          => TOML string
 ```
+
+### Wrap an existing stdio server with a transport firewall
+
+Because getmcp uses a canonical stdio command definition, you can also generate configs for a firewall-wrapped MCP server without changing the underlying server package:
+
+```ts
+const protectedFilesystem = generateAllConfigs("filesystem-safe", {
+  command: "npx",
+  args: [
+    "-y",
+    "mcp-transport-firewall",
+    "--",
+    "npx",
+    "-y",
+    "@modelcontextprotocol/server-filesystem",
+    ".",
+  ],
+});
+```
+
+More package-first launch patterns are documented at https://github.com/shleder/mcp-transport-firewall/blob/main/docs/CLIENT_CONFIGS.md.
 
 ### Validate configs with Zod schemas
 
