@@ -50,8 +50,8 @@
   },
   "dependencies": {
     "@getmcp/core": "*",
-    "smol-toml": "^1.6.0",
-    "yaml": "^2.8.2"
+    "smol-toml": "^1.6.1",
+    "yaml": "^2.8.3"
   },
   "engines": {
     "node": ">=22.17.0"
