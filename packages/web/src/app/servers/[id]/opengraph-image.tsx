@@ -1,11 +1,16 @@
 import { ImageResponse } from "next/og";
-import { getServerBySlug, getAllServers } from "@getmcp/registry";
+import { getServerBySlug } from "@getmcp/registry";
 import { isStdioConfig } from "@getmcp/core";
 import { getCommand, DEFAULT_PM } from "@/lib/package-manager";
 import { loadOGFonts, OG_FONT_FAMILY, stripEmoji } from "@/lib/og-image";
+import { getPopularOfficialServers } from "@/lib/popular-servers";
+
+export const dynamic = "force-static";
+export const revalidate = false;
+export const dynamicParams = true;
 
 export function generateStaticParams() {
-  return getAllServers().map((server) => ({ id: server.slug }));
+  return getPopularOfficialServers().map((server) => ({ id: server.slug }));
 }
 
 export const alt = "MCP Server Configuration";
