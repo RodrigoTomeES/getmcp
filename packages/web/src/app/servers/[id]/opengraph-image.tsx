@@ -5,7 +5,6 @@ import { getCommand, DEFAULT_PM } from "@/lib/package-manager";
 import { loadOGFonts, OG_FONT_FAMILY, stripEmoji } from "@/lib/og-image";
 import { getPopularOfficialServers } from "@/lib/popular-servers";
 
-export const dynamic = "force-static";
 export const revalidate = false;
 export const dynamicParams = true;
 

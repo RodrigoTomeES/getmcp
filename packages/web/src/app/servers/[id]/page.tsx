@@ -14,7 +14,6 @@ import { GUIDE_SLUGS } from "@/lib/guide-data";
 import { SITE_URL } from "@/lib/constants";
 import { getPopularOfficialServers } from "@/lib/popular-servers";
 
-export const dynamic = "force-static";
 export const revalidate = false;
 export const dynamicParams = true;
 
