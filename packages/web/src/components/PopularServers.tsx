@@ -1,27 +1,25 @@
 import Link from "next/link";
-import { getOfficialServers, getServerMetrics } from "@getmcp/registry";
+import { getServerMetrics } from "@getmcp/registry";
 import { ServerCard, type ServerCardData } from "./ServerCard";
+import { getPopularOfficialServers } from "@/lib/popular-servers";
 
 export function PopularServers() {
-  const servers = getOfficialServers()
-    .map((s) => {
-      const metrics = getServerMetrics(s.id);
-      return {
-        id: s.id,
-        slug: s.slug,
-        name: s.name,
-        description: s.description,
-        categories: s.categories as string[],
-        runtime: s.runtime as string | undefined,
-        isRemote: "url" in s.config,
-        envCount: s.requiredEnvVars.length,
-        stars: metrics?.github?.stars,
-        downloads: metrics?.npm?.weeklyDownloads,
-        isOfficial: s.isOfficial || false,
-      };
-    })
-    .sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0))
-    .slice(0, 6) satisfies ServerCardData[];
+  const servers = getPopularOfficialServers().map((s) => {
+    const metrics = getServerMetrics(s.id);
+    return {
+      id: s.id,
+      slug: s.slug,
+      name: s.name,
+      description: s.description,
+      categories: s.categories as string[],
+      runtime: s.runtime as string | undefined,
+      isRemote: "url" in s.config,
+      envCount: s.requiredEnvVars.length,
+      stars: metrics?.github?.stars,
+      downloads: metrics?.npm?.weeklyDownloads,
+      isOfficial: s.isOfficial || false,
+    };
+  }) satisfies ServerCardData[];
 
   return (
     <section>

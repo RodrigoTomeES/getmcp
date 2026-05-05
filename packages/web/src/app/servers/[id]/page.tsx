@@ -12,11 +12,14 @@ import { ServerSidebar } from "@/components/ServerSidebar";
 import { Lock, BadgeCheck } from "lucide-react";
 import { GUIDE_SLUGS } from "@/lib/guide-data";
 import { SITE_URL } from "@/lib/constants";
+import { getPopularOfficialServers } from "@/lib/popular-servers";
 
-export const dynamicParams = false;
+export const dynamic = "force-static";
+export const revalidate = false;
+export const dynamicParams = true;
 
 export function generateStaticParams() {
-  return getAllServers().map((server) => ({ id: server.slug }));
+  return getPopularOfficialServers().map((server) => ({ id: server.slug }));
 }
 
 export function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
