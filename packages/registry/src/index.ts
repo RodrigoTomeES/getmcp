@@ -7,12 +7,16 @@
  */
 
 import * as fs from "node:fs";
-import * as path from "node:path";
-import { fileURLToPath } from "node:url";
 import type { RegistryEntryType } from "@getmcp/core";
 import { transformToInternal, type InternalRegistryEntry } from "./transform.js";
 import { extractServerConfig, type ExtractedConfig } from "./extract-config.js";
 import type { GetMCPMetricsType } from "./enrichment-types.js";
+
+// Static JSON import: the bundler (Turbopack / webpack / esbuild) inlines the
+// data into the consumer's bundle, so the registry works inside Vercel
+// serverless functions where __dirname-based fs reads would fail because the
+// data file is never traced into the function bundle.
+import bundledServers from "../data/servers.json" with { type: "json" };
 
 // Re-export for consumers
 export { extractServerConfig, type ExtractedConfig } from "./extract-config.js";
@@ -46,20 +50,7 @@ function invalidateCache(): void {
 }
 
 function loadServers(): void {
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-  // Resolve data directory for both dev (src/) and dist/ contexts
-  let dataPath = path.resolve(__dirname, "..", "data", "servers.json");
-  if (!fs.existsSync(dataPath)) {
-    dataPath = path.resolve(__dirname, "data", "servers.json");
-  }
-
-  if (!fs.existsSync(dataPath)) {
-    // No data file yet — registry is empty until first sync
-    return;
-  }
-
-  _rawEntries = JSON.parse(fs.readFileSync(dataPath, "utf-8")) as RegistryEntryType[];
+  _rawEntries = bundledServers as unknown as RegistryEntryType[];
 
   for (const raw of _rawEntries) {
     _rawIndex.set(raw.server.name, raw);
