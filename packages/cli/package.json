@@ -54,13 +54,13 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@clack/prompts": "^1.0.1",
+    "@clack/prompts": "^1.4.0",
     "@getmcp/core": "*",
     "@getmcp/generators": "*",
     "@getmcp/registry": "*",
     "smol-toml": "^1.6.0",
-    "yaml": "^2.8.2",
-    "zod": "^4.0.0"
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^24.0.0"
