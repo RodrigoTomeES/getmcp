@@ -7,6 +7,7 @@
 
 import * as path from "node:path";
 import * as os from "node:os";
+import * as fs from "node:fs";
 import { generators } from "@getmcp/generators";
 import type { AppIdType, AppMetadata } from "@getmcp/core";
 import { supportsBothScopes } from "@getmcp/core";
@@ -91,10 +92,23 @@ export function detectApps(): DetectedApp[] {
     const hasBothScopes = supportsBothScopes(generator.app);
     const globalConfigPath = hasBothScopes ? getConfigPath(generator.app, "global") : undefined;
 
+    // For dual-scope apps, prefer the project config when it exists; otherwise
+    // fall back to the global config so that doctor/list reflect the config
+    // the user is actually using. This matters for apps like OpenCode and
+    // Claude Code where many users only keep a global config.
+    let effectiveConfigPath = configPath;
+    if (hasBothScopes && globalConfigPath) {
+      const projectExists = fs.existsSync(configPath);
+      const globalExists = fs.existsSync(globalConfigPath);
+      if (!projectExists && globalExists) {
+        effectiveConfigPath = globalConfigPath;
+      }
+    }
+
     results.push({
       id: generator.app.id,
       name: generator.app.name,
-      configPath,
+      configPath: effectiveConfigPath,
       exists: generator.detectInstalled(),
       supportsBothScopes: hasBothScopes,
       ...(globalConfigPath ? { globalConfigPath } : {}),
