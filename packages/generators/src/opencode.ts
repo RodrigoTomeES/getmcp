@@ -36,10 +36,14 @@ export class OpenCodeGenerator extends BaseGenerator {
     name: "OpenCode",
     description: "Open-source AI coding agent by Anomaly",
     configPaths: "opencode.json",
+    // OpenCode resolves its config dir with `xdg-basedir`
+    // (XDG_CONFIG_HOME, else ~/.config), which is platform-agnostic — Windows
+    // included, so there is no %AppData% variant. Both `opencode.json` and
+    // `opencode.jsonc` are accepted; `.json` takes precedence.
     globalConfigPaths: {
-      darwin: "~/.config/opencode/opencode.jsonc",
-      win32: "%AppData%/opencode/opencode.jsonc",
-      linux: "~/.config/opencode/opencode.jsonc",
+      darwin: "%XDGConfigHome%/opencode/opencode.json",
+      win32: "%XDGConfigHome%/opencode/opencode.json",
+      linux: "%XDGConfigHome%/opencode/opencode.json",
     },
     configFormat: "jsonc",
     docsUrl: "https://opencode.ai/docs/mcp-servers/",

@@ -14,7 +14,7 @@
 import * as p from "@clack/prompts";
 import { execFileSync } from "node:child_process";
 import { getServer } from "@getmcp/registry";
-import { detectInstalledApps } from "../detect.js";
+import { detectInstalledApps, getReadableConfigPaths, type ReadableConfig } from "../detect.js";
 import { readConfigFile, listServersInConfig } from "../config-file.js";
 import { getTrackedServers } from "../lock.js";
 import { getAllRegistries } from "../registry-config.js";
@@ -46,24 +46,43 @@ export async function doctorCommand(options: DoctorOptions = {}): Promise<void> 
     details: apps.map((a) => a.name).join(", ") || undefined,
   });
 
-  // 2. Parse config files and cache parsed configs for reuse
+  // 2. Parse config files and cache parsed configs for reuse.
+  // Dual-scope apps may have both a project and a global config; report on
+  // every file that exists so a global-only setup is not silently ignored.
   const parsedConfigs = new Map<string, Record<string, unknown>>();
+  const appConfigs = new Map<string, ReadableConfig[]>();
+
   for (const app of apps) {
-    try {
-      const config = readConfigFile(app.configPath);
-      parsedConfigs.set(app.configPath, config);
+    const readable = getReadableConfigPaths(app);
+    appConfigs.set(app.id, readable);
+
+    if (readable.length === 0) {
       results.push({
         category: "config-parse",
         status: "ok",
-        message: `${app.name}: config file is valid`,
+        message: `${app.name}: no config file yet`,
       });
-    } catch (err) {
-      results.push({
-        category: "config-parse",
-        status: "error",
-        message: `${app.name}: config file has syntax errors`,
-        details: err instanceof Error ? err.message : String(err),
-      });
+      continue;
+    }
+
+    for (const { scope, path } of readable) {
+      // Only disambiguate when the app actually has more than one config
+      const label = readable.length > 1 ? `${app.name} (${scope})` : app.name;
+      try {
+        parsedConfigs.set(path, readConfigFile(path));
+        results.push({
+          category: "config-parse",
+          status: "ok",
+          message: `${label}: config file is valid`,
+        });
+      } catch (err) {
+        results.push({
+          category: "config-parse",
+          status: "error",
+          message: `${label}: config file has syntax errors`,
+          details: err instanceof Error ? err.message : String(err),
+        });
+      }
     }
   }
 
@@ -71,19 +90,24 @@ export async function doctorCommand(options: DoctorOptions = {}): Promise<void> 
   const allConfiguredServers = new Map<string, string[]>();
 
   for (const app of apps) {
-    const cached = parsedConfigs.get(app.configPath);
-    if (!cached) continue;
-    let servers: string[];
-    try {
-      servers = listServersInConfig(cached);
-    } catch {
-      continue;
-    }
+    for (const { path } of appConfigs.get(app.id) ?? []) {
+      const cached = parsedConfigs.get(path);
+      if (!cached) continue;
+      let servers: string[];
+      try {
+        servers = listServersInConfig(cached);
+      } catch {
+        continue;
+      }
 
-    for (const serverId of servers) {
-      const existing = allConfiguredServers.get(serverId) ?? [];
-      existing.push(app.id);
-      allConfiguredServers.set(serverId, existing);
+      for (const serverId of servers) {
+        const existing = allConfiguredServers.get(serverId) ?? [];
+        // A server present in both scopes of one app is still one app
+        if (!existing.includes(app.id)) {
+          existing.push(app.id);
+          allConfiguredServers.set(serverId, existing);
+        }
+      }
     }
   }
 

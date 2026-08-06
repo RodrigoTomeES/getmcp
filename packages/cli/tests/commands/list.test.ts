@@ -1,4 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach, type MockInstance } from "vitest";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import { listCommand } from "../../src/commands/list.js";
 
 vi.mock("@clack/prompts", () => ({
@@ -9,6 +12,9 @@ vi.mock("@clack/prompts", () => ({
 // Mock detectInstalledApps to avoid filesystem access
 vi.mock("../../src/detect.js", () => ({
   detectInstalledApps: vi.fn(() => []),
+  getReadableConfigPaths: vi.fn((app: { configPath: string }) => [
+    { scope: "project" as const, path: app.configPath },
+  ]),
 }));
 
 let consoleSpy: MockInstance;
@@ -133,6 +139,46 @@ describe("listCommand", () => {
     expect(Array.isArray(parsed)).toBe(true);
     // detectInstalledApps returns [], so empty array
     expect(parsed).toEqual([]);
+  });
+
+  // Regression: a global-only config was invisible to `list --installed`
+  it("includes servers from a global-only config in --json output", async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "getmcp-list-"));
+    const globalConfig = path.join(tmpDir, "opencode.json");
+    fs.writeFileSync(
+      globalConfig,
+      JSON.stringify({ mcp: { exa: { type: "local", command: ["npx", "exa"] } } }),
+    );
+
+    const { detectInstalledApps, getReadableConfigPaths } = await import("../../src/detect.js");
+    (detectInstalledApps as ReturnType<typeof vi.fn>).mockReturnValueOnce([
+      {
+        id: "opencode",
+        name: "OpenCode",
+        configPath: "opencode.json",
+        exists: true,
+        supportsBothScopes: true,
+        globalConfigPath: globalConfig,
+      },
+    ]);
+    (getReadableConfigPaths as ReturnType<typeof vi.fn>).mockReturnValueOnce([
+      { scope: "global", path: globalConfig },
+    ]);
+
+    try {
+      await listCommand({ installed: true, json: true });
+
+      const output = consoleSpy.mock.calls.map((c) => c.join(" ")).join("\n");
+      const parsed = JSON.parse(output);
+      expect(parsed[0].servers).toEqual(["exa"]);
+      expect(parsed[0].configs).toEqual([
+        { scope: "global", path: globalConfig, servers: ["exa"] },
+      ]);
+      // configPath stays project-scoped for backwards compatibility
+      expect(parsed[0].configPath).toBe("opencode.json");
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
   });
 
   // --quiet mode
