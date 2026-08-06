@@ -35,13 +35,7 @@ export class OpenCodeGenerator extends BaseGenerator {
     id: "opencode",
     name: "OpenCode",
     description: "Open-source AI coding agent by Anomaly",
-    // Project-level config. OpenCode accepts both opencode.json and opencode.jsonc;
-    // we write .json because it is the most widely compatible default.
     configPaths: "opencode.json",
-    // Global config. Per OpenCode docs, global settings live in
-    // ~/.config/opencode/opencode.jsonc (JSONC to allow comments).
-    // On Windows the equivalent location is %AppData%\opencode\.
-    // See https://opencode.ai/docs/config/
     globalConfigPaths: {
       darwin: "~/.config/opencode/opencode.jsonc",
       win32: "%AppData%/opencode/opencode.jsonc",
