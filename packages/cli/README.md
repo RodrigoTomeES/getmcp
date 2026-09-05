@@ -263,6 +263,18 @@ This file:
 
 The lock file enables the `check` and `update` commands — `check` compares your lock file against actual app configs to detect drift (using per-app scopes to resolve the correct config path), and `update` re-applies configs from the registry.
 
+## Project and global scopes
+
+Some apps (Claude Code, Cursor, Codex, OpenCode) read MCP servers from either a project config
+in the current directory or a global one in your home directory.
+
+- `add`, `remove`, `sync`, and `update` write to exactly one scope — chosen with `--project`
+  (the default) or `--global`, and recorded per app in the lock file. A project-scoped install
+  never touches your global config.
+- `doctor`, `list --installed`, and `check` read **every** config that exists, so a server
+  configured only in your global config is still reported. When an app has configs in both
+  scopes, the output names the scope.
+
 ## Supported Apps
 
 The CLI auto-detects and generates configs for:
@@ -277,7 +289,7 @@ The CLI auto-detects and generates configs for:
 | Roo Code          | `mcp_settings.json` (VS Code globalStorage)                                                                                        | JSON   |
 | Goose             | `~/.config/goose/config.yaml`                                                                                                      | YAML   |
 | Windsurf          | `~/.codeium/windsurf/mcp_config.json`                                                                                              | JSON   |
-| OpenCode          | `opencode.json`                                                                                                                    | JSONC  |
+| OpenCode          | `opencode.json` (project), `~/.config/opencode/opencode.json` (global, all platforms)                                              | JSONC  |
 | Zed               | `settings.json` (Zed settings)                                                                                                     | JSON   |
 | PyCharm           | `.ai/mcp/mcp.json` (project-level, requires JetBrains AI Assistant plugin)                                                         | JSON   |
 | Codex             | `~/.codex/config.toml` (global), `.codex/config.toml` (project)                                                                    | TOML   |
