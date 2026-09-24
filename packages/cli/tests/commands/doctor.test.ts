@@ -1,4 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach, type MockInstance } from "vitest";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import { doctorCommand } from "../../src/commands/doctor.js";
 
 vi.mock("@clack/prompts", () => ({
@@ -10,6 +13,9 @@ vi.mock("@clack/prompts", () => ({
 // Mock detectInstalledApps to avoid filesystem access
 vi.mock("../../src/detect.js", () => ({
   detectInstalledApps: vi.fn(() => []),
+  getReadableConfigPaths: vi.fn((app: { configPath: string }) => [
+    { scope: "project" as const, path: app.configPath },
+  ]),
 }));
 
 // Mock lock file to avoid filesystem access
@@ -111,5 +117,84 @@ describe("doctorCommand", () => {
     const appsResult = parsed.find((r: { category: string }) => r.category === "apps");
     expect(appsResult.status).toBe("ok");
     expect(appsResult.message).toContain("1 AI application(s) detected");
+  });
+
+  // Regression: OpenCode declared no global config path, so doctor read the
+  // relative opencode.json, parsed {} and reported zero servers while still
+  // claiming the config was valid.
+  it("reports servers from a global-only config", async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "getmcp-doctor-"));
+    const globalConfig = path.join(tmpDir, "opencode.json");
+    fs.writeFileSync(
+      globalConfig,
+      JSON.stringify({ mcp: { exa: { type: "local", command: ["npx", "exa"] } } }),
+    );
+
+    const { detectInstalledApps, getReadableConfigPaths } = await import("../../src/detect.js");
+    (detectInstalledApps as ReturnType<typeof vi.fn>).mockReturnValueOnce([
+      {
+        id: "opencode",
+        name: "OpenCode",
+        configPath: "opencode.json",
+        exists: true,
+        supportsBothScopes: true,
+        globalConfigPath: globalConfig,
+      },
+    ]);
+    (getReadableConfigPaths as ReturnType<typeof vi.fn>).mockReturnValueOnce([
+      { scope: "global", path: globalConfig },
+    ]);
+
+    try {
+      await doctorCommand({ json: true });
+
+      const output = consoleSpy.mock.calls.map((c) => c.join(" ")).join("\n");
+      const parsed = JSON.parse(output) as { category: string; details?: string }[];
+
+      // The server in the global config is seen and attributed to OpenCode
+      const serverResult = parsed.find((r) => r.category === "server-status");
+      expect(serverResult).toBeDefined();
+      expect(serverResult!.details).toContain("opencode");
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  it("labels the scope when an app has configs in both scopes", async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "getmcp-doctor-"));
+    const projectConfig = path.join(tmpDir, "project.json");
+    const globalConfig = path.join(tmpDir, "global.json");
+    fs.writeFileSync(projectConfig, JSON.stringify({ mcp: {} }));
+    fs.writeFileSync(globalConfig, JSON.stringify({ mcp: {} }));
+
+    const { detectInstalledApps, getReadableConfigPaths } = await import("../../src/detect.js");
+    (detectInstalledApps as ReturnType<typeof vi.fn>).mockReturnValueOnce([
+      {
+        id: "opencode",
+        name: "OpenCode",
+        configPath: projectConfig,
+        exists: true,
+        supportsBothScopes: true,
+        globalConfigPath: globalConfig,
+      },
+    ]);
+    (getReadableConfigPaths as ReturnType<typeof vi.fn>).mockReturnValueOnce([
+      { scope: "project", path: projectConfig },
+      { scope: "global", path: globalConfig },
+    ]);
+
+    try {
+      await doctorCommand({ json: true });
+
+      const output = consoleSpy.mock.calls.map((c) => c.join(" ")).join("\n");
+      const parsed = JSON.parse(output) as { category: string; message: string }[];
+      const parseResults = parsed.filter((r) => r.category === "config-parse");
+
+      expect(parseResults).toHaveLength(2);
+      expect(parseResults[0]!.message).toContain("OpenCode (project)");
+      expect(parseResults[1]!.message).toContain("OpenCode (global)");
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
   });
 });
