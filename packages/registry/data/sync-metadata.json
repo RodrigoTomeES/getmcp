@@ -1,13 +1,13 @@
 {
-  "syncedAt": "2026-09-29T12:00:31.518Z",
+  "syncedAt": "2026-09-30T11:48:08.685Z",
   "syncMode": "incremental",
-  "totalEntries": 36394,
-  "updatedEntries": 927,
-  "removedEntries": 17,
-  "enrichedWithGitHub": 637,
-  "withMetrics": 666,
+  "totalEntries": 36745,
+  "updatedEntries": 1024,
+  "removedEntries": 54,
+  "enrichedWithGitHub": 722,
+  "withMetrics": 744,
   "sources": [
     "official"
   ],
-  "duration": "158.5s"
+  "duration": "137.4s"
 }
