@@ -77,15 +77,14 @@ font-family:
   sans-serif;
 
 /* Monospace (Tailwind font-mono) */
-font-family: var(--font-fira-mono), ui-monospace, monospace;
+font-family: "Fira Mono", ui-monospace, monospace;
 ```
 
-**Fira Mono** is loaded via `next/font/google` in `layout.tsx` with the `latin` subset. Box-drawing and block element characters (█, ╗, ╔, etc.) used in the hero ASCII art are not part of any Google Fonts subset — they fall through to the `ui-monospace, monospace` fallback, which renders them natively on all platforms.
+**Fira Mono** is self-hosted via `@fontsource/fira-mono` (`latin-400.css` and `latin-500.css`, imported in `src/layouts/BaseLayout.astro`) with the `latin` subset. Box-drawing and block element characters (█, ╗, ╔, etc.) used in the hero ASCII art are not part of any Google Fonts subset — they fall through to the `ui-monospace, monospace` fallback, which renders them natively on all platforms.
 
 - Weights loaded: **400** (ASCII art), **500** (tagline `font-medium`)
-- CSS variable: `--font-fira-mono`
-- Tailwind integration: `--font-mono` in `@theme` references the CSS variable with `ui-monospace, monospace` fallback
-- `display: swap` — shows fallback font immediately, swaps when Fira Mono loads
+- Tailwind integration: `--font-mono` in `@theme` is `"Fira Mono", ui-monospace, monospace`
+- `font-display: swap` (fontsource default) — shows fallback font immediately, swaps when Fira Mono loads
 
 ### OG Images (Inter)
 
@@ -95,7 +94,7 @@ Font files in `packages/web/assets/`:
 - `Inter-SemiBold.ttf` (600)
 - `Inter-Bold.ttf` (700)
 
-Used exclusively for `next/og` ImageResponse generation.
+Used exclusively for OG image generation at build time (satori + `@resvg/resvg-js`, see `src/lib/og-image.tsx`). CJK and Hebrew text falls back to the Noto Sans fonts in the same folder.
 
 ### Font Weights
 
@@ -660,13 +659,14 @@ Enhanced metadata display on server listing cards.
 
 ## Dependencies
 
-| Package                       | Purpose                     |
-| ----------------------------- | --------------------------- |
-| `next@^16.1.6`                | Framework (App Router)      |
-| `react@^19.2.4`               | UI library                  |
-| `tailwindcss@^4.0.0`          | CSS framework               |
-| `@tailwindcss/postcss@^4.0.0` | PostCSS integration         |
-| `lightningcss@^1.30.0`        | CSS processing              |
-| `babel-plugin-react-compiler` | React Compiler optimization |
+| Package                      | Purpose                   |
+| ---------------------------- | ------------------------- |
+| `astro@^7.3.5`               | Framework (static output) |
+| `@astrojs/react@^7.0.0`      | React islands             |
+| `react@^19.3.0`              | UI library                |
+| `tailwindcss@^4.3.3`         | CSS framework             |
+| `@tailwindcss/vite@^4.3.3`   | Vite integration          |
+| `@fontsource/fira-mono`      | Self-hosted Fira Mono     |
+| `satori` + `@resvg/resvg-js` | OG image generation       |
 
 No UI component library (shadcn, Radix, etc.). All components are custom-built.

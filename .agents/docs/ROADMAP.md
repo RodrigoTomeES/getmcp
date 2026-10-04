@@ -79,7 +79,7 @@ Critical gaps in test coverage.
 - [x] **Add error path tests for `toStdioFields`/`toRemoteFields`** — Tests exist in `generators.test.ts` (`toStdioFields error handling > throws for remote config`, `toRemoteFields error handling > throws for stdio config`).
   - File: `packages/generators/tests/generators.test.ts`
 
-- [ ] **Add tests for web package** — The entire Next.js app has zero tests. Should add at minimum: component tests for `ConfigViewer`, `SearchBar`, `ServerCard`; integration tests for server detail pages; snapshot tests for key layouts.
+- [ ] **Add tests for web package** — Unit tests now cover metadata resolution, sitemap generation, server detail helpers and OG rendering (`packages/web/tests/`). Still missing: component tests for `ConfigViewer`, `SearchBar`, `ServerCard`; snapshot tests for key layouts.
   - Directory: `packages/web/`
 
 ---
@@ -194,6 +194,20 @@ Enhancements to the Next.js web directory.
 
 - [ ] **Add light mode / theme toggle** — The site is dark-mode only with hardcoded dark colors. Add light theme support or respect `prefers-color-scheme` media query.
   - File: `packages/web/src/app/globals.css`
+
+---
+
+## 6b. Web — Migration from Next.js/Vercel to Astro static
+
+The site was taken down on Vercel's free tier for excessive traffic. Phase 1 ports it 1:1 to a static Astro build that any static host can serve; phase 2 picks the host from the measured build size.
+
+- [x] **Phase 1: port Next.js App Router site to Astro (static output)** — Same routes, markup, metadata, JSON-LD, OG images (satori + resvg at build time, one per server), sitemap (now chunked) and client behavior (React islands). Vercel Analytics/Speed Insights replaced by Cloudflare Web Analytics (`PUBLIC_CF_ANALYTICS_TOKEN`). `vercel.json` removed.
+  - Files: `packages/web/astro.config.mjs`, `packages/web/src/pages/**`, `packages/web/src/layouts/BaseLayout.astro`, `packages/web/src/lib/{metadata,og-image,og-pages,og-server,server-detail,server-paths,sitemap}.ts(x)`
+- [x] **Build size report** — `packages/web/scripts/measure.ts` reports file count, total size, per-page sizes and hosting-limit checks (GitHub Pages 1 GB, Cloudflare 20k/100k files, 25 MiB per file) in the GitHub Actions job summary.
+  - Files: `packages/web/scripts/build.ts`, `packages/web/scripts/measure.ts`, `.github/workflows/web.yml`
+- [ ] **Phase 2: choose hosting and deploy** — Options: GitHub Pages + Cloudflare proxy, Cloudflare R2 + CDN, or Cloudflare Workers Paid (static assets). Decide from the size report, then add a deploy workflow (on push and after the daily registry sync), move `getmcp.es` DNS to Cloudflare, emit the security headers from `packages/web/src/lib/security-headers.ts` in the host format (previously served by `next.config.ts`), and delete the Vercel project.
+- [ ] **Optional size optimizations (only if phase 2 needs them)** — Generate the 19 configs client-side instead of embedding them per page, load the `/servers` search index with `fetch` instead of island props, move server OG images to object storage.
+- [ ] **Faster rebuilds** — Evaluate `experimental.incrementalBuild` (Astro 7.2+, with a `cacheKey` per server page) and persist the cache in CI.
 
 ---
 

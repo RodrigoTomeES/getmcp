@@ -1,0 +1,242 @@
+import { isStdioConfig } from "@getmcp/core";
+import type { InternalRegistryEntry } from "@getmcp/registry";
+import { getCommand, DEFAULT_PM } from "@/lib/package-manager";
+import { OG_FONT_FAMILY, renderOGImage, stripEmoji } from "@/lib/og-image";
+
+export const SERVER_OG_ALT = "MCP Server Configuration";
+
+/** OG image for `/servers/[id]` (ported from the Next.js `opengraph-image.tsx`). */
+export async function createServerOGImage(server: InternalRegistryEntry) {
+  const isStdio = isStdioConfig(server.config);
+  const transport = isStdio ? "stdio" : "remote";
+
+  const name = stripEmoji(server.name);
+
+  // Truncate description (use Array.from to handle multi-byte characters safely)
+  let description = stripEmoji(server.description);
+  const chars = Array.from(description);
+  if (chars.length > 160) {
+    description = chars.slice(0, 157).join("") + "...";
+  }
+
+  const categories = (server.categories ?? []).slice(0, 4);
+  const installCommand = getCommand(DEFAULT_PM, server.id);
+
+  return renderOGImage(
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: "#0a0a0a",
+        padding: "60px",
+        fontFamily: OG_FONT_FAMILY,
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Background gradient accent */}
+      <div
+        style={{
+          position: "absolute",
+          top: "-200px",
+          right: "-200px",
+          width: "600px",
+          height: "600px",
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)",
+          display: "flex",
+        }}
+      />
+
+      {/* Top bar with accent line */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "4px",
+          background: "linear-gradient(90deg, #3b82f6, #2563eb, #3b82f6)",
+          display: "flex",
+        }}
+      />
+
+      {/* Logo section */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "16px",
+          marginBottom: "16px",
+        }}
+      >
+        {/* Logo icon */}
+        <svg width="56" height="56" viewBox="0 0 32 32" fill="none">
+          <path d="M16 3 L16 15" stroke="#ededed" strokeWidth="2.2" strokeLinecap="round" />
+          <path
+            d="M11 11 L16 16 L21 11"
+            stroke="#ededed"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle cx="16" cy="20" r="3.5" stroke="#ededed" strokeWidth="2" fill="none" />
+          <path d="M16 23.5 L16 29" stroke="#ededed" strokeWidth="2" strokeLinecap="round" />
+          <path d="M12.9 22.6 L8 27" stroke="#ededed" strokeWidth="2" strokeLinecap="round" />
+          <path d="M19.1 22.6 L24 27" stroke="#ededed" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+        <span
+          style={{
+            fontSize: "48px",
+            fontWeight: 700,
+            color: "#ededed",
+            letterSpacing: "-1px",
+          }}
+        >
+          getmcp
+        </span>
+        <span
+          style={{
+            fontSize: "16px",
+            fontWeight: 600,
+            color: "white",
+            backgroundColor: "#3b82f6",
+            padding: "4px 12px",
+            borderRadius: "20px",
+            marginLeft: "4px",
+          }}
+        >
+          beta
+        </span>
+      </div>
+
+      {/* Main content */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          justifyContent: "center",
+          gap: "24px",
+        }}
+      >
+        {/* Server name + transport badge */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "16px",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "64px",
+              fontWeight: 700,
+              color: "#ededed",
+              lineHeight: 1.1,
+              letterSpacing: "-2px",
+              display: "flex",
+            }}
+          >
+            {name}
+          </div>
+          <span
+            style={{
+              fontSize: "16px",
+              fontWeight: 700,
+              color: isStdio ? "#4ade80" : "#c084fc",
+              backgroundColor: isStdio ? "rgba(34,197,94,0.1)" : "rgba(168,85,247,0.1)",
+              border: isStdio ? "1px solid rgba(34,197,94,0.2)" : "1px solid rgba(168,85,247,0.2)",
+              padding: "6px 16px",
+              borderRadius: "20px",
+            }}
+          >
+            {transport}
+          </span>
+        </div>
+
+        {/* Description */}
+        <div
+          style={{
+            fontSize: "26px",
+            color: "#a0a0a0",
+            lineHeight: 1.4,
+            display: "flex",
+          }}
+        >
+          {description}
+        </div>
+
+        {/* Install command box */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            backgroundColor: "#111111",
+            border: "1px solid #262626",
+            borderRadius: "10px",
+            padding: "14px 20px",
+          }}
+        >
+          <span
+            style={{
+              fontSize: "21px",
+              color: "#3b82f6",
+              fontWeight: 700,
+            }}
+          >
+            $
+          </span>
+          <span
+            style={{
+              fontSize: "21px",
+              color: "#94a3b8",
+              fontFamily: "monospace",
+            }}
+          >
+            {installCommand}
+          </span>
+        </div>
+      </div>
+
+      {/* Bottom section */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        {/* Category pills */}
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          {categories.map((cat) => (
+            <span
+              key={cat}
+              style={{
+                fontSize: "14px",
+                color: "#94a3b8",
+                backgroundColor: "#1e293b",
+                padding: "6px 14px",
+                borderRadius: "20px",
+              }}
+            >
+              {cat}
+            </span>
+          ))}
+        </div>
+
+        <span
+          style={{
+            fontSize: "20px",
+            color: "#a0a0a0",
+          }}
+        >
+          getmcp.es
+        </span>
+      </div>
+    </div>,
+  );
+}

@@ -214,7 +214,7 @@ export function resolveAlias(command: string): string | undefined {
  * Exit if the user cancelled a @clack/prompts prompt.
  * Replaces the repeated `if (p.isCancel(val)) { p.cancel(...); process.exit(0); }` pattern.
  */
-export function exitIfCancelled<T>(value: T | symbol): asserts value is T {
+export function exitIfCancelled<T>(value: T): asserts value is Exclude<T, symbol> {
   // @clack/prompts returns a Symbol when the user cancels
   if (typeof value === "symbol") {
     // Dynamic import would be circular; use process.exit directly

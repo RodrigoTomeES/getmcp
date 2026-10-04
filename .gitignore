@@ -3,10 +3,8 @@ node_modules/
 
 # Build output
 dist/
-out/
-.next/
+.astro/
 *.tsbuildinfo
-next-env.d.ts
 
 # Environment variables
 .env

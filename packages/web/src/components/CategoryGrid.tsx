@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getServersByCategory } from "@getmcp/registry";
 import { CATEGORY_NAMES, CATEGORY_DESCRIPTIONS } from "@/lib/categories";
 
@@ -15,7 +14,7 @@ export function CategoryGrid() {
           const count = getServersByCategory(slug).length;
 
           return (
-            <Link
+            <a
               key={slug}
               href={`/category/${slug}`}
               className="group flex flex-col rounded-lg border border-border bg-surface p-4 hover:bg-surface-hover hover:border-accent/50 transition-colors"
@@ -27,7 +26,7 @@ export function CategoryGrid() {
                 <span className="text-xs text-text-secondary shrink-0">{count}</span>
               </div>
               <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed">{desc}</p>
-            </Link>
+            </a>
           );
         })}
       </div>

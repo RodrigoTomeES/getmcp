@@ -1,7 +1,8 @@
-import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
+import satori, { type SatoriOptions } from "satori";
+import { renderAsync } from "@resvg/resvg-js";
 
 export const OG_SIZE = { width: 1200, height: 630 };
 export const OG_CONTENT_TYPE = "image/png" as const;
@@ -15,29 +16,60 @@ export function stripEmoji(text: string): string {
     .trim();
 }
 
-export async function loadOGFonts() {
-  const [interBold, interRegular, notoSansSC, notoSansKR, notoSansJP, notoSansHebrew] =
-    await Promise.all([
-      readFile(join(process.cwd(), "assets/Inter-Bold.ttf")),
-      readFile(join(process.cwd(), "assets/Inter-Regular.ttf")),
-      readFile(join(process.cwd(), "assets/NotoSansSC-Regular.ttf")),
-      readFile(join(process.cwd(), "assets/NotoSansKR-Regular.ttf")),
-      readFile(join(process.cwd(), "assets/NotoSansJP-Regular.ttf")),
-      readFile(join(process.cwd(), "assets/NotoSansHebrew-Regular.ttf")),
-    ]);
-  return [
-    { name: "Inter", data: interBold, style: "normal" as const, weight: 700 as const },
-    { name: "Inter", data: interRegular, style: "normal" as const, weight: 400 as const },
-    { name: "Noto Sans SC", data: notoSansSC, style: "normal" as const, weight: 400 as const },
-    { name: "Noto Sans KR", data: notoSansKR, style: "normal" as const, weight: 400 as const },
-    { name: "Noto Sans JP", data: notoSansJP, style: "normal" as const, weight: 400 as const },
-    {
-      name: "Noto Sans Hebrew",
-      data: notoSansHebrew,
-      style: "normal" as const,
-      weight: 400 as const,
-    },
-  ];
+type OGFont = SatoriOptions["fonts"][number];
+
+let fontsPromise: Promise<OGFont[]> | undefined;
+
+/**
+ * Load the OG fonts once per build. Satori caches parsed fonts per `fonts`
+ * array instance, so reusing the same array avoids re-parsing the (large) CJK
+ * fonts for every one of the ~38k images.
+ */
+export function loadOGFonts(): Promise<OGFont[]> {
+  fontsPromise ??= (async () => {
+    // Astro builds from the package root; tests set the path explicitly.
+    const assets = process.env.GETMCP_WEB_ASSETS_DIR ?? join(process.cwd(), "assets");
+    const [interBold, interRegular, notoSansSC, notoSansKR, notoSansJP, notoSansHebrew] =
+      await Promise.all([
+        readFile(join(assets, "Inter-Bold.ttf")),
+        readFile(join(assets, "Inter-Regular.ttf")),
+        readFile(join(assets, "NotoSansSC-Regular.ttf")),
+        readFile(join(assets, "NotoSansKR-Regular.ttf")),
+        readFile(join(assets, "NotoSansJP-Regular.ttf")),
+        readFile(join(assets, "NotoSansHebrew-Regular.ttf")),
+      ]);
+    return [
+      { name: "Inter", data: interBold, style: "normal" as const, weight: 700 as const },
+      { name: "Inter", data: interRegular, style: "normal" as const, weight: 400 as const },
+      { name: "Noto Sans SC", data: notoSansSC, style: "normal" as const, weight: 400 as const },
+      { name: "Noto Sans KR", data: notoSansKR, style: "normal" as const, weight: 400 as const },
+      { name: "Noto Sans JP", data: notoSansJP, style: "normal" as const, weight: 400 as const },
+      {
+        name: "Noto Sans Hebrew",
+        data: notoSansHebrew,
+        style: "normal" as const,
+        weight: 400 as const,
+      },
+    ];
+  })();
+  return fontsPromise;
+}
+
+/** Render a Satori element tree to a PNG (replaces `next/og`'s `ImageResponse`). */
+export async function renderOGImage(element: ReactElement): Promise<Uint8Array> {
+  const fonts = await loadOGFonts();
+  const svg = await satori(element, { ...OG_SIZE, fonts });
+  // Satori already converts text to paths, so resvg never needs (slow to load) system fonts.
+  const image = await renderAsync(svg, {
+    fitTo: { mode: "width", value: OG_SIZE.width },
+    font: { loadSystemFonts: false },
+  });
+  return image.asPng();
+}
+
+/** Build a static PNG `Response` for an Astro endpoint. */
+export function pngResponse(png: Uint8Array): Response {
+  return new Response(png as BodyInit, { headers: { "Content-Type": OG_CONTENT_TYPE } });
 }
 
 interface OGImageOptions {
@@ -47,9 +79,7 @@ interface OGImageOptions {
 }
 
 export async function createOGImage({ heading, description, pills }: OGImageOptions) {
-  const fonts = await loadOGFonts();
-
-  return new ImageResponse(
+  return renderOGImage(
     <div
       style={{
         width: "100%",
@@ -211,9 +241,5 @@ export async function createOGImage({ heading, description, pills }: OGImageOpti
         </span>
       </div>
     </div>,
-    {
-      ...OG_SIZE,
-      fonts,
-    },
   );
 }

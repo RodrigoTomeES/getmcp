@@ -1,0 +1,160 @@
+---
+import "@fontsource/fira-mono/latin-400.css";
+import "@fontsource/fira-mono/latin-500.css";
+import "@/styles/globals.css";
+import { absoluteUrl, type ResolvedMetadata } from "@/lib/metadata";
+import { OG_SIZE } from "@/lib/og-image";
+
+interface Props {
+  metadata: ResolvedMetadata;
+}
+
+const { metadata } = Astro.props;
+const { title, description, keywords, alternates, openGraph, twitter, ogImage, noindex } =
+  metadata;
+const ogImageUrl = ogImage && absoluteUrl(ogImage.path);
+
+// Cloudflare Web Analytics beacon (replaces Vercel Analytics + Speed Insights).
+const analyticsToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
+---
+
+<!doctype html>
+<html lang="en" style="color-scheme: dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <title>{title}</title>
+    {noindex && <meta name="robots" content="noindex" />}
+    {description && <meta name="description" content={description} />}
+    {keywords && keywords.length > 0 && <meta name="keywords" content={keywords.join(",")} />}
+    {alternates?.canonical && <link rel="canonical" href={absoluteUrl(alternates.canonical)} />}
+    {
+      alternates?.languages &&
+        Object.entries(alternates.languages).map(([lang, href]) => (
+          <link rel="alternate" hreflang={lang} href={href} />
+        ))
+    }
+    {openGraph?.title && <meta property="og:title" content={openGraph.title} />}
+    {openGraph?.description && <meta property="og:description" content={openGraph.description} />}
+    {openGraph?.siteName && <meta property="og:site_name" content={openGraph.siteName} />}
+    {openGraph?.locale && <meta property="og:locale" content={openGraph.locale} />}
+    {
+      ogImage && (
+        <>
+          <meta property="og:image" content={ogImageUrl} />
+          <meta property="og:image:alt" content={ogImage.alt} />
+          <meta property="og:image:type" content="image/png" />
+          <meta property="og:image:width" content={String(OG_SIZE.width)} />
+          <meta property="og:image:height" content={String(OG_SIZE.height)} />
+        </>
+      )
+    }
+    {openGraph?.type && <meta property="og:type" content={openGraph.type} />}
+    {twitter?.card && <meta name="twitter:card" content={twitter.card} />}
+    {twitter?.site && <meta name="twitter:site" content={twitter.site} />}
+    {twitter?.creator && <meta name="twitter:creator" content={twitter.creator} />}
+    {twitter?.title && <meta name="twitter:title" content={twitter.title} />}
+    {twitter?.description && <meta name="twitter:description" content={twitter.description} />}
+    {
+      ogImage && (
+        <>
+          <meta name="twitter:image" content={ogImageUrl} />
+          <meta name="twitter:image:alt" content={ogImage.alt} />
+          <meta name="twitter:image:type" content="image/png" />
+          <meta name="twitter:image:width" content={String(OG_SIZE.width)} />
+          <meta name="twitter:image:height" content={String(OG_SIZE.height)} />
+        </>
+      )
+    }
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" sizes="any" />
+    <slot name="head" />
+  </head>
+  <body class="min-h-dvh flex flex-col">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-accent focus:text-white focus:text-sm focus:font-medium"
+    >
+      Skip to main content
+    </a>
+
+    <header class="border-b border-border px-6 py-4">
+      <div class="max-w-6xl mx-auto flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2.5" aria-label="getmcp home">
+          <img
+            src="/icon.svg"
+            alt="getmcp — Universal MCP Installer"
+            width="32"
+            height="32"
+            class="h-6 w-auto"
+            fetchpriority="high"
+          />
+          <span class="text-xl font-bold tracking-tight -mt-1.5">getmcp</span>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-accent text-white font-medium">
+            beta
+          </span>
+        </a>
+        <nav class="flex items-center gap-3 sm:gap-6 text-sm">
+          <a href="/servers" class="text-text-secondary hover:text-text transition-colors">
+            Servers
+          </a>
+          <a href="/guides" class="text-text-secondary hover:text-text transition-colors">
+            Guides
+          </a>
+          <a href="/docs" class="text-text-secondary hover:text-text transition-colors">Docs</a>
+          <a
+            href="https://github.com/RodrigoTomeES/getmcp"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-text-secondary hover:text-text transition-colors"
+          >
+            GitHub
+            <span class="sr-only"> (opens in new tab)</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content" class="flex-1">
+      <slot />
+    </main>
+
+    <footer class="border-t border-border px-6 py-8 text-sm text-text-secondary">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+          <p>getmcp &mdash; One config format, every AI app.</p>
+          <nav class="flex items-center gap-4">
+            <a href="/servers" class="hover:text-text transition-colors">Servers</a>
+            <a href="/guides" class="hover:text-text transition-colors">Guides</a>
+            <a href="/docs" class="hover:text-text transition-colors">Docs</a>
+            <a
+              href="https://github.com/RodrigoTomeES/getmcp"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-text transition-colors"
+            >
+              GitHub
+              <span class="sr-only"> (opens in new tab)</span>
+            </a>
+          </nav>
+        </div>
+        <p class="text-xs text-text-secondary/60 text-center">&copy; 2026 getmcp</p>
+      </div>
+    </footer>
+
+    <script>
+      import "@/scripts/code-copy";
+    </script>
+
+    {
+      analyticsToken && (
+        <script
+          is:inline
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: analyticsToken })}
+        />
+      )
+    }
+  </body>
+</html>

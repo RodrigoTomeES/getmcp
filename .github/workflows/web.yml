@@ -1,0 +1,56 @@
+name: Web
+
+# Builds the static Astro site and reports its size against the limits of the
+# hosting options under evaluation (see packages/web/scripts/measure.ts).
+# There is no deploy step yet: the hosting provider is decided from these numbers.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/web/**"
+      - "packages/core/**"
+      - "packages/generators/**"
+      - "packages/registry/src/**"
+      - ".github/workflows/web.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "packages/web/**"
+      - "packages/core/**"
+      - "packages/generators/**"
+      - "packages/registry/src/**"
+      - ".github/workflows/web.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: web-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build & measure
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build packages
+        run: |
+          npm run build -w @getmcp/core
+          npm run build -w @getmcp/generators
+          npm run build -w @getmcp/registry
+
+      - name: Build web (writes size report to the job summary)
+        run: npm run build -w @getmcp/web

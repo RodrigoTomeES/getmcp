@@ -1,0 +1,42 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { DocsContent } from "@/components/DocsContent";
+import { resolveMetadata } from "@/lib/metadata";
+import { DOCS_OG } from "@/lib/og-pages";
+
+const metadata = resolveMetadata(
+  {
+    title: "Documentation \u2014 CLI Commands, Config Formats & API Reference",
+    description:
+      "Complete guide to getmcp: CLI installation, commands, project manifests, supported AI apps, library API, and contributing.",
+    alternates: {
+      canonical: "/docs",
+    },
+    openGraph: {
+      title: "Documentation \u2014 CLI Commands, Config Formats & API Reference",
+      description:
+        "Complete guide to getmcp: CLI installation, commands, project manifests, supported AI apps, library API, and contributing.",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Documentation \u2014 CLI Commands, Config Formats & API Reference",
+      description:
+        "Complete guide to getmcp: CLI installation, commands, project manifests, supported AI apps, library API, and contributing.",
+    },
+    keywords: [
+      "getmcp documentation",
+      "MCP CLI commands",
+      "MCP config format",
+      "getmcp API",
+      "MCP server installation",
+      "getmcp guide",
+    ],
+  },
+  { ogImage: { path: "/docs/opengraph-image.png", alt: DOCS_OG.alt } },
+);
+---
+
+<BaseLayout metadata={metadata}>
+  <DocsContent />
+</BaseLayout>

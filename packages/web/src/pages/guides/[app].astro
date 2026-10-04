@@ -1,0 +1,291 @@
+---
+import type { GetStaticPaths } from "astro";
+import { generators } from "@getmcp/generators";
+import type { AppIdType } from "@getmcp/core";
+import { getServerBySlug } from "@getmcp/registry";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import JsonLd from "@/components/JsonLd.astro";
+import { CodeBlock } from "@/components/CodeBlock";
+import { PackageManagerCommand } from "@/components/PackageManagerCommand";
+import { SITE_URL } from "@/lib/constants";
+import { GUIDES, GUIDE_SLUGS, type GuideData } from "@/lib/guide-data";
+import { resolveMetadata } from "@/lib/metadata";
+import { GUIDE_OG } from "@/lib/og-pages";
+
+export const getStaticPaths = (() =>
+  GUIDE_SLUGS.map((app) => ({ params: { app } }))) satisfies GetStaticPaths;
+
+const { app } = Astro.params as { app: string };
+const guide = GUIDES[app];
+
+const metadata = resolveMetadata(
+  {
+    title: `How to Install MCP Servers in ${guide.name}`,
+    description: `Step-by-step guide to install and configure MCP servers in ${guide.name}. Covers config format, file location, quick install with getmcp CLI, and troubleshooting.`,
+    keywords: [
+      `${guide.name} MCP`,
+      `${guide.name} MCP server`,
+      `${guide.name} MCP setup`,
+      `install MCP ${guide.name}`,
+      "MCP server",
+      "getmcp",
+    ],
+    alternates: { canonical: `/guides/${app}` },
+    openGraph: {
+      title: `How to Install MCP Servers in ${guide.name} — getmcp`,
+      description: `Step-by-step guide to install and configure MCP servers in ${guide.name}.`,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `How to Install MCP Servers in ${guide.name} — getmcp`,
+      description: `Step-by-step guide to install and configure MCP servers in ${guide.name}.`,
+    },
+  },
+  { ogImage: { path: `/guides/${app}/opengraph-image.png`, alt: GUIDE_OG.alt } },
+);
+
+/**
+ * Generate a sample config for this app using the first popular server that
+ * exists in the registry.
+ */
+function getSampleConfig(appSlug: string, guide: GuideData): string | null {
+  const gen = generators[appSlug as AppIdType];
+  if (!gen) return null;
+
+  for (const serverId of guide.popularServers) {
+    const server = getServerBySlug(serverId);
+    if (server) {
+      const config = gen.generate(serverId, server.config);
+      return gen.serialize(config);
+    }
+  }
+  return null;
+}
+
+const gen = generators[app as AppIdType];
+const sampleConfig = getSampleConfig(app, guide);
+const sampleServerId = guide.popularServers[0];
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: `How to Install MCP Servers in ${guide.name}`,
+    description: `Step-by-step guide to install and configure MCP servers in ${guide.name}.`,
+    url: `${SITE_URL}/guides/${app}`,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${SITE_URL}/guides/${app}`,
+    },
+    author: { "@type": "Organization", name: "getmcp" },
+    publisher: {
+      "@type": "Organization",
+      name: "getmcp",
+      url: SITE_URL,
+    },
+    inLanguage: "en",
+    proficiencyLevel: "Beginner",
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Guides",
+        item: `${SITE_URL}/guides`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: guide.name,
+        item: `${SITE_URL}/guides/${app}`,
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout metadata={metadata}>
+  <div class="max-w-4xl mx-auto px-6 py-10 md:py-16">
+    <JsonLd data={jsonLd} />
+
+    {/* Breadcrumb */}
+    <nav class="text-sm text-text-secondary mb-8" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-text transition-colors">Home</a>
+      <span class="mx-2 text-text-secondary/50">/</span>
+      <a href="/guides" class="hover:text-text transition-colors">Guides</a>
+      <span class="mx-2 text-text-secondary/50">/</span>
+      <span class="text-text">{guide.name}</span>
+    </nav>
+
+    {/* Header */}
+    <h1 class="text-3xl font-bold tracking-tight mb-4">
+      How to Install MCP Servers in {guide.name}
+    </h1>
+    <p class="text-lg text-text-secondary leading-relaxed max-w-2xl mb-10">
+      {guide.overview}
+    </p>
+
+    {/* Quick install */}
+    <section class="mb-12">
+      <h2 class="text-xl font-semibold mb-4">Quick Install with getmcp</h2>
+      <p class="text-text-secondary mb-4">
+        The fastest way to install MCP servers in {guide.name} is with the getmcp CLI:
+      </p>
+      <PackageManagerCommand client:load />
+    </section>
+
+    {/* Config format */}
+    <section class="mb-12">
+      <h2 class="text-xl font-semibold mb-4">Configuration Format</h2>
+      <dl class="grid grid-cols-2 gap-x-8 gap-y-4 py-5 border-y border-border mb-6">
+        <div>
+          <dt class="text-xs text-text-secondary uppercase tracking-wider mb-1">Format</dt>
+          <dd class="font-mono text-sm">{guide.format}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-text-secondary uppercase tracking-wider mb-1">Root Key</dt>
+          <dd class="font-mono text-sm">{guide.rootKey}</dd>
+        </div>
+        {
+          guide.configPaths.project && (
+            <div>
+              <dt class="text-xs text-text-secondary uppercase tracking-wider mb-1">
+                Project Config
+              </dt>
+              <dd class="font-mono text-sm break-all">{guide.configPaths.project}</dd>
+            </div>
+          )
+        }
+        {
+          guide.configPaths.macos && (
+            <div>
+              <dt class="text-xs text-text-secondary uppercase tracking-wider mb-1">
+                Global Config (macOS / Linux)
+              </dt>
+              <dd class="font-mono text-sm break-all">{guide.configPaths.macos}</dd>
+            </div>
+          )
+        }
+        {
+          guide.configPaths.windows && (
+            <div>
+              <dt class="text-xs text-text-secondary uppercase tracking-wider mb-1">
+                Global Config (Windows)
+              </dt>
+              <dd class="font-mono text-sm break-all">{guide.configPaths.windows}</dd>
+            </div>
+          )
+        }
+        {
+          guide.configPaths.linux && guide.configPaths.linux !== guide.configPaths.macos && (
+            <div>
+              <dt class="text-xs text-text-secondary uppercase tracking-wider mb-1">
+                Global Config (Linux)
+              </dt>
+              <dd class="font-mono text-sm break-all">{guide.configPaths.linux}</dd>
+            </div>
+          )
+        }
+      </dl>
+
+      {
+        sampleConfig && (
+          <div>
+            <p class="text-text-secondary mb-3">
+              Example configuration for the{" "}
+              <a href={`/servers/${sampleServerId}`} class="text-accent hover:underline">{sampleServerId}</a>{" "}
+              server:
+            </p>
+            <CodeBlock label={guide.format} code={sampleConfig} />
+          </div>
+        )
+      }
+    </section>
+
+    {/* Prerequisites */}
+    <section class="mb-12">
+      <h2 class="text-xl font-semibold mb-4">Prerequisites</h2>
+      <ul class="space-y-2">
+        {
+          guide.prerequisites.map((req) => (
+            <li class="flex items-start gap-2 text-text-secondary">
+              <span class="text-accent mt-1 shrink-0" aria-hidden="true">
+                &bull;
+              </span>
+              <span>{req}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    {/* Popular servers */}
+    <section class="mb-12">
+      <h2 class="text-xl font-semibold mb-4">Popular Servers for {guide.name}</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {
+          guide.popularServers.map((id) => {
+            const server = getServerBySlug(id);
+            if (!server) return null;
+            return (
+              <a
+                href={`/servers/${id}`}
+                class="flex items-center gap-3 rounded-lg border border-border bg-surface p-4 hover:bg-surface-hover hover:border-accent/50 transition-colors"
+              >
+                <div class="min-w-0">
+                  <p class="font-medium text-sm truncate">{server.name}</p>
+                  <p class="text-xs text-text-secondary truncate">{server.description}</p>
+                </div>
+              </a>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    {/* Troubleshooting */}
+    <section class="mb-12">
+      <h2 class="text-xl font-semibold mb-4">Troubleshooting</h2>
+      <ul class="space-y-4">
+        {
+          guide.troubleshooting.map((tip) => (
+            <li class="flex items-start gap-2">
+              <span class="text-warning mt-0.5 shrink-0 text-xs leading-5" aria-hidden="true">
+                &#x25B8;
+              </span>
+              <span class="text-text-secondary text-sm leading-relaxed">{tip}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    {/* Official docs link */}
+    {
+      gen?.app?.docsUrl && (
+        <section>
+          <h2 class="text-xl font-semibold mb-4">Official Documentation</h2>
+          <a
+            href={gen.app.docsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-accent hover:underline text-sm"
+          >
+            {guide.name} MCP documentation
+            <span class="sr-only"> (opens in new tab)</span>
+          </a>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
