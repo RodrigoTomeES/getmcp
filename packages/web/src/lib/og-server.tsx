@@ -33,23 +33,8 @@ export async function createServerOGImage(server: InternalRegistryEntry) {
         padding: "60px",
         fontFamily: OG_FONT_FAMILY,
         position: "relative",
-        overflow: "hidden",
       }}
     >
-      {/* Background gradient accent */}
-      <div
-        style={{
-          position: "absolute",
-          top: "-200px",
-          right: "-200px",
-          width: "600px",
-          height: "600px",
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)",
-          display: "flex",
-        }}
-      />
-
       {/* Top bar with accent line */}
       <div
         style={{

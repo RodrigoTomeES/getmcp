@@ -55,10 +55,36 @@ export function loadOGFonts(): Promise<OGFont[]> {
   return fontsPromise;
 }
 
-/** Render a Satori element tree to a PNG (replaces `next/og`'s `ImageResponse`). */
+const OG_BACKGROUND_RECT = `<rect x="0" y="0" width="${OG_SIZE.width}" height="${OG_SIZE.height}" fill="#0a0a0a"/>`;
+
+/**
+ * Blue glow in the top-right corner, as a native SVG radial gradient. Satori
+ * turns the equivalent CSS `radial-gradient` (plus the `overflow: hidden` it
+ * needed) into a pattern with nested and full-canvas masks that made resvg
+ * ~5x slower to rasterize; the pixels are the same (max 1/255 difference).
+ */
+const OG_GLOW =
+  '<radialGradient id="og-glow" cx="1100" cy="100" r="424.26406871192853" gradientUnits="userSpaceOnUse">' +
+  '<stop offset="0" stop-color="rgb(59,130,246)" stop-opacity="0.15"/>' +
+  '<stop offset="0.7" stop-color="rgb(0,0,0)" stop-opacity="0"/>' +
+  "</radialGradient>" +
+  '<circle cx="1100" cy="100" r="300" fill="url(#og-glow)"/>';
+
+/** Insert the glow right above the root background, below everything else. */
+export function addOGGlow(svg: string): string {
+  const index = svg.indexOf(OG_BACKGROUND_RECT);
+  if (index === -1) throw new Error("OG image: root background rect not found in Satori output");
+  const end = index + OG_BACKGROUND_RECT.length;
+  return svg.slice(0, end) + OG_GLOW + svg.slice(end);
+}
+
+/**
+ * Render a Satori element tree to a PNG (replaces `next/og`'s `ImageResponse`).
+ * The root element must have the `#0a0a0a` background; the corner glow is added here.
+ */
 export async function renderOGImage(element: ReactElement): Promise<Uint8Array> {
   const fonts = await loadOGFonts();
-  const svg = await satori(element, { ...OG_SIZE, fonts });
+  const svg = addOGGlow(await satori(element, { ...OG_SIZE, fonts }));
   // Satori already converts text to paths, so resvg never needs (slow to load) system fonts.
   const image = await renderAsync(svg, {
     fitTo: { mode: "width", value: OG_SIZE.width },
@@ -90,23 +116,8 @@ export async function createOGImage({ heading, description, pills }: OGImageOpti
         padding: "60px",
         fontFamily: OG_FONT_FAMILY,
         position: "relative",
-        overflow: "hidden",
       }}
     >
-      {/* Background gradient accent */}
-      <div
-        style={{
-          position: "absolute",
-          top: "-200px",
-          right: "-200px",
-          width: "600px",
-          height: "600px",
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)",
-          display: "flex",
-        }}
-      />
-
       {/* Top bar with accent line */}
       <div
         style={{

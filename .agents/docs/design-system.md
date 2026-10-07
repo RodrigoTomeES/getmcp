@@ -470,7 +470,7 @@ Dimensions: **1200 x 630px** (PNG).
 
 | Element          | Style                                              |
 | ---------------- | -------------------------------------------------- |
-| Background       | `#0a0a0a` + radial accent gradient (top-right)     |
+| Background       | `#0a0a0a` + radial accent gradient (top-right)\*   |
 | Top bar          | 4px gradient `#3b82f6 → #2563eb → #3b82f6`         |
 | Logo text        | Inter Bold 48px, `#ededed`                         |
 | Beta badge       | `#3b82f6` bg, white text, 16px, rounded-full       |
@@ -480,6 +480,8 @@ Dimensions: **1200 x 630px** (PNG).
 | Transport badges | Stdio: `#4ade80`, Remote: `#c084fc`                |
 | Code block       | `#111111` bg, `#ededed` text, `$` prompt `#3b82f6` |
 | Domain           | 20px, `#a0a0a0`, bottom-right                      |
+
+\* The glow is not part of the Satori element tree: `renderOGImage()` (`src/lib/og-image.tsx`) injects it into the SVG as a native `<radialGradient>`. A CSS `radial-gradient` (with the `overflow: hidden` it needs) makes Satori emit a pattern with full-canvas masks that is ~2.2× slower to render for the same pixels. Templates only need the `#0a0a0a` root background.
 
 Fonts: `Inter-Bold.ttf` (700), `Inter-Regular.ttf` (400) loaded from `assets/`.
 
