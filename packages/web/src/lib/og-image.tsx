@@ -40,6 +40,38 @@ export async function loadOGFonts() {
   ];
 }
 
+/**
+ * Blue glow in the top-right corner. Drawn as a native SVG radial gradient
+ * instead of a CSS `radial-gradient`: satori turns the CSS version into a
+ * pattern with nested masks that is much slower to rasterize. Same pixels
+ * (max 1/255 difference). The canvas edge clips the overflow, so the root
+ * container does not need `overflow: hidden` (which adds a full-canvas mask).
+ */
+export function OGGlow() {
+  return (
+    <svg
+      width="600"
+      height="600"
+      viewBox="0 0 600 600"
+      style={{ position: "absolute", top: "-200px", right: "-200px" }}
+    >
+      <defs>
+        <radialGradient
+          id="og-glow"
+          cx="300"
+          cy="300"
+          r="424.26406871192853"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0" stopColor="rgb(59,130,246)" stopOpacity="0.15" />
+          <stop offset="0.7" stopColor="rgb(0,0,0)" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <circle cx="300" cy="300" r="300" fill="url(#og-glow)" />
+    </svg>
+  );
+}
+
 interface OGImageOptions {
   heading: ReactNode[] | ReactNode;
   description: string;
@@ -60,22 +92,10 @@ export async function createOGImage({ heading, description, pills }: OGImageOpti
         padding: "60px",
         fontFamily: OG_FONT_FAMILY,
         position: "relative",
-        overflow: "hidden",
       }}
     >
       {/* Background gradient accent */}
-      <div
-        style={{
-          position: "absolute",
-          top: "-200px",
-          right: "-200px",
-          width: "600px",
-          height: "600px",
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)",
-          display: "flex",
-        }}
-      />
+      <OGGlow />
 
       {/* Top bar with accent line */}
       <div
