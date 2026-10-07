@@ -59,6 +59,7 @@ Cloudflare cachea HTML, assets y OG images; Vercel solo recibe los _cache miss_.
 2. Cloudflare → SSL/TLS **Full (strict)** (con _Flexible_ hay bucles de redirección).
 3. Pasar `@` y `www` a **Proxied**.
 4. **Cache Rule** → _Eligible for cache_:
+
    ```
    (http.host eq "getmcp.es"
     and not starts_with(http.request.uri.path, "/_vercel")
@@ -70,6 +71,7 @@ Cloudflare cachea HTML, assets y OG images; Vercel solo recibe los _cache miss_.
    - Edge TTL: _Ignore cache-control header_, 7–30 días (Vercel envía `max-age=0, must-revalidate`).
    - Browser TTL: _Respect origin_. Cache key con query string (por defecto).
    - **Excluir la cabecera `RSC` es obligatorio**: Next sirve HTML o payload RSC en la misma URL según esa cabecera y Cloudflare ignora `Vary`.
+
 5. **Tiered Cache** activado (gratis): evita que cada PoP pida al origen por separado.
 6. **Security → Bots**: _Block AI bots_ + _Bot Fight Mode_.
 
@@ -157,7 +159,7 @@ Igual que C pero con Astro. Las fichas en SSR con **Route Caching** (`Astro.cach
 | **Total**                         | **76.203** | **4.102 MB**           |
 | Proyección +20% servidores        | 91.444     | 4.922 MB               |
 
-- Build completo (páginas + OG): **22 min** en GitHub Actions, ~20 de ellos en OG images (optimizable a minutos/segundos, ver _Rendimiento de la generación de OG images_).
+- Build completo (páginas + OG): **22 min** en GitHub Actions, ~20 de ellos en OG images. Con el degradado nativo ya implementado: **9 min 41 s** (ver _Rendimiento de la generación de OG images_).
 - GitHub Pages (1 GB) ❌ · Cloudflare Free (20K archivos) ❌ · Cloudflare Workers Paid (100K archivos) ✅ pero de pago.
 
 Las OG images son la mitad de los archivos y 2/3 del peso → sacarlas del deploy lo hace viable en Vercel (opción H).
@@ -250,14 +252,18 @@ Comparación píxel a píxel con la imagen original: **diferencia máxima 1/255 
 | Original         | 19 img/s | 69 img/s  | 98 img/s  |
 | Degradado nativo | 42 img/s | 152 img/s | 215 img/s |
 
-**Proyección para ~38K imágenes en CI** (orientativa; medido en un PC local, no en el runner):
+**Tiempo de las OG en CI** (las dos primeras filas medidas en GitHub Actions; el resto, proyección desde el benchmark local):
 
-| Escenario                                       | Tiempo           |
-| ----------------------------------------------- | ---------------- |
-| Actual (medido en CI)                           | ~20 min          |
-| Degradado nativo dentro de Astro                | ~9 min           |
-| Degradado nativo + script aparte con 4 workers  | ~4–5 min         |
-| **+ incremental (solo OG cuyos datos cambian)** | **segundos/día** |
+| Escenario                                           | Tiempo OG        | Build completo                  | Fuente                                                                                                                             |
+| --------------------------------------------------- | ---------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Original                                            | ~20 min          | 21 min 59 s (38.088 páginas)    | ✅ Medido, [run 37233860090](https://github.com/RodrigoTomeES/getmcp/actions/runs/37233860090)                                     |
+| **Degradado nativo dentro de Astro (implementado)** | **~8,5 min**     | **9 min 41 s (39.223 páginas)** | ✅ Medido, [run 37692302032](https://github.com/RodrigoTomeES/getmcp/actions/runs/37692302032) — **−56%** con un 3% más de páginas |
+| Degradado nativo + script aparte con 4 workers      | ~4–5 min         | —                               | Proyección                                                                                                                         |
+| **+ incremental (solo OG cuyos datos cambian)**     | **segundos/día** | —                               | Proyección                                                                                                                         |
+
+La proyección de ~9 min del benchmark local se cumplió en CI (~8,5 min), así que las filas proyectadas son razonablemente fiables.
+
+> **Nota de fidelidad visual:** producción (Next.js 16.2.4 → `@vercel/og` 0.11.1) usa **satori 0.25.0**; la rama Astro instaló **satori 0.35.0**, que mide el texto algo distinto (títulos ~2–3 px más anchos por el `letterSpacing`). No lo causa el degradado. Para un port 1:1, fijar `satori@0.25.0` (verificado compatible con `addOGGlow`).
 
 **Incremental:** una OG de servidor solo depende de nombre, descripción, categorías, id, transporte y la versión de la plantilla. Un hash de esos campos por servidor permite regenerar (y subir a R2, opción H) solo las que cambian; de los ~1.000–2.000 servidores modificados al día, muchos solo cambian métricas que no salen en la imagen.
 
