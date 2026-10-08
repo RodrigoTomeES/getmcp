@@ -9,7 +9,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 
 **Guías de referencia:** skill `modern-web-guidance` (`.claude/skills/modern-web-guidance`). Antes de implementar un punto de HTML, CSS o JS de cliente: `npx -y modern-web-guidance@latest retrieve "<id>"`. Los IDs aplicables van indicados en cada punto como _(guía: `id`)_.
 
-**Política de navegadores (pendiente de decidir):** las guías dan por seguras las funciones _Baseline widely available_ y piden fallback para el resto. Propuesta: mejora progresiva, es decir, usar funciones nuevas solo si sin ellas la web sigue funcionando (transiciones, speculation rules, `closedby`), sin polyfills. Si se acepta, conviene anotarlo en `CLAUDE.md`.
+**Política de navegadores (decidida):** mejora progresiva. Se usan funciones nuevas solo si sin ellas la web sigue funcionando (transiciones, speculation rules, `closedby` con su pequeño fallback). Sin polyfills. Está anotada en `AGENTS.md`.
 
 ## Cómo verificar cada cambio
 
@@ -43,7 +43,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
   - `AnimatedCommand` y `NotFound`: `.astro` más un script pequeño.
   - Componentes React que solo se renderizan en el servidor (ServerCard, ServerSidebar, CategoryGrid, PopularServers, SupportedApps, StatsBar, FormatShowcase, TeamFeatures, SecurityFeatures, DeveloperExperience, DocsContent, DocsSidebar, CodeBlock): pasarlos a `.astro`. Ojo, `ServerCard` también lo usa la isla `SearchBar`.
   - Ganancia: la home y el 404 sin react-dom, y menos `renderToString` en el build.
-- [~] **A3. API de fuentes de Astro.**
+- [x] **A3. API de fuentes de Astro.** Hecho en `7e5d6b9`.
   - **Decisión:** `fontProviders.fontsource()`, no `npm`, para tener la config más simple y quitar la dependencia.
   - Config: Fira Mono en pesos `[400, 500]`, subsets `["latin", "symbols2"]` y `fallbacks: ["monospace"]`.
   - Uso: un único `<Font cssVariable="--font-fira-mono" preload={fontPreload} />` en `BaseLayout.astro`, y `--font-mono: var(--font-fira-mono)` en `@theme inline`.
@@ -64,7 +64,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
     - El logo mide 424 px en la home y 365 px en el 404, igual que en producción.
     - En Windows, la fallback generada (Courier New) iguala los anchos de Fira Mono (423,8 px frente a 424 px).
     - Si el proveedor falla en CI, cambiar a `fontProviders.npm()` es una línea.
-- [ ] **A4. Build incremental** (`experimental.incrementalBuild`, Astro 7.2 o posterior).
+- [ ] **A4. Build incremental** (`experimental.incrementalBuild`, Astro 7.2 o posterior). **Aplazado:** el build se ejecuta en Vercel, así que hay que replantear dónde vive la caché antes de hacerlo.
   - Devolver `cacheKey` en `getStaticPaths()` de `servers/[id]` y de sus endpoints de OG.
   - Necesita persistir `node_modules/.astro` en CI (~3 GB, `actions/cache`); `astro build --force` reconstruye todo.
   - Es experimental y no está probado con endpoints. Es la mayor mejora posible del build diario (~32 min).
@@ -101,13 +101,13 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 
 - [ ] **B1. `/servers` pesa 19,8 MB.**
   - El 99,5 % son los props de `<SearchBar client:load servers={…}>`: los ~39.700 servidores serializados en el atributo `props` (`src/pages/servers/index.astro:39-54,113`).
-  - Propuesta: un endpoint estático compacto (`src/pages/servers.json.ts`) cargado desde la isla con `client:idle`, y la primera página de resultados en HTML estático para que los crawlers vean más de 24 enlaces. Alternativa: Pagefind.
+  - Propuesta: un endpoint estático compacto (`src/pages/servers.json.ts`) cargado desde la isla con `client:idle`, y la primera página de resultados en HTML estático para que los crawlers vean más de 24 enlaces. **Decidido:** JSON estático propio. **Futuro:** migrar la búsqueda a Pagefind.
 - [ ] **B2. `/category/ai` pesa 3 MB.**
   - 2.779 tarjetas sin paginar más ~300 KB de JSON-LD `ItemList` (`src/pages/category/[slug].astro:70-81,122-128`).
   - Propuesta: `paginate()` en `/category/[slug]/[...page].astro`, con el `ItemList` limitado a la página actual.
   - Si se descarta paginar, como mínimo añadir `content-visibility: auto` con `contain-intrinsic-size` a la cuadrícula de tarjetas por debajo del pliegue. No reduce los 3 MB, pero sí el coste de render. _(guía: `defer-rendering-heavy-content`)_
 - [ ] **B3. Imágenes OG: unos 2,6 GB (66 KB × 39.700) y la mayor parte del tiempo de build.**
-  - Opciones: PNG con paleta cuantizada, OG genérica con personalizadas solo para el top N, u otra estrategia. **Requiere decisión.**
+  - **Decidido:** mantener una OG propia por servidor y comprimir los PNG con paleta cuantizada. El aspecto no debe cambiar de forma apreciable. Las otras opciones descartadas: OG genérica con personalizadas solo para el top N.
   - Borrar de paso `assets/Inter-SemiBold.ttf`, que no se usa (ver D2).
 
 ## C. Fallos (ya existían en Next.js)
@@ -119,7 +119,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 - [ ] **C2. El JSON-LD no se escapa.**
   - `src/components/JsonLd.astro:9` usa `set:html={JSON.stringify(data)}` con descripciones de terceros. Un `</script>` en el registry rompería la página.
   - Arreglo: `.replace(/</g, "\\u003c")`. Mismo patrón en `DocsContent.tsx:12-57`.
-- [~] **C3. Doble punto en la meta description de cada servidor** (`src/pages/servers/[id].astro:29`): "Sign in once.. Install with:".
+- [x] **C3. Doble punto en la meta description de cada servidor** (`src/pages/servers/[id].astro:29`): "Sign in once.. Install with:". Hecho en `8585247`.
   - Afectaba a unas 31.000 fichas: 30.059 descripciones terminan en `.` y 1.016 en otra puntuación.
   - Arreglo: `toSentence()` en `src/lib/format.ts`. Recorta espacios, quita un `,` `:` o `;` final y añade punto solo si no termina ya en `.` `!` `?` `…`. Tests en `tests/format.test.ts`.
   - Las 5 descripciones que ya vienen mal del registry ("SEO..", "quickly!.") se dejan como están.

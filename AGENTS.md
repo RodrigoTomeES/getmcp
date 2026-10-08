@@ -127,6 +127,12 @@ Follows [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.
 
 ---
 
+## Browser Support (web)
+
+Progressive enhancement: features that are not Baseline widely available may be used only when the site still works without them (e.g. cross-document view transitions, speculation rules, `<dialog closedby>` with its small fallback). No polyfills. See the `modern-web-guidance` skill for per-feature fallbacks.
+
+---
+
 ## Installed Skills
 
 Skills are installed under `.agents/skills/`. See the skill files for triggers and descriptions.
