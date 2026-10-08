@@ -11,6 +11,7 @@ import { ServerCard } from "@/components/ServerCard";
 import { ServerSidebar } from "@/components/ServerSidebar";
 import { GUIDE_SLUGS } from "@/lib/guide-data";
 import { SITE_URL } from "@/lib/constants";
+import { toSentence } from "@/lib/format";
 import { resolveMetadata } from "@/lib/metadata";
 import { SERVER_OG_ALT } from "@/lib/og-server";
 import { getServerPaths } from "@/lib/server-paths";
@@ -26,7 +27,7 @@ const { server } = Astro.props;
 const id = server.slug;
 
 const title = `${server.name} MCP Server`;
-const description = `${server.description}. Install with: npx @getmcp/cli add ${server.id}`;
+const description = `${toSentence(server.description)} Install with: npx @getmcp/cli add ${server.id}`;
 
 const metadata = resolveMetadata(
   {

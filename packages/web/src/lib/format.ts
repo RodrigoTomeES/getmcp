@@ -4,6 +4,16 @@ export function compactNumber(n: number): string {
   return String(n);
 }
 
+/**
+ * Ensure third-party text ends as a sentence: trims it, drops a trailing `,` `:` `;`
+ * and adds a period unless it already ends with `.` `!` `?` or `…` (optionally
+ * followed by a closing quote or bracket).
+ */
+export function toSentence(text: string): string {
+  const trimmed = text.trim().replace(/[,:;]+$/, "");
+  return /[.!?…]["')\]]*$/.test(trimmed) ? trimmed : `${trimmed}.`;
+}
+
 export function relativeTime(isoDate: string, now = Date.now()): string {
   const then = new Date(isoDate).getTime();
   if (Number.isNaN(then)) return "\u2014";

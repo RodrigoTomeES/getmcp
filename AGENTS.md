@@ -95,7 +95,7 @@ This is not optional — documentation drift causes confusion and wastes time. T
 
 ## Testing
 
-- **737 tests** across 34 test files
+- **757 tests** across 35 test files
 - Run all tests: `npx vitest` (from repo root)
 - Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc. (`npx vitest --project web` for the web package)
 - Test locations:
@@ -104,7 +104,7 @@ This is not optional — documentation drift causes confusion and wastes time. T
   - `packages/registry/tests/` — entry validation, lookup, search, categories, content integrity, fetch-metrics
   - `packages/cli/tests/` — app-selection, bin flags, config-file I/O, credentials, detect, errors, format, lock file, preferences, registry-cache, registry-config, utils
   - `packages/cli/tests/commands/` — add, check, doctor, find, import, list, registry, remove, sync, update command tests
-  - `packages/web/tests/` — metadata resolution, sitemap, server detail helpers, OG image rendering
+  - `packages/web/tests/` — metadata resolution, sitemap, server detail helpers, OG image rendering, text formatting (`toSentence`)
 
 ---
 
