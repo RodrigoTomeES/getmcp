@@ -3,7 +3,7 @@ import { getAllServers, getCategories, getAllMetrics } from "@getmcp/registry";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import { SearchBar } from "@/components/SearchBar";
-import { SITE_URL } from "@/lib/constants";
+import { APP_COUNT, SITE_URL } from "@/lib/constants";
 import { resolveMetadata } from "@/lib/metadata";
 import { SERVERS_OG } from "@/lib/og-pages";
 
@@ -11,21 +11,21 @@ const metadata = resolveMetadata(
   {
     title: "MCP Server Directory — Browse & Install",
     description:
-      "Browse and install MCP servers for Claude Desktop, VS Code, Cursor, and 16 more AI apps. Filter by category, search by name, and install with one command.",
+      `Browse and install MCP servers for Claude Desktop, VS Code, Cursor, and ${APP_COUNT - 3} more AI apps. Filter by category, search by name, and install with one command.`,
     alternates: {
       canonical: "/servers",
     },
     openGraph: {
       title: "MCP Server Directory — getmcp",
       description:
-        "Browse and install MCP servers for Claude Desktop, VS Code, Cursor, and 16 more AI apps.",
+        `Browse and install MCP servers for Claude Desktop, VS Code, Cursor, and ${APP_COUNT - 3} more AI apps.`,
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
       title: "MCP Server Directory — getmcp",
       description:
-        "Browse and install MCP servers for Claude Desktop, VS Code, Cursor, and 16 more AI apps.",
+        `Browse and install MCP servers for Claude Desktop, VS Code, Cursor, and ${APP_COUNT - 3} more AI apps.`,
     },
   },
   { ogImage: { path: "/servers/opengraph-image.png", alt: SERVERS_OG.alt } },
@@ -58,7 +58,7 @@ const jsonLd = [
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "MCP Server Directory",
-    description: `Browse and install ${count}+ MCP servers for 19 AI applications.`,
+    description: `Browse and install ${count}+ MCP servers for ${APP_COUNT} AI applications.`,
     url: `${SITE_URL}/servers`,
     mainEntityOfPage: {
       "@type": "WebPage",
@@ -105,7 +105,7 @@ const jsonLd = [
     <div class="mb-12">
       <h1 class="text-4xl font-bold tracking-tight mb-3">MCP Server Directory</h1>
       <p class="text-lg text-text-secondary leading-relaxed max-w-2xl">
-        Browse {count}+ MCP servers and install them into 19 AI applications with a single command.
+        Browse {count}+ MCP servers and install them into {APP_COUNT} AI applications with a single command.
       </p>
     </div>
 

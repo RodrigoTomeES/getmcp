@@ -1,7 +1,7 @@
 import { getServerCount, getServersByCategory } from "@getmcp/registry";
-import { getAppIds } from "@getmcp/generators";
 import { createOGImage } from "@/lib/og-image";
 import { CATEGORY_NAMES } from "@/lib/categories";
+import { APP_COUNT } from "@/lib/constants";
 
 /*
  * OG images for the non-server routes (ported 1:1 from the Next.js
@@ -10,15 +10,14 @@ import { CATEGORY_NAMES } from "@/lib/categories";
  */
 
 export const HOME_OG = {
-  alt: "getmcp — Install MCP Servers in 19 AI Apps",
+  alt: `getmcp — Install MCP Servers in ${APP_COUNT} AI Apps`,
   render() {
     const serverCount = getServerCount();
-    const appCount = getAppIds().length;
 
     return createOGImage({
       heading: [
         <span key="heading-1">Install MCP Servers</span>,
-        <span key="heading-2">in {appCount} AI Apps</span>,
+        <span key="heading-2">in {APP_COUNT} AI Apps</span>,
       ],
       description: `One command. ${serverCount}+ servers. Configs for JSON, JSONC, YAML, and TOML — generated for every app automatically.`,
       pills: [
@@ -28,7 +27,7 @@ export const HOME_OG = {
         "Windsurf",
         "Goose",
         "Zed",
-        `+${appCount - 6} more`,
+        `+${APP_COUNT - 6} more`,
       ],
     });
   },
@@ -41,8 +40,8 @@ export const SERVERS_OG = {
 
     return createOGImage({
       heading: [<span key="heading-1">MCP Server Directory</span>],
-      description: `Browse and install ${count}+ MCP servers for 19 AI applications with one command.`,
-      pills: ["Claude Desktop", "VS Code", "Cursor", "Windsurf", "+15 more"],
+      description: `Browse and install ${count}+ MCP servers for ${APP_COUNT} AI applications with one command.`,
+      pills: ["Claude Desktop", "VS Code", "Cursor", "Windsurf", `+${APP_COUNT - 4} more`],
     });
   },
 };
@@ -52,9 +51,8 @@ export const GUIDES_OG = {
   render() {
     return createOGImage({
       heading: [<span key="heading-1">MCP Setup Guides</span>],
-      description:
-        "Step-by-step guides to install and configure MCP servers in 19 AI applications.",
-      pills: ["Claude Desktop", "VS Code", "Cursor", "Windsurf", "+15 more"],
+      description: `Step-by-step guides to install and configure MCP servers in ${APP_COUNT} AI applications.`,
+      pills: ["Claude Desktop", "VS Code", "Cursor", "Windsurf", `+${APP_COUNT - 4} more`],
     });
   },
 };
@@ -79,7 +77,7 @@ export const CATEGORY_OG = {
 
     return createOGImage({
       heading: [<span key="1">{name} MCP Servers</span>],
-      description: `Browse and install ${count} ${name.toLowerCase()} MCP servers across 19 AI apps.`,
+      description: `Browse and install ${count} ${name.toLowerCase()} MCP servers across ${APP_COUNT} AI apps.`,
       pills: [name],
     });
   },

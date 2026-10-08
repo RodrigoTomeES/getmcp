@@ -2,29 +2,29 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import { GUIDES, GUIDE_SLUGS } from "@/lib/guide-data";
-import { SITE_URL } from "@/lib/constants";
+import { APP_COUNT, SITE_URL } from "@/lib/constants";
 import { resolveMetadata } from "@/lib/metadata";
 import { GUIDES_OG } from "@/lib/og-pages";
 
 const metadata = resolveMetadata(
   {
-    title: "MCP Setup Guides — Install Servers in 19 AI Apps",
+    title: `MCP Setup Guides — Install Servers in ${APP_COUNT} AI Apps`,
     description:
-      "Step-by-step guides to install and configure MCP servers in Claude Desktop, VS Code, Cursor, Windsurf, and 15 more AI applications. Covers config format, file location, and troubleshooting.",
+      `Step-by-step guides to install and configure MCP servers in Claude Desktop, VS Code, Cursor, Windsurf, and ${APP_COUNT - 4} more AI applications. Covers config format, file location, and troubleshooting.`,
     alternates: {
       canonical: "/guides",
     },
     openGraph: {
       title: "MCP Setup Guides — getmcp",
       description:
-        "Step-by-step guides to install and configure MCP servers in 19 AI applications.",
+        `Step-by-step guides to install and configure MCP servers in ${APP_COUNT} AI applications.`,
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
       title: "MCP Setup Guides — getmcp",
       description:
-        "Step-by-step guides to install and configure MCP servers in 19 AI applications.",
+        `Step-by-step guides to install and configure MCP servers in ${APP_COUNT} AI applications.`,
     },
   },
   { ogImage: { path: "/guides/opengraph-image.png", alt: GUIDES_OG.alt } },

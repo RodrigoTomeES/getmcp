@@ -1,9 +1,8 @@
 ---
 import { getServerCount } from "@getmcp/registry";
-import { getAppIds } from "@getmcp/generators";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import JsonLd from "@/components/JsonLd.astro";
-import { SITE_URL } from "@/lib/constants";
+import { APP_COUNT, SITE_URL } from "@/lib/constants";
 import { resolveMetadata } from "@/lib/metadata";
 import { HOME_OG } from "@/lib/og-pages";
 import { AnimatedCommand } from "@/components/AnimatedCommand";
@@ -22,7 +21,7 @@ const metadata = resolveMetadata(
   {
     title: "getmcp — Install MCP Servers in Claude, VS Code, Cursor & 16 More Apps",
     description:
-      "Install and configure MCP servers across Claude Desktop, VS Code, Cursor, Windsurf, Codex, and 14 more AI apps with one command. Multi-registry support, team manifests, and config generation for JSON, JSONC, YAML, and TOML.",
+      `Install and configure MCP servers across Claude Desktop, VS Code, Cursor, Windsurf, Codex, and ${APP_COUNT - 5} more AI apps with one command. Multi-registry support, team manifests, and config generation for JSON, JSONC, YAML, and TOML.`,
     alternates: {
       canonical: "/",
     },
@@ -31,7 +30,6 @@ const metadata = resolveMetadata(
 );
 
 const count = getServerCount();
-const appCount = getAppIds().length;
 
 const jsonLd = [
   {
@@ -41,7 +39,7 @@ const jsonLd = [
     alternateName: "getmcp.es",
     url: SITE_URL,
     inLanguage: "en",
-    description: `Browse, discover, and install MCP servers into ${appCount} AI applications. One config, every app.`,
+    description: `Browse, discover, and install MCP servers into ${APP_COUNT} AI applications. One config, every app.`,
     publisher: {
       "@type": "Organization",
       name: "getmcp",
@@ -70,9 +68,9 @@ const jsonLd = [
     url: SITE_URL,
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Windows, macOS, Linux",
-    description: `Universal MCP server installer supporting ${appCount} AI applications and 4 config formats.`,
+    description: `Universal MCP server installer supporting ${APP_COUNT} AI applications and 4 config formats.`,
     featureList: [
-      "Install MCP servers across 19 AI apps",
+      `Install MCP servers across ${APP_COUNT} AI apps`,
       "Multi-registry support with private registries",
       "Team project manifests (getmcp.json)",
       "Config generation for JSON, JSONC, YAML, and TOML",
@@ -103,7 +101,7 @@ const jsonLd = [
         name: "What is getmcp?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "getmcp is a universal installer and configuration tool for MCP (Model Context Protocol) servers. It lets you install and configure MCP servers across 19 AI applications — including Claude Desktop, VS Code, Cursor, and Windsurf — with a single command.",
+          text: `getmcp is a universal installer and configuration tool for MCP (Model Context Protocol) servers. It lets you install and configure MCP servers across ${APP_COUNT} AI applications — including Claude Desktop, VS Code, Cursor, and Windsurf — with a single command.`,
         },
       },
       {
@@ -134,7 +132,7 @@ const jsonLd = [
 
     {/* Hero section — two-column layout */}
     <div class="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-10 lg:gap-14 mb-16 pt-4 md:pt-10 relative">
-      <h1 class="absolute hidden">getmcp — Install MCP Servers Across {appCount} AI Apps</h1>
+      <h1 class="absolute hidden">getmcp — Install MCP Servers Across {APP_COUNT} AI Apps</h1>
 
       {/* Subtle radial glow */}
       <div
@@ -150,7 +148,7 @@ const jsonLd = [
       <div class="relative flex flex-col justify-center text-center lg:text-left">
         <p class="text-text-secondary text-xl sm:text-2xl leading-tight tracking-tight text-balance mb-8">
           One command. Every AI app. Install and configure MCP servers across{" "}
-          <span class="text-text font-medium">{appCount} applications</span> - from Claude
+          <span class="text-text font-medium">{APP_COUNT} applications</span> - from Claude
           Desktop to VS Code to Cursor.{" "}
           <span class="text-text font-medium">{count}+ servers</span> ready, with automatic
           config generation for JSON, JSONC, YAML, and TOML.
@@ -166,7 +164,7 @@ const jsonLd = [
     </div>
 
     {/* Stats Bar */}
-    <StatsBar serverCount={count} appCount={appCount} />
+    <StatsBar serverCount={count} appCount={APP_COUNT} />
 
     {/* Separator */}
     <hr class="border-border mb-10" />
@@ -187,7 +185,7 @@ const jsonLd = [
         (MCP) lets AI assistants connect to external tools and data sources. The problem? Every AI
         app uses a different config format — different root keys, field names, and file formats.
         getmcp solves this: define your servers once, and we generate the correct config for all{" "}
-        {appCount} supported apps automatically.
+        {APP_COUNT} supported apps automatically.
       </p>
       <p class="font-medium text-text mb-6">
         No more copy-pasting from docs. No more format guessing.
@@ -240,7 +238,7 @@ const jsonLd = [
     <div class="text-center py-10 border-t border-border">
       <h2 class="text-2xl font-bold text-text mb-2">Stop configuring. Start building.</h2>
       <p class="text-text-secondary mb-6">
-        {count}+ servers. {appCount} AI apps. One command.
+        {count}+ servers. {APP_COUNT} AI apps. One command.
       </p>
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
         <a

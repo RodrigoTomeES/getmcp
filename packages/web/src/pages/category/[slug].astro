@@ -5,7 +5,7 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import { ServerCard, type ServerCardData } from "@/components/ServerCard";
 import { CATEGORY_NAMES, CATEGORY_DESCRIPTIONS } from "@/lib/categories";
-import { SITE_URL } from "@/lib/constants";
+import { APP_COUNT, SITE_URL } from "@/lib/constants";
 import { resolveMetadata } from "@/lib/metadata";
 import { CATEGORY_OG } from "@/lib/og-pages";
 
@@ -25,20 +25,20 @@ const metaDescription = CATEGORY_DESCRIPTIONS[slug] ?? `Browse ${name} MCP serve
 const metadata = resolveMetadata(
   {
     title: `${name} MCP Servers — Browse & Install`,
-    description: `${metaDescription} ${servers.length} servers available. Install with one command across 19 AI apps.`,
+    description: `${metaDescription} ${servers.length} servers available. Install with one command across ${APP_COUNT} AI apps.`,
     keywords: [name, `${name} MCP`, `${name} MCP servers`, "MCP server", "getmcp"],
     alternates: {
       canonical: `/category/${slug}`,
     },
     openGraph: {
       title: `${name} MCP Servers — getmcp`,
-      description: `${metaDescription} Install with one command across 19 AI apps.`,
+      description: `${metaDescription} Install with one command across ${APP_COUNT} AI apps.`,
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
       title: `${name} MCP Servers — getmcp`,
-      description: `${metaDescription} Install with one command across 19 AI apps.`,
+      description: `${metaDescription} Install with one command across ${APP_COUNT} AI apps.`,
     },
   },
   { ogImage: { path: `/category/${slug}/opengraph-image.png`, alt: CATEGORY_OG.alt } },

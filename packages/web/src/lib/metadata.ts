@@ -1,4 +1,4 @@
-import { SITE_URL } from "./constants";
+import { APP_COUNT, SITE_URL } from "./constants";
 
 /**
  * Minimal port of the Next.js Metadata API used by the previous site.
@@ -43,10 +43,9 @@ export type OgImage = {
   alt: string;
 };
 
-const DEFAULT_TITLE = "getmcp — Install MCP Servers in 19 AI Apps with One Command";
+const DEFAULT_TITLE = `getmcp — Install MCP Servers in ${APP_COUNT} AI Apps with One Command`;
 const TITLE_TEMPLATE = (title: string) => `${title} — getmcp`;
-const DEFAULT_DESCRIPTION =
-  "Install and configure MCP servers across Claude Desktop, VS Code, Cursor, and 16 more AI apps with one command. Universal config generator for JSON, JSONC, YAML, and TOML.";
+const DEFAULT_DESCRIPTION = `Install and configure MCP servers across Claude Desktop, VS Code, Cursor, and ${APP_COUNT - 3} more AI apps with one command. Universal config generator for JSON, JSONC, YAML, and TOML.`;
 
 export const ROOT_METADATA: PageMetadata = {
   description: DEFAULT_DESCRIPTION,

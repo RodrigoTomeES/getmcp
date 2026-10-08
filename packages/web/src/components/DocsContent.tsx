@@ -1,12 +1,9 @@
-import { getAppIds } from "@getmcp/generators";
-import { SITE_URL } from "@/lib/constants";
+import { APP_COUNT, SITE_URL } from "@/lib/constants";
 import { CodeBlock } from "@/components/CodeBlock";
 import { DocsSidebar } from "@/components/DocsSidebar";
 
 /** Body of /docs, rendered to static HTML by `src/pages/docs.astro`. */
 export function DocsContent() {
-  const appCount = getAppIds().length;
-
   return (
     <div className="max-w-5xl mx-auto px-6 py-16 flex gap-12">
       <script
@@ -92,7 +89,7 @@ export function DocsContent() {
               <code className="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
                 mcp_servers
               </code>
-              ... there are {appCount} apps, 6 root keys, and 4 formats.
+              ... there are {APP_COUNT} apps, 6 root keys, and 4 formats.
             </p>
             <p>
               <span className="text-text font-medium">getmcp</span> solves this with one canonical
@@ -344,7 +341,7 @@ npx @getmcp/cli add my-server --registry my-team`}</CodeBlock>
         <section id="supported-apps" className="mb-16 scroll-mt-24">
           <h2 className="text-2xl font-bold mb-5">Supported apps</h2>
           <p className="text-text-secondary leading-relaxed mb-4">
-            getmcp generates config for {appCount} AI applications, each with its own format:
+            getmcp generates config for {APP_COUNT} AI applications, each with its own format:
           </p>
           <div className="overflow-x-auto rounded-lg border border-border">
             <table className="w-full text-sm">
@@ -430,7 +427,7 @@ npx @getmcp/cli add my-server --registry my-team`}</CodeBlock>
         |
 +-------+-------+-------+-------+
 |       |       |       |       |
-Claude  VS Code Goose  Codex  + ${appCount - 4} more
+Claude  VS Code Goose  Codex  + ${APP_COUNT - 4} more
 Desktop (servers)(YAML) (TOML)   apps`}</CodeBlock>
             <p>There are two types of server configs:</p>
             <ul className="list-disc list-inside space-y-2 ml-1">
@@ -562,7 +559,7 @@ getServersByCategory("web");
               <a href="/" className="text-accent hover:underline">
                 web directory
               </a>
-              , CLI search, and all {appCount} config generators.
+              , CLI search, and all {APP_COUNT} config generators.
             </p>
           </div>
         </section>
