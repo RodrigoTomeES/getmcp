@@ -1053,6 +1053,8 @@ The site uses structured data (JSON-LD) for SEO and schema.org compliance:
 
 All schemas include proper `@context`, `@type`, and required properties per schema.org specification.
 
+Every JSON-LD block is rendered by `components/JsonLd.astro`, which serialises it with `serializeJsonLd()` (`lib/json-ld.ts`): `JSON.stringify` with every `<` escaped as a JSON unicode escape, so third-party registry text cannot close the `<script>` or open an HTML comment.
+
 ---
 
 ## 9. Future Plans

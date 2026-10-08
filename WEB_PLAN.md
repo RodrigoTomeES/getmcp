@@ -126,9 +126,10 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
   - Los slugs de `src/lib/guide-data.ts` (`github`, `filesystem`, `brave-search`…) ya no existen; los reales son tipo `brave-brave-search`.
   - `src/pages/guides/[app].astro:52-68` falla en silencio. Además `sampleServerId = guide.popularServers[0]` puede no coincidir con el servidor elegido.
   - Propuesta: elegirlos desde el registry o las métricas, o validar los slugs en el build.
-- [ ] **C2. El JSON-LD no se escapa.**
+- [x] **C2. El JSON-LD no se escapa.**
   - `src/components/JsonLd.astro:9` usa `set:html={JSON.stringify(data)}` con descripciones de terceros. Un `</script>` en el registry rompería la página.
   - Arreglo: `.replace(/</g, "\\u003c")`. Mismo patrón en `DocsContent.tsx:12-57`.
+  - Hecho: `serializeJsonLd()` en `src/lib/json-ld.ts`, usado por `JsonLd.astro`. El JSON-LD de `/docs` sale de `DocsContent.tsx` y pasa a `docs.astro` vía `<JsonLd>`, así que ya no queda `dangerouslySetInnerHTML`. Tests en `tests/json-ld.test.ts`. Solo cambia el HTML de los 10 servidores con `<` en nombre o descripción, y el JSON es equivalente.
 - [x] **C3. Doble punto en la meta description de cada servidor** (`src/pages/servers/[id].astro:29`): "Sign in once.. Install with:". Hecho en `8585247`.
   - Afectaba a unas 31.000 fichas: 30.059 descripciones terminan en `.` y 1.016 en otra puntuación.
   - Arreglo: `toSentence()` en `src/lib/format.ts`. Recorta espacios, quita un `,` `:` o `;` final y añade punto solo si no termina ya en `.` `!` `?` `…`. Tests en `tests/format.test.ts`.

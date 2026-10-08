@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { DocsContent } from "@/components/DocsContent";
+import JsonLd from "@/components/JsonLd.astro";
+import { SITE_URL } from "@/lib/constants";
 import { resolveMetadata } from "@/lib/metadata";
 import { DOCS_OG } from "@/lib/og-pages";
 
@@ -35,8 +37,51 @@ const metadata = resolveMetadata(
   },
   { ogImage: { path: "/docs/opengraph-image.png", alt: DOCS_OG.alt } },
 );
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: "getmcp Documentation — CLI Commands, Config Formats & API Reference",
+    description:
+      "Complete guide to getmcp: CLI installation, commands, project manifests, supported AI apps, library API, and contributing.",
+    url: `${SITE_URL}/docs`,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${SITE_URL}/docs`,
+    },
+    author: { "@type": "Organization", name: "getmcp" },
+    publisher: {
+      "@type": "Organization",
+      name: "getmcp",
+      url: SITE_URL,
+    },
+    inLanguage: "en",
+    proficiencyLevel: "Beginner",
+    dependencies: "Node.js 18+, npm",
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Documentation",
+        item: `${SITE_URL}/docs`,
+      },
+    ],
+  },
+];
 ---
 
 <BaseLayout metadata={metadata}>
+  <JsonLd data={jsonLd} />
   <DocsContent />
 </BaseLayout>
