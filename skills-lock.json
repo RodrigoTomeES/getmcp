@@ -31,6 +31,12 @@
       "sourceType": "github",
       "computedHash": "516bd2154eb843a8240e43d5b285229129853114ad7075a5e141e1c08e408c84"
     },
+    "modern-web-guidance": {
+      "source": "GoogleChrome/modern-web-guidance",
+      "sourceType": "github",
+      "skillPath": "skills/modern-web-guidance/SKILL.md",
+      "computedHash": "e2d8049ae0c76439bb5a1e263b205b7974c0be1b032f0cbb86b6aa551ecc1efd"
+    },
     "performance": {
       "source": "addyosmani/web-quality-skills",
       "sourceType": "github",
