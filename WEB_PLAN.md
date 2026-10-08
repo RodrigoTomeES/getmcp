@@ -15,6 +15,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 
 - Comprobaciones ligeras: `npx vitest run --project web`, `npx astro check` (en `packages/web`), `npx oxlint packages/web/src`.
 - Para cambios de contenido: comparar `astro dev` contra el último `packages/web/dist` (head, JSON-LD, texto, enlaces y PNG de OG).
+- Build parcial (para revisar HTML construido: CSP, OG, tiempos): desde `packages/web`, `WEB_MAX_SERVER_PAGES=200 npx astro build --outDir node_modules/.partial-dist` (unos 45 s, 238 páginas, ~500 archivos) y borrar la carpeta después. Siempre incluye `github-github`, `data-prism`, `pg-aiguide`, `apify-apify`, `sh-mcp`, `pretrip`, `bev-door` y `0bridge`. El `outDir` debe estar en el mismo disco que el repo.
 - Build completo solo si hace falta: `npm run build` (raíz) y luego `npm run build -w @getmcp/web`. Tarda unos 32 min y genera unos 79.500 archivos en `packages/web/dist`. `--outDir` en otro disco falla (`EXDEV`).
 - Regresión visual contra producción: producción solo se reconstruye una vez al día, así que las capturas del mismo día siguen siendo válidas. Hay que usar la misma rama de datos (`chore(registry): daily sync`) que `origin/main`.
 
@@ -22,6 +23,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 
 - [x] **Fuente del logo ASCII y fallback** (`fa17ffc`): subset `symbols2` de Fira Mono con `unicode-range` y `Fira Mono Fallback` con métricas. Sustituido por A3.
 - [x] **C6** (`430a357`): el botón "Browse servers" del 404 apunta a `/servers` (`src/components/NotFound.tsx`).
+- [x] **P0. Builds parciales**: `WEB_MAX_SERVER_PAGES` en `src/lib/server-paths.ts` limita las fichas `/servers/[id]` y sus OG (sin definir = todas). Probado con 200: 43 s y 503 archivos.
 - [x] **D4** (`f3b6385`): `APP_COUNT` en `src/lib/constants.ts` sustituye los "19 AI apps" y "N more" escritos a mano. Salida verificada como idéntica.
 
 ---

@@ -95,7 +95,7 @@ This is not optional — documentation drift causes confusion and wastes time. T
 
 ## Testing
 
-- **757 tests** across 35 test files
+- **759 tests** across 35 test files
 - Run all tests: `npx vitest` (from repo root)
 - Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc. (`npx vitest --project web` for the web package)
 - Test locations:
@@ -105,6 +105,7 @@ This is not optional — documentation drift causes confusion and wastes time. T
   - `packages/cli/tests/` — app-selection, bin flags, config-file I/O, credentials, detect, errors, format, lock file, preferences, registry-cache, registry-config, utils
   - `packages/cli/tests/commands/` — add, check, doctor, find, import, list, registry, remove, sync, update command tests
   - `packages/web/tests/` — metadata resolution, sitemap, server detail helpers, OG image rendering, text formatting (`toSentence`)
+- Quick local web build (never run a full build locally: ~32 min, ~79,500 files): from `packages/web` run `WEB_MAX_SERVER_PAGES=200 npx astro build --outDir node_modules/.partial-dist`, then delete that folder. `WEB_MAX_SERVER_PAGES` caps the `/servers/[id]` pages and OG images (`src/lib/server-paths.ts`) and always keeps a fixed set of representative slugs (e.g. `github-github`). The `outDir` must be on the same drive as the repo (Astro moves assets with `fs.rename`, which fails with `EXDEV` across drives); `node_modules` is git-ignored.
 
 ---
 
