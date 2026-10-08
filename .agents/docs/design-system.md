@@ -77,13 +77,14 @@ font-family:
   sans-serif;
 
 /* Monospace (Tailwind font-mono) */
-font-family: "Fira Mono", ui-monospace, monospace;
+font-family: "Fira Mono", "Fira Mono Fallback", ui-monospace, monospace;
 ```
 
-**Fira Mono** is self-hosted via `@fontsource/fira-mono` (`latin-400.css` and `latin-500.css`, imported in `src/layouts/BaseLayout.astro`) with the `latin` subset. Box-drawing and block element characters (█, ╗, ╔, etc.) used in the hero ASCII art are not part of any Google Fonts subset — they fall through to the `ui-monospace, monospace` fallback, which renders them natively on all platforms.
+**Fira Mono** is self-hosted via `@fontsource/fira-mono` (`latin-400.css` and `latin-500.css`, imported in `src/layouts/BaseLayout.astro`) with the `latin` subset. The box-drawing and block element characters (█, ╗, ╔, ═, ║, ╚, ╝) used by the ASCII logos on the home and 404 pages live in Fira Mono's `symbols2` subset. `src/styles/globals.css` declares that face by hand (weight 400, `unicode-range: U+2500-259F`, pointing at fontsource's `fira-mono-symbols2-400-normal.woff2`), because fontsource's own `symbols2-400.css` has no `unicode-range`. The browser only downloads it on pages that render those glyphs. Without it the glyphs fall back to a system font and the logo renders striped and narrower.
 
-- Weights loaded: **400** (ASCII art), **500** (tagline `font-medium`)
-- Tailwind integration: `--font-mono` in `@theme` is `"Fira Mono", ui-monospace, monospace`
+- Weights loaded: **400** (ASCII art, code), **500** (`font-medium` labels)
+- Tailwind integration: `--font-mono` in `@theme` is `"Fira Mono", "Fira Mono Fallback", ui-monospace, monospace`
+- `Fira Mono Fallback` is a metric-matched `local("Arial")` face (`size-adjust: 134.59%`, `ascent-override: 69.47%`, `descent-override: 19.69%`, values taken from the former `next/font` output) that keeps text from shifting while Fira Mono loads
 - `font-display: swap` (fontsource default) — shows fallback font immediately, swaps when Fira Mono loads
 
 ### OG Images (Inter)
