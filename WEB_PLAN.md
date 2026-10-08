@@ -20,7 +20,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 
 ## Ya hecho
 
-- [x] **Fuente del logo ASCII y fallback** (`fa17ffc`): subset `symbols2` de Fira Mono con `unicode-range` y `Fira Mono Fallback` con métricas. Lo sustituirá A3.
+- [x] **Fuente del logo ASCII y fallback** (`fa17ffc`): subset `symbols2` de Fira Mono con `unicode-range` y `Fira Mono Fallback` con métricas. Sustituido por A3.
 - [x] **C6** (`430a357`): el botón "Browse servers" del 404 apunta a `/servers` (`src/components/NotFound.tsx`).
 - [x] **D4** (`f3b6385`): `APP_COUNT` en `src/lib/constants.ts` sustituye los "19 AI apps" y "N more" escritos a mano. Salida verificada como idéntica.
 
@@ -43,7 +43,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
   - `AnimatedCommand` y `NotFound`: `.astro` más un script pequeño.
   - Componentes React que solo se renderizan en el servidor (ServerCard, ServerSidebar, CategoryGrid, PopularServers, SupportedApps, StatsBar, FormatShowcase, TeamFeatures, SecurityFeatures, DeveloperExperience, DocsContent, DocsSidebar, CodeBlock): pasarlos a `.astro`. Ojo, `ServerCard` también lo usa la isla `SearchBar`.
   - Ganancia: la home y el 404 sin react-dom, y menos `renderToString` en el build.
-- [ ] **A3. API de fuentes de Astro.**
+- [~] **A3. API de fuentes de Astro.**
   - **Decisión:** `fontProviders.fontsource()`, no `npm`, para tener la config más simple y quitar la dependencia.
   - Config: Fira Mono en pesos `[400, 500]`, subsets `["latin", "symbols2"]` y `fallbacks: ["monospace"]`.
   - Uso: un único `<Font cssVariable="--font-fira-mono" preload={fontPreload} />` en `BaseLayout.astro`, y `--font-mono: var(--font-fira-mono)` en `@theme inline`.
@@ -58,7 +58,12 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
   - Se acepta:
     - El hinting de Fontsource da diferencias de 1 px respecto a producción.
     - El fallback automático usa Courier New, que no existe en Linux ni Android.
-  - Comprobar al implementarlo: que el subset `symbols2` se resuelve. Si el proveedor falla, `npm` es el cambio de una línea.
+  - **Verificado** (en `astro dev`; falta confirmarlo en el próximo build de CI):
+    - `symbols2` se resuelve.
+    - La home y el 404 precargan `latin` y `symbols2`; el resto solo `latin` y no descargan `symbols2`.
+    - El logo mide 424 px en la home y 365 px en el 404, igual que en producción.
+    - En Windows, la fallback generada (Courier New) iguala los anchos de Fira Mono (423,8 px frente a 424 px).
+    - Si el proveedor falla en CI, cambiar a `fontProviders.npm()` es una línea.
 - [ ] **A4. Build incremental** (`experimental.incrementalBuild`, Astro 7.2 o posterior).
   - Devolver `cacheKey` en `getStaticPaths()` de `servers/[id]` y de sus endpoints de OG.
   - Necesita persistir `node_modules/.astro` en CI (~3 GB, `actions/cache`); `astro build --force` reconstruye todo.

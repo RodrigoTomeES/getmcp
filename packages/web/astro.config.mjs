@@ -1,4 +1,4 @@
-import { defineConfig } from "astro/config";
+import { defineConfig, fontProviders } from "astro/config";
 import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 
@@ -14,6 +14,18 @@ export default defineConfig({
     // main thread, so this overlaps it across the ~38k server pages.
     concurrency: 8,
   },
+  fonts: [
+    {
+      name: "Fira Mono",
+      cssVariable: "--font-fira-mono",
+      provider: fontProviders.fontsource(),
+      weights: [400, 500],
+      styles: ["normal"],
+      // symbols2 holds the box-drawing glyphs (█ ╗ ═ ║) of the ASCII logos.
+      subsets: ["latin", "symbols2"],
+      fallbacks: ["monospace"],
+    },
+  ],
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],

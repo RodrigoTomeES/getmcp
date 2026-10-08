@@ -77,15 +77,17 @@ font-family:
   sans-serif;
 
 /* Monospace (Tailwind font-mono) */
-font-family: "Fira Mono", "Fira Mono Fallback", ui-monospace, monospace;
+font-family: var(--font-fira-mono); /* "Fira Mono", "Fira Mono fallback: Courier New", monospace */
 ```
 
-**Fira Mono** is self-hosted via `@fontsource/fira-mono` (`latin-400.css` and `latin-500.css`, imported in `src/layouts/BaseLayout.astro`) with the `latin` subset. The box-drawing and block element characters (█, ╗, ╔, ═, ║, ╚, ╝) used by the ASCII logos on the home and 404 pages live in Fira Mono's `symbols2` subset. `src/styles/globals.css` declares that face by hand (weight 400, `unicode-range: U+2500-259F`, pointing at fontsource's `fira-mono-symbols2-400-normal.woff2`), because fontsource's own `symbols2-400.css` has no `unicode-range`. The browser only downloads it on pages that render those glyphs. Without it the glyphs fall back to a system font and the logo renders striped and narrower.
+**Fira Mono** is loaded with the Astro Fonts API (`fonts` in `astro.config.mjs`, provider `fontProviders.fontsource()`). Astro downloads the files from Fontsource at build time, caches them in `node_modules/.astro/fonts`, and serves them hashed from `/_astro/fonts/`. `<Font cssVariable="--font-fira-mono" />` in `src/layouts/BaseLayout.astro` outputs the `@font-face` rules and the preload links.
 
-- Weights loaded: **400** (ASCII art, code), **500** (`font-medium` labels)
-- Tailwind integration: `--font-mono` in `@theme` is `"Fira Mono", "Fira Mono Fallback", ui-monospace, monospace`
-- `Fira Mono Fallback` is a metric-matched `local("Arial")` face (`size-adjust: 134.59%`, `ascent-override: 69.47%`, `descent-override: 19.69%`, values taken from the former `next/font` output) that keeps text from shifting while Fira Mono loads
-- `font-display: swap` (fontsource default) — shows fallback font immediately, swaps when Fira Mono loads
+- Weights: **400** (ASCII art, code) and **500** (`font-medium` labels), style `normal`.
+- Subsets: `latin` and `symbols2`. `symbols2` holds the box-drawing and block element characters (█, ╗, ╔, ═, ║, ╚, ╝) of the ASCII logos on the home and 404 pages. Each subset is its own `@font-face` with a `unicode-range`, so `symbols2` is only downloaded on pages that render those glyphs.
+- Preload: every page preloads `latin` 400. Pages with an above-the-fold ASCII logo (`index.astro`, `404.astro`) pass `preloadSymbols` to `BaseLayout` to also preload `symbols2` 400.
+- Fallback: `fallbacks: ["monospace"]`. Astro generates a metric-matched `Courier New` face, so text barely shifts when Fira Mono loads. On systems without Courier New (most Linux/Android), the plain `monospace` fallback is used.
+- Tailwind integration: `@theme inline { --font-mono: var(--font-fira-mono); }` in `src/styles/globals.css`.
+- `font-display: swap` (Fonts API default): shows the fallback immediately and swaps when Fira Mono loads.
 
 ### OG Images (Inter)
 
@@ -669,7 +671,6 @@ Enhanced metadata display on server listing cards.
 | `react@^19.3.0`              | UI library                |
 | `tailwindcss@^4.3.3`         | CSS framework             |
 | `@tailwindcss/vite@^4.3.3`   | Vite integration          |
-| `@fontsource/fira-mono`      | Self-hosted Fira Mono     |
 | `satori` + `@resvg/resvg-js` | OG image generation       |
 
 No UI component library (shadcn, Radix, etc.). All components are custom-built.

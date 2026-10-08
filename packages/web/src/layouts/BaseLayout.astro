@@ -1,15 +1,20 @@
 ---
-import "@fontsource/fira-mono/latin-400.css";
-import "@fontsource/fira-mono/latin-500.css";
+import { Font } from "astro:assets";
 import "@/styles/globals.css";
 import { absoluteUrl, type ResolvedMetadata } from "@/lib/metadata";
 import { OG_SIZE } from "@/lib/og-image";
 
 interface Props {
   metadata: ResolvedMetadata;
+  /** Preload the box-drawing font subset (pages with an above-the-fold ASCII logo). */
+  preloadSymbols?: boolean;
 }
 
-const { metadata } = Astro.props;
+const { metadata, preloadSymbols = false } = Astro.props;
+const fontPreload = [
+  { weight: 400, style: "normal", subset: "latin" },
+  ...(preloadSymbols ? [{ weight: 400, style: "normal", subset: "symbols2" }] : []),
+];
 const { title, description, keywords, alternates, openGraph, twitter, ogImage, noindex } =
   metadata;
 const ogImageUrl = ogImage && absoluteUrl(ogImage.path);
@@ -68,6 +73,7 @@ const analyticsToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
       )
     }
     <link rel="icon" href="/icon.svg" type="image/svg+xml" sizes="any" />
+    <Font cssVariable="--font-fira-mono" preload={fontPreload} />
     <slot name="head" />
   </head>
   <body class="min-h-dvh flex flex-col">

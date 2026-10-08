@@ -1,29 +1,11 @@
 @import "tailwindcss";
 
-/* Box-drawing glyphs (█ ╗ ═ ║ …) for the ASCII logos on the home and 404 pages.
-   Fontsource's latin subset lacks them and its symbols2 CSS has no unicode-range,
-   so declare the face here: it is only downloaded on pages that use these glyphs. */
-@font-face {
-  font-family: "Fira Mono";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("@fontsource/fira-mono/files/fira-mono-symbols2-400-normal.woff2") format("woff2");
-  unicode-range: U+2500-259F;
-}
-
-/* Metric-matched fallback (values from next/font) so text doesn't shift when Fira Mono loads. */
-@font-face {
-  font-family: "Fira Mono Fallback";
-  src: local("Arial");
-  ascent-override: 69.47%;
-  descent-override: 19.69%;
-  line-gap-override: 0%;
-  size-adjust: 134.59%;
+/* Fira Mono is loaded by the Astro Fonts API (`fonts` in astro.config.mjs). */
+@theme inline {
+  --font-mono: var(--font-fira-mono);
 }
 
 @theme {
-  --font-mono: "Fira Mono", "Fira Mono Fallback", ui-monospace, monospace;
   --color-bg: #0a0a0a;
   --color-surface: #141414;
   --color-surface-hover: #1c1c1c;
