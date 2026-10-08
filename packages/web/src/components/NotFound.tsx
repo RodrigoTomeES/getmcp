@@ -177,7 +177,7 @@ export function NotFound() {
       {/* CTA */}
       <div className="mt-10 text-center">
         <a
-          href="/"
+          href="/servers"
           className="inline-block px-6 py-2.5 rounded-lg bg-accent text-white font-medium hover:bg-accent-hover transition-colors"
         >
           Browse servers
