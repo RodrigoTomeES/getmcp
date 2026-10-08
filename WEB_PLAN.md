@@ -108,6 +108,14 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
   - Si se descarta paginar, como mínimo añadir `content-visibility: auto` con `contain-intrinsic-size` a la cuadrícula de tarjetas por debajo del pliegue. No reduce los 3 MB, pero sí el coste de render. _(guía: `defer-rendering-heavy-content`)_
 - [ ] **B3. Imágenes OG: unos 2,6 GB (66 KB × 39.700) y la mayor parte del tiempo de build.**
   - **Decidido:** mantener una OG propia por servidor y comprimir los PNG con paleta cuantizada. El aspecto no debe cambiar de forma apreciable. Las otras opciones descartadas: OG genérica con personalizadas solo para el top N.
+  - **Medido** (4 OG reales, codificadas con `sharp`):
+    - El PNG que genera `resvg` está mal comprimido: ~67 KB de media.
+    - **Con paleta de 256 colores:** ~23 KB (−65 %), 0,00 % de píxeles distintos con umbral 0,1. Cada imagen tiene ~390 colores.
+    - **Sin pérdida, nivel 9:** ~36 KB (−49 %), píxeles idénticos.
+    - **JPEG:** más grande o con artefactos alrededor del texto.
+    - **WebP:** algo más pequeño, pero su compatibilidad en previsualizaciones de enlaces no está garantizada.
+  - **Elegido:** `sharp` con `png({ palette: true, colours: 256, dither: 1, compressionLevel: 9, effort: 4 })` sobre la salida de `resvg`. Cuesta ~45 ms por imagen, unos +4 min de build con concurrencia 8.
+  - **Revisión del usuario:** al terminar, enseñar imágenes antes/después de varias OG. Si no convence, cambiar a sin pérdida (`png({ compressionLevel: 9 })`).
   - Borrar de paso `assets/Inter-SemiBold.ttf`, que no se usa (ver D2).
 
 ## C. Fallos (ya existían en Next.js)
