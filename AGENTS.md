@@ -105,7 +105,7 @@ This is not optional — documentation drift causes confusion and wastes time. T
   - `packages/cli/tests/` — app-selection, bin flags, config-file I/O, credentials, detect, errors, format, lock file, preferences, registry-cache, registry-config, utils
   - `packages/cli/tests/commands/` — add, check, doctor, find, import, list, registry, remove, sync, update command tests
   - `packages/web/tests/` — metadata resolution, sitemap, server detail helpers, OG image rendering, text and date formatting (`toSentence`, `formatDate`, `formatRelativeTime`), JSON-LD escaping, server sorting and default search state, guides popular servers, pagination helpers (`getPageNumbers`, `categoryPageUrl`)
-- Quick local web build (never run a full build locally: ~32 min, ~79,500 files): from `packages/web` run `WEB_MAX_SERVER_PAGES=200 npx astro build --outDir node_modules/.partial-dist`, then delete that folder. `WEB_MAX_SERVER_PAGES` caps the `/servers/[id]` pages and OG images (`src/lib/server-paths.ts`) and always keeps a fixed set of representative slugs (e.g. `github-github`). The `outDir` must be on the same drive as the repo (Astro moves assets with `fs.rename`, which fails with `EXDEV` across drives); `node_modules` is git-ignored. Known issue: a stale `packages/web/dist` (~79,500 files) can make Tailwind's `@tailwindcss/oxide` source scanner hang, which stalls `astro dev` and the partial build; if that happens, move `dist` out of the way (do not mass-delete it on the slow HDD) or temporarily add `@source not "../../dist";` to `src/styles/globals.css` without committing it.
+- Quick local web build (never run a full build locally: ~32 min, ~79,500 files): from `packages/web` run `WEB_MAX_SERVER_PAGES=200 npx astro build --outDir node_modules/.partial-dist`, then delete that folder. `WEB_MAX_SERVER_PAGES` caps the `/servers/[id]` pages and OG images (`src/lib/server-paths.ts`) and always keeps a fixed set of representative slugs (e.g. `github-github`). The `outDir` must be on the same drive as the repo (Astro moves assets with `fs.rename`, which fails with `EXDEV` across drives); `node_modules` is git-ignored. Visual regression against production: see `tools/vrt/README.md` (not a workspace; `npm run setup` inside it installs Playwright). Known issue: a stale `packages/web/dist` (~79,500 files) can make Tailwind's `@tailwindcss/oxide` source scanner hang, which stalls `astro dev` and the partial build; if that happens, move `dist` out of the way (do not mass-delete it on the slow HDD) or temporarily add `@source not "../../dist";` to `src/styles/globals.css` without committing it.
 
 ---
 
@@ -131,6 +131,20 @@ Follows [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.
 ## Browser Support (web)
 
 Progressive enhancement: features that are not Baseline widely available may be used only when the site still works without them (e.g. cross-document view transitions, speculation rules, `<dialog closedby>` with its small fallback). No polyfills. See the `modern-web-guidance` skill for per-feature fallbacks.
+
+---
+
+## Notes for AI agents
+
+- `CLAUDE.md` is a symlink to `AGENTS.md`: edit `AGENTS.md`. Never run `sed -i` or a formatter on `CLAUDE.md` (it replaces the symlink with a file). If `git status` shows `T CLAUDE.md`, restore it with `git checkout -- CLAUDE.md`.
+- Format only the files you changed (`npx oxfmt <file> ...`). Running it on whole folders rewrites line endings of untouched files. It can also mangle Markdown: underscores read as emphasis, as in `WEB_PLAN` becoming `WEB*PLAN` inside `_..._` italics. Check the output after formatting.
+- Long-running or parallel agents must not leak processes. `astro dev` for this site holds ~40k registry entries and can grow to several GB; a run once exhausted 32 GB of RAM.
+  - Prefer the partial build over `astro dev`.
+  - Start any dev server as `NODE_OPTIONS=--max-old-space-size=4096 timeout 1200 npx astro dev --port <port> --ignore-lock`, one at a time, and stop it right after.
+  - Never launch Edge/Chrome directly: use Playwright with `browser.close()` in `finally` and a `timeout`.
+  - Never stop the user's own dev server (port 4321).
+- Production (getmcp.es) rebuilds once a day after the registry sync, so same-day captures of it stay valid. Do not recapture it repeatedly.
+- The web improvement plan lives in `WEB_PLAN.md` at the repo root (items by ID, decisions, status, commit per task). Read it before working on an item, and update the item's status afterwards.
 
 ---
 

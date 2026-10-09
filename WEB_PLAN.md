@@ -238,6 +238,27 @@ Notas menores que dejaron los revisores al implementar A–E (98 en total, ningu
 - [ ] **F6. CSP (opcional).** Documentar por qué no se usa `require-trusted-types-for 'script'` (A7); el hash de `RESTORE_CHOICE_SCRIPT` se añade en todas las páginas aunque solo lo usen algunas (A7); Astro emite la CSP al final del `<head>`, así que el hash de las speculation rules sobra (A7).
 - [ ] **F7. Verificaciones pendientes.** Probar A1 y E2 en Firefox y WebKit (Playwright ya instalado en el scratchpad; respetar las reglas de memoria de `AGENTS.md`); comprobación en navegador de A2b (barrido y revelado con y sin `prefers-reduced-motion`); prueba en ejecución de B1 (no se pudo: `astro dev` se colgaba); medir el build completo tras B3 en el primer CI.
 
+## Regresión visual
+
+Herramientas en `tools/vrt/` (ver su `README.md`). Baseline: capturas de producción (Next.js) del 2026-10-08, con los datos del sync del 8 de octubre. Las capturas no están en el repo: hay que sacarlas de nuevo en cada máquina (`node capture.mjs prod https://getmcp.es`).
+
+**2026-10-09, HEAD `2d985a8` (build parcial) frente a producción, 45 rutas × 2 viewports:**
+
+- **Regresión (pendiente, F2):** en las ~39.900 fichas de servidor hay 40 px de más entre la configuración y "Related Servers", por los `<script>` hermanos de `ConfigViewer.astro` dentro de un `space-y-10` (A1). `node check.mjs` lo detecta ("SPACE-Y").
+- **Sin cambios respecto a la comparación anterior:**
+  - home 0,11–0,22 %;
+  - docs 0,14–0,33 %;
+  - índice de guías 0,03–0,09 %;
+  - 404 0,03–0,41 %;
+  - OG 0,2–1,1 %.
+- **Cambios intencionados:**
+  - categorías paginadas (B2, 80–96 %);
+  - guías con servidores populares y ejemplo de config (C1, ~30 %, +800 px);
+  - fichas con la miga "Home /", espacios en "… guide →" y `h2` "Configuration" (E3, D3, E1; 2,5–4,4 %);
+  - cabecera móvil sin la pastilla "beta" (C7).
+- **Fallo de producción que Astro ya no tiene:** en la captura de escritorio de `/servers`, el panel de filtros móvil de producción ("Show 39376 results") se cuela en la página completa; con el `<dialog>` de E2 ya no pasa.
+- **Datos:** producción mezcla días por ISR (39.376 servidores en home y `/servers` frente a 39.905 en el build). La hora relativa ("20m" / "1d") depende del momento de la captura.
+
 ## Siguiente sesión
 
 1. Visto bueno del usuario a las OG de B3.
