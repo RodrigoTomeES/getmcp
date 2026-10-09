@@ -37,6 +37,33 @@ export default defineConfig({
       }),
     },
   },
+  // Content Security Policy, emitted as a <meta> on every page. Astro hashes its
+  // own scripts and styles; `is:inline` scripts add their hash via
+  // `Astro.csp.insertScriptHash` in BaseLayout. An allowlist, not
+  // 'strict-dynamic': the site is static with one third-party script (the
+  // Cloudflare beacon). style-src-attr 'unsafe-inline' keeps `style` attributes
+  // (Astro markup and React style props) working; img-src https: covers remote
+  // server icons. A meta CSP cannot be report-only or carry frame-ancestors or
+  // report-to, so those and HSTS are host headers (ROADMAP 6b, phase 2).
+  security: {
+    csp: {
+      directives: [
+        "default-src 'self'",
+        "img-src 'self' data: https:",
+        "font-src 'self'",
+        "connect-src 'self' https://cloudflareinsights.com",
+        "object-src 'none'",
+        "base-uri 'none'",
+        "form-action 'self'",
+      ],
+      scriptDirective: {
+        resources: ["'self'", "https://static.cloudflareinsights.com"],
+      },
+      styleDirective: {
+        resources: ["'self'", { resource: "'unsafe-inline'", kind: "attribute" }],
+      },
+    },
+  },
   // buildReport logs the build size report (and writes the GitHub job summary).
   integrations: [react(), buildReport()],
   vite: {

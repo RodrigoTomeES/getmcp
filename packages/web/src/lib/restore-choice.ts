@@ -5,8 +5,9 @@
  * first paint instead of flashing the default panel. Stale values (no radio
  * with that value) are ignored.
  *
- * Kept as one constant string so its content, and the CSP hash A7 adds for it,
- * stay byte-stable: Astro does not hash `is:inline` scripts on its own.
+ * Kept as one constant string so its content, and the CSP hash that
+ * `BaseLayout.astro` adds for it, stay byte-stable: Astro does not hash
+ * `is:inline` scripts on its own.
  */
 export const RESTORE_CHOICE_SCRIPT =
   '(()=>{const root=document.currentScript.previousElementSibling;let v;try{v=localStorage.getItem(root.dataset.storageKey)}catch{}const r=v&&[...root.querySelectorAll("input[type=radio]")].find((i)=>i.value===v);if(!r)return;r.checked=true;for(const p of root.querySelectorAll("[data-panel]"))p.hidden=p.dataset.panel!==v;const s=root.querySelector("select");if(s)s.value=v})();';

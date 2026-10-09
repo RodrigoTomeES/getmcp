@@ -8,7 +8,7 @@ Use the native CSS scroll spy via `scroll-target-group: auto` + `:target-current
 
 **The `@supports (scroll-target-group: auto)` block MUST stay out of `globals.css` and any file processed by Tailwind/Vite.** The pattern was introduced because Turbopack's CSS parser (Next.js era) could not handle `scroll-target-group` or `:target-current`; it is kept out of the pipeline after the move to Astro so the rule never goes through a CSS toolchain that may not understand these new properties.
 
-The rules live in `packages/web/public/docs-scroll-spy.css`, which Astro copies to the output untouched. `pages/docs.astro` links it in the head (through the layout's `head` slot), so only /docs loads it, and no inline `<style>` is needed (one less thing for a CSP to hash).
+The rules live in `packages/web/public/docs-scroll-spy.css`, which Astro copies to the output untouched. `pages/docs.astro` links it in the head (through the layout's `head` slot), so only /docs loads it, and no inline `<style>` is needed: the site's CSP (`security.csp`) allows it through `style-src 'self'`, without a hash.
 
 ## Implementation Pattern
 

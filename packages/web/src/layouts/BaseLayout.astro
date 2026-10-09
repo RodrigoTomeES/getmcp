@@ -1,8 +1,10 @@
 ---
+import { createHash } from "node:crypto";
 import { Font } from "astro:assets";
 import { PUBLIC_CF_ANALYTICS_TOKEN } from "astro:env/client";
 import "@/styles/globals.css";
 import { absoluteUrl, type ResolvedMetadata } from "@/lib/metadata";
+import { RESTORE_CHOICE_SCRIPT } from "@/lib/restore-choice";
 import { OG_SIZE } from "@/lib/og-image";
 
 interface Props {
@@ -26,7 +28,6 @@ const analyticsToken = PUBLIC_CF_ANALYTICS_TOKEN;
 // Native speculation rules (Chromium only; other browsers ignore the script).
 // One document rule prefetches same-origin pages on hover/pointerdown
 // ("moderate"), skipping OG images, the sitemap and JSON endpoints.
-// A strict CSP (A7) must allow this inline script by its hash.
 const SPECULATION_RULES = JSON.stringify({
   prefetch: [
     {
@@ -43,6 +44,15 @@ const SPECULATION_RULES = JSON.stringify({
     },
   ],
 });
+// Astro does not hash `is:inline` scripts, so allow ours in the CSP
+// (`security.csp` in astro.config.mjs) by their hashes. They are added here,
+// before the head renders, because the policy is emitted with the head:
+// hashes added by a component in <body> (e.g. RestoreChoice) would be dropped.
+for (const script of [SPECULATION_RULES, RESTORE_CHOICE_SCRIPT]) {
+  Astro.csp?.insertScriptHash(
+    `sha256-${createHash("sha256").update(script).digest("base64")}`,
+  );
+}
 ---
 
 <!doctype html>
