@@ -157,7 +157,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 
 ## E. Accesibilidad y SEO
 
-- [ ] **E1. Encabezados:** el 404 no tiene `h1`; "Configuration" en `ConfigViewer.tsx:47` es `h3` entre `h2` (ya `h2` desde A1); las categorías saltan de `h1` a las tarjetas `h3`.
+- [x] **E1. Encabezados:** el 404 no tiene `h1`; "Configuration" en `ConfigViewer.tsx:47` es `h3` entre `h2` (ya `h2` desde A1); las categorías saltan de `h1` a las tarjetas `h3`. Hecho en E1: `<h1 class="sr-only">404: Page not found</h1>` en `404.astro` y el envoltorio del ASCII de `NotFound.astro` pasa a `aria-hidden="true"` (sin `role="img"`, para no anunciar "404" dos veces); `<h2 class="sr-only">Server listing</h2>` antes de la rejilla en `category/[slug]/[...page].astro` (mismo patrón que `SearchBar.tsx`). `ConfigViewer` ya se resolvió en A1.
 - [x] **E2. ARIA y teclado:**
   - [x] Las pestañas de `ConfigViewer` no se manejan con las flechas, y el tabpanel apunta a pestañas ocultas en móvil. Resuelto en A1 (radios nativos).
   - [x] `PackageManagerCommand` no comunica qué opción está elegida. Resuelto en A1 (radios nativos).

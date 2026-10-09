@@ -126,6 +126,7 @@ const jsonLd = [
     {
       page.data.length > 0 ? (
         <>
+          <h2 class="sr-only">Server listing</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {page.data.map((server) => (
               <ServerCard server={server} />

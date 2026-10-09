@@ -397,7 +397,7 @@ Both icons are always rendered; `scripts/copy.ts` toggles `data-copied` and writ
 `NotFound.astro`, static (no React):
 
 ```
- ASCII "404"              ← two aria-hidden <pre> layers in a role="img" wrapper, clamp(10px, 4.2vw, 26px)
+ ASCII "404"              ← two <pre> layers in an aria-hidden wrapper (the page h1 is sr-only in 404.astro), clamp(10px, 4.2vw, 26px)
  terminal window          ← fake `npx @getmcp/cli find <path>` with a red error line and a hint
  [Browse servers]         ← primary CTA button + `or run npx @getmcp/cli find`
 ```
