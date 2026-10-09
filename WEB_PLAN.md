@@ -156,15 +156,15 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 ## E. Accesibilidad y SEO
 
 - [ ] **E1. Encabezados:** el 404 no tiene `h1`; "Configuration" en `ConfigViewer.tsx:47` es `h3` entre `h2` (ya `h2` desde A1); las categorías saltan de `h1` a las tarjetas `h3`.
-- [ ] **E2. ARIA y teclado:**
+- [x] **E2. ARIA y teclado:**
   - [x] Las pestañas de `ConfigViewer` no se manejan con las flechas, y el tabpanel apunta a pestañas ocultas en móvil. Resuelto en A1 (radios nativos).
   - [x] `PackageManagerCommand` no comunica qué opción está elegida. Resuelto en A1 (radios nativos).
   - [x] El "Copied" de los botones de copiar no se anuncia: añadir una región `aria-live="polite"`. _(guía: `accessibility`, sección Live Regions)_ Hecho en E7 (`scripts/copy.ts`).
-  - `FilterSheet` sigue siendo enfocable cuando está cerrado. Propuesta: `<dialog>` nativo abierto con `showModal()`, con `closedby="any"` para cerrar al tocar fuera. _(guías: `accessibility` sección 12, `light-dismiss-a-dialog`)_
+  - [x] `FilterSheet` sigue siendo enfocable cuando está cerrado. Hecho en E2: `<dialog closedby="any">` con `showModal()`; se quitan el focus trap, el manejo de Esc, la restauración del foco, el bloqueo de scroll del `body` y el fondo falso; el evento `close` llama a `onClose` (props sin cambios, `SearchBar` intacto); fallback de clic en el fondo si no existe `closedBy`; `html:has(dialog:modal) { overflow: hidden }` en `globals.css`; sin animación. Verificado en Chromium a 390 px con `astro dev`: Tab no sale del diálogo, cerrado no es alcanzable con Tab, Esc y clic en el fondo cierran y devuelven el foco a "Filters", reabrir funciona, la página no hace scroll detrás; con el fallback forzado (sin `closedBy` ni atributo) el clic en el fondo cierra. Firefox y WebKit no probados (sin navegadores compatibles en la máquina). Propuesta: `<dialog>` nativo abierto con `showModal()`, con `closedby="any"` para cerrar al tocar fuera. _(guías: `accessibility` sección 12, `light-dismiss-a-dialog`)_
     - `showModal()` vuelve inerte el resto de la página, así que el focus trap hecho a mano (`FilterSheet.tsx:22-53`) se elimina.
     - Safari no soporta `closedby`: las guías dan un fallback de unas 10 líneas que cierra con un clic en el `::backdrop`.
   - [x] El `aria-label` de `AsciiArt.tsx:81` está en un `<pre>` sin rol. Resuelto en A2a (`role="img"` en el envoltorio de `AsciiArt.astro`).
-  - El `<img>` del logo de la cabecera debería llevar `alt=""`.
+  - El `<img>` del logo de la cabecera debería llevar `alt=""`. Lo cierra A8 (dueño de ese `<img>`); no se toca en E2.
 - [ ] **E3. Breadcrumbs consistentes:** categoría y guías usan `<span>`, sin `<ol>` ni `aria-current`.
 - [ ] **E4. "Actualizado hace X" congelado en el build:** `ServerSidebar.tsx:232-234` usa `relativeTime(lastPush)` en el HTML estático.
   - Propuesta: `<time datetime="…">` con la fecha absoluta en el HTML, y un script mínimo que la reescribe como relativa con `Intl.RelativeTimeFormat`, que es Baseline amplio.

@@ -44,6 +44,11 @@ html {
   scroll-padding-block-start: 6rem;
 }
 
+/* Keep the page from scrolling behind an open modal <dialog> (FilterSheet). */
+html:has(dialog:modal) {
+  overflow: hidden;
+}
+
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
