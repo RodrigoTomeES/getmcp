@@ -102,7 +102,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 
 ## B. Rendimiento de páginas grandes
 
-- [ ] **B1. `/servers` pesa 19,8 MB.**
+- [x] **B1. `/servers` pesa 19,8 MB.** _Hecho: la página solo envía las 24 primeras tarjetas y el total; la isla carga `/servers.json` (endpoint estático, ~10 MB sin comprimir, ~1,8 MB brotli) tras hidratar, con `priority: "low"` si la URL no trae búsqueda, y muestra "Loading servers…" en otros estados. Se mantiene `client:load`._
   - El 99,5 % son los props de `<SearchBar client:load servers={…}>`: los ~39.700 servidores serializados en el atributo `props` (`src/pages/servers/index.astro:39-54,113`).
   - Propuesta: un endpoint estático compacto (`src/pages/servers.json.ts`) cargado desde la isla con `client:idle`, y la primera página de resultados en HTML estático para que los crawlers vean más de 24 enlaces. **Decidido:** JSON estático propio. **Futuro:** migrar la búsqueda a Pagefind.
 - [ ] **B2. `/category/ai` pesa 3 MB.**

@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { ServerCardData } from "../src/lib/server-detail";
-import { sortServers } from "../src/lib/server-search";
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_SORT,
+  isDefaultState,
+  sortServers,
+  type SearchState,
+} from "../src/lib/server-search";
 
 function card(name: string, extra: Partial<ServerCardData> = {}): ServerCardData {
   return {
@@ -59,5 +65,39 @@ describe("sortServers", () => {
     const result = sortServers(input, "alphabetical");
     expect(input).toEqual(copy);
     expect(result).not.toBe(input);
+  });
+});
+
+describe("isDefaultState", () => {
+  const base: SearchState = {
+    q: "",
+    categories: [],
+    runtimes: [],
+    transports: [],
+    official: false,
+    sort: DEFAULT_SORT,
+    pageSize: DEFAULT_PAGE_SIZE,
+    page: 1,
+  };
+
+  it("is true for the unfiltered first page", () => {
+    expect(isDefaultState(base)).toBe(true);
+  });
+
+  it("ignores a whitespace-only query", () => {
+    expect(isDefaultState({ ...base, q: "   " })).toBe(true);
+  });
+
+  it.each<[string, Partial<SearchState>]>([
+    ["a query", { q: "github" }],
+    ["a category", { categories: ["ai"] }],
+    ["a runtime", { runtimes: ["node"] }],
+    ["a transport", { transports: ["remote"] }],
+    ["official only", { official: true }],
+    ["another sort", { sort: "alphabetical" }],
+    ["another page size", { pageSize: 48 }],
+    ["a later page", { page: 2 }],
+  ])("is false with %s", (_, change) => {
+    expect(isDefaultState({ ...base, ...change })).toBe(false);
   });
 });

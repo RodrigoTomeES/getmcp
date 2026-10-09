@@ -25,3 +25,32 @@ export function sortServers(list: readonly ServerCardData[], sortBy: SortOption)
   }
   return sorted.sort((a, b) => (b[sortBy] ?? -1) - (a[sortBy] ?? -1));
 }
+
+export type SearchState = {
+  q: string;
+  categories: readonly string[];
+  runtimes: readonly string[];
+  transports: readonly string[];
+  official: boolean;
+  sort: SortOption;
+  pageSize: number;
+  page: number;
+};
+
+/**
+ * True only for the unfiltered first page with the default sort and page size:
+ * the state the statically rendered `initialServers` represent, so they can be
+ * shown before the full `/servers.json` index arrives.
+ */
+export function isDefaultState(state: SearchState): boolean {
+  return (
+    state.q.trim() === "" &&
+    state.categories.length === 0 &&
+    state.runtimes.length === 0 &&
+    state.transports.length === 0 &&
+    !state.official &&
+    state.sort === DEFAULT_SORT &&
+    state.pageSize === DEFAULT_PAGE_SIZE &&
+    state.page === 1
+  );
+}

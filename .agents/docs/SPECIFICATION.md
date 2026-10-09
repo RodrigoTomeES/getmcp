@@ -1023,6 +1023,7 @@ A fully static Astro website that serves as a public directory for MCP servers. 
 
 - HTML for every route below, with URLs without trailing slash (`/servers/foo` → `servers/foo.html`).
 - OG images generated at build time with satori + resvg (`*/opengraph-image.png`), one per page including every server.
+- `/servers.json`: the search index for the `/servers` island (every server as `ServerCardData`); the `/servers` HTML ships only the first page.
 - Sitemap index (`/sitemap.xml`) plus chunked sitemaps (`/sitemap-<n>.xml`, 10,000 URLs each) and a static `robots.txt`.
 - `npm run build -w @getmcp/web` prints a size report (`scripts/measure.ts`: file counts, total size, per-page sizes, comparison against static hosting limits) and writes it to the GitHub Actions job summary (`.github/workflows/web.yml`).
 
@@ -1030,14 +1031,14 @@ A fully static Astro website that serves as a public directory for MCP servers. 
 
 The web application provides the following public routes:
 
-| Route              | Purpose                                                                        |
-| ------------------ | ------------------------------------------------------------------------------ |
-| `/`                | Homepage with hero section, search, and recent servers                         |
-| `/docs`            | Documentation page (getting started, supported apps, library usage)            |
-| `/servers`         | Server directory index page with search and category/runtime/transport filters |
-| `/servers/[id]`    | Individual server detail page with config generators for all 19 apps           |
-| `/category/[slug]` | 14 category landing pages with per-category server grids and descriptions      |
-| `/guides/[app]`    | 19 app-specific MCP setup guides (config details, examples, troubleshooting)   |
+| Route              | Purpose                                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `/`                | Homepage with hero section, search, and recent servers                                                             |
+| `/docs`            | Documentation page (getting started, supported apps, library usage)                                                |
+| `/servers`         | Server directory index page with search and category/runtime/transport filters (index loaded from `/servers.json`) |
+| `/servers/[id]`    | Individual server detail page with config generators for all 19 apps                                               |
+| `/category/[slug]` | 14 category landing pages with per-category server grids and descriptions                                          |
+| `/guides/[app]`    | 19 app-specific MCP setup guides (config details, examples, troubleshooting)                                       |
 
 ### JSON-LD Schemas
 
