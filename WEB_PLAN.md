@@ -158,7 +158,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 - [ ] **E2. ARIA y teclado:**
   - Las pestañas de `ConfigViewer` no se manejan con las flechas, y el tabpanel apunta a pestañas ocultas en móvil (se resuelve con los radios de A1).
   - `PackageManagerCommand` no comunica qué opción está elegida (se resuelve con los radios de A1).
-  - El "Copied" de los botones de copiar no se anuncia: añadir una región `aria-live="polite"`. _(guía: `accessibility`, sección Live Regions)_
+  - [x] El "Copied" de los botones de copiar no se anuncia: añadir una región `aria-live="polite"`. _(guía: `accessibility`, sección Live Regions)_ Hecho en E7 (`scripts/copy.ts`).
   - `FilterSheet` sigue siendo enfocable cuando está cerrado. Propuesta: `<dialog>` nativo abierto con `showModal()`, con `closedby="any"` para cerrar al tocar fuera. _(guías: `accessibility` sección 12, `light-dismiss-a-dialog`)_
     - `showModal()` vuelve inerte el resto de la página, así que el focus trap hecho a mano (`FilterSheet.tsx:22-53`) se elimina.
     - Safari no soporta `closedby`: las guías dan un fallback de unas 10 líneas que cierra con un clic en el `::backdrop`.
@@ -174,7 +174,10 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
   - El 404 hereda el `hreflang` de la home (`metadata.ts:84-89`).
   - Faltan `favicon.ico`, `apple-touch-icon` y el manifest.
   - Sobran los `twitter:image:*` no estándar y la meta `keywords`.
-- [ ] **E7. Copiar código:** `scripts/code-copy.ts:40` usa `closest(".rounded-lg")`, que es frágil (mejor un atributo `data-`), y se incluye en las ~39.700 fichas aunque no tengan `CodeBlock`. A los botones de `CodeBlock.tsx:24` les falta `type="button"`.
+- [x] **E7. Copiar código:** `scripts/code-copy.ts:40` usa `closest(".rounded-lg")`, que es frágil (mejor un atributo `data-`), y se incluye en las ~39.700 fichas aunque no tengan `CodeBlock`. A los botones de `CodeBlock.tsx:24` les falta `type="button"`.
+  - Hecho: `scripts/code-copy.ts` pasa a `scripts/copy.ts`, con contrato de atributos (`data-copy`, `data-copy-root`, `data-copy-text`, `data-copied`) y una región `aria-live` compartida. Nuevo `CodeBlock.astro` (iconos de `@lucide/astro`) en las guías. El script ya no se importa en `BaseLayout`, solo en los componentes y páginas con botones de copiar (`/docs` lo importa de forma transitoria hasta A2d).
+  - Pendiente (fuera de alcance): en `/docs` todos los botones se llaman "Copy code"; se podría añadir `aria-describedby` hacia el encabezado de la sección.
+  - Pendiente (fuera de alcance): hoy ninguna guía muestra el ejemplo de configuración, porque los `popularServers` de `lib/guide-data.ts` (`github`, `filesystem`…) no coinciden con ningún slug del registro y `getSampleConfig()` devuelve `null`. Hay que pasarlos a slugs reales.
 - [ ] **E8. `?page=` fuera de rango en `/servers`:** se corrige en pantalla, pero la URL conserva el valor erróneo.
 
 ## Orden sugerido

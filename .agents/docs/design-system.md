@@ -368,9 +368,12 @@ border-accent bg-accent text-white            (config tab)
 ### Icon Button (copy)
 
 ```
-text-text-secondary hover:text-text transition-colors rounded-md
-→ text-success (copied state, reverts after 2s)
+group text-text-secondary hover:text-text transition-colors rounded-md
+→ data-copied on the button for 2s: Copy icon `group-data-copied:hidden`,
+  Check icon `text-success hidden group-data-copied:block`
 ```
+
+Both icons are always rendered; `scripts/copy.ts` toggles `data-copied` and writes "Copied to clipboard" into one shared `aria-live="polite"` region (cleared by the same 2s timer). The `aria-label` stays "Copy code".
 
 ---
 
@@ -410,6 +413,8 @@ Icons come from two libraries: **lucide-react** (generic UI icons) and **@icons-
 - Color: `text-text-secondary` (inherits via `currentColor`)
 
 No wrapper file — consumers import directly from `lucide-react` and `@icons-pack/react-simple-icons`. Pass `aria-hidden="true"` on each usage.
+
+In `.astro` components use **@lucide/astro** with per-icon deep imports (`import Copy from "@lucide/astro/icons/copy"`); never the barrel import, which compiles every icon.
 
 Icons used: `Search`, `SlidersHorizontal`, `Terminal`, `Copy`, `Check`, `X`, `Lock`, `Star`, `Download`, `GitFork`, `CircleDot`, `ExternalLink`, `BadgeCheck`, `SiGithub`, `SiDocker`, custom logo.
 

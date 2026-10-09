@@ -85,3 +85,8 @@ const jsonLd = [
   <JsonLd data={jsonLd} />
   <DocsContent />
 </BaseLayout>
+
+<script>
+  // Transitional: DocsContent renders React CodeBlocks as static HTML; A2d drops this.
+  import "@/scripts/copy";
+</script>

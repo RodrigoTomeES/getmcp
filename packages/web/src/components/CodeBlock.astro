@@ -1,0 +1,36 @@
+---
+/**
+ * Static code block with a copy button, driven by `@/scripts/copy`.
+ * Keep in sync with `CodeBlock.tsx` (used inside React islands) until A2d removes it.
+ */
+import Check from "@lucide/astro/icons/check";
+import Copy from "@lucide/astro/icons/copy";
+
+interface Props {
+  code: string;
+  label?: string;
+}
+
+const { code, label } = Astro.props;
+---
+
+<div class="rounded-lg border border-border bg-code-bg overflow-hidden" data-copy-root>
+  <div class="flex items-center justify-between px-4 py-2 border-b border-border">
+    <span class="text-xs text-text-secondary font-medium">{label ?? "Code"}</span>
+    <button
+      type="button"
+      data-copy
+      class="group text-text-secondary hover:text-text transition-colors shrink-0 p-1 rounded-md"
+      aria-label="Copy code"
+    >
+      <Copy class="w-4 h-4 group-data-copied:hidden" aria-hidden="true" />
+      <Check class="w-4 h-4 text-success hidden group-data-copied:block" aria-hidden="true" />
+    </button>
+  </div>
+  <pre
+    class="p-4 overflow-x-auto text-sm font-mono leading-relaxed text-text"><code data-copy-text data-language={label?.toLowerCase()}>{code}</code></pre>
+</div>
+
+<script>
+  import "@/scripts/copy";
+</script>
