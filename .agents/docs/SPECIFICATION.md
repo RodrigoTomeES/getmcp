@@ -1038,7 +1038,7 @@ The web application provides the following public routes:
 | `/docs`            | Documentation page (getting started, supported apps, library usage)                                                |
 | `/servers`         | Server directory index page with search and category/runtime/transport filters (index loaded from `/servers.json`) |
 | `/servers/[id]`    | Individual server detail page with config generators for all 19 apps                                               |
-| `/category/[slug]` | 14 category landing pages with per-category server grids and descriptions                                          |
+| `/category/[slug]` | 14 category landing pages, 48 servers per page sorted by GitHub stars; later pages at `/category/[slug]/[n]`       |
 | `/guides/[app]`    | 19 app-specific MCP setup guides (config details, examples, troubleshooting)                                       |
 
 ### JSON-LD Schemas
@@ -1047,7 +1047,7 @@ The site uses structured data (JSON-LD) for SEO and schema.org compliance:
 
 - **BreadcrumbList** — Category and guide navigation breadcrumbs
 - **CollectionPage** — Server directory index (`/servers`)
-- **ItemList** — Category server grids (`/category/[slug]`)
+- **ItemList** — Category server grids (`/category/[slug]`), current page only
 - **TechArticle** — App-specific guides (`/guides/[app]`)
 - **SoftwareApplication** (fixed) — Organization schema in root layout
 - **WebApplication** — Root application metadata

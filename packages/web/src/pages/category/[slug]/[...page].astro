@@ -1,32 +1,48 @@
 ---
-import type { GetStaticPaths } from "astro";
+import type { GetStaticPaths, Page } from "astro";
 import { getServersByCategory } from "@getmcp/registry";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import JsonLd from "@/components/JsonLd.astro";
+import { Pagination } from "@/components/Pagination";
 import ServerCard from "@/components/ServerCard.astro";
 import { CATEGORY_NAMES, CATEGORY_DESCRIPTIONS, CATEGORY_SLUGS } from "@/lib/categories";
 import { APP_COUNT, SITE_URL } from "@/lib/constants";
 import { resolveMetadata } from "@/lib/metadata";
-import type { ServerCardData } from "@/lib/server-detail";
+import { toServerCardData, type ServerCardData } from "@/lib/server-detail";
 import { CATEGORY_OG } from "@/lib/og-pages";
+import { CATEGORY_PAGE_SIZE, categoryPageUrl } from "@/lib/pagination";
+import { sortServers } from "@/lib/server-search";
 
-// Only categories with a display name get a page.
-export const getStaticPaths = (() =>
-  CATEGORY_SLUGS.map((slug) => ({ params: { slug } }))) satisfies GetStaticPaths;
+// Only categories with a display name get a page. Page 1 is /category/<slug>,
+// the rest /category/<slug>/<n>, most GitHub stars first (like /servers).
+export const getStaticPaths = (({ paginate }) =>
+  CATEGORY_SLUGS.flatMap((slug) =>
+    paginate(sortServers(getServersByCategory(slug).map(toServerCardData), "stars"), {
+      params: { slug },
+      pageSize: CATEGORY_PAGE_SIZE,
+    }),
+  )) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<ServerCardData>;
+}
 
 const { slug } = Astro.params as { slug: string };
+const { page } = Astro.props;
+const n = page.currentPage;
 const name = CATEGORY_NAMES[slug];
 const description = CATEGORY_DESCRIPTIONS[slug] ?? "";
-const servers = getServersByCategory(slug);
+const canonicalPath = categoryPageUrl(slug, n);
+const pageSuffix = n > 1 ? ` Page ${n} of ${page.lastPage}.` : "";
 
 const metaDescription = CATEGORY_DESCRIPTIONS[slug] ?? `Browse ${name} MCP servers.`;
 const metadata = resolveMetadata(
   {
-    title: `${name} MCP Servers — Browse & Install`,
-    description: `${metaDescription} ${servers.length} servers available. Install with one command across ${APP_COUNT} AI apps.`,
+    title: n > 1 ? `${name} MCP Servers — Page ${n}` : `${name} MCP Servers — Browse & Install`,
+    description: `${metaDescription} ${page.total} servers available. Install with one command across ${APP_COUNT} AI apps.${pageSuffix}`,
     keywords: [name, `${name} MCP`, `${name} MCP servers`, "MCP server", "getmcp"],
     alternates: {
-      canonical: `/category/${slug}`,
+      canonical: canonicalPath,
     },
     openGraph: {
       title: `${name} MCP Servers — getmcp`,
@@ -42,37 +58,26 @@ const metadata = resolveMetadata(
   { ogImage: { path: `/category/${slug}/opengraph-image.png`, alt: CATEGORY_OG.alt } },
 );
 
-const minimalServers: ServerCardData[] = servers.map((s) => ({
-  id: s.id,
-  slug: s.slug,
-  name: s.name,
-  description: s.description,
-  categories: s.categories,
-  isRemote: "url" in s.config,
-  envCount: s.requiredEnvVars.length,
-  isOfficial: s.isOfficial,
-}));
-
 const jsonLd = [
   {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: `${name} MCP Servers`,
     description,
-    url: `${SITE_URL}/category/${slug}`,
+    url: `${SITE_URL}${canonicalPath}`,
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${SITE_URL}/category/${slug}`,
+      "@id": `${SITE_URL}${canonicalPath}`,
     },
   },
   {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: `${name} MCP Servers`,
-    numberOfItems: servers.length,
-    itemListElement: minimalServers.map((s, i) => ({
+    numberOfItems: page.data.length,
+    itemListElement: page.data.map((s, i) => ({
       "@type": "ListItem",
-      position: i + 1,
+      position: page.start + i + 1,
       name: s.name,
       url: `${SITE_URL}/servers/${s.slug}`,
     })),
@@ -112,18 +117,26 @@ const jsonLd = [
       <h1 class="text-3xl font-bold tracking-tight mb-3">{name} MCP Servers</h1>
       <p class="text-lg text-text-secondary leading-relaxed max-w-2xl">{description}</p>
       <p class="text-sm text-text-secondary mt-2">
-        {servers.length} server{servers.length !== 1 ? "s" : ""} available
+        {page.total} server{page.total !== 1 ? "s" : ""} available
+        {page.lastPage > 1 && ` · Page ${n} of ${page.lastPage}`}
       </p>
     </div>
 
     {/* Server grid */}
     {
-      minimalServers.length > 0 ? (
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {minimalServers.map((server) => (
-            <ServerCard server={server} />
-          ))}
-        </div>
+      page.data.length > 0 ? (
+        <>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {page.data.map((server) => (
+              <ServerCard server={server} />
+            ))}
+          </div>
+          <Pagination
+            page={n}
+            totalPages={page.lastPage}
+            hrefFor={(p: number) => categoryPageUrl(slug, p)}
+          />
+        </>
       ) : (
         <div class="text-center py-20 text-text-secondary">
           <p class="text-lg mb-2">No servers in this category yet</p>
