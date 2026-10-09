@@ -29,6 +29,9 @@
   --color-warning-border: color-mix(in srgb, #f59e0b 30%, transparent);
   --color-warning-subtle: color-mix(in srgb, #f59e0b 12%, transparent);
   --color-warning-light: color-mix(in srgb, #f59e0b 80%, white);
+
+  /* Home hero: solid ASCII logo wipe (used as motion-safe:animate-ascii-reveal) */
+  --animate-ascii-reveal: ascii-reveal 250ms steps(40) both;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -57,6 +60,15 @@ body {
   }
   50% {
     opacity: 0;
+  }
+}
+
+@keyframes ascii-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
   }
 }
 

@@ -1,6 +1,6 @@
 /**
  * Native radio groups that switch pre-rendered panels (ConfigViewer,
- * PackageManagerCommand).
+ * PackageManagerCommand, CliShowcase).
  *
  * Attribute contract, per `[data-radio-panels]` root:
  * - `input[type=radio]` elements whose `value` matches a `[data-panel]`;

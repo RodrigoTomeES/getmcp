@@ -1,5 +1,11 @@
-import { useState, useCallback } from "react";
-import { Terminal } from "lucide-react";
+---
+/**
+ * "10 commands" showcase: a native radio group of command cards
+ * (`name="cli-command"`) and one pre-rendered terminal mock per command
+ * (the inactive ones `hidden`), switched by `@/scripts/radio-panels`.
+ * No storage key: the first command is always the default.
+ */
+import Terminal from "@lucide/astro/icons/terminal";
 
 type TerminalLine = {
   text: string;
@@ -213,112 +219,74 @@ const COLOR_MAP: Record<string, string> = {
   warning: "text-warning",
   secondary: "text-text-secondary",
 };
+---
 
-export function CliShowcase() {
-  const [selected, setSelected] = useState(0);
+<section class="mb-12">
+  <h2 class="text-xl font-bold mb-2">10 commands. Zero friction.</h2>
+  <p class="text-text-secondary mb-8 max-w-2xl">
+    From installing your first server to managing a team registry, the CLI handles it all.
+  </p>
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      const cols = 2;
-      const total = COMMANDS.length;
-      let next = selected;
-
-      switch (e.key) {
-        case "ArrowRight":
-          next = selected + 1 < total ? selected + 1 : selected;
-          break;
-        case "ArrowLeft":
-          next = selected - 1 >= 0 ? selected - 1 : selected;
-          break;
-        case "ArrowDown":
-          next = selected + cols < total ? selected + cols : selected;
-          break;
-        case "ArrowUp":
-          next = selected - cols >= 0 ? selected - cols : selected;
-          break;
-        default:
-          return;
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8" data-radio-panels>
+    {/* Left: command cards */}
+    <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0">
+      <legend class="sr-only">CLI commands</legend>
+      {
+        COMMANDS.map((cmd, i) => (
+          <label
+            for={`cli-command-${cmd.name}`}
+            class="rounded-lg border p-3 text-left transition-colors cursor-pointer border-border bg-surface not-has-checked:hover:border-accent/50 has-checked:border-accent has-checked:bg-accent/10 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent"
+          >
+            <input
+              type="radio"
+              id={`cli-command-${cmd.name}`}
+              name="cli-command"
+              value={cmd.name}
+              checked={i === 0}
+              autocomplete="off"
+              class="sr-only"
+            />
+            <span class="block text-accent font-mono text-sm font-medium">{cmd.name}</span>
+            <span class="block text-xs text-text-secondary mt-1">{cmd.description}</span>
+          </label>
+        ))
       }
+    </fieldset>
 
-      if (next !== selected) {
-        e.preventDefault();
-        setSelected(next);
-      }
-    },
-    [selected],
-  );
-
-  const active = COMMANDS[selected];
-
-  return (
-    <section className="mb-12">
-      <h2 className="text-xl font-bold mb-2">10 commands. Zero friction.</h2>
-      <p className="text-text-secondary mb-8 max-w-2xl">
-        From installing your first server to managing a team registry, the CLI handles it all.
-      </p>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Left: command cards */}
+    {/* Right: terminal mocks */}
+    {
+      COMMANDS.map((cmd, i) => (
         <div
-          role="tablist"
-          aria-label="CLI commands"
-          className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-          onKeyDown={handleKeyDown}
+          data-panel={cmd.name}
+          hidden={i !== 0}
+          class="rounded-lg border border-border bg-code-bg overflow-hidden"
         >
-          {COMMANDS.map((cmd, i) => (
-            <button
-              key={cmd.name}
-              type="button"
-              role="tab"
-              aria-selected={i === selected}
-              aria-controls="cli-terminal-panel"
-              tabIndex={i === selected ? 0 : -1}
-              onClick={() => setSelected(i)}
-              className={`rounded-lg border p-3 text-left transition-colors cursor-pointer ${
-                i === selected
-                  ? "border-accent bg-accent/10"
-                  : "border-border bg-surface hover:border-accent/50"
-              }`}
-            >
-              <p className="text-accent font-mono text-sm font-medium">{cmd.name}</p>
-              <p className="text-xs text-text-secondary mt-1">{cmd.description}</p>
-            </button>
-          ))}
-        </div>
-
-        {/* Right: terminal mock */}
-        <div
-          id="cli-terminal-panel"
-          role="tabpanel"
-          aria-label={`Terminal output for ${active.name} command`}
-          className="rounded-lg border border-border bg-code-bg overflow-hidden"
-        >
-          <div className="flex items-center gap-2 px-4 py-2 border-b border-border">
-            <Terminal className="w-4 h-4 text-text-secondary shrink-0" aria-hidden="true" />
-            <span className="text-xs font-mono text-text-secondary select-none">terminal</span>
+          <div class="flex items-center gap-2 px-4 py-2 border-b border-border">
+            <Terminal class="w-4 h-4 text-text-secondary shrink-0" aria-hidden="true" />
+            <span class="text-xs font-mono text-text-secondary select-none">terminal</span>
           </div>
-          <div className="px-4 py-3 font-mono text-sm leading-relaxed overflow-x-auto">
+          <div class="px-4 py-3 font-mono text-sm leading-relaxed overflow-x-auto">
             <p>
-              <span className="text-accent">$</span>{" "}
-              <span className="text-text">{active.terminal.command}</span>
+              <span class="text-accent">$</span> <span class="text-text">{cmd.terminal.command}</span>
             </p>
-            <div className="mt-2">
-              {active.terminal.lines.map((line, i) => (
-                <p
-                  key={`${active.name}-${i}`}
-                  className={line.color ? COLOR_MAP[line.color] : "text-text"}
-                >
+            <div class="mt-2">
+              {cmd.terminal.lines.map((line) => (
+                <p class={line.color ? COLOR_MAP[line.color] : "text-text"}>
                   {line.text || "\u00A0"}
                 </p>
               ))}
             </div>
           </div>
         </div>
-      </div>
+      ))
+    }
+  </div>
 
-      <p className="text-sm text-text-secondary text-center mt-6">
-        Works with npx — no installation required.
-      </p>
-    </section>
-  );
-}
+  <p class="text-sm text-text-secondary text-center mt-6">
+    Works with npx — no installation required.
+  </p>
+</section>
+
+<script>
+  import "@/scripts/radio-panels";
+</script>

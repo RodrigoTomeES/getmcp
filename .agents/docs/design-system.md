@@ -292,6 +292,14 @@ Configuration
 - PM unchecked: `text-text-secondary hover:text-text`; focus ring as in ConfigViewer
 - The four commands are pre-rendered `<span data-panel data-copy-text>` inside one `<pre><code>`; the copy button copies the visible one
 
+### Home hero and CLI showcase
+
+**Files**: `components/AsciiArt.astro`, `components/AnimatedCommand.astro`, `components/CliShowcase.astro` (no React on the home page)
+
+- **ASCII logo**: the outlined art and the solid layer are both rendered statically inside a `role="img" aria-label="getmcp"` wrapper (both `<pre>` are `aria-hidden`). The solid layer gets `motion-safe:animate-ascii-reveal`, a 250 ms `clip-path: inset(0 100% 0 0)` → `inset(0)` wipe in `steps(40)`. Without JS or with reduced motion the logo is complete from the first paint. The CRT scanline overlay is `motion-reduce:hidden`
+- **Animated command**: the first command is server-rendered in full (no-JS and reduced-motion state). The script starts in the "typed, pausing" state (2000 ms), then erases (30 ms/char), pauses 300 ms and types the next (60 ms/char). The blinking cursor is `motion-reduce:hidden`. Both copy buttons carry `data-copy` with the full current command
+- **CLI showcase**: command cards are `<label>`s around sr-only radios (`name="cli-command"`, `<fieldset>` + sr-only `<legend>`); checked: `has-checked:border-accent has-checked:bg-accent/10`, unchecked hover: `not-has-checked:hover:border-accent/50`, focus ring via `has-focus-visible:`. Arrow keys move linearly through the cards. The 10 terminal mocks are pre-rendered `[data-panel]`s, the inactive ones `hidden`
+
 ### MetaItem
 
 **File**: `components/MetaItem.tsx`
@@ -431,12 +439,14 @@ Custom SVG (download arrow + node network). Stroke: `#ededed`, strokeWidth `2.2`
 
 ## Animations & Transitions
 
-| Pattern              | Class               | Duration | Usage                        |
-| -------------------- | ------------------- | -------- | ---------------------------- |
-| Color change         | `transition-colors` | 150ms    | Hover text/border/background |
-| All properties       | `transition-all`    | 150ms    | Card hover (bg + border)     |
-| Loading skeleton     | `animate-pulse`     | default  | Loading states               |
-| Copy button feedback | (JS timeout)        | 2000ms   | Checkmark → clipboard revert |
+| Pattern              | Class                                              | Duration | Usage                                                 |
+| -------------------- | -------------------------------------------------- | -------- | ----------------------------------------------------- |
+| Color change         | `transition-colors`                                | 150ms    | Hover text/border/background                          |
+| All properties       | `transition-all`                                   | 150ms    | Card hover (bg + border)                              |
+| Loading skeleton     | `animate-pulse`                                    | default  | Loading states                                        |
+| Copy button feedback | (JS timeout)                                       | 2000ms   | Checkmark → clipboard revert                          |
+| ASCII logo reveal    | `motion-safe:animate-ascii-reveal`                 | 250ms    | Home hero solid layer (`clip-path` wipe, `steps(40)`) |
+| Typing cursor        | `motion-safe:animate-[blink_1s_step-end_infinite]` | 1s       | Hero command cursor (hidden with reduced motion)      |
 
 ---
 
