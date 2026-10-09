@@ -6,11 +6,13 @@ import { FilterPanel } from "./FilterPanel";
 import { FilterSheet } from "./FilterSheet";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { useDebounce } from "@/hooks/use-debounce";
-
-const PAGE_SIZES = [24, 48, 72] as const;
-const DEFAULT_PAGE_SIZE = 24;
-
-type SortOption = "alphabetical" | "stars" | "downloads";
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_SORT,
+  PAGE_SIZES,
+  sortServers,
+  type SortOption,
+} from "@/lib/server-search";
 
 function parseMulti(param: string | null): string[] {
   return param ? param.split(",").filter(Boolean) : [];
@@ -29,7 +31,7 @@ export function SearchBar({
   const [selectedRuntimes, setSelectedRuntimes] = useState<string[]>([]);
   const [selectedTransports, setSelectedTransports] = useState<string[]>([]);
   const [officialOnly, setOfficialOnly] = useState(false);
-  const [sortBy, setSortBy] = useState<SortOption>("stars");
+  const [sortBy, setSortBy] = useState<SortOption>(DEFAULT_SORT);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [page, setPage] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -77,7 +79,7 @@ export function SearchBar({
     if (selectedRuntimes.length) params.set("runtime", selectedRuntimes.join(","));
     if (selectedTransports.length) params.set("transport", selectedTransports.join(","));
     if (officialOnly) params.set("official", "true");
-    if (sortBy !== "stars") params.set("sort", sortBy);
+    if (sortBy !== DEFAULT_SORT) params.set("sort", sortBy);
     if (pageSize !== DEFAULT_PAGE_SIZE) params.set("per_page", String(pageSize));
     if (page > 1) params.set("page", String(page));
 
@@ -136,15 +138,10 @@ export function SearchBar({
       result = result.filter((item) => item.searchable.includes(q));
     }
 
-    let sorted = result.map(({ server }) => server);
-
-    if (sortBy === "stars") {
-      sorted = [...sorted].sort((a, b) => (b.stars ?? -1) - (a.stars ?? -1));
-    } else if (sortBy === "downloads") {
-      sorted = [...sorted].sort((a, b) => (b.downloads ?? -1) - (a.downloads ?? -1));
-    }
-
-    return sorted;
+    return sortServers(
+      result.map(({ server }) => server),
+      sortBy,
+    );
   }, [
     searchIndex,
     query,
@@ -174,7 +171,7 @@ export function SearchBar({
     setSelectedRuntimes([]);
     setSelectedTransports([]);
     setOfficialOnly(false);
-    setSortBy("stars");
+    setSortBy(DEFAULT_SORT);
     setPageSize(DEFAULT_PAGE_SIZE);
     setPage(1);
   };
@@ -203,7 +200,7 @@ export function SearchBar({
     selectedRuntimes.length > 0 ||
     selectedTransports.length > 0 ||
     officialOnly ||
-    sortBy !== "stars" ||
+    sortBy !== DEFAULT_SORT ||
     pageSize !== DEFAULT_PAGE_SIZE;
 
   const activeFilterCount =

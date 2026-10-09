@@ -136,7 +136,8 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
   - Arreglo: `toSentence()` en `src/lib/format.ts`. Recorta espacios, quita un `,` `:` o `;` final y añade punto solo si no termina ya en `.` `!` `?` `…`. Tests en `tests/format.test.ts`.
   - Las 5 descripciones que ya vienen mal del registry ("SEO..", "quickly!.") se dejan como están.
 - [ ] **C4. La home no tiene `h1` accesible:** `class="absolute hidden"` (`src/pages/index.astro:137`). Cambiar a `sr-only`.
-- [ ] **C5. El orden "alfabético" de `/servers`** ordena por ID inverso (`SearchBar.tsx:140-145`); debería ordenar por nombre.
+- [x] **C5. El orden "alfabético" de `/servers`** ordena por ID inverso (`SearchBar.tsx:140-145`); debería ordenar por nombre.
+  - Hecho: `sortServers()` en `src/lib/server-search.ts` (con `SortOption`, `DEFAULT_SORT`, `PAGE_SIZES`, `DEFAULT_PAGE_SIZE`). "Alphabetical" ordena por nombre con `Intl.Collator("en", { sensitivity: "base", numeric: true })`; los nombres que empiezan por puntuación van primero. Tests en `tests/server-search.test.ts`.
 - [x] **C6. El botón "Browse servers" del 404 apuntaba a `/`.** Hecho en `430a357`.
 - [ ] **C7. Cabecera móvil:** a 390 px la pastilla "beta" tapa "Servers" (`BaseLayout.astro:81-115`).
   - El flex no tiene `flex-wrap`, y las guías piden `flex-wrap: wrap` siempre que pueda desbordar. _(guía: `css-layout`)_
