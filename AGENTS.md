@@ -26,9 +26,9 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22.17) with
 | `packages/generators` | `@getmcp/generators` | 19 config generators (one per AI app), each transforms canonical format to app-native format                                                                                                                                    |
 | `packages/registry`   | `@getmcp/registry`   | Catalog of MCP server definitions with search/filter API                                                                                                                                                                        |
 | `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `doctor`, `import`, `sync`, `registry` commands with app auto-detection, config merging, multi-registry support, and installation tracking via `getmcp-lock.json` |
-| `packages/web`        | `@getmcp/web`        | Astro static web directory for browsing servers and generating config snippets (static `.astro` components with small scripts; React islands only where still needed), with Cloudflare Web Analytics                            |
+| `packages/web`        | `@getmcp/web`        | Astro static web directory for browsing servers and generating config snippets (static `.astro` components with small scripts; React only for the `/servers` search island), with Cloudflare Web Analytics                      |
 
-**Tech stack**: TypeScript 5.7+, Zod 4.0+, Vitest 3.0+, Astro 7.3+ (web, static output), React 19 (web islands), Tailwind CSS 4.3+ (web), `@clack/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
+**Tech stack**: TypeScript 5.7+, Zod 4.0+, Vitest 3.0+, Astro 7.3+ (web, static output), React 19 (web `/servers` search island), Tailwind CSS 4.3+ (web), `@clack/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
 
 > See `.agents/docs/SPECIFICATION.md` Section 3 for the full architecture breakdown.
 
@@ -146,7 +146,7 @@ Skills are installed under `.agents/skills/`. See the skill files for triggers a
 - **[`ROADMAP.md`](./.agents/docs/ROADMAP.md)** — Planned improvements and open tasks
 - **[`design-system.md`](./.agents/docs/design-system.md)** — Web package design system: colors, fonts, typography, components, layout patterns, and OG image specs
 - **[`competence.md`](./.agents/docs/competence.md)** — Competence analysis
-- **[`css-scroll-spy.md`](./.agents/docs/css-scroll-spy.md)** — CSS scroll spy pattern: inline `<style>` technique (kept out of the CSS pipeline)
+- **[`css-scroll-spy.md`](./.agents/docs/css-scroll-spy.md)** — CSS scroll spy pattern: rules in a `public/` stylesheet (kept out of the CSS pipeline)
 - **[`file-map.md`](./.agents/docs/file-map.md)** — Complete file-by-file reference for all 5 packages
 - **[`publishing.md`](./.agents/docs/publishing.md)** — Auto-release workflow, OIDC trusted publishing, trigger paths, edge cases
 - **[`commit-convention.md`](./.agents/docs/commit-convention.md)** — Conventional Commits types, scopes, and examples

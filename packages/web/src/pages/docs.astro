@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { DocsContent } from "@/components/DocsContent";
+import DocsContent from "@/components/DocsContent.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import { SITE_URL } from "@/lib/constants";
 import { resolveMetadata } from "@/lib/metadata";
@@ -82,11 +82,7 @@ const jsonLd = [
 ---
 
 <BaseLayout metadata={metadata}>
+  <link rel="stylesheet" href="/docs-scroll-spy.css" slot="head" />
   <JsonLd data={jsonLd} />
   <DocsContent />
 </BaseLayout>
-
-<script>
-  // Transitional: DocsContent renders React CodeBlocks as static HTML; A2d drops this.
-  import "@/scripts/copy";
-</script>

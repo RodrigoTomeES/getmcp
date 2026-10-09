@@ -338,7 +338,7 @@ Configuration
 
 ### DocsSidebar
 
-**File**: `components/DocsSidebar.tsx`
+**File**: `components/DocsSidebar.astro`
 
 ```
  ON THIS PAGE       ← text-xs font-medium uppercase tracking-wider
@@ -352,7 +352,7 @@ Configuration
 - Heading: `text-xs font-medium uppercase tracking-wider text-text-secondary mb-4`
 - List: `space-y-2.5 text-sm border-l border-border pl-4`
 - Level 3 items indented with `pl-3 text-xs`
-- Supports `scroll-target-group` and `:target-current` for active state highlighting
+- Supports `scroll-target-group` and `:target-current` for active state highlighting (rules in `public/docs-scroll-spy.css`, see `css-scroll-spy.md`)
 
 ---
 

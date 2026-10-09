@@ -1,0 +1,547 @@
+---
+/** Body of /docs, rendered by `src/pages/docs.astro`. */
+import { APP_COUNT } from "@/lib/constants";
+import CodeBlock from "@/components/CodeBlock.astro";
+import DocsSidebar from "@/components/DocsSidebar.astro";
+
+// Kept in the frontmatter: a dash run in the template confuses oxlint's Astro frontmatter detection.
+const architectureDiagram = `Canonical Format
+        |
++-------+-------+-------+-------+
+|       |       |       |       |
+Claude  VS Code Goose  Codex  + ${APP_COUNT - 4} more
+Desktop (servers)(YAML) (TOML)   apps`;
+---
+
+<div class="max-w-5xl mx-auto px-6 py-16 flex gap-12">
+  <DocsSidebar />
+  <div class="min-w-0 max-w-3xl flex-1">
+    {/* Hero */}
+    <section class="mb-16">
+      <h1 class="text-4xl font-bold tracking-tight mb-4">Documentation</h1>
+      <p class="text-lg text-text-secondary leading-relaxed max-w-2xl">
+        Learn how to install, configure, and use getmcp to manage MCP servers across all AI
+        applications.
+      </p>
+    </section>
+
+    {/* What is getmcp? */}
+    <section id="what-is-getmcp" class="mb-16 scroll-mt-24">
+      <h2 class="text-2xl font-bold mb-5">What is getmcp?</h2>
+      <div class="space-y-4 text-text-secondary leading-relaxed">
+        <p>
+          Every AI application uses a different config format for MCP (Model Context Protocol)
+          servers. Claude Desktop uses{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            mcpServers
+          </code>
+          , VS Code uses{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            servers
+          </code>
+          , Goose uses YAML with{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            cmd
+          </code>
+          /
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            envs
+          </code>
+          , Codex uses TOML with{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            mcp_servers
+          </code>
+          ... there are {APP_COUNT} apps, 6 root keys, and 4 formats.
+        </p>
+        <p>
+          <span class="text-text font-medium">getmcp</span> solves this with one canonical
+          format, config generators for every app, a registry of popular servers, and a CLI that
+          auto-detects your apps and writes the correct config.
+        </p>
+      </div>
+    </section>
+
+    {/* Getting started */}
+    <section id="getting-started" class="mb-16 scroll-mt-24">
+      <h2 class="text-2xl font-bold mb-5">Getting started</h2>
+      <div class="space-y-4 text-text-secondary leading-relaxed">
+        <p>Install any MCP server into all your detected AI apps with a single command:</p>
+        <CodeBlock label="CLI" code={`npx @getmcp/cli add <server>`} />
+        <p>Here are the most common CLI commands:</p>
+        <CodeBlock label="CLI" code={`# Install a server by official ID
+npx @getmcp/cli add io.github.github/github-mcp-server
+
+# Fuzzy search — unrecognized input triggers search
+npx @getmcp/cli add github
+
+# Browse available servers
+npx @getmcp/cli list
+
+# Search for servers by keyword
+npx @getmcp/cli list --search=database
+
+# Interactive fuzzy search
+npx @getmcp/cli find
+
+# Remove a server from all apps
+npx @getmcp/cli remove
+
+# Check installation status
+npx @getmcp/cli check
+
+# Update all tracked installations
+npx @getmcp/cli update
+
+# Diagnose config issues
+npx @getmcp/cli doctor
+
+# Adopt existing server configs into tracking
+npx @getmcp/cli import
+
+# Sync from project manifest (getmcp.json)
+npx @getmcp/cli sync
+
+# Manage custom registry sources
+npx @getmcp/cli registry list
+npx @getmcp/cli registry add https://mcp.example.com --name my-team
+
+# Machine-readable JSON output
+npx @getmcp/cli list --json`} />
+        <p>
+          The CLI auto-detects which AI applications you have installed, prompts for any
+          required environment variables, and merges the config into each app{"'"}s config file.
+          It never overwrites your existing configuration.
+        </p>
+        <p>
+          The CLI uses official server IDs (like{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            io.github.github/github-mcp-server
+          </code>
+          ). If the input doesn{"'"}t match an exact ID, the CLI performs a fuzzy search across
+          server names, descriptions, and categories.
+        </p>
+      </div>
+    </section>
+
+    {/* Project manifests */}
+    <section id="project-manifests" class="mb-16 scroll-mt-24">
+      <h2 class="text-2xl font-bold mb-5">Project manifests</h2>
+      <div class="space-y-4 text-text-secondary leading-relaxed">
+        <p>
+          Teams can share MCP server configurations via a{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            getmcp.json
+          </code>{" "}
+          manifest file in the project root:
+        </p>
+        <CodeBlock label="JSON" code={`{
+  "servers": {
+    "io.github.github/github-mcp-server": {},
+    "io.github.modelcontextprotocol/server-postgres": {
+      "env": {
+        "DATABASE_URL": "postgresql://localhost:5432/mydb"
+      }
+    }
+  },
+  "registries": [
+    { "name": "my-team", "url": "https://mcp.example.com", "type": "private" }
+  ]
+}`} />
+        <p>
+          Then any team member can install all declared servers into their detected apps with:
+        </p>
+        <CodeBlock label="CLI" code={`npx @getmcp/cli sync`} />
+        <p>
+          The sync command reads the manifest, resolves each server from configured registries,
+          merges any local overrides (like environment variables), and writes the correct config
+          for every detected app.
+        </p>
+      </div>
+    </section>
+
+    {/* Custom registries */}
+    <section id="custom-registries" class="mb-16 scroll-mt-24">
+      <h2 class="text-2xl font-bold mb-5">Custom registries</h2>
+      <div class="space-y-4 text-text-secondary leading-relaxed">
+        <p>
+          Beyond the official registry, getmcp supports multiple registry sources — teams can
+          host private registries or use third-party public ones.
+        </p>
+
+        <h3 id="adding-a-registry" class="text-lg font-semibold text-text scroll-mt-24">
+          Adding a registry
+        </h3>
+        <p>
+          Register a new source with the{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            registry add
+          </code>{" "}
+          command. Use the{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            --name
+          </code>{" "}
+          flag to give it a friendly alias:
+        </p>
+        <CodeBlock label="CLI" code={`npx @getmcp/cli registry add https://mcp.example.com --name my-team`} />
+        <p>
+          The CLI pings the registry{"'"}s{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            /v0.1/ping
+          </code>{" "}
+          endpoint to detect whether it{"'"}s public or private. Private registries require
+          authentication (see below).
+        </p>
+
+        <h3 id="listing-registries" class="text-lg font-semibold text-text scroll-mt-24">
+          Listing registries
+        </h3>
+        <p>View all configured registries, including their type and status:</p>
+        <CodeBlock label="CLI" code={`npx @getmcp/cli registry list
+
+# Machine-readable output
+npx @getmcp/cli registry list --json`} />
+
+        <h3 id="removing-a-registry" class="text-lg font-semibold text-text scroll-mt-24">
+          Removing a registry
+        </h3>
+        <p>
+          Remove a registry by name. This also cleans up any stored credentials for that
+          registry:
+        </p>
+        <CodeBlock label="CLI" code={`npx @getmcp/cli registry remove my-team`} />
+
+        <h3
+          id="using-a-specific-registry"
+          class="text-lg font-semibold text-text scroll-mt-24"
+        >
+          Using a specific registry
+        </h3>
+        <p>
+          When adding a server, use the{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            --registry
+          </code>{" "}
+          flag to install from a specific source:
+        </p>
+        <CodeBlock label="CLI" code={`npx @getmcp/cli add my-server --registry my-team`} />
+      </div>
+    </section>
+
+    {/* Authentication */}
+    <section id="authentication" class="mb-16 scroll-mt-24">
+      <h2 class="text-2xl font-bold mb-5">Authentication</h2>
+      <div class="space-y-4 text-text-secondary leading-relaxed">
+        <p>
+          Private registries require authentication. The CLI supports three auth methods:{" "}
+          <span class="text-text font-medium">bearer token</span>,{" "}
+          <span class="text-text font-medium">basic auth</span> (username/password), and{" "}
+          <span class="text-text font-medium">custom header</span>.
+        </p>
+
+        <h3 id="login" class="text-lg font-semibold text-text scroll-mt-24">
+          Login
+        </h3>
+        <p>
+          Authenticate with a registry using the{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            --method
+          </code>{" "}
+          flag to choose your auth method:
+        </p>
+        <CodeBlock label="CLI" code={`# Bearer token (default)
+npx @getmcp/cli registry login my-team --method bearer
+
+# Basic auth (username + password)
+npx @getmcp/cli registry login my-team --method basic
+
+# Custom header (key + value)
+npx @getmcp/cli registry login my-team --method header`} />
+
+        <h3 id="logout" class="text-lg font-semibold text-text scroll-mt-24">
+          Logout
+        </h3>
+        <p>Remove stored credentials for a registry:</p>
+        <CodeBlock label="CLI" code={`npx @getmcp/cli registry logout my-team`} />
+
+        <h3 id="env-var-override" class="text-lg font-semibold text-text scroll-mt-24">
+          Environment variable override
+        </h3>
+        <p>
+          For CI/CD pipelines or automated environments, set an environment variable instead of
+          using interactive login. The variable{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            GETMCP_REGISTRY_&lt;NAME&gt;_TOKEN
+          </code>{" "}
+          is resolved first and treated as a bearer token:
+        </p>
+        <CodeBlock label="CLI" code={`# For a registry named "my-team"
+export GETMCP_REGISTRY_MY_TEAM_TOKEN=your-token-here
+npx @getmcp/cli add my-server --registry my-team`} />
+
+        <h3 id="credential-storage" class="text-lg font-semibold text-text scroll-mt-24">
+          Credential storage
+        </h3>
+        <p>
+          Credentials are stored locally at{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            ~/.config/getmcp/credentials.json
+          </code>{" "}
+          with{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            0600
+          </code>{" "}
+          permissions (owner read/write only). Removing a registry with{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-sm font-mono text-text">
+            registry remove
+          </code>{" "}
+          automatically cleans up its credentials.
+        </p>
+      </div>
+    </section>
+
+    {/* Supported apps */}
+    <section id="supported-apps" class="mb-16 scroll-mt-24">
+      <h2 class="text-2xl font-bold mb-5">Supported apps</h2>
+      <p class="text-text-secondary leading-relaxed mb-4">
+        getmcp generates config for {APP_COUNT} AI applications, each with its own format:
+      </p>
+      <div class="overflow-x-auto rounded-lg border border-border">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-border bg-surface">
+              <th scope="col" class="text-left px-4 py-3 font-medium">
+                App
+              </th>
+              <th scope="col" class="text-left px-4 py-3 font-medium">
+                Root Key
+              </th>
+              <th scope="col" class="text-left px-4 py-3 font-medium">
+                Format
+              </th>
+            </tr>
+          </thead>
+          <tbody class="text-text-secondary">
+            {[
+              ["Claude Desktop", "mcpServers", "JSON", "claude-desktop"],
+              ["Claude Code", "mcpServers", "JSON", "claude-code"],
+              ["VS Code / Copilot", "servers", "JSON", "vscode"],
+              ["Cursor", "mcpServers", "JSON", "cursor"],
+              ["Cline", "mcpServers", "JSON", "cline"],
+              ["Roo Code", "mcpServers", "JSON", "roo-code"],
+              ["Goose", "extensions", "YAML", "goose"],
+              ["Windsurf", "mcpServers", "JSON", "windsurf"],
+              ["OpenCode", "mcp", "JSONC", "opencode"],
+              ["Zed", "context_servers", "JSON", "zed"],
+              ["PyCharm", "mcpServers", "JSON", "pycharm"],
+              ["Codex", "mcp_servers", "TOML", "codex"],
+              ["Gemini CLI", "mcpServers", "JSON", "gemini-cli"],
+              ["Continue", "mcpServers", "JSON", "continue"],
+              ["Amazon Q", "mcpServers", "JSON", "amazon-q"],
+              ["Trae", "mcpServers", "JSON", "trae"],
+              ["BoltAI", "mcpServers", "JSON", "bolt-ai"],
+              ["LibreChat", "mcpServers", "YAML", "libre-chat"],
+              ["Antigravity", "mcpServers", "JSON", "antigravity"],
+            ].map(([app, rootKey, format, guideSlug]) => (
+              <tr class="border-b border-border last:border-b-0">
+                <td class="px-4 py-2.5">
+                  {app}
+                  {guideSlug && (
+                    <a
+                      href={`/guides/${guideSlug}`}
+                      class="text-accent hover:underline ml-2 text-xs"
+                    >
+                      guide
+                    </a>
+                  )}
+                </td>
+                <td class="px-4 py-2.5">
+                  <code class="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
+                    {rootKey}
+                  </code>
+                </td>
+                <td class="px-4 py-2.5">{format}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    {/* How it works */}
+    <section id="how-it-works" class="mb-16 scroll-mt-24">
+      <h2 class="text-2xl font-bold mb-5">How it works</h2>
+      <div class="space-y-4 text-text-secondary leading-relaxed">
+        <p>
+          Server definitions are stored in a{" "}
+          <span class="text-text font-medium">canonical format</span> aligned with the{" "}
+          <a
+            href="https://registry.modelcontextprotocol.io/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-accent hover:underline"
+          >
+            official MCP registry schema
+          </a>
+          . Config generators transform this into each app{"'"}s native format — renaming
+          fields, changing root keys, switching file formats.
+        </p>
+        <CodeBlock code={architectureDiagram} />
+        <p>There are two types of server configs:</p>
+        <ul class="list-disc list-inside space-y-2 ml-1">
+          <li>
+            <span class="text-text font-medium">Stdio servers</span> — run a local process
+            with{" "}
+            <code class="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
+              command
+            </code>
+            ,{" "}
+            <code class="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
+              args
+            </code>
+            , and{" "}
+            <code class="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
+              env
+            </code>
+          </li>
+          <li>
+            <span class="text-text font-medium">Remote servers</span> — connect to a URL
+            with{" "}
+            <code class="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
+              url
+            </code>{" "}
+            and optional{" "}
+            <code class="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
+              transport
+            </code>{" "}
+            (
+            <code class="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
+              http
+            </code>
+            ,{" "}
+            <code class="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
+              streamable-http
+            </code>
+            , or{" "}
+            <code class="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
+              sse
+            </code>
+            )
+          </li>
+        </ul>
+        <p>
+          Transport is auto-inferred: URLs ending in{" "}
+          <code class="bg-surface-hover px-1.5 py-0.5 rounded text-xs font-mono text-text">
+            /sse
+          </code>{" "}
+          default to SSE, others default to HTTP.
+        </p>
+      </div>
+    </section>
+
+    {/* Library usage */}
+    <section id="library-usage" class="mb-16 scroll-mt-24">
+      <h2 class="text-2xl font-bold mb-5">Library usage</h2>
+      <div class="space-y-6 text-text-secondary leading-relaxed">
+        <p>
+          All packages are available on npm and can be used programmatically in your own
+          projects.
+        </p>
+
+        <div>
+          <h3 id="generate-config" class="text-lg font-semibold text-text mb-3">
+            Generate config for any app
+          </h3>
+          <CodeBlock label="TS" code={`import { generateConfig, generateAllConfigs } from "@getmcp/generators";
+
+// Generate for a specific app
+const config = generateConfig("goose", "github", {
+  command: "npx",
+  args: ["-y", "@modelcontextprotocol/server-github"],
+  env: { GITHUB_TOKEN: "ghp_xxx" },
+});
+// => { extensions: { github: { cmd: "npx", args: [...], envs: {...} } } }
+
+// Generate for ALL apps at once
+const all = generateAllConfigs("github", {
+  command: "npx",
+  args: ["-y", "@modelcontextprotocol/server-github"],
+  env: { GITHUB_TOKEN: "ghp_xxx" },
+});`} />
+        </div>
+
+        <div>
+          <h3 id="validate-schemas" class="text-lg font-semibold text-text mb-3">
+            Validate configs with Zod schemas
+          </h3>
+          <CodeBlock label="TS" code={`import { StdioServerConfig, CanonicalMCPConfig } from "@getmcp/core";
+
+StdioServerConfig.parse({ command: "npx", args: ["server"] });
+// throws ZodError if invalid`} />
+        </div>
+
+        <div>
+          <h3 id="search-registry" class="text-lg font-semibold text-text mb-3">
+            Search the registry
+          </h3>
+          <CodeBlock label="TS" code={`import { searchServers, getServersByCategory } from "@getmcp/registry";
+
+searchServers("database");
+// => [{ id: "io.github.modelcontextprotocol/server-postgres", slug: "postgres", ... }]
+
+getServersByCategory("web");
+// => [{ id: "io.github.anthropics/...", slug: "brave-search", ... }]`} />
+        </div>
+      </div>
+    </section>
+
+    {/* Adding a server */}
+    <section id="adding-a-server" class="mb-16 scroll-mt-24">
+      <h2 class="text-2xl font-bold mb-5">Adding a server to the registry</h2>
+      <div class="space-y-4 text-text-secondary leading-relaxed">
+        <p>
+          getmcp syncs server data from the{" "}
+          <a
+            href="https://registry.modelcontextprotocol.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-accent hover:underline"
+          >
+            official MCP registry
+          </a>
+          . To add your MCP server, submit it to the official registry — getmcp will pick it up
+          automatically during the next sync.
+        </p>
+        <p>
+          Once your server is in the official registry, it will appear in the{" "}
+          <a href="/" class="text-accent hover:underline">
+            web directory
+          </a>
+          , CLI search, and all {APP_COUNT} config generators.
+        </p>
+      </div>
+    </section>
+
+    {/* Security */}
+    <section id="security-disclaimer" class="scroll-mt-24">
+      <div class="rounded-lg border border-warning-border bg-warning-subtle p-6">
+        <h2 class="text-xl font-bold text-warning mb-3">Security disclaimer</h2>
+        <div class="space-y-3 text-text-secondary leading-relaxed text-sm">
+          <p>
+            MCP servers in the getmcp registry are community-contributed. While we review
+            submissions,{" "}
+            <span class="text-text">
+              getmcp cannot guarantee the quality, security, or reliability
+            </span>{" "}
+            of any server.
+          </p>
+          <p>
+            Before installing a server, review its source code and understand what permissions
+            it requires. Stdio servers run local processes on your machine, and remote servers
+            connect to third-party endpoints. Always use environment variables for sensitive
+            credentials and never commit API keys to config files.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

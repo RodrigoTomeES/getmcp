@@ -1,0 +1,16 @@
+/*
+ * Native CSS scroll spy for the /docs table of contents (DocsSidebar.astro).
+ * Served from public/ on purpose so it never goes through Tailwind/Vite:
+ * see .agents/docs/css-scroll-spy.md.
+ */
+@supports (scroll-target-group: auto) {
+  nav[aria-label="Table of contents"] ul {
+    scroll-target-group: auto;
+  }
+  nav[aria-label="Table of contents"] a:target-current {
+    color: var(--color-accent);
+  }
+  nav[aria-label="Table of contents"] li:has(a:target-current) {
+    border-left-color: var(--color-accent);
+  }
+}
