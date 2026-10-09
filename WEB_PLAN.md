@@ -143,7 +143,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 - [ ] **C7. Cabecera móvil:** a 390 px la pastilla "beta" tapa "Servers" (`BaseLayout.astro:81-115`).
   - El flex no tiene `flex-wrap`, y las guías piden `flex-wrap: wrap` siempre que pueda desbordar. _(guía: `css-layout`)_
   - Propuesta: `flex-wrap` con `gap`, y ocultar la pastilla por debajo de `sm`. Alternativa: GitHub como icono.
-- [ ] **C8. Riesgos latentes.**
+- [x] **C8. Riesgos latentes.** Hecho: `CATEGORY_SLUGS` (`lib/categories.ts`) alimenta página, OG, sitemap (ordenado) y `CategoryGrid`; `GUIDE_NAMES` eliminado (OG usa `GUIDES[app].shortName ?? name`, endpoint con `GUIDE_SLUGS`). Rutas: aplazado por decisión del usuario, la comprobación queda en ROADMAP 6b Fase 2.
   - **Categorías:** la página filtra las que no tienen nombre (`category/[slug].astro:14-17`), pero el endpoint de OG y `lib/sitemap.ts:22` usan todas. Una categoría nueva produciría una URL que da 404 en el sitemap.
   - **Rutas:** `servers/foo.html` convive con la carpeta `servers/foo/` de la imagen OG (igual en guides y category). Hay que verificar en Cloudflare que `/servers/foo` no redirige a `/servers/foo/`. Si lo hace, mover las OG a `/og/...`.
   - **Guías:** `GUIDE_NAMES` en `og-pages.tsx:89-109` duplica `GUIDES[*].name`, y el endpoint de OG usa sus claves en vez de `GUIDE_SLUGS`.

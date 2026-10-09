@@ -1,4 +1,5 @@
-import { getAllServers, getCategories } from "@getmcp/registry";
+import { getAllServers } from "@getmcp/registry";
+import { CATEGORY_SLUGS } from "@/lib/categories";
 import { GUIDE_SLUGS } from "@/lib/guide-data";
 import { SITE_URL } from "@/lib/constants";
 
@@ -19,7 +20,7 @@ export function getSitemapEntries(): SitemapEntry[] {
     { url: SITE_URL, changeFrequency: "weekly", priority: 1 },
     { url: `${SITE_URL}/docs`, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE_URL}/servers`, changeFrequency: "weekly", priority: 0.95 },
-    ...getCategories().map((cat) => ({
+    ...[...CATEGORY_SLUGS].sort().map((cat) => ({
       url: `${SITE_URL}/category/${cat}`,
       changeFrequency: "monthly" as const,
       priority: 0.85,

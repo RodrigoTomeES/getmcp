@@ -1,8 +1,8 @@
 ---
 import { getServersByCategory } from "@getmcp/registry";
-import { CATEGORY_NAMES, CATEGORY_DESCRIPTIONS } from "@/lib/categories";
+import { CATEGORY_NAMES, CATEGORY_DESCRIPTIONS, CATEGORY_SLUGS } from "@/lib/categories";
 
-const categories = Object.keys(CATEGORY_NAMES).map((slug) => ({
+const categories = CATEGORY_SLUGS.map((slug) => ({
   slug,
   name: CATEGORY_NAMES[slug],
   desc: CATEGORY_DESCRIPTIONS[slug] ?? "",

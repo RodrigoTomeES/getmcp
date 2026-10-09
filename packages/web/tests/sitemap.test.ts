@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { getAllServers, getCategories } from "@getmcp/registry";
+import { getAllServers } from "@getmcp/registry";
+import { CATEGORY_SLUGS } from "@/lib/categories";
 import { GUIDE_SLUGS } from "@/lib/guide-data";
 import {
   chunkEntries,
@@ -19,7 +20,7 @@ describe("sitemap", () => {
     expect(urls).toContain("https://getmcp.es/servers");
     expect(urls).toContain("https://getmcp.es/docs");
     expect(urls).toContain("https://getmcp.es/guides");
-    for (const cat of getCategories()) expect(urls).toContain(`https://getmcp.es/category/${cat}`);
+    for (const cat of CATEGORY_SLUGS) expect(urls).toContain(`https://getmcp.es/category/${cat}`);
     for (const app of GUIDE_SLUGS) expect(urls).toContain(`https://getmcp.es/guides/${app}`);
     expect(urls.filter((u) => u.includes("/servers/")).length).toBe(slugs.size);
     expect(new Set(urls).size).toBe(urls.length);

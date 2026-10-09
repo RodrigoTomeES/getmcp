@@ -7,6 +7,8 @@
 
 export type GuideData = {
   name: string;
+  /** Shorter label for tight spaces such as OG images (defaults to name). */
+  shortName?: string;
   slug: string;
   /** Human-readable format label (e.g. "JSON", "YAML") */
   format: string;
@@ -59,6 +61,7 @@ export const GUIDES: Record<string, GuideData> = {
 
   vscode: {
     name: "VS Code / GitHub Copilot",
+    shortName: "VS Code",
     slug: "vscode",
     format: "JSON",
     rootKey: "servers",
