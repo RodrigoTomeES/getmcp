@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { compactNumber } from "@/lib/format";
 import { Star, Download, BadgeCheck } from "lucide-react";
 
@@ -25,7 +24,7 @@ export function ServerCard({ server }: { server: ServerCardData }) {
   const hasMetadata = hasStats || server.runtime || hasCategories || server.envCount > 0;
 
   return (
-    <Link
+    <a
       href={`/servers/${server.slug}`}
       className="group flex flex-col rounded-lg border border-border bg-surface p-5 hover:bg-surface-hover hover:border-accent/50 transition-all"
     >
@@ -108,6 +107,6 @@ export function ServerCard({ server }: { server: ServerCardData }) {
           )}
         </div>
       )}
-    </Link>
+    </a>
   );
 }

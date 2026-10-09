@@ -1015,9 +1015,16 @@ When `--refresh` is used interactively, the CLI prompts the user to choose betwe
 
 ### Overview
 
-A Next.js website that serves as a public directory for MCP servers. Think "npm registry for MCP servers" with one-click config generation.
+A fully static Astro website that serves as a public directory for MCP servers. Think "npm registry for MCP servers" with one-click config generation.
 
-**Tech stack**: Next.js 15.3+ (App Router), Tailwind CSS 4.0+, Vercel Analytics + Speed Insights, with `@getmcp/core`, `@getmcp/generators`, and `@getmcp/registry` imported directly. Server pages are statically generated from the registry.
+**Tech stack**: Astro 7.3+ (`output: "static"`, `build.format: "file"`), React 19 islands for interactive components, Tailwind CSS 4.3+ (`@tailwindcss/vite`), Cloudflare Web Analytics, with `@getmcp/core`, `@getmcp/generators`, and `@getmcp/registry` imported directly at build time. Every page — including one page per registry server slug — is prerendered; there is no server runtime.
+
+**Build output**:
+
+- HTML for every route below, with URLs without trailing slash (`/servers/foo` → `servers/foo.html`).
+- OG images generated at build time with satori + resvg (`*/opengraph-image.png`), one per page including every server.
+- Sitemap index (`/sitemap.xml`) plus chunked sitemaps (`/sitemap-<n>.xml`, 10,000 URLs each) and a static `robots.txt`.
+- `npm run build -w @getmcp/web` prints a size report (`scripts/measure.ts`: file counts, total size, per-page sizes, comparison against static hosting limits) and writes it to the GitHub Actions job summary (`.github/workflows/web.yml`).
 
 ### Routes
 

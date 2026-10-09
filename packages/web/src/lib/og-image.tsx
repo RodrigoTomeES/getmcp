@@ -1,7 +1,8 @@
-import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
+import satori, { type SatoriOptions } from "satori";
+import { renderAsync } from "@resvg/resvg-js";
 
 export const OG_SIZE = { width: 1200, height: 630 };
 export const OG_CONTENT_TYPE = "image/png" as const;
@@ -15,29 +16,86 @@ export function stripEmoji(text: string): string {
     .trim();
 }
 
-export async function loadOGFonts() {
-  const [interBold, interRegular, notoSansSC, notoSansKR, notoSansJP, notoSansHebrew] =
-    await Promise.all([
-      readFile(join(process.cwd(), "assets/Inter-Bold.ttf")),
-      readFile(join(process.cwd(), "assets/Inter-Regular.ttf")),
-      readFile(join(process.cwd(), "assets/NotoSansSC-Regular.ttf")),
-      readFile(join(process.cwd(), "assets/NotoSansKR-Regular.ttf")),
-      readFile(join(process.cwd(), "assets/NotoSansJP-Regular.ttf")),
-      readFile(join(process.cwd(), "assets/NotoSansHebrew-Regular.ttf")),
-    ]);
-  return [
-    { name: "Inter", data: interBold, style: "normal" as const, weight: 700 as const },
-    { name: "Inter", data: interRegular, style: "normal" as const, weight: 400 as const },
-    { name: "Noto Sans SC", data: notoSansSC, style: "normal" as const, weight: 400 as const },
-    { name: "Noto Sans KR", data: notoSansKR, style: "normal" as const, weight: 400 as const },
-    { name: "Noto Sans JP", data: notoSansJP, style: "normal" as const, weight: 400 as const },
-    {
-      name: "Noto Sans Hebrew",
-      data: notoSansHebrew,
-      style: "normal" as const,
-      weight: 400 as const,
-    },
-  ];
+type OGFont = SatoriOptions["fonts"][number];
+
+let fontsPromise: Promise<OGFont[]> | undefined;
+
+/**
+ * Load the OG fonts once per build. Satori caches parsed fonts per `fonts`
+ * array instance, so reusing the same array avoids re-parsing the (large) CJK
+ * fonts for every one of the ~38k images.
+ */
+export function loadOGFonts(): Promise<OGFont[]> {
+  fontsPromise ??= (async () => {
+    // Astro builds from the package root; tests set the path explicitly.
+    const assets = process.env.GETMCP_WEB_ASSETS_DIR ?? join(process.cwd(), "assets");
+    const [interBold, interRegular, notoSansSC, notoSansKR, notoSansJP, notoSansHebrew] =
+      await Promise.all([
+        readFile(join(assets, "Inter-Bold.ttf")),
+        readFile(join(assets, "Inter-Regular.ttf")),
+        readFile(join(assets, "NotoSansSC-Regular.ttf")),
+        readFile(join(assets, "NotoSansKR-Regular.ttf")),
+        readFile(join(assets, "NotoSansJP-Regular.ttf")),
+        readFile(join(assets, "NotoSansHebrew-Regular.ttf")),
+      ]);
+    return [
+      { name: "Inter", data: interBold, style: "normal" as const, weight: 700 as const },
+      { name: "Inter", data: interRegular, style: "normal" as const, weight: 400 as const },
+      { name: "Noto Sans SC", data: notoSansSC, style: "normal" as const, weight: 400 as const },
+      { name: "Noto Sans KR", data: notoSansKR, style: "normal" as const, weight: 400 as const },
+      { name: "Noto Sans JP", data: notoSansJP, style: "normal" as const, weight: 400 as const },
+      {
+        name: "Noto Sans Hebrew",
+        data: notoSansHebrew,
+        style: "normal" as const,
+        weight: 400 as const,
+      },
+    ];
+  })();
+  return fontsPromise;
+}
+
+const OG_BACKGROUND_RECT = `<rect x="0" y="0" width="${OG_SIZE.width}" height="${OG_SIZE.height}" fill="#0a0a0a"/>`;
+
+/**
+ * Blue glow in the top-right corner, as a native SVG radial gradient. Satori
+ * turns the equivalent CSS `radial-gradient` (plus the `overflow: hidden` it
+ * needed) into a pattern with nested and full-canvas masks that made resvg
+ * ~5x slower to rasterize; the pixels are the same (max 1/255 difference).
+ */
+const OG_GLOW =
+  '<radialGradient id="og-glow" cx="1100" cy="100" r="424.26406871192853" gradientUnits="userSpaceOnUse">' +
+  '<stop offset="0" stop-color="rgb(59,130,246)" stop-opacity="0.15"/>' +
+  '<stop offset="0.7" stop-color="rgb(0,0,0)" stop-opacity="0"/>' +
+  "</radialGradient>" +
+  '<circle cx="1100" cy="100" r="300" fill="url(#og-glow)"/>';
+
+/** Insert the glow right above the root background, below everything else. */
+export function addOGGlow(svg: string): string {
+  const index = svg.indexOf(OG_BACKGROUND_RECT);
+  if (index === -1) throw new Error("OG image: root background rect not found in Satori output");
+  const end = index + OG_BACKGROUND_RECT.length;
+  return svg.slice(0, end) + OG_GLOW + svg.slice(end);
+}
+
+/**
+ * Render a Satori element tree to a PNG (replaces `next/og`'s `ImageResponse`).
+ * The root element must have the `#0a0a0a` background; the corner glow is added here.
+ */
+export async function renderOGImage(element: ReactElement): Promise<Uint8Array> {
+  const fonts = await loadOGFonts();
+  const svg = addOGGlow(await satori(element, { ...OG_SIZE, fonts }));
+  // Satori already converts text to paths, so resvg never needs (slow to load) system fonts.
+  const image = await renderAsync(svg, {
+    fitTo: { mode: "width", value: OG_SIZE.width },
+    font: { loadSystemFonts: false },
+  });
+  return image.asPng();
+}
+
+/** Build a static PNG `Response` for an Astro endpoint. */
+export function pngResponse(png: Uint8Array): Response {
+  return new Response(png as BodyInit, { headers: { "Content-Type": OG_CONTENT_TYPE } });
 }
 
 interface OGImageOptions {
@@ -47,9 +105,7 @@ interface OGImageOptions {
 }
 
 export async function createOGImage({ heading, description, pills }: OGImageOptions) {
-  const fonts = await loadOGFonts();
-
-  return new ImageResponse(
+  return renderOGImage(
     <div
       style={{
         width: "100%",
@@ -60,23 +116,8 @@ export async function createOGImage({ heading, description, pills }: OGImageOpti
         padding: "60px",
         fontFamily: OG_FONT_FAMILY,
         position: "relative",
-        overflow: "hidden",
       }}
     >
-      {/* Background gradient accent */}
-      <div
-        style={{
-          position: "absolute",
-          top: "-200px",
-          right: "-200px",
-          width: "600px",
-          height: "600px",
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)",
-          display: "flex",
-        }}
-      />
-
       {/* Top bar with accent line */}
       <div
         style={{
@@ -211,9 +252,5 @@ export async function createOGImage({ heading, description, pills }: OGImageOpti
         </span>
       </div>
     </div>,
-    {
-      ...OG_SIZE,
-      fonts,
-    },
   );
 }

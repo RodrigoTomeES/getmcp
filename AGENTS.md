@@ -26,9 +26,9 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22.17) with
 | `packages/generators` | `@getmcp/generators` | 19 config generators (one per AI app), each transforms canonical format to app-native format                                                                                                                                    |
 | `packages/registry`   | `@getmcp/registry`   | Catalog of MCP server definitions with search/filter API                                                                                                                                                                        |
 | `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `doctor`, `import`, `sync`, `registry` commands with app auto-detection, config merging, multi-registry support, and installation tracking via `getmcp-lock.json` |
-| `packages/web`        | `@getmcp/web`        | Next.js (App Router) web directory for browsing servers and generating config snippets, with Vercel Analytics and Speed Insights                                                                                                |
+| `packages/web`        | `@getmcp/web`        | Astro static web directory for browsing servers and generating config snippets (React islands for interactivity), with Cloudflare Web Analytics                                                                                 |
 
-**Tech stack**: TypeScript 5.7+, Zod 4.0+, Vitest 3.0+, Next.js 15.3+ (web), Tailwind CSS 4.0+ (web), `@clack/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
+**Tech stack**: TypeScript 5.7+, Zod 4.0+, Vitest 3.0+, Astro 7.3+ (web, static output), React 19 (web islands), Tailwind CSS 4.3+ (web), `@clack/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
 
 > See `.agents/docs/SPECIFICATION.md` Section 3 for the full architecture breakdown.
 
@@ -95,15 +95,16 @@ This is not optional — documentation drift causes confusion and wastes time. T
 
 ## Testing
 
-- **720 tests** across 30 test files
+- **757 tests** across 35 test files
 - Run all tests: `npx vitest` (from repo root)
-- Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc.
+- Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc. (`npx vitest --project web` for the web package)
 - Test locations:
   - `packages/core/tests/` — schema validation (including RegistrySource, RegistryCredential, RegistryAuthMethod), type guards, transport inference, ProjectManifest
   - `packages/generators/tests/` — all 19 generators (stdio + remote + multi-server + serialization + detectInstalled)
   - `packages/registry/tests/` — entry validation, lookup, search, categories, content integrity, fetch-metrics
   - `packages/cli/tests/` — app-selection, bin flags, config-file I/O, credentials, detect, errors, format, lock file, preferences, registry-cache, registry-config, utils
   - `packages/cli/tests/commands/` — add, check, doctor, find, import, list, registry, remove, sync, update command tests
+  - `packages/web/tests/` — metadata resolution, sitemap, server detail helpers, OG image rendering, text formatting (`toSentence`)
 
 ---
 
@@ -138,7 +139,7 @@ Skills are installed under `.agents/skills/`. See the skill files for triggers a
 - **[`ROADMAP.md`](./.agents/docs/ROADMAP.md)** — Planned improvements and open tasks
 - **[`design-system.md`](./.agents/docs/design-system.md)** — Web package design system: colors, fonts, typography, components, layout patterns, and OG image specs
 - **[`competence.md`](./.agents/docs/competence.md)** — Competence analysis
-- **[`css-scroll-spy.md`](./.agents/docs/css-scroll-spy.md)** — CSS scroll spy pattern: inline `<style>` technique required by Turbopack constraint
+- **[`css-scroll-spy.md`](./.agents/docs/css-scroll-spy.md)** — CSS scroll spy pattern: inline `<style>` technique (kept out of the CSS pipeline)
 - **[`file-map.md`](./.agents/docs/file-map.md)** — Complete file-by-file reference for all 5 packages
 - **[`publishing.md`](./.agents/docs/publishing.md)** — Auto-release workflow, OIDC trusted publishing, trigger paths, edge cases
 - **[`commit-convention.md`](./.agents/docs/commit-convention.md)** — Conventional Commits types, scopes, and examples

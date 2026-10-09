@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export function TeamFeatures() {
   return (
     <section className="mb-12">
@@ -44,12 +42,12 @@ export function TeamFeatures() {
 $ getmcp registry login company \\
     --method bearer`}
           </pre>
-          <Link
+          <a
             href="/docs#custom-registries"
             className="inline-block mt-3 text-sm text-accent hover:underline"
           >
             Learn more →
-          </Link>
+          </a>
         </div>
 
         {/* Card 3 — Lock File */}

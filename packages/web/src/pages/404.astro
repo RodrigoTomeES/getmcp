@@ -1,0 +1,16 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { NotFound } from "@/components/NotFound";
+import { resolveMetadata } from "@/lib/metadata";
+import { HOME_OG } from "@/lib/og-pages";
+
+// Like the Next.js not-found page: root metadata, root OG image, noindex.
+const metadata = resolveMetadata(
+  {},
+  { noindex: true, ogImage: { path: "/opengraph-image.png", alt: HOME_OG.alt } },
+);
+---
+
+<BaseLayout metadata={metadata} preloadSymbols>
+  <NotFound client:load />
+</BaseLayout>

@@ -4,9 +4,9 @@
 
 Use the native CSS scroll spy via `scroll-target-group: auto` + `:target-current` pseudo-class. This is a progressive enhancement — wrapped in `@supports` so unsupported browsers simply get default styling with no errors.
 
-## Turbopack Constraint
+## Build Constraint
 
-**The `@supports (scroll-target-group: auto)` block MUST be placed in an inline `<style>` tag inside the component, NOT in `globals.css` or any file processed by Tailwind/Turbopack.** Turbopack's CSS parser cannot handle `scroll-target-group` or `:target-current` and will fail the build with a "Parsing CSS source code failed" error.
+**The `@supports (scroll-target-group: auto)` block MUST be placed in an inline `<style>` tag inside the component, NOT in `globals.css` or any file processed by Tailwind/Vite.** The pattern was introduced because Turbopack's CSS parser (Next.js era) could not handle `scroll-target-group` or `:target-current`; it is kept inline after the move to Astro so the rule never goes through a CSS pipeline that may not understand these new properties. `DocsSidebar.tsx` is rendered to static HTML by Astro, so the inline `<style>` ends up in the page as-is.
 
 ## Implementation Pattern
 

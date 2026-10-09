@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { ServerCard, type ServerCardData } from "./ServerCard";
 import { Pagination } from "./Pagination";

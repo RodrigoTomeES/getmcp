@@ -201,7 +201,7 @@ getmcp/
     generators/    # 19 config generators (one per app)
     registry/      # 105+ MCP server definitions
     cli/           # add/remove/list/doctor/import commands, app detection
-    web/           # Next.js web directory at getmcp.es
+    web/           # Astro static web directory at getmcp.es
 ```
 
 The CLI supports JSON, JSONC, YAML, and TOML config files natively. Format is auto-detected from the file extension, so Goose configs are read/written as YAML and Codex configs as TOML.

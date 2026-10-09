@@ -77,15 +77,17 @@ font-family:
   sans-serif;
 
 /* Monospace (Tailwind font-mono) */
-font-family: var(--font-fira-mono), ui-monospace, monospace;
+font-family: var(--font-fira-mono); /* "Fira Mono", "Fira Mono fallback: Courier New", monospace */
 ```
 
-**Fira Mono** is loaded via `next/font/google` in `layout.tsx` with the `latin` subset. Box-drawing and block element characters (█, ╗, ╔, etc.) used in the hero ASCII art are not part of any Google Fonts subset — they fall through to the `ui-monospace, monospace` fallback, which renders them natively on all platforms.
+**Fira Mono** is loaded with the Astro Fonts API (`fonts` in `astro.config.mjs`, provider `fontProviders.fontsource()`). Astro downloads the files from Fontsource at build time, caches them in `node_modules/.astro/fonts`, and serves them hashed from `/_astro/fonts/`. `<Font cssVariable="--font-fira-mono" />` in `src/layouts/BaseLayout.astro` outputs the `@font-face` rules and the preload links.
 
-- Weights loaded: **400** (ASCII art), **500** (tagline `font-medium`)
-- CSS variable: `--font-fira-mono`
-- Tailwind integration: `--font-mono` in `@theme` references the CSS variable with `ui-monospace, monospace` fallback
-- `display: swap` — shows fallback font immediately, swaps when Fira Mono loads
+- Weights: **400** (ASCII art, code) and **500** (`font-medium` labels), style `normal`.
+- Subsets: `latin` and `symbols2`. `symbols2` holds the box-drawing and block element characters (█, ╗, ╔, ═, ║, ╚, ╝) of the ASCII logos on the home and 404 pages. Each subset is its own `@font-face` with a `unicode-range`, so `symbols2` is only downloaded on pages that render those glyphs.
+- Preload: every page preloads `latin` 400. Pages with an above-the-fold ASCII logo (`index.astro`, `404.astro`) pass `preloadSymbols` to `BaseLayout` to also preload `symbols2` 400.
+- Fallback: `fallbacks: ["monospace"]`. Astro generates a metric-matched `Courier New` face, so text barely shifts when Fira Mono loads. On systems without Courier New (most Linux/Android), the plain `monospace` fallback is used.
+- Tailwind integration: `@theme inline { --font-mono: var(--font-fira-mono); }` in `src/styles/globals.css`.
+- `font-display: swap` (Fonts API default): shows the fallback immediately and swaps when Fira Mono loads.
 
 ### OG Images (Inter)
 
@@ -95,7 +97,7 @@ Font files in `packages/web/assets/`:
 - `Inter-SemiBold.ttf` (600)
 - `Inter-Bold.ttf` (700)
 
-Used exclusively for `next/og` ImageResponse generation.
+Used exclusively for OG image generation at build time (satori + `@resvg/resvg-js`, see `src/lib/og-image.tsx`). CJK and Hebrew text falls back to the Noto Sans fonts in the same folder.
 
 ### Font Weights
 
@@ -471,7 +473,7 @@ Dimensions: **1200 x 630px** (PNG).
 
 | Element          | Style                                              |
 | ---------------- | -------------------------------------------------- |
-| Background       | `#0a0a0a` + radial accent gradient (top-right)     |
+| Background       | `#0a0a0a` + radial accent gradient (top-right)\*   |
 | Top bar          | 4px gradient `#3b82f6 → #2563eb → #3b82f6`         |
 | Logo text        | Inter Bold 48px, `#ededed`                         |
 | Beta badge       | `#3b82f6` bg, white text, 16px, rounded-full       |
@@ -481,6 +483,8 @@ Dimensions: **1200 x 630px** (PNG).
 | Transport badges | Stdio: `#4ade80`, Remote: `#c084fc`                |
 | Code block       | `#111111` bg, `#ededed` text, `$` prompt `#3b82f6` |
 | Domain           | 20px, `#a0a0a0`, bottom-right                      |
+
+\* The glow is not part of the Satori element tree: `renderOGImage()` (`src/lib/og-image.tsx`) injects it into the SVG as a native `<radialGradient>`. A CSS `radial-gradient` (with the `overflow: hidden` it needs) makes Satori emit a pattern with full-canvas masks that is ~2.2× slower to render for the same pixels. Templates only need the `#0a0a0a` root background.
 
 Fonts: `Inter-Bold.ttf` (700), `Inter-Regular.ttf` (400) loaded from `assets/`.
 
@@ -660,13 +664,13 @@ Enhanced metadata display on server listing cards.
 
 ## Dependencies
 
-| Package                       | Purpose                     |
-| ----------------------------- | --------------------------- |
-| `next@^16.1.6`                | Framework (App Router)      |
-| `react@^19.2.4`               | UI library                  |
-| `tailwindcss@^4.0.0`          | CSS framework               |
-| `@tailwindcss/postcss@^4.0.0` | PostCSS integration         |
-| `lightningcss@^1.30.0`        | CSS processing              |
-| `babel-plugin-react-compiler` | React Compiler optimization |
+| Package                      | Purpose                   |
+| ---------------------------- | ------------------------- |
+| `astro@^7.3.5`               | Framework (static output) |
+| `@astrojs/react@^7.0.0`      | React islands             |
+| `react@^19.3.0`              | UI library                |
+| `tailwindcss@^4.3.3`         | CSS framework             |
+| `@tailwindcss/vite@^4.3.3`   | Vite integration          |
+| `satori` + `@resvg/resvg-js` | OG image generation       |
 
 No UI component library (shadcn, Radix, etc.). All components are custom-built.

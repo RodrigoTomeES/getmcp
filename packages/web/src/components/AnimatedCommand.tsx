@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Terminal, Check, Copy } from "lucide-react";
 import { useClipboard } from "@/hooks/use-clipboard";

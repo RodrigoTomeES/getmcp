@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Pill } from "./Pill";

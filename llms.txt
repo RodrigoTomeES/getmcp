@@ -23,7 +23,7 @@ TypeScript monorepo with 5 packages:
 - `@getmcp/generators` — Config generators for 19 AI applications
 - `@getmcp/registry` — Registry of 2,946+ MCP server definitions
 - `@getmcp/cli` — CLI tool with add, remove, list, find, check, update, doctor, import, registry, sync commands
-- `@getmcp/web` — Next.js web directory at getmcp.es
+- `@getmcp/web` — Astro static web directory at getmcp.es
 
 ## Quick Start
 

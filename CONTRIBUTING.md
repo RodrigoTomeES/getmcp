@@ -41,7 +41,7 @@ packages/
   generators/   - Config generators for 19 AI apps
   registry/     - MCP server catalog (synced from official registry)
   cli/          - CLI tool (getmcp)
-  web/          - Next.js web directory
+  web/          - Astro static web directory
 ```
 
 ## Commit Convention

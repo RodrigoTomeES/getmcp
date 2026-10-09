@@ -5,5 +5,5 @@
     "correctness": "error"
   },
   "rules": {},
-  "ignorePatterns": ["dist/**", "coverage/**", ".next/**"]
+  "ignorePatterns": ["dist/**", "coverage/**", ".astro/**"]
 }
