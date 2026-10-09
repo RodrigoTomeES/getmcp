@@ -1,7 +1,7 @@
 name: Web
 
 # Builds the static Astro site and reports its size against the limits of the
-# hosting options under evaluation (see packages/web/scripts/measure.ts).
+# hosting options under evaluation (see packages/web/integrations/build-report.ts).
 # There is no deploy step yet: the hosting provider is decided from these numbers.
 
 on:

@@ -6,9 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "tsx scripts/build.ts",
+    "build": "astro build",
     "preview": "astro preview",
-    "measure": "tsx scripts/measure.ts",
     "lint": "astro check"
   },
   "dependencies": {

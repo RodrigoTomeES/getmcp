@@ -1,6 +1,7 @@
 import { defineConfig, fontProviders } from "astro/config";
 import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
+import buildReport from "./integrations/build-report.ts";
 
 export default defineConfig({
   site: "https://getmcp.es",
@@ -26,7 +27,8 @@ export default defineConfig({
       fallbacks: ["monospace"],
     },
   ],
-  integrations: [react()],
+  // buildReport logs the build size report (and writes the GitHub job summary).
+  integrations: [react(), buildReport()],
   vite: {
     plugins: [tailwindcss()],
     // resvg ships a native `.node` binary that must be loaded by Node, not bundled.
