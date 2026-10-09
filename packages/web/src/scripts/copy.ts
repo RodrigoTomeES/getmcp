@@ -12,7 +12,8 @@
  * live region announces "Copied to clipboard", cleared by the same timer.
  *
  * Import it from the components/pages that render copy buttons, not globally.
- * Hydrated React islands handle their own buttons and don't load this script.
+ * Every copy button on the site is static HTML handled here (no React island
+ * renders one).
  */
 
 const RESET_MS = 2000;

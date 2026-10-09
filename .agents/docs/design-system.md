@@ -113,14 +113,14 @@ Used exclusively for OG image generation at build time (satori + `@resvg/resvg-j
 
 ### Headings
 
-| Level         | Classes                            | Example                  |
-| ------------- | ---------------------------------- | ------------------------ |
-| Page title    | `text-4xl font-bold`               | Homepage h1              |
-| Section title | `text-3xl font-bold`               | Server detail h1         |
-| Section h2    | `text-2xl font-bold`               | Docs sections            |
-| Subsection    | `text-lg font-semibold`            | Component section titles |
-| Card title    | `font-semibold text-lg`            | ServerCard name          |
-| Logo          | `text-xl font-bold tracking-tight` | Header branding          |
+| Level         | Classes                            | Example                        |
+| ------------- | ---------------------------------- | ------------------------------ |
+| Page title    | `text-4xl font-bold`               | Page h1 (home h1 is `sr-only`) |
+| Section title | `text-3xl font-bold`               | Server detail h1               |
+| Section h2    | `text-2xl font-bold`               | Docs sections                  |
+| Subsection    | `text-lg font-semibold`            | Component section titles       |
+| Card title    | `font-semibold text-lg`            | ServerCard name                |
+| Logo          | `text-xl font-bold tracking-tight` | Header branding                |
 
 ### Body Text
 
@@ -432,6 +432,10 @@ In `.astro` components use **@lucide/astro** with per-icon deep imports (`import
 
 Icons used: `Search`, `SlidersHorizontal`, `Terminal`, `Copy`, `Check`, `X`, `Lock`, `Star`, `Download`, `GitFork`, `CircleDot`, `ExternalLink`, `BadgeCheck`, GitHub and Docker brand paths, custom logo.
 
+### Favicons and app icons
+
+Generated from `public/icon.svg` by `packages/web/scripts/generate-icons.ts` (run it manually after changing the logo): the glyph at 75% size on a full-bleed `#0a0a0a` square, so it stays legible on any launcher or tab background. Outputs `favicon.ico` (32×32), `apple-touch-icon.png` (180×180), `icon-192.png` and `icon-512.png`. `manifest.webmanifest` lists the 192/512 icons with `theme_color` and `background_color` `#0a0a0a`. The SVG itself is still served as the scalable favicon.
+
 ### Logo
 
 Custom SVG (download arrow + node network). Stroke: `#ededed`, strokeWidth `2.2`. Displayed at `h-6 w-auto` in the header as `<img src="/icon.svg" alt="">` (decorative: the parent link has `aria-label="getmcp home"`), with no `fetchpriority` (reserved for the LCP image).
@@ -574,7 +578,7 @@ Per-app installation and configuration guides with generator metadata.
 │ □ MCP CLI installed                     │
 │                                         │
 │ Popular MCP Servers                     │  ← Compact 2-col grid
-│ [Server] [Server]                       │     (names + badges only)
+│ [Server] [Server]                       │     (name + description cards)
 │ [Server] [Server]                       │
 │                                         │
 │ Troubleshooting                         │  ← FAQ or common issues

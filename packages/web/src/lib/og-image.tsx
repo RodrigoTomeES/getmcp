@@ -94,7 +94,7 @@ export async function renderOGImage(element: ReactElement): Promise<Uint8Array> 
     fitTo: { mode: "width", value: OG_SIZE.width },
     font: { loadSystemFonts: false },
   });
-  // resvg's encoder compresses poorly; a 256-colour palette is ~65% smaller and looks the same (WEB_PLAN B3).
+  // resvg's encoder compresses poorly; a 256-colour palette PNG is much smaller with no visible change at a 0.1 pixelmatch threshold (WEB_PLAN B3).
   return sharp(image.asPng())
     .png({ palette: true, colours: 256, dither: 1, compressionLevel: 9, effort: 4 })
     .toBuffer();

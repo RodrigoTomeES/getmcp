@@ -107,8 +107,9 @@ for (const script of [SPECULATION_RULES, RESTORE_CHOICE_SCRIPT]) {
     <!--
       Cross-document view transitions: hold the first render until the header
       is parsed so the cross-fade never lands on a blank page. It targets the
-      header, not <main>, because blocking on <main> would wait for a page's
-      whole main content (e.g. the large /servers listing).
+      header, not <main>: the guide suggests the end of the above-the-fold
+      content, but that differs per page, and the header is a small element
+      every page renders first.
     -->
     <link rel="expect" href="#site-header" blocking="render" />
     <script type="speculationrules" is:inline set:html={SPECULATION_RULES} />

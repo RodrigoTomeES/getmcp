@@ -85,7 +85,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 - [x] **A6. `astro:env`** para `PUBLIC_CF_ANALYTICS_TOKEN`.
   - `envField.string({ context: "client", access: "public", optional: true })`, y borrar la declaración a mano de `src/env.d.ts`.
   - **Hecho:** `env.schema` en `astro.config.mjs`; `BaseLayout.astro` lo importa de `astro:env/client` y solo pinta el beacon si hay token. `src/env.d.ts` borrado. El token se configura como variable de entorno del proyecto en Vercel (donde corre el build); recordatorio en ROADMAP fase 2 para moverlo si cambia el host. El comentario de Vercel de `BaseLayout.astro` (D3, en realidad la línea 22) ya está reescrito. Verificado con `astro dev`: con `PUBLIC_CF_ANALYTICS_TOKEN=test` sale `data-cf-beacon='{"token":"test"}'`, sin él no hay beacon.
-  - Ojo: `.github/workflows/web.yml` nunca define el token, así que la analítica no se activa. Hay que decidir dónde se configura.
+  - Decidido: el token se define como variable de entorno del proyecto en Vercel, donde se hace el build (recordatorio en ROADMAP para moverlo si cambia el host).
 - [x] **A7. CSP integrada** (`security.csp`). Mejor después de A1 y A2.
   - **Hecho:** `security.csp` en `astro.config.mjs` (lista blanca con `'self'` y el host del beacon, sin `'unsafe-inline'` en scripts, `style-src-attr 'unsafe-inline'`, comentario con el porqué). Los dos scripts `is:inline` (speculation rules y `RESTORE_CHOICE_SCRIPT`) añaden su hash con `Astro.csp.insertScriptHash` en el frontmatter de `BaseLayout.astro`: añadido desde `RestoreChoice.astro` se perdía, porque el `<meta>` ya se ha pintado al llegar al `<body>`. El scroll-spy ya estaba en `public/docs-scroll-spy.css` (A2d). `security-headers.ts` borrado; las cabeceras que solo puede mandar el host (HSTS, nosniff, X-Frame-Options/`frame-ancestors`, Referrer-Policy) quedan listadas en ROADMAP fase 2 (decisión: sin `vercel.json` ni `_headers`). Verificado con build parcial (428 páginas): todas llevan el `<meta>` CSP, los 1279 bloques `<script>`/`<style>` en línea tienen su hash, y el HTML es idéntico al de antes salvo el `<meta>`. Astro lo coloca al final del `<head>`, así que no gobierna lo anterior (fuente, speculation rules), pero sí todo el `<body>`. En Chromium (Playwright) sobre el build parcial: sin violaciones de CSP ni errores en /, /servers, una ficha, /docs, una guía, una categoría y el 404; la isla de `/servers` hidrata y busca, la restauración de la opción guardada funciona y `/docs-scroll-spy.css` carga.
   - Hashes automáticos de scripts y estilos en línea; el beacon de Cloudflare va en `scriptDirective.resources`.
@@ -111,7 +111,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
   - 2.779 tarjetas sin paginar más ~300 KB de JSON-LD `ItemList` (`src/pages/category/[slug].astro:70-81,122-128`).
   - Propuesta: `paginate()` en `/category/[slug]/[...page].astro`, con el `ItemList` limitado a la página actual.
   - Si se descarta paginar, como mínimo añadir `content-visibility: auto` con `contain-intrinsic-size` a la cuadrícula de tarjetas por debajo del pliegue. No reduce los 3 MB, pero sí el coste de render. _(guía: `defer-rendering-heavy-content`)_
-- [x] **B3. Imágenes OG: unos 2,6 GB (66 KB × 39.700) y la mayor parte del tiempo de build.** _Hecho: `renderOGImage()` (`src/lib/og-image.tsx`) pasa la salida de `resvg` por `sharp` con las opciones elegidas y `sharp.concurrency(1)`; `sharp` es dependencia directa y externa en Vite. En 7 OG reales: 472,6 KB → 165,9 KB (−64,9 %), diferencia máxima 10/255, ~44 ms por imagen; build parcial: 237 OG, todas indexadas, 24 KB de media. `og.test.ts` comprueba el tipo de color 3 y un tope de tamaño. Pendiente: revisión visual del usuario (pares antes/después en el scratchpad) y medir la duración del build completo en el primer CI. También cierra el punto `og-image.tsx:82` de D3._
+- [x] **B3. Imágenes OG: unos 2,6 GB (66 KB × 39.700) y la mayor parte del tiempo de build.** _Hecho: `renderOGImage()` (`src/lib/og-image.tsx`) pasa la salida de `resvg` por `sharp` con las opciones elegidas y `sharp.concurrency(1)`; `sharp` es dependencia directa y externa en Vite. En 7 OG reales: 472,6 KB → 165,9 KB (−64,9 %), diferencia máxima 10/255, ~44 ms por imagen; build parcial: 237 OG, todas indexadas, 24 KB de media. `og.test.ts` comprueba el tipo de color 3 y un tope de tamaño. Comparación antes/después enseñada al usuario el 2026-10-09 (umbral 0,1: 0 % de píxeles distintos; −64–66 %); queda pendiente su visto bueno. Si no convence, cambiar a sin pérdida (`png({ compressionLevel: 9 })`). Falta medir la duración del build completo en el primer CI. También cierra el punto `og-image.tsx:82` de D3._
   - **Decidido:** mantener una OG propia por servidor y comprimir los PNG con paleta cuantizada. El aspecto no debe cambiar de forma apreciable. Las otras opciones descartadas: OG genérica con personalizadas solo para el top N.
   - **Medido** (4 OG reales, codificadas con `sharp`):
     - El PNG que genera `resvg` está mal comprimido: ~67 KB de media.
@@ -167,9 +167,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
   - [x] Las pestañas de `ConfigViewer` no se manejan con las flechas, y el tabpanel apunta a pestañas ocultas en móvil. Resuelto en A1 (radios nativos).
   - [x] `PackageManagerCommand` no comunica qué opción está elegida. Resuelto en A1 (radios nativos).
   - [x] El "Copied" de los botones de copiar no se anuncia: añadir una región `aria-live="polite"`. _(guía: `accessibility`, sección Live Regions)_ Hecho en E7 (`scripts/copy.ts`).
-  - [x] `FilterSheet` sigue siendo enfocable cuando está cerrado. Hecho en E2: `<dialog closedby="any">` con `showModal()`; se quitan el focus trap, el manejo de Esc, la restauración del foco, el bloqueo de scroll del `body` y el fondo falso; el evento `close` llama a `onClose` (props sin cambios, `SearchBar` intacto); fallback de clic en el fondo si no existe `closedBy`; `html:has(dialog:modal) { overflow: hidden }` en `globals.css`; sin animación. Verificado en Chromium a 390 px con `astro dev`: Tab no sale del diálogo, cerrado no es alcanzable con Tab, Esc y clic en el fondo cierran y devuelven el foco a "Filters", reabrir funciona, la página no hace scroll detrás; con el fallback forzado (sin `closedBy` ni atributo) el clic en el fondo cierra. Firefox y WebKit no probados (sin navegadores compatibles en la máquina). Propuesta: `<dialog>` nativo abierto con `showModal()`, con `closedby="any"` para cerrar al tocar fuera. _(guías: `accessibility` sección 12, `light-dismiss-a-dialog`)_
-    - `showModal()` vuelve inerte el resto de la página, así que el focus trap hecho a mano (`FilterSheet.tsx:22-53`) se elimina.
-    - Safari no soporta `closedby`: las guías dan un fallback de unas 10 líneas que cierra con un clic en el `::backdrop`.
+  - [x] `FilterSheet` sigue siendo enfocable cuando está cerrado. Hecho en E2: `<dialog closedby="any">` con `showModal()`; se quitan el focus trap, el manejo de Esc, la restauración del foco, el bloqueo de scroll del `body` y el fondo falso; el evento `close` llama a `onClose` (props sin cambios, `SearchBar` intacto); fallback de clic en el fondo si no existe `closedBy`; `html:has(dialog:modal) { overflow: hidden }` en `globals.css`; sin animación. Verificado en Chromium a 390 px con `astro dev`: Tab no sale del diálogo, cerrado no es alcanzable con Tab, Esc y clic en el fondo cierran y devuelven el foco a "Filters", reabrir funciona, la página no hace scroll detrás; con el fallback forzado (sin `closedBy` ni atributo) el clic en el fondo cierra. Firefox y WebKit no probados (ver F7). _(guías: `accessibility` sección 12, `light-dismiss-a-dialog`)_
   - [x] El `aria-label` de `AsciiArt.tsx:81` está en un `<pre>` sin rol. Resuelto en A2a (`role="img"` en el envoltorio de `AsciiArt.astro`).
   - [x] El `<img>` del logo de la cabecera debería llevar `alt=""`. Resuelto en A8.
 - [x] **E3. Breadcrumbs consistentes:** categoría y guías usan `<span>`, sin `<ol>` ni `aria-current`. _Hecho: `components/Breadcrumbs.astro` (`items: { label, href? }[]`) en /servers, fichas, categorías (también páginas 2+, último elemento = nombre de la categoría) y guías: `nav[aria-label=Breadcrumb]` > `ol` con `flex-wrap`, separadores `/` con `aria-hidden`, último elemento `aria-current="page"` con `wrap-anywhere`. Todas empiezan por Home, como su JSON-LD (las fichas ganan "Home /"). Verificado en el build parcial y con Chromium a 390 px: sin scroll horizontal, los nombres largos se parten._
@@ -185,12 +183,63 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 - [x] **E7. Copiar código:** `scripts/code-copy.ts:40` usa `closest(".rounded-lg")`, que es frágil (mejor un atributo `data-`), y se incluye en las ~39.700 fichas aunque no tengan `CodeBlock`. A los botones de `CodeBlock.tsx:24` les falta `type="button"`.
   - Hecho: `scripts/code-copy.ts` pasa a `scripts/copy.ts`, con contrato de atributos (`data-copy`, `data-copy-root`, `data-copy-text`, `data-copied`) y una región `aria-live` compartida. Nuevo `CodeBlock.astro` (iconos de `@lucide/astro`) en las guías. El script ya no se importa en `BaseLayout`, solo en los componentes y páginas con botones de copiar (`/docs` lo importa de forma transitoria hasta A2d).
   - Pendiente (fuera de alcance): en `/docs` todos los botones se llaman "Copy code"; se podría añadir `aria-describedby` hacia el encabezado de la sección.
-  - Pendiente (fuera de alcance): hoy ninguna guía muestra el ejemplo de configuración, porque los `popularServers` de `lib/guide-data.ts` (`github`, `filesystem`…) no coinciden con ningún slug del registro y `getSampleConfig()` devuelve `null`. Hay que pasarlos a slugs reales.
-- [x] **E8. `?page=` fuera de rango en `/servers`:** se corrige en pantalla, pero la URL conserva el valor erróneo. _Hecho: `readSearchState()` y `toSearchString()` en `lib/server-search.ts` validan la URL (listas con lista blanca y sin duplicados, `sort`/`per_page` conocidos, `page` entero positivo) y la isla la reescribe en forma canónica con `replaceState` al cargar; `?page=` se acota cuando llega el índice, `?q=` restaurado ya no se pierde durante el debounce y se conservan parámetros ajenos (`utm_\*`). `RUNTIMES`/`TRANSPORTS`pasan a`server-search.ts`. Se quitó el comentario "server component" y el `eslint-disable`de`SearchBar.tsx` (D3 ya no debe tocar ese archivo).\_
+  - Resuelto en C1 (`c869fbd`); se conserva el contexto original: hoy ninguna guía muestra el ejemplo de configuración, porque los `popularServers` de `lib/guide-data.ts` (`github`, `filesystem`…) no coinciden con ningún slug del registro y `getSampleConfig()` devuelve `null`. Hay que pasarlos a slugs reales.
+- [x] **E8. `?page=` fuera de rango en `/servers`:** se corrige en pantalla, pero la URL conserva el valor erróneo. Hecho en `2f92409`: `readSearchState()` y `toSearchString()` en `lib/server-search.ts` validan la URL (listas con lista blanca y sin duplicados, `sort`/`per_page` conocidos, `page` entero positivo) y la isla la reescribe en forma canónica con `replaceState` al cargar. `?page=` se acota cuando llega el índice, un `?q=` restaurado ya no se pierde durante el debounce y se conservan los parámetros ajenos (como `utm_source`). `RUNTIMES` y `TRANSPORTS` pasan a `server-search.ts`. Se quitó el comentario "server component" y el `eslint-disable` de `SearchBar.tsx`.
 
-## Orden sugerido
+## Commits por tarea
 
-1. C y D (fallos y limpieza), más E de bajo esfuerzo.
-2. A3, A5, A6 y A8 (mejoras rápidas de Astro).
-3. A1, A2, B1 y B2 (fuera React y páginas más ligeras).
-4. A4, A7 y B3 (necesitan decisiones de CI y de hosting).
+| Tarea | Commit    | Tarea | Commit    | Tarea | Commit    |
+| ----- | --------- | ----- | --------- | ----- | --------- |
+| P0    | `cbe4a0c` | A2d   | `8f90461` | E3    | `088565f` |
+| A1    | `1cde148` | A3    | `7e5d6b9` | E4    | `5d8e4bc` |
+| A2a   | `94ad047` | A5    | `d63704e` | E5    | `a651741` |
+| A2b   | `d40631c` | A6    | `609d60a` | E6    | `162f6d6` |
+| A2c   | `1931218` | A7    | `bc14412` | E7    | `dc32aa3` |
+| A8    | `290e21b` | C4    | `f626c1c` | E8    | `2f92409` |
+| B1    | `9769129` | C5    | `cb41573` | D2    | `0911788` |
+| B2    | `9aa28f5` | C6    | `430a357` | D3    | `68a799b` |
+| B3    | `09ece47` | C7    | `a0916bc` | D4    | `f3b6385` |
+| C1    | `c869fbd` | C8    | `f9c718b` | E1    | `3def04d` |
+| C2    | `24a5f8d` | C3    | `8585247` | E2    | `b0a4ab8` |
+
+## F. Seguimiento de la revisión adversaria (pendiente, otra sesión)
+
+Notas menores que dejaron los revisores al implementar A–E (98 en total, ninguna bloqueante). La documentación ya se corrigió; esto es lo que queda. Entre paréntesis, la tarea donde salió.
+
+- [ ] **F1. Accesibilidad.**
+  - Copiar (E7): muestra "Copied" aunque la copia falle (no espera a `copyText()`); varios botones comparten la región en vivo y se pisan los avisos; sin JS los botones son enfocables pero no hacen nada.
+  - Paginación de categorías (B2, E3): "Anterior/Siguiente" desactivados son `<a role="link" aria-disabled>` sin `href` (debería ser un `<span aria-disabled>`). En la página 2 y siguientes la miga de pan marca la categoría como página actual y no coincide con el JSON-LD `BreadcrumbList`.
+  - Diálogo de filtros (E2): se nombra con `aria-label` en vez de `aria-labelledby` a un encabezado real (el título visible es un `<p>`); en Safari el fallback se cierra si arrastras desde dentro y sueltas fuera (usar `pointerdown`+`pointerup`); la página salta de lado al ocultar la barra de scroll (`scrollbar-gutter: stable`).
+  - Selector de configuración (A1): sin JS, marcar una pastilla no cambia el panel; en alto contraste (`forced-colors`) no se ve cuál está elegida; `label` envuelve el input y además usa `for`/`id` (riesgo de ids duplicados).
+  - Tarjetas y fichas: las estadísticas de `ServerCard` tienen `aria-label` sin rol (en las dos copias, A2c); los iconos de GitHub y Docker de `ServerSidebar.astro` perdieron su `<title>` (A2c); el alt del icono del servidor repite el h1 (A8).
+  - Animaciones (A2b): el barrido de la home y el 404 anima `top` en bucle infinito y no se puede pausar (guía `motion`: usar `transform`).
+  - Docs (A2d): el scroll-spy no marca `aria-current` en el enlace activo (guía `scrollspy`); la regla `li:has(a:target-current)` no hace nada porque el borde está en el `<ul>`.
+  - Cabecera (C7): el `<nav>` no tiene `flex-wrap` y puede desbordar a 320 px con zoom de texto.
+- [ ] **F2. Fallos funcionales.**
+  - `/servers` (B1): si falla la descarga de `servers.json` con estado no por defecto, se queda "Loading servers…" para siempre junto al mensaje de error; en móvil, mientras carga, el botón del panel de filtros muestra el total en vez del recuento filtrado; en `/servers` sin estado el índice se pide con prioridad baja aunque la búsqueda es la interacción principal (guía `deprioritize-background-fetches`).
+  - E8: `hasUrlState` se calcula con los parámetros crudos, así que `?page=abc` (que se normaliza a `/servers`) no baja a prioridad baja; usar `!isDefaultState(parsed)` y quitar el segundo parseo.
+  - Datos (B2): algunas categorías listan el mismo slug dos veces (ai: 2.779 entradas, 2.770 URLs únicas). Viene del registry; deduplicar al paginar.
+- [ ] **F3. Tests que no protegen.**
+  - P0: el test del tope solo mira 3 de los 8 slugs representativos y de forma condicional.
+  - C1: `guides.test.ts` pasa si la lista de populares sale vacía (`if (!sample) continue`).
+  - C8: el test del sitemap no falla si vuelven a salir categorías sin nombre.
+  - B3: el tope de tamaño solo cubre la OG de docs, no las de servidores.
+  - C5: el orden de nombres que empiezan por puntuación está documentado pero sin test.
+  - E5: el test "lists every static route" depende de que `WEB_MAX_SERVER_PAGES` no esté definida.
+- [ ] **F4. Simplificaciones de código (opcional).**
+  - Opciones de ordenación en tres sitios (`SORT_OPTIONS`, el tipo `SortOption` y dos `<option>` a mano): derivar el tipo del array (C5, E8). Parámetros de URL también en tres sitios (B1).
+  - `RESTORE_CHOICE_SCRIPT` es una cadena minificada a mano que duplica la lógica de `radio-panels.ts`, sin tipos ni lint (A1).
+  - `Pagination` acepta `onPageChange` y `hrefFor` a la vez o ninguno (B2); `ServerSidebar` mezcla componentes y la cadena `"docker"` en el tipo del icono (A2c).
+  - Ramas de fallback inalcanzables (C8, E3); `renderBuildReport` exportado sin uso (A8); alias `analyticsToken` innecesario (A6).
+  - Rendimiento menor: `getPopularOfficialServers()` reordena en cada página de guía (C1); el script de tiempo relativo se carga en fichas sin fecha y el chunk compartido crea un `Intl.DateTimeFormat` que el cliente no usa (E4); `/docs-scroll-spy.css` está en `public/` sin hash y bloquea el render (A2d).
+  - La cifra del ahorro de B3 aparece en cinco sitios (comentario, docs, WEB_PLAN, commit…); dejar una sola fuente.
+- [ ] **F5. Herramientas (opcional).** `integrations/` no pasa por oxlint (A8); `scripts/generate-icons.ts` no es un script de npm (E6); la lista de slugs representativos está duplicada en código y docs (P0).
+- [ ] **F6. CSP (opcional).** Documentar por qué no se usa `require-trusted-types-for 'script'` (A7); el hash de `RESTORE_CHOICE_SCRIPT` se añade en todas las páginas aunque solo lo usen algunas (A7); Astro emite la CSP al final del `<head>`, así que el hash de las speculation rules sobra (A7).
+- [ ] **F7. Verificaciones pendientes.** Probar A1 y E2 en Firefox y WebKit (Playwright ya instalado en el scratchpad; respetar las reglas de memoria de `AGENTS.md`); comprobación en navegador de A2b (barrido y revelado con y sin `prefers-reduced-motion`); prueba en ejecución de B1 (no se pudo: `astro dev` se colgaba); medir el build completo tras B3 en el primer CI.
+
+## Siguiente sesión
+
+1. Visto bueno del usuario a las OG de B3.
+2. F1–F3 (accesibilidad, fallos y tests), luego F7.
+3. F4–F6 si compensa.
+4. Aplazados: A4 (build incremental, replantear con Vercel) y D1 (restos de Next.js).
