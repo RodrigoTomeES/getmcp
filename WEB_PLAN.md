@@ -110,7 +110,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
   - 2.779 tarjetas sin paginar más ~300 KB de JSON-LD `ItemList` (`src/pages/category/[slug].astro:70-81,122-128`).
   - Propuesta: `paginate()` en `/category/[slug]/[...page].astro`, con el `ItemList` limitado a la página actual.
   - Si se descarta paginar, como mínimo añadir `content-visibility: auto` con `contain-intrinsic-size` a la cuadrícula de tarjetas por debajo del pliegue. No reduce los 3 MB, pero sí el coste de render. _(guía: `defer-rendering-heavy-content`)_
-- [ ] **B3. Imágenes OG: unos 2,6 GB (66 KB × 39.700) y la mayor parte del tiempo de build.**
+- [x] **B3. Imágenes OG: unos 2,6 GB (66 KB × 39.700) y la mayor parte del tiempo de build.** _Hecho: `renderOGImage()` (`src/lib/og-image.tsx`) pasa la salida de `resvg` por `sharp` con las opciones elegidas y `sharp.concurrency(1)`; `sharp` es dependencia directa y externa en Vite. En 7 OG reales: 472,6 KB → 165,9 KB (−64,9 %), diferencia máxima 10/255, ~44 ms por imagen; build parcial: 237 OG, todas indexadas, 24 KB de media. `og.test.ts` comprueba el tipo de color 3 y un tope de tamaño. Pendiente: revisión visual del usuario (pares antes/después en el scratchpad) y medir la duración del build completo en el primer CI. También cierra el punto `og-image.tsx:82` de D3._
   - **Decidido:** mantener una OG propia por servidor y comprimir los PNG con paleta cuantizada. El aspecto no debe cambiar de forma apreciable. Las otras opciones descartadas: OG genérica con personalizadas solo para el top N.
   - **Medido** (4 OG reales, codificadas con `sharp`):
     - El PNG que genera `resvg` está mal comprimido: ~67 KB de media.
@@ -156,7 +156,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 - [ ] **D1. Restos de Next.js:** borrar `packages/web/.next/`, `next-env.d.ts` y `tsconfig.tsbuildinfo` (761 KB). Quitar del `.gitignore` las entradas que se añadieron para ignorarlos. Revisar el `include: ["**/*"]` de `tsconfig.json`.
 - [x] **D2. Código y assets muertos:** `src/lib/security-headers.ts` (o se resuelve en A7), `@keyframes fade-in-up` (`globals.css`), `assets/Inter-SemiBold.ttf`. También `public/logo.svg` y `logo-light.svg`, que solo usa el README.
   - **Hecho:** borrados `@keyframes fade-in-up` e `Inter-SemiBold.ttf` (las plantillas OG piden ahora `fontWeight: 700`, que es lo que satori ya renderizaba). Los logos del README se movieron a `.github/assets/`. `security-headers.ts` queda para A7.
-- [ ] **D3. Comentarios de Next.js y Vercel:** ~~`SearchBar.tsx:63`~~ (hecho en E8) y `ConfigViewer.tsx:30` ("server component" y `eslint-disable`), ~~`BaseLayout.astro:17`~~ (hecho en A6), `og-image.tsx:82`.
+- [ ] **D3. Comentarios de Next.js y Vercel:** ~~`SearchBar.tsx:63`~~ (hecho en E8) y `ConfigViewer.tsx:30` ("server component" y `eslint-disable`), ~~`BaseLayout.astro:17`~~ (hecho en A6), ~~`og-image.tsx:82`~~ (hecho en B3).
 - [x] **D4. Cifras escritas a mano.** Hecho en `f3b6385`. Queda opcional: "10 commands" (`StatsBar.tsx`, `CliShowcase.tsx`) podría salir de `COMMANDS.length`.
 
 ## E. Accesibilidad y SEO

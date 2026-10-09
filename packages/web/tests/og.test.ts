@@ -6,12 +6,15 @@ import { addOGGlow } from "@/lib/og-image";
 
 const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 
-function expectPng(png: Uint8Array) {
+function expectPng(png: Uint8Array, maxBytes?: number) {
   expect(Array.from(png.subarray(0, 8))).toEqual(PNG_SIGNATURE);
   // IHDR width and height (big-endian) live at bytes 16-23.
   const view = new DataView(png.buffer, png.byteOffset, png.byteLength);
   expect(view.getUint32(16)).toBe(1200);
   expect(view.getUint32(20)).toBe(630);
+  // IHDR colour type (byte 25) 3 = indexed: sharp re-encodes as a 256-colour palette.
+  expect(png[25]).toBe(3);
+  if (maxBytes !== undefined) expect(png.byteLength).toBeLessThan(maxBytes);
 }
 
 describe("addOGGlow", () => {
@@ -30,7 +33,7 @@ describe("addOGGlow", () => {
 
 describe("OG images", () => {
   it("renders a page OG image", async () => {
-    expectPng(await DOCS_OG.render());
+    expectPng(await DOCS_OG.render(), 40_000);
   });
 
   it("renders a server OG image, including CJK and Hebrew text", async () => {

@@ -41,8 +41,8 @@ export default defineConfig({
   integrations: [react(), buildReport()],
   vite: {
     plugins: [tailwindcss()],
-    // resvg ships a native `.node` binary that must be loaded by Node, not bundled.
-    optimizeDeps: { exclude: ["@resvg/resvg-js"] },
-    ssr: { external: ["@resvg/resvg-js"] },
+    // resvg and sharp (OG images) ship native binaries that must be loaded by Node, not bundled.
+    optimizeDeps: { exclude: ["@resvg/resvg-js", "sharp"] },
+    ssr: { external: ["@resvg/resvg-js", "sharp"] },
   },
 });

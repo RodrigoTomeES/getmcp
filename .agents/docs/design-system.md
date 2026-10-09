@@ -96,7 +96,7 @@ Font files in `packages/web/assets/`:
 - `Inter-Regular.ttf` (400)
 - `Inter-Bold.ttf` (700)
 
-Used exclusively for OG image generation at build time (satori + `@resvg/resvg-js`, see `src/lib/og-image.tsx`). CJK and Hebrew text falls back to the Noto Sans fonts in the same folder.
+Used exclusively for OG image generation at build time (satori + `@resvg/resvg-js`, then `sharp` re-encodes the PNG as a 256-colour palette PNG, ~65% smaller with no visible change; see `src/lib/og-image.tsx`). CJK and Hebrew text falls back to the Noto Sans fonts in the same folder.
 
 ### Font Weights
 
@@ -690,15 +690,15 @@ Enhanced metadata display on server listing cards.
 
 ## Dependencies
 
-| Package                      | Purpose                   |
-| ---------------------------- | ------------------------- |
-| `astro@^7.3.5`               | Framework (static output) |
-| `@astrojs/react@^7.0.0`      | React islands             |
-| `react@^19.3.0`              | UI library                |
-| `tailwindcss@^4.3.3`         | CSS framework             |
-| `@tailwindcss/vite@^4.3.3`   | Vite integration          |
-| `@lucide/astro`              | Icons in `.astro` files   |
-| `lucide-react`               | Icons in React islands    |
-| `satori` + `@resvg/resvg-js` | OG image generation       |
+| Package                                | Purpose                   |
+| -------------------------------------- | ------------------------- |
+| `astro@^7.3.5`                         | Framework (static output) |
+| `@astrojs/react@^7.0.0`                | React islands             |
+| `react@^19.3.0`                        | UI library                |
+| `tailwindcss@^4.3.3`                   | CSS framework             |
+| `@tailwindcss/vite@^4.3.3`             | Vite integration          |
+| `@lucide/astro`                        | Icons in `.astro` files   |
+| `lucide-react`                         | Icons in React islands    |
+| `satori` + `@resvg/resvg-js` + `sharp` | OG image generation       |
 
 No UI component library (shadcn, Radix, etc.). All components are custom-built.
