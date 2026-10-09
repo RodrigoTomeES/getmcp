@@ -14,26 +14,38 @@ export function toSentence(text: string): string {
   return /[.!?…]["')\]]*$/.test(trimmed) ? trimmed : `${trimmed}.`;
 }
 
-export function relativeTime(isoDate: string, now = Date.now()): string {
+const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" });
+
+/** Absolute date such as "Oct 3, 2026" (UTC), or null when `isoDate` is not a valid date. */
+export function formatDate(isoDate: string): string | null {
+  const time = new Date(isoDate).getTime();
+  return Number.isNaN(time) ? null : dateFormat.format(time);
+}
+
+const relativeFormat = new Intl.RelativeTimeFormat("en", { style: "narrow" });
+
+const MINUTE = 60_000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+const RELATIVE_UNITS: Array<[Intl.RelativeTimeFormatUnit, number]> = [
+  ["year", 365 * DAY],
+  ["month", 30 * DAY],
+  ["day", DAY],
+  ["hour", HOUR],
+  ["minute", MINUTE],
+];
+
+/**
+ * Past time relative to `now`, such as "3d ago", "5mo ago" or "2y ago". Returns
+ * null for an invalid date and for anything under a minute old, including
+ * future dates (clock skew), so callers keep showing the absolute date.
+ */
+export function formatRelativeTime(isoDate: string, now = Date.now()): string | null {
   const then = new Date(isoDate).getTime();
-  if (Number.isNaN(then)) return "\u2014";
-
-  const seconds = Math.floor((now - then) / 1000);
-
-  if (seconds < 60) return "just now";
-
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${months}mo ago`;
-
-  const years = Math.floor(months / 12);
-  return `${years}y ago`;
+  if (Number.isNaN(then)) return null;
+  const elapsed = Math.max(0, now - then);
+  for (const [unit, size] of RELATIVE_UNITS) {
+    if (elapsed >= size) return relativeFormat.format(-Math.floor(elapsed / size), unit);
+  }
+  return null;
 }

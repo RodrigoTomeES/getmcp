@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import { getAllServers } from "@getmcp/registry";
 import { generators } from "@getmcp/generators";
 import {
@@ -51,5 +51,33 @@ describe("server detail helpers", () => {
     for (const { params, props } of paths.slice(0, 100)) {
       expect(props.server.slug).toBe(params.id);
     }
+  });
+
+  describe("WEB_MAX_SERVER_PAGES", () => {
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it("caps the paths and keeps the representative slugs", () => {
+      vi.stubEnv("WEB_MAX_SERVER_PAGES", "50");
+      const paths = getServerPaths();
+      expect(paths.length).toBe(50);
+      const ids = new Set(paths.map((p) => p.params.id));
+      expect(ids.size).toBe(50);
+      for (const slug of ["github-github", "pg-aiguide", "apify-apify"]) {
+        if (servers.some((s) => s.slug === slug)) expect(ids.has(slug)).toBe(true);
+      }
+      for (const { params, props } of paths) {
+        expect(props.server.slug).toBe(params.id);
+      }
+    });
+
+    it("ignores invalid values", () => {
+      const all = new Set(servers.map((s) => s.slug)).size;
+      for (const value of ["", "0", "-5", "abc", "1.5"]) {
+        vi.stubEnv("WEB_MAX_SERVER_PAGES", value);
+        expect(getServerPaths().length).toBe(all);
+      }
+    });
   });
 });

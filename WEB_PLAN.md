@@ -9,12 +9,13 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 
 **Guías de referencia:** skill `modern-web-guidance` (`.claude/skills/modern-web-guidance`). Antes de implementar un punto de HTML, CSS o JS de cliente: `npx -y modern-web-guidance@latest retrieve "<id>"`. Los IDs aplicables van indicados en cada punto como _(guía: `id`)_.
 
-**Política de navegadores (pendiente de decidir):** las guías dan por seguras las funciones _Baseline widely available_ y piden fallback para el resto. Propuesta: mejora progresiva, es decir, usar funciones nuevas solo si sin ellas la web sigue funcionando (transiciones, speculation rules, `closedby`), sin polyfills. Si se acepta, conviene anotarlo en `CLAUDE.md`.
+**Política de navegadores (decidida):** mejora progresiva. Se usan funciones nuevas solo si sin ellas la web sigue funcionando (transiciones, speculation rules, `closedby` con su pequeño fallback). Sin polyfills. Está anotada en `AGENTS.md`.
 
 ## Cómo verificar cada cambio
 
 - Comprobaciones ligeras: `npx vitest run --project web`, `npx astro check` (en `packages/web`), `npx oxlint packages/web/src`.
 - Para cambios de contenido: comparar `astro dev` contra el último `packages/web/dist` (head, JSON-LD, texto, enlaces y PNG de OG).
+- Build parcial (para revisar HTML construido: CSP, OG, tiempos): desde `packages/web`, `WEB_MAX_SERVER_PAGES=200 npx astro build --outDir node_modules/.partial-dist` (unos 45 s, 238 páginas, ~500 archivos) y borrar la carpeta después. Siempre incluye `github-github`, `data-prism`, `pg-aiguide`, `apify-apify`, `sh-mcp`, `pretrip`, `bev-door` y `0bridge`. El `outDir` debe estar en el mismo disco que el repo.
 - Build completo solo si hace falta: `npm run build` (raíz) y luego `npm run build -w @getmcp/web`. Tarda unos 32 min y genera unos 79.500 archivos en `packages/web/dist`. `--outDir` en otro disco falla (`EXDEV`).
 - Regresión visual contra producción: producción solo se reconstruye una vez al día, así que las capturas del mismo día siguen siendo válidas. Hay que usar la misma rama de datos (`chore(registry): daily sync`) que `origin/main`.
 
@@ -22,13 +23,14 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 
 - [x] **Fuente del logo ASCII y fallback** (`fa17ffc`): subset `symbols2` de Fira Mono con `unicode-range` y `Fira Mono Fallback` con métricas. Sustituido por A3.
 - [x] **C6** (`430a357`): el botón "Browse servers" del 404 apunta a `/servers` (`src/components/NotFound.tsx`).
+- [x] **P0. Builds parciales**: `WEB_MAX_SERVER_PAGES` en `src/lib/server-paths.ts` limita las fichas `/servers/[id]` y sus OG (sin definir = todas). Probado con 200: 43 s y 503 archivos.
 - [x] **D4** (`f3b6385`): `APP_COUNT` en `src/lib/constants.ts` sustituye los "19 AI apps" y "N more" escritos a mano. Salida verificada como idéntica.
 
 ---
 
 ## A. Funciones nativas de Astro
 
-- [ ] **A1. Quitar React de las fichas de servidor.**
+- [x] **A1. Quitar React de las fichas de servidor.** Hecho: `ConfigViewer.astro` y `PackageManagerCommand.astro` con radios nativos en `<fieldset>` (`name="config-app"` / `"package-manager"`, `autocomplete="off"`), `scripts/radio-panels.ts` y `RestoreChoice.astro` (script inline constante en `lib/restore-choice.ts`; A7 debe añadir su hash). Fichas y guías sin `astro-island` ni `client.*.js`; texto visible y `<pre>` idénticos al antes. Parpadeo verificado: con los módulos bloqueados, la restauración inline ya muestra la opción guardada. Sin `hidden="until-found"`. El título "Configuration" pasa a `h2`.
   - Pasar `ConfigViewer` y `PackageManagerCommand` a `.astro`, con los paneles pre-renderizados y `hidden`.
   - **Selector:** usar un grupo de `<input type="radio">` nativo con aspecto de pastilla, en lugar de los `role="tab"` actuales.
     - Da gratis el teclado (flechas) y la semántica. Hoy los `role="tab"` no responden a las flechas, y las guías piden que si usas `role="tab"` se comporte como una pestaña completa.
@@ -37,13 +39,14 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
   - Hoy cada una de las ~39.700 fichas carga `client.*.js` (213 KB, react-dom) y `ConfigViewer.*.js` (43 KB). Este arrastra todos los textos de `GUIDES` porque importa `APP_LABELS` desde `lib/guide-data.ts`.
   - Arregla de paso el parpadeo al hidratar: se pinta la primera pestaña o "npm" y luego salta a la preferencia guardada.
   - Archivos: `src/pages/servers/[id].astro:211,268`, `src/pages/guides/[app].astro:144`.
-- [ ] **A2. Quitar React donde sobra en el resto.**
+- [x] **A2. Quitar React donde sobra en el resto.**
+  - Progreso: A2a hecho (home sin islas). `AsciiArt.astro` pinta las dos capas en estático (envoltorio `role="img" aria-label="getmcp"`, `<pre>` con `aria-hidden`) y revela la maciza con `motion-safe:animate-ascii-reveal` (`clip-path` 250 ms con `steps(40)`); se quita el cursor del revelado. `AnimatedCommand.astro` pinta el primer comando completo y su script arranca en la pausa tras escribir; actualiza el `data-copy` de los dos botones (`scripts/copy.ts`). `CliShowcase.astro` usa radios nativos (`name="cli-command"`) con `scripts/radio-panels.ts` y 10 paneles prerenderizados; las flechas recorren las tarjetas en orden lineal. Verificado renderizando cada componente aislado (Astro container frente a `renderToStaticMarkup` del `.tsx`): `<pre>` y texto iguales salvo lo esperado (capa maciza y comando inicial completos, `legend`, 9 paneles ocultos más). Comprobado con `astro dev`: 0 `astro-island`, sin `client.*.js`, 10 paneles (9 `hidden`). En navegador (Chromium y Firefox 157): sin JS el logo sale completo y se ve el panel `add`; con movimiento reducido no hay revelado, ni parpadeo, ni animación del comando; el comando no se vacía al cargar y copiar a mitad de animación copia el comando completo; las flechas recorren las tarjetas (con anillo de foco solo con teclado); en Firefox, tras elegir tarjeta y recargar, radio y panel coinciden; el LCP es el párrafo de la cabecera (608 ms), no el logo. Nota: el `dist/` antiguo (ignorado por git) hace que `scanner.globs` de `@tailwindcss/oxide` se cuelgue, y con él `astro dev` y el build parcial; para verificar se excluyó con `@source not "../../dist"` en una config temporal sin commitear. A2b hecho (404 sin React): `NotFound.astro` pinta en estático el 404 ASCII (envoltorio `role="img" aria-label="Error 404"`, capa maciza con `motion-safe:animate-ascii-reveal`, sin cursor de revelado), la terminal y el CTA; el barrido de scanline lleva `motion-reduce:hidden` y el cursor `motion-safe:animate-[blink_1s_step-end_infinite]`; un script de dos líneas escribe `location.pathname` en `[data-pathname]` (el HTML muestra `/unknown`, como el SSR anterior). Comprobado con `astro dev`: 0 `astro-island`, sin `client.*.js`; el `<pre>` de fondo es idéntico y el texto igual salvo la capa maciza completa. No se pudo probar en navegador (ninguno accesible desde esta máquina); se comprobó que el CSS generado incluye las tres utilidades de movimiento. A2c hecho (componentes solo de servidor a `.astro`): `ServerSidebar`, `CategoryGrid`, `PopularServers`, `SupportedApps`, `StatsBar`, `FormatShowcase`, `TeamFeatures`, `SecurityFeatures` y `DeveloperExperience` pasan a `.astro` (iconos de `@lucide/astro`; GitHub y Docker como `<svg>` en línea con las rutas de simple-icons, CC0) y se quita `@icons-pack/react-simple-icons`. `ServerCard` se duplica: `ServerCard.astro` para las páginas estáticas y `ServerCard.tsx` solo en la isla de `SearchBar`, con comentario de mantenerlos sincronizados; `ServerCardData` pasa a `lib/server-detail.ts`. `BadgeCheck` y `Lock` de `servers/[id].astro` pasan a `@lucide/astro`. Las páginas de servidor, categoría y home ya no renderizan React. El contenido de los `<pre>` va en el frontmatter o en una sola línea (Astro quita los saltos de línea con sangría junto a etiquetas, así que se conservan los `{" "}`). Verificado con `astro dev` antes/después (/, 6 servidores con y sin estadísticas, Docker, homepage, +N etiquetas y secretos, /category/ai y /category/developer-tools): `<pre>` idénticos byte a byte y texto, clases y atributos idénticos salvo atributos de SVG (solo cambia "hace 18h/19h" por la hora); 0 `astro-island` en esas páginas; `/servers` sigue renderizando las tarjetas de la isla. Nota: `@tailwindcss/oxide` volvió a colgarse escaneando `packages/web` (con `dist/`), y para verificar se limitó la fuente a `src` en una config temporal sin commitear. A2d hecho (docs sin React): `DocsContent.astro` y `DocsSidebar.astro` sustituyen a los `.tsx`; los 15 ejemplos usan `CodeBlock.astro` (que trae `scripts/copy.ts`), así que se quita el script transitorio de `docs.astro` y se borran `CodeBlock.tsx` y `hooks/use-clipboard.ts`. Las reglas del scroll-spy pasan, sin cambios, a `public/docs-scroll-spy.css`, enlazado desde el `<head>` de `docs.astro` (fuera del pipeline de CSS; cubre el paso del scroll-spy de A7). El diagrama ASCII va en el frontmatter porque la fila de guiones confunde la detección del frontmatter de oxlint. Verificado con `astro dev` antes/después: los 15 `<pre>` idénticos byte a byte (solo cambia `data-copy-text="true"` por el atributo sin valor), texto y secuencia de etiquetas/clases idénticos, 0 `astro-island`, 15 botones de copiar. No se pudo probar en navegador el scroll-spy ni el copiado (el script lee el `textContent` del `<code>`, igual que antes). React queda solo en la isla `SearchBar` de `/servers`.
   - `AsciiArt`: revelado con una animación CSS (`clip-path` con `steps()`) dentro de `@media (prefers-reduced-motion: no-preference)`. Así el logo se ve completo sin JS y sin animación para quien la desactiva. Hoy sin JS el logo macizo no aparece nunca.
   - `CliShowcase`: mismo patrón de radios que A1.
   - `AnimatedCommand` y `NotFound`: `.astro` más un script pequeño.
   - Componentes React que solo se renderizan en el servidor (ServerCard, ServerSidebar, CategoryGrid, PopularServers, SupportedApps, StatsBar, FormatShowcase, TeamFeatures, SecurityFeatures, DeveloperExperience, DocsContent, DocsSidebar, CodeBlock): pasarlos a `.astro`. Ojo, `ServerCard` también lo usa la isla `SearchBar`.
   - Ganancia: la home y el 404 sin react-dom, y menos `renderToString` en el build.
-- [~] **A3. API de fuentes de Astro.**
+- [x] **A3. API de fuentes de Astro.** Hecho en `7e5d6b9`.
   - **Decisión:** `fontProviders.fontsource()`, no `npm`, para tener la config más simple y quitar la dependencia.
   - Config: Fira Mono en pesos `[400, 500]`, subsets `["latin", "symbols2"]` y `fallbacks: ["monospace"]`.
   - Uso: un único `<Font cssVariable="--font-fira-mono" preload={fontPreload} />` en `BaseLayout.astro`, y `--font-mono: var(--font-fira-mono)` en `@theme inline`.
@@ -64,11 +67,11 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
     - El logo mide 424 px en la home y 365 px en el 404, igual que en producción.
     - En Windows, la fallback generada (Courier New) iguala los anchos de Fira Mono (423,8 px frente a 424 px).
     - Si el proveedor falla en CI, cambiar a `fontProviders.npm()` es una línea.
-- [ ] **A4. Build incremental** (`experimental.incrementalBuild`, Astro 7.2 o posterior).
+- [ ] **A4. Build incremental** (`experimental.incrementalBuild`, Astro 7.2 o posterior). **Aplazado:** el build se ejecuta en Vercel, así que hay que replantear dónde vive la caché antes de hacerlo.
   - Devolver `cacheKey` en `getStaticPaths()` de `servers/[id]` y de sus endpoints de OG.
   - Necesita persistir `node_modules/.astro` en CI (~3 GB, `actions/cache`); `astro build --force` reconstruye todo.
   - Es experimental y no está probado con endpoints. Es la mayor mejora posible del build diario (~32 min).
-- [ ] **A5. Precarga de la siguiente página y view transitions nativas.**
+- [x] **A5. Precarga de la siguiente página y view transitions nativas.** _Hecho: `SPECULATION_RULES` en `BaseLayout.astro` (una regla de documento, `prefetch`, `"moderate"`, excluye `*.png`, `*.xml` y `*.json`; sin `prerender`), `@view-transition` dentro del bloque `no-preference` de `globals.css` y `<link rel="expect" href="#site-header" blocking="render">` (el header, no `<main>`, para no esperar al contenido completo)._
   - **Precarga:** speculation rules nativas en `BaseLayout.astro`, en lugar del `prefetch` de Astro. _(guía: `improve-next-page-load-performance`)_
     - Una regla de documento (no una lista de URLs) con `prefetch` y `eagerness: "moderate"`, que se activa al pasar el ratón.
     - Excluir `*.png`, `*.xml` y `*.json`.
@@ -79,14 +82,16 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
     - **No** apuntar a `#main-content`: en `/servers` (19,8 MB) bloquearía el render hasta parsear todo.
     - Firefox no soporta las transiciones entre documentos: navega sin animación.
   - **No** usar `<ClientRouter />`: es incompatible con `security.csp` y obliga a re-enlazar scripts.
-- [ ] **A6. `astro:env`** para `PUBLIC_CF_ANALYTICS_TOKEN`.
+- [x] **A6. `astro:env`** para `PUBLIC_CF_ANALYTICS_TOKEN`.
   - `envField.string({ context: "client", access: "public", optional: true })`, y borrar la declaración a mano de `src/env.d.ts`.
-  - Ojo: `.github/workflows/web.yml` nunca define el token, así que la analítica no se activa. Hay que decidir dónde se configura.
-- [ ] **A7. CSP integrada** (`security.csp`). Mejor después de A1 y A2.
+  - **Hecho:** `env.schema` en `astro.config.mjs`; `BaseLayout.astro` lo importa de `astro:env/client` y solo pinta el beacon si hay token. `src/env.d.ts` borrado. El token se configura como variable de entorno del proyecto en Vercel (donde corre el build); recordatorio en ROADMAP fase 2 para moverlo si cambia el host. El comentario de Vercel de `BaseLayout.astro` (D3, en realidad la línea 22) ya está reescrito. Verificado con `astro dev`: con `PUBLIC_CF_ANALYTICS_TOKEN=test` sale `data-cf-beacon='{"token":"test"}'`, sin él no hay beacon.
+  - Decidido: el token se define como variable de entorno del proyecto en Vercel, donde se hace el build (recordatorio en ROADMAP para moverlo si cambia el host).
+- [x] **A7. CSP integrada** (`security.csp`). Mejor después de A1 y A2.
+  - **Hecho:** `security.csp` en `astro.config.mjs` (lista blanca con `'self'` y el host del beacon, sin `'unsafe-inline'` en scripts, `style-src-attr 'unsafe-inline'`, comentario con el porqué). Los dos scripts `is:inline` (speculation rules y `RESTORE_CHOICE_SCRIPT`) añaden su hash con `Astro.csp.insertScriptHash` en el frontmatter de `BaseLayout.astro`: añadido desde `RestoreChoice.astro` se perdía, porque el `<meta>` ya se ha pintado al llegar al `<body>`. El scroll-spy ya estaba en `public/docs-scroll-spy.css` (A2d). `security-headers.ts` borrado; las cabeceras que solo puede mandar el host (HSTS, nosniff, X-Frame-Options/`frame-ancestors`, Referrer-Policy) quedan listadas en ROADMAP fase 2 (decisión: sin `vercel.json` ni `_headers`). Verificado con build parcial (428 páginas): todas llevan el `<meta>` CSP, los 1279 bloques `<script>`/`<style>` en línea tienen su hash, y el HTML es idéntico al de antes salvo el `<meta>`. Astro lo coloca al final del `<head>`, así que no gobierna lo anterior (fuente, speculation rules), pero sí todo el `<body>`. En Chromium (Playwright) sobre el build parcial: sin violaciones de CSP ni errores en /, /servers, una ficha, /docs, una guía, una categoría y el 404; la isla de `/servers` hidrata y busca, la restauración de la opción guardada funciona y `/docs-scroll-spy.css` carga.
   - Hashes automáticos de scripts y estilos en línea; el beacon de Cloudflare va en `scriptDirective.resources`.
   - En páginas estáticas sale como `<meta>`. Para `frame-ancestors` y `report-to` hace falta un `_headers` en el host.
   - Se elimina `src/lib/security-headers.ts`, que hoy no importa nadie.
-- [ ] **A8. Logo SVG como componente, prioridad de imágenes y medición del build como integración.**
+- [x] **A8. Logo SVG como componente, prioridad de imágenes y medición del build como integración.** _Hecho: el logo sigue como `<img src="/icon.svg">` (decisión del usuario: no se inlinea) sin `fetchpriority` y con `alt=""`; el icono del servidor ya no lleva `loading="lazy"`; `scripts/build.ts` y `scripts/measure.ts` pasan a `integrations/build-report.ts` y `build` es `astro build`. El tiempo de build ahora va de `astro:build:start` a `astro:build:done` (no incluye carga de config ni sync), así que no es comparable 1:1 con informes anteriores._
   - `BaseLayout.astro:84-91`: importar `icon.svg` como componente y quitar `fetchpriority="high"`. Las guías lo reservan para la imagen LCP (como mucho una o dos por página), y en un icono de 24 px compite con ella. _(guía: `optimize-image-priority`)_
   - `servers/[id].astro:143-151`: quitar `loading="lazy"` del icono del servidor. Está en la cabecera, por encima del pliegue, y las guías piden no usar lazy ahí.
   - `scripts/build.ts` y `scripts/measure.ts`: pasar a una integración `astro:build:done`, para que `build` vuelva a ser solo `astro build`.
@@ -99,37 +104,50 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 
 ## B. Rendimiento de páginas grandes
 
-- [ ] **B1. `/servers` pesa 19,8 MB.**
+- [x] **B1. `/servers` pesa 19,8 MB.** _Hecho: la página solo envía las 24 primeras tarjetas y el total; la isla carga `/servers.json` (endpoint estático, ~10 MB sin comprimir, ~1,8 MB brotli) tras hidratar, con `priority: "low"` si la URL no trae búsqueda, y muestra "Loading servers…" en otros estados. Se mantiene `client:load`._
   - El 99,5 % son los props de `<SearchBar client:load servers={…}>`: los ~39.700 servidores serializados en el atributo `props` (`src/pages/servers/index.astro:39-54,113`).
-  - Propuesta: un endpoint estático compacto (`src/pages/servers.json.ts`) cargado desde la isla con `client:idle`, y la primera página de resultados en HTML estático para que los crawlers vean más de 24 enlaces. Alternativa: Pagefind.
-- [ ] **B2. `/category/ai` pesa 3 MB.**
+  - Propuesta: un endpoint estático compacto (`src/pages/servers.json.ts`) cargado desde la isla con `client:idle`, y la primera página de resultados en HTML estático para que los crawlers vean más de 24 enlaces. **Decidido:** JSON estático propio. **Futuro:** migrar la búsqueda a Pagefind.
+- [x] **B2. `/category/ai` pesa 3 MB.** _Hecho: `src/pages/category/[slug]/[...page].astro` con `paginate()`, 48 por página (204 páginas; `/category/ai` y `/category/ai/2`…`/58`), ordenadas por estrellas de GitHub con las mismas tarjetas que `/servers`. El `ItemList` cubre solo la página actual; las páginas 2+ tienen canonical, título y descripción propios y no entran en el sitemap. `Pagination.tsx` admite `hrefFor` (enlaces, sin JS); helpers en `src/lib/pagination.ts`. `/category/ai` pasa de ~3 MB a ~118 KB._
   - 2.779 tarjetas sin paginar más ~300 KB de JSON-LD `ItemList` (`src/pages/category/[slug].astro:70-81,122-128`).
   - Propuesta: `paginate()` en `/category/[slug]/[...page].astro`, con el `ItemList` limitado a la página actual.
   - Si se descarta paginar, como mínimo añadir `content-visibility: auto` con `contain-intrinsic-size` a la cuadrícula de tarjetas por debajo del pliegue. No reduce los 3 MB, pero sí el coste de render. _(guía: `defer-rendering-heavy-content`)_
-- [ ] **B3. Imágenes OG: unos 2,6 GB (66 KB × 39.700) y la mayor parte del tiempo de build.**
-  - Opciones: PNG con paleta cuantizada, OG genérica con personalizadas solo para el top N, u otra estrategia. **Requiere decisión.**
-  - Borrar de paso `assets/Inter-SemiBold.ttf`, que no se usa (ver D2).
+- [x] **B3. Imágenes OG: unos 2,6 GB (66 KB × 39.700) y la mayor parte del tiempo de build.** _Hecho: `renderOGImage()` (`src/lib/og-image.tsx`) pasa la salida de `resvg` por `sharp` con las opciones elegidas y `sharp.concurrency(1)`; `sharp` es dependencia directa y externa en Vite. En 7 OG reales: 472,6 KB → 165,9 KB (−64,9 %), diferencia máxima 10/255, ~44 ms por imagen; build parcial: 237 OG, todas indexadas, 24 KB de media. `og.test.ts` comprueba el tipo de color 3 y un tope de tamaño. Comparación antes/después enseñada al usuario el 2026-10-09 (umbral 0,1: 0 % de píxeles distintos; −64–66 %); queda pendiente su visto bueno. Si no convence, cambiar a sin pérdida (`png({ compressionLevel: 9 })`). Falta medir la duración del build completo en el primer CI. También cierra el punto `og-image.tsx:82` de D3._
+  - **Decidido:** mantener una OG propia por servidor y comprimir los PNG con paleta cuantizada. El aspecto no debe cambiar de forma apreciable. Las otras opciones descartadas: OG genérica con personalizadas solo para el top N.
+  - **Medido** (4 OG reales, codificadas con `sharp`):
+    - El PNG que genera `resvg` está mal comprimido: ~67 KB de media.
+    - **Con paleta de 256 colores:** ~23 KB (−65 %), 0,00 % de píxeles distintos con umbral 0,1. Cada imagen tiene ~390 colores.
+    - **Sin pérdida, nivel 9:** ~36 KB (−49 %), píxeles idénticos.
+    - **JPEG:** más grande o con artefactos alrededor del texto.
+    - **WebP:** algo más pequeño, pero su compatibilidad en previsualizaciones de enlaces no está garantizada.
+  - **Elegido:** `sharp` con `png({ palette: true, colours: 256, dither: 1, compressionLevel: 9, effort: 4 })` sobre la salida de `resvg`. Cuesta ~45 ms por imagen, unos +4 min de build con concurrencia 8.
+  - **Revisión del usuario:** al terminar, enseñar imágenes antes/después de varias OG. Si no convence, cambiar a sin pérdida (`png({ compressionLevel: 9 })`).
+  - Borrar de paso `assets/Inter-SemiBold.ttf`, que no se usa (hecho en D2).
 
 ## C. Fallos (ya existían en Next.js)
 
-- [ ] **C1. Las 19 guías muestran "Popular Servers" vacío y sin "Example configuration".**
+- [x] **C1. Las 19 guías muestran "Popular Servers" vacío y sin "Example configuration".**
   - Los slugs de `src/lib/guide-data.ts` (`github`, `filesystem`, `brave-search`…) ya no existen; los reales son tipo `brave-brave-search`.
   - `src/pages/guides/[app].astro:52-68` falla en silencio. Además `sampleServerId = guide.popularServers[0]` puede no coincidir con el servidor elegido.
   - Propuesta: elegirlos desde el registry o las métricas, o validar los slugs en el build.
-- [ ] **C2. El JSON-LD no se escapa.**
+  - Hecho: se quita `popularServers` de `GuideData`. Las guías usan `getPopularOfficialServers()` (`src/lib/popular-servers.ts`, los 6 oficiales con más estrellas, igual que la home) con el título "Popular MCP Servers". El ejemplo usa el primero, con clave `server.id` y enlace a `server.slug`. `getPopularOfficialServers()` descarta entradas cuyo slug lleva a otro servidor. Tests en `tests/guides.test.ts`.
+- [x] **C2. El JSON-LD no se escapa.**
   - `src/components/JsonLd.astro:9` usa `set:html={JSON.stringify(data)}` con descripciones de terceros. Un `</script>` en el registry rompería la página.
   - Arreglo: `.replace(/</g, "\\u003c")`. Mismo patrón en `DocsContent.tsx:12-57`.
-- [~] **C3. Doble punto en la meta description de cada servidor** (`src/pages/servers/[id].astro:29`): "Sign in once.. Install with:".
+  - Hecho: `serializeJsonLd()` en `src/lib/json-ld.ts`, usado por `JsonLd.astro`. El JSON-LD de `/docs` sale de `DocsContent.tsx` y pasa a `docs.astro` vía `<JsonLd>`, así que ya no queda `dangerouslySetInnerHTML`. Tests en `tests/json-ld.test.ts`. Solo cambia el HTML de los 10 servidores con `<` en nombre o descripción, y el JSON es equivalente.
+- [x] **C3. Doble punto en la meta description de cada servidor** (`src/pages/servers/[id].astro:29`): "Sign in once.. Install with:". Hecho en `8585247`.
   - Afectaba a unas 31.000 fichas: 30.059 descripciones terminan en `.` y 1.016 en otra puntuación.
   - Arreglo: `toSentence()` en `src/lib/format.ts`. Recorta espacios, quita un `,` `:` o `;` final y añade punto solo si no termina ya en `.` `!` `?` `…`. Tests en `tests/format.test.ts`.
   - Las 5 descripciones que ya vienen mal del registry ("SEO..", "quickly!.") se dejan como están.
-- [ ] **C4. La home no tiene `h1` accesible:** `class="absolute hidden"` (`src/pages/index.astro:137`). Cambiar a `sr-only`.
-- [ ] **C5. El orden "alfabético" de `/servers`** ordena por ID inverso (`SearchBar.tsx:140-145`); debería ordenar por nombre.
+- [x] **C4. La home no tiene `h1` accesible:** `class="absolute hidden"` (`src/pages/index.astro:137`). Cambiar a `sr-only`.
+  - Hecho: el `h1` de la home usa `sr-only` (`display:none` lo sacaba del árbol de accesibilidad). Al ser `position:absolute` no ocupa celda del grid, así que el hero no cambia.
+- [x] **C5. El orden "alfabético" de `/servers`** ordena por ID inverso (`SearchBar.tsx:140-145`); debería ordenar por nombre.
+  - Hecho: `sortServers()` en `src/lib/server-search.ts` (con `SortOption`, `DEFAULT_SORT`, `PAGE_SIZES`, `DEFAULT_PAGE_SIZE`). "Alphabetical" ordena por nombre con `Intl.Collator("en", { sensitivity: "base", numeric: true })`; los nombres que empiezan por puntuación van primero. Tests en `tests/server-search.test.ts`.
 - [x] **C6. El botón "Browse servers" del 404 apuntaba a `/`.** Hecho en `430a357`.
-- [ ] **C7. Cabecera móvil:** a 390 px la pastilla "beta" tapa "Servers" (`BaseLayout.astro:81-115`).
+- [x] **C7. Cabecera móvil:** a 390 px la pastilla "beta" tapa "Servers" (`BaseLayout.astro:81-115`).
+  - Hecho: la fila de la cabecera usa `flex-wrap gap-x-4 gap-y-2` (a ~320 px o con texto grande, la nav baja a una segunda línea en vez de solaparse) y la pastilla "beta" lleva `max-sm:hidden` (el enlace ya tiene `aria-label`). GitHub sigue como texto.
   - El flex no tiene `flex-wrap`, y las guías piden `flex-wrap: wrap` siempre que pueda desbordar. _(guía: `css-layout`)_
   - Propuesta: `flex-wrap` con `gap`, y ocultar la pastilla por debajo de `sm`. Alternativa: GitHub como icono.
-- [ ] **C8. Riesgos latentes.**
+- [x] **C8. Riesgos latentes.** Hecho: `CATEGORY_SLUGS` (`lib/categories.ts`) alimenta página, OG, sitemap (ordenado) y `CategoryGrid`; `GUIDE_NAMES` eliminado (OG usa `GUIDES[app].shortName ?? name`, endpoint con `GUIDE_SLUGS`). Rutas: aplazado por decisión del usuario, la comprobación queda en ROADMAP 6b Fase 2.
   - **Categorías:** la página filtra las que no tienen nombre (`category/[slug].astro:14-17`), pero el endpoint de OG y `lib/sitemap.ts:22` usan todas. Una categoría nueva produciría una URL que da 404 en el sitemap.
   - **Rutas:** `servers/foo.html` convive con la carpeta `servers/foo/` de la imagen OG (igual en guides y category). Hay que verificar en Cloudflare que `/servers/foo` no redirige a `/servers/foo/`. Si lo hace, mover las OG a `/og/...`.
   - **Guías:** `GUIDE_NAMES` en `og-pages.tsx:89-109` duplica `GUIDES[*].name`, y el endpoint de OG usa sus claves en vez de `GUIDE_SLUGS`.
@@ -137,38 +155,113 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 ## D. Limpieza
 
 - [ ] **D1. Restos de Next.js:** borrar `packages/web/.next/`, `next-env.d.ts` y `tsconfig.tsbuildinfo` (761 KB). Quitar del `.gitignore` las entradas que se añadieron para ignorarlos. Revisar el `include: ["**/*"]` de `tsconfig.json`.
-- [ ] **D2. Código y assets muertos:** `src/lib/security-headers.ts` (o se resuelve en A7), `@keyframes fade-in-up` (`globals.css`), `assets/Inter-SemiBold.ttf`. También `public/logo.svg` y `logo-light.svg`, que solo usa el README.
-- [ ] **D3. Comentarios de Next.js y Vercel:** `SearchBar.tsx:63` y `ConfigViewer.tsx:30` ("server component" y `eslint-disable`), `BaseLayout.astro:17`, `og-image.tsx:82`.
+- [x] **D2. Código y assets muertos:** `src/lib/security-headers.ts` (o se resuelve en A7), `@keyframes fade-in-up` (`globals.css`), `assets/Inter-SemiBold.ttf`. También `public/logo.svg` y `logo-light.svg`, que solo usa el README.
+  - **Hecho:** borrados `@keyframes fade-in-up` e `Inter-SemiBold.ttf` (las plantillas OG piden ahora `fontWeight: 700`, que es lo que satori ya renderizaba). Los logos del README se movieron a `.github/assets/`. `security-headers.ts` queda para A7.
+- [x] **D3. Comentarios de Next.js y Vercel:** ~~`SearchBar.tsx:63`~~ (hecho en E8) y ~~`ConfigViewer.tsx:30`~~ (desapareció con A1), ~~`BaseLayout.astro:17`~~ (hecho en A6), ~~`og-image.tsx:82`~~ (hecho en B3). _Hecho: reescritos los comentarios de `og-server.tsx` y `404.astro` (`og-pages.tsx` ya no lo tenía). Se mantienen a propósito los que explican compatibilidad con el sitio anterior: `metadata.ts`, `server-paths.ts`, `sitemap.ts`, `astro.config.mjs` y `tests/metadata.test.ts`. `security-headers.ts` (que menciona `next.config.ts` y Vercel) queda para A7, que lo borra._
 - [x] **D4. Cifras escritas a mano.** Hecho en `f3b6385`. Queda opcional: "10 commands" (`StatsBar.tsx`, `CliShowcase.tsx`) podría salir de `COMMANDS.length`.
 
 ## E. Accesibilidad y SEO
 
-- [ ] **E1. Encabezados:** el 404 no tiene `h1`; "Configuration" en `ConfigViewer.tsx:47` es `h3` entre `h2`; las categorías saltan de `h1` a las tarjetas `h3`.
-- [ ] **E2. ARIA y teclado:**
-  - Las pestañas de `ConfigViewer` no se manejan con las flechas, y el tabpanel apunta a pestañas ocultas en móvil (se resuelve con los radios de A1).
-  - `PackageManagerCommand` no comunica qué opción está elegida (se resuelve con los radios de A1).
-  - El "Copied" de los botones de copiar no se anuncia: añadir una región `aria-live="polite"`. _(guía: `accessibility`, sección Live Regions)_
-  - `FilterSheet` sigue siendo enfocable cuando está cerrado. Propuesta: `<dialog>` nativo abierto con `showModal()`, con `closedby="any"` para cerrar al tocar fuera. _(guías: `accessibility` sección 12, `light-dismiss-a-dialog`)_
-    - `showModal()` vuelve inerte el resto de la página, así que el focus trap hecho a mano (`FilterSheet.tsx:22-53`) se elimina.
-    - Safari no soporta `closedby`: las guías dan un fallback de unas 10 líneas que cierra con un clic en el `::backdrop`.
-  - El `aria-label` de `AsciiArt.tsx:81` está en un `<pre>` sin rol.
-  - El `<img>` del logo de la cabecera debería llevar `alt=""`.
-- [ ] **E3. Breadcrumbs consistentes:** categoría y guías usan `<span>`, sin `<ol>` ni `aria-current`.
-- [ ] **E4. "Actualizado hace X" congelado en el build:** `ServerSidebar.tsx:232-234` usa `relativeTime(lastPush)` en el HTML estático.
+- [x] **E1. Encabezados:** el 404 no tiene `h1`; "Configuration" en `ConfigViewer.tsx:47` es `h3` entre `h2` (ya `h2` desde A1); las categorías saltan de `h1` a las tarjetas `h3`. Hecho en E1: `<h1 class="sr-only">404: Page not found</h1>` en `404.astro` y el envoltorio del ASCII de `NotFound.astro` pasa a `aria-hidden="true"` (sin `role="img"`, para no anunciar "404" dos veces); `<h2 class="sr-only">Server listing</h2>` antes de la rejilla en `category/[slug]/[...page].astro` (mismo patrón que `SearchBar.tsx`). `ConfigViewer` ya se resolvió en A1.
+- [x] **E2. ARIA y teclado:**
+  - [x] Las pestañas de `ConfigViewer` no se manejan con las flechas, y el tabpanel apunta a pestañas ocultas en móvil. Resuelto en A1 (radios nativos).
+  - [x] `PackageManagerCommand` no comunica qué opción está elegida. Resuelto en A1 (radios nativos).
+  - [x] El "Copied" de los botones de copiar no se anuncia: añadir una región `aria-live="polite"`. _(guía: `accessibility`, sección Live Regions)_ Hecho en E7 (`scripts/copy.ts`).
+  - [x] `FilterSheet` sigue siendo enfocable cuando está cerrado. Hecho en E2: `<dialog closedby="any">` con `showModal()`; se quitan el focus trap, el manejo de Esc, la restauración del foco, el bloqueo de scroll del `body` y el fondo falso; el evento `close` llama a `onClose` (props sin cambios, `SearchBar` intacto); fallback de clic en el fondo si no existe `closedBy`; `html:has(dialog:modal) { overflow: hidden }` en `globals.css`; sin animación. Verificado en Chromium a 390 px con `astro dev`: Tab no sale del diálogo, cerrado no es alcanzable con Tab, Esc y clic en el fondo cierran y devuelven el foco a "Filters", reabrir funciona, la página no hace scroll detrás; con el fallback forzado (sin `closedBy` ni atributo) el clic en el fondo cierra. Firefox y WebKit no probados (ver F7). _(guías: `accessibility` sección 12, `light-dismiss-a-dialog`)_
+  - [x] El `aria-label` de `AsciiArt.tsx:81` está en un `<pre>` sin rol. Resuelto en A2a (`role="img"` en el envoltorio de `AsciiArt.astro`).
+  - [x] El `<img>` del logo de la cabecera debería llevar `alt=""`. Resuelto en A8.
+- [x] **E3. Breadcrumbs consistentes:** categoría y guías usan `<span>`, sin `<ol>` ni `aria-current`. _Hecho: `components/Breadcrumbs.astro` (`items: { label, href? }[]`) en /servers, fichas, categorías (también páginas 2+, último elemento = nombre de la categoría) y guías: `nav[aria-label=Breadcrumb]` > `ol` con `flex-wrap`, separadores `/` con `aria-hidden`, último elemento `aria-current="page"` con `wrap-anywhere`. Todas empiezan por Home, como su JSON-LD (las fichas ganan "Home /"). Verificado en el build parcial y con Chromium a 390 px: sin scroll horizontal, los nombres largos se parten._
+- [x] **E4. "Actualizado hace X" congelado en el build:** `ServerSidebar.tsx:232-234` usa `relativeTime(lastPush)` en el HTML estático. _Hecho: `ServerSidebar.astro` pinta `<time datetime={lastPush} data-relative-time title="Oct 8, 2026">Oct 8, 2026</time>` (`formatDate()`, UTC); `scripts/relative-time.ts` (solo en fichas) lo reescribe con `formatRelativeTime()` (`Intl.RelativeTimeFormat` narrow: "1d ago", "5mo ago"; mes = 30 días, año = 365; menos de un minuto o fecha futura dejan la fecha absoluta). `relativeTime()` eliminado. La fecha "Updated" sigue, así que E5 mantiene `lastPush`. Verificado en el build parcial y en Chromium: con JS "1d ago", sin JS "Oct 8, 2026"._
   - Propuesta: `<time datetime="…">` con la fecha absoluta en el HTML, y un script mínimo que la reescribe como relativa con `Intl.RelativeTimeFormat`, que es Baseline amplio.
   - Sin JS se ve la fecha absoluta, que nunca queda desfasada.
-- [ ] **E5. Sitemap con `lastmod` real:** `lib/sitemap.ts:77` pone la fecha del build a todas las URLs, así que Google ve unos 40.000 cambios al día. Usar la fecha real (por ejemplo `lastPush` de las métricas).
-- [ ] **E6. Head:**
+- [x] **E5. Sitemap con `lastmod` real:** `lib/sitemap.ts:77` pone la fecha del build a todas las URLs, así que Google ve unos 40.000 cambios al día. Usar la fecha real (por ejemplo `lastPush` de las métricas). _Hecho: cada ficha usa la fecha más reciente entre `updatedAt` del registro oficial y `lastPush` de GitHub (`serverLastModified()`); la home, `/servers` y las categorías (solo la página 1) usan la de su servidor más reciente; docs y guías omiten `<lastmod>`; cada entrada del índice usa la fecha más reciente de su trozo. Las URLs de fichas salen de `getServerPaths()`. Si E4 quita la fecha "Updated" de la ficha, quitar también `lastPush`._
+- [x] **E6. Head:** _Hecho: `og:url` sale del canonical (el 404 no tiene canonical, así que no lo lleva). hreflang eliminado del todo (datos, tipo y bucle en `BaseLayout`): nunca llegó a las páginas indexables (sus `alternates` se sustituían por el canonical), solo al 404 noindex; el sitio es de un solo idioma y `<html lang="en">` se mantiene; anotado en ROADMAP sección 9. Quitadas la meta `keywords` (tipo, raíz y 4 páginas) y `twitter:image:type/width/height`. Nuevos `/favicon.ico` (PNG 32 px en ICO), `/apple-touch-icon.png` (180), `icon-192.png`/`icon-512.png` y `/manifest.webmanifest` (sin `display`), generados con `scripts/generate-icons.ts` (manual, `@resvg/resvg-js`). Verificado en el build parcial._
   - Falta `og:url`.
   - El 404 hereda el `hreflang` de la home (`metadata.ts:84-89`).
   - Faltan `favicon.ico`, `apple-touch-icon` y el manifest.
   - Sobran los `twitter:image:*` no estándar y la meta `keywords`.
-- [ ] **E7. Copiar código:** `scripts/code-copy.ts:40` usa `closest(".rounded-lg")`, que es frágil (mejor un atributo `data-`), y se incluye en las ~39.700 fichas aunque no tengan `CodeBlock`. A los botones de `CodeBlock.tsx:24` les falta `type="button"`.
-- [ ] **E8. `?page=` fuera de rango en `/servers`:** se corrige en pantalla, pero la URL conserva el valor erróneo.
+- [x] **E7. Copiar código:** `scripts/code-copy.ts:40` usa `closest(".rounded-lg")`, que es frágil (mejor un atributo `data-`), y se incluye en las ~39.700 fichas aunque no tengan `CodeBlock`. A los botones de `CodeBlock.tsx:24` les falta `type="button"`.
+  - Hecho: `scripts/code-copy.ts` pasa a `scripts/copy.ts`, con contrato de atributos (`data-copy`, `data-copy-root`, `data-copy-text`, `data-copied`) y una región `aria-live` compartida. Nuevo `CodeBlock.astro` (iconos de `@lucide/astro`) en las guías. El script ya no se importa en `BaseLayout`, solo en los componentes y páginas con botones de copiar (`/docs` lo importa de forma transitoria hasta A2d).
+  - Pendiente (fuera de alcance): en `/docs` todos los botones se llaman "Copy code"; se podría añadir `aria-describedby` hacia el encabezado de la sección.
+  - Resuelto en C1 (`c869fbd`); se conserva el contexto original: hoy ninguna guía muestra el ejemplo de configuración, porque los `popularServers` de `lib/guide-data.ts` (`github`, `filesystem`…) no coinciden con ningún slug del registro y `getSampleConfig()` devuelve `null`. Hay que pasarlos a slugs reales.
+- [x] **E8. `?page=` fuera de rango en `/servers`:** se corrige en pantalla, pero la URL conserva el valor erróneo. Hecho en `2f92409`: `readSearchState()` y `toSearchString()` en `lib/server-search.ts` validan la URL (listas con lista blanca y sin duplicados, `sort`/`per_page` conocidos, `page` entero positivo) y la isla la reescribe en forma canónica con `replaceState` al cargar. `?page=` se acota cuando llega el índice, un `?q=` restaurado ya no se pierde durante el debounce y se conservan los parámetros ajenos (como `utm_source`). `RUNTIMES` y `TRANSPORTS` pasan a `server-search.ts`. Se quitó el comentario "server component" y el `eslint-disable` de `SearchBar.tsx`.
 
-## Orden sugerido
+## Commits por tarea
 
-1. C y D (fallos y limpieza), más E de bajo esfuerzo.
-2. A3, A5, A6 y A8 (mejoras rápidas de Astro).
-3. A1, A2, B1 y B2 (fuera React y páginas más ligeras).
-4. A4, A7 y B3 (necesitan decisiones de CI y de hosting).
+| Tarea | Commit    | Tarea | Commit    | Tarea | Commit    |
+| ----- | --------- | ----- | --------- | ----- | --------- |
+| P0    | `cbe4a0c` | A2d   | `8f90461` | E3    | `088565f` |
+| A1    | `1cde148` | A3    | `7e5d6b9` | E4    | `5d8e4bc` |
+| A2a   | `94ad047` | A5    | `d63704e` | E5    | `a651741` |
+| A2b   | `d40631c` | A6    | `609d60a` | E6    | `162f6d6` |
+| A2c   | `1931218` | A7    | `bc14412` | E7    | `dc32aa3` |
+| A8    | `290e21b` | C4    | `f626c1c` | E8    | `2f92409` |
+| B1    | `9769129` | C5    | `cb41573` | D2    | `0911788` |
+| B2    | `9aa28f5` | C6    | `430a357` | D3    | `68a799b` |
+| B3    | `09ece47` | C7    | `a0916bc` | D4    | `f3b6385` |
+| C1    | `c869fbd` | C8    | `f9c718b` | E1    | `3def04d` |
+| C2    | `24a5f8d` | C3    | `8585247` | E2    | `b0a4ab8` |
+
+## F. Seguimiento de la revisión adversaria (pendiente, otra sesión)
+
+Notas menores que dejaron los revisores al implementar A–E (98 en total, ninguna bloqueante). La documentación ya se corrigió; esto es lo que queda. Entre paréntesis, la tarea donde salió.
+
+- [ ] **F1. Accesibilidad.**
+  - Copiar (E7): muestra "Copied" aunque la copia falle (no espera a `copyText()`); varios botones comparten la región en vivo y se pisan los avisos; sin JS los botones son enfocables pero no hacen nada.
+  - Paginación de categorías (B2, E3): "Anterior/Siguiente" desactivados son `<a role="link" aria-disabled>` sin `href` (debería ser un `<span aria-disabled>`). En la página 2 y siguientes la miga de pan marca la categoría como página actual y no coincide con el JSON-LD `BreadcrumbList`.
+  - Diálogo de filtros (E2): se nombra con `aria-label` en vez de `aria-labelledby` a un encabezado real (el título visible es un `<p>`); en Safari el fallback se cierra si arrastras desde dentro y sueltas fuera (usar `pointerdown`+`pointerup`); la página salta de lado al ocultar la barra de scroll (`scrollbar-gutter: stable`).
+  - Selector de configuración (A1): sin JS, marcar una pastilla no cambia el panel; en alto contraste (`forced-colors`) no se ve cuál está elegida; `label` envuelve el input y además usa `for`/`id` (riesgo de ids duplicados).
+  - Tarjetas y fichas: las estadísticas de `ServerCard` tienen `aria-label` sin rol (en las dos copias, A2c); los iconos de GitHub y Docker de `ServerSidebar.astro` perdieron su `<title>` (A2c); el alt del icono del servidor repite el h1 (A8).
+  - Animaciones (A2b): el barrido de la home y el 404 anima `top` en bucle infinito y no se puede pausar (guía `motion`: usar `transform`).
+  - Docs (A2d): el scroll-spy no marca `aria-current` en el enlace activo (guía `scrollspy`); la regla `li:has(a:target-current)` no hace nada porque el borde está en el `<ul>`.
+  - Cabecera (C7): el `<nav>` no tiene `flex-wrap` y puede desbordar a 320 px con zoom de texto.
+- [ ] **F2. Fallos funcionales.**
+  - `/servers` (B1): si falla la descarga de `servers.json` con estado no por defecto, se queda "Loading servers…" para siempre junto al mensaje de error; en móvil, mientras carga, el botón del panel de filtros muestra el total en vez del recuento filtrado; en `/servers` sin estado el índice se pide con prioridad baja aunque la búsqueda es la interacción principal (guía `deprioritize-background-fetches`).
+  - E8: `hasUrlState` se calcula con los parámetros crudos, así que `?page=abc` (que se normaliza a `/servers`) no baja a prioridad baja; usar `!isDefaultState(parsed)` y quitar el segundo parseo.
+  - **Regresión visual (A1, encontrada en la VRT del 2026-10-09):** en las ~39.900 fichas de servidor hay 40 px de más entre la configuración y "Related Servers". La columna izquierda usa `space-y-10` (`src/pages/servers/[id].astro:198`), y `ConfigViewer.astro` emite su `<div>` seguido de dos `<script>` hermanos (`RestoreChoice` y `radio-panels`). El `<div>` deja de ser el último hijo y recibe `margin-bottom: 40px`. Arreglo: meter los scripts dentro del `<div>` raíz del componente o cambiar `space-y-10` por `flex flex-col gap-10`. Solo pasa en las fichas; el resto de páginas se comprobó.
+  - Datos (B2): algunas categorías listan el mismo slug dos veces (ai: 2.779 entradas, 2.770 URLs únicas). Viene del registry; deduplicar al paginar.
+- [ ] **F3. Tests que no protegen.**
+  - P0: el test del tope solo mira 3 de los 8 slugs representativos y de forma condicional.
+  - C1: `guides.test.ts` pasa si la lista de populares sale vacía (`if (!sample) continue`).
+  - C8: el test del sitemap no falla si vuelven a salir categorías sin nombre.
+  - B3: el tope de tamaño solo cubre la OG de docs, no las de servidores.
+  - C5: el orden de nombres que empiezan por puntuación está documentado pero sin test.
+  - E5: el test "lists every static route" depende de que `WEB_MAX_SERVER_PAGES` no esté definida.
+- [ ] **F4. Simplificaciones de código (opcional).**
+  - Opciones de ordenación en tres sitios (`SORT_OPTIONS`, el tipo `SortOption` y dos `<option>` a mano): derivar el tipo del array (C5, E8). Parámetros de URL también en tres sitios (B1).
+  - `RESTORE_CHOICE_SCRIPT` es una cadena minificada a mano que duplica la lógica de `radio-panels.ts`, sin tipos ni lint (A1).
+  - `Pagination` acepta `onPageChange` y `hrefFor` a la vez o ninguno (B2); `ServerSidebar` mezcla componentes y la cadena `"docker"` en el tipo del icono (A2c).
+  - Ramas de fallback inalcanzables (C8, E3); `renderBuildReport` exportado sin uso (A8); alias `analyticsToken` innecesario (A6).
+  - Rendimiento menor: `getPopularOfficialServers()` reordena en cada página de guía (C1); el script de tiempo relativo se carga en fichas sin fecha y el chunk compartido crea un `Intl.DateTimeFormat` que el cliente no usa (E4); `/docs-scroll-spy.css` está en `public/` sin hash y bloquea el render (A2d).
+  - La cifra del ahorro de B3 aparece en cinco sitios (comentario, docs, WEB_PLAN, commit…); dejar una sola fuente.
+- [ ] **F5. Herramientas (opcional).** `integrations/` no pasa por oxlint (A8); `scripts/generate-icons.ts` no es un script de npm (E6); la lista de slugs representativos está duplicada en código y docs (P0).
+- [ ] **F6. CSP (opcional).** Documentar por qué no se usa `require-trusted-types-for 'script'` (A7); el hash de `RESTORE_CHOICE_SCRIPT` se añade en todas las páginas aunque solo lo usen algunas (A7); Astro emite la CSP al final del `<head>`, así que el hash de las speculation rules sobra (A7).
+- [ ] **F7. Verificaciones pendientes.** Probar A1 y E2 en Firefox y WebKit (Playwright ya instalado en el scratchpad; respetar las reglas de memoria de `AGENTS.md`); comprobación en navegador de A2b (barrido y revelado con y sin `prefers-reduced-motion`); prueba en ejecución de B1 (no se pudo: `astro dev` se colgaba); medir el build completo tras B3 en el primer CI.
+
+## Regresión visual
+
+Herramientas en `tools/vrt/` (ver su `README.md`). Baseline: capturas de producción (Next.js) del 2026-10-08, con los datos del sync del 8 de octubre. Las capturas no están en el repo: hay que sacarlas de nuevo en cada máquina (`node capture.mjs prod https://getmcp.es`).
+
+**2026-10-09, HEAD `2d985a8` (build parcial) frente a producción, 45 rutas × 2 viewports:**
+
+- **Regresión (pendiente, F2):** en las ~39.900 fichas de servidor hay 40 px de más entre la configuración y "Related Servers", por los `<script>` hermanos de `ConfigViewer.astro` dentro de un `space-y-10` (A1). `node check.mjs` lo detecta ("SPACE-Y").
+- **Sin cambios respecto a la comparación anterior:**
+  - home 0,11–0,22 %;
+  - docs 0,14–0,33 %;
+  - índice de guías 0,03–0,09 %;
+  - 404 0,03–0,41 %;
+  - OG 0,2–1,1 %.
+- **Cambios intencionados:**
+  - categorías paginadas (B2, 80–96 %);
+  - guías con servidores populares y ejemplo de config (C1, ~30 %, +800 px);
+  - fichas con la miga "Home /", espacios en "… guide →" y `h2` "Configuration" (E3, D3, E1; 2,5–4,4 %);
+  - cabecera móvil sin la pastilla "beta" (C7).
+- **Fallo de producción que Astro ya no tiene:** en la captura de escritorio de `/servers`, el panel de filtros móvil de producción ("Show 39376 results") se cuela en la página completa; con el `<dialog>` de E2 ya no pasa.
+- **Datos:** producción mezcla días por ISR (39.376 servidores en home y `/servers` frente a 39.905 en el build). La hora relativa ("20m" / "1d") depende del momento de la captura.
+
+## Siguiente sesión
+
+1. Visto bueno del usuario a las OG de B3.
+2. F1–F3 (accesibilidad, fallos y tests), luego F7.
+3. F4–F6 si compensa.
+4. Aplazados: A4 (build incremental, replantear con Vercel) y D1 (restos de Next.js).

@@ -5,17 +5,17 @@ import JsonLd from "@/components/JsonLd.astro";
 import { APP_COUNT, SITE_URL } from "@/lib/constants";
 import { resolveMetadata } from "@/lib/metadata";
 import { HOME_OG } from "@/lib/og-pages";
-import { AnimatedCommand } from "@/components/AnimatedCommand";
-import { AsciiArt } from "@/components/AsciiArt";
-import { StatsBar } from "@/components/StatsBar";
-import { FormatShowcase } from "@/components/FormatShowcase";
-import { CliShowcase } from "@/components/CliShowcase";
-import { PopularServers } from "@/components/PopularServers";
-import { TeamFeatures } from "@/components/TeamFeatures";
-import { CategoryGrid } from "@/components/CategoryGrid";
-import { SecurityFeatures } from "@/components/SecurityFeatures";
-import { SupportedApps } from "@/components/SupportedApps";
-import { DeveloperExperience } from "@/components/DeveloperExperience";
+import AnimatedCommand from "@/components/AnimatedCommand.astro";
+import AsciiArt from "@/components/AsciiArt.astro";
+import StatsBar from "@/components/StatsBar.astro";
+import FormatShowcase from "@/components/FormatShowcase.astro";
+import CliShowcase from "@/components/CliShowcase.astro";
+import PopularServers from "@/components/PopularServers.astro";
+import TeamFeatures from "@/components/TeamFeatures.astro";
+import CategoryGrid from "@/components/CategoryGrid.astro";
+import SecurityFeatures from "@/components/SecurityFeatures.astro";
+import SupportedApps from "@/components/SupportedApps.astro";
+import DeveloperExperience from "@/components/DeveloperExperience.astro";
 
 const metadata = resolveMetadata(
   {
@@ -132,7 +132,7 @@ const jsonLd = [
 
     {/* Hero section — two-column layout */}
     <div class="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-10 lg:gap-14 mb-16 pt-4 md:pt-10 relative">
-      <h1 class="absolute hidden">getmcp — Install MCP Servers Across {APP_COUNT} AI Apps</h1>
+      <h1 class="sr-only">getmcp — Install MCP Servers Across {APP_COUNT} AI Apps</h1>
 
       {/* Subtle radial glow */}
       <div
@@ -142,7 +142,7 @@ const jsonLd = [
       />
 
       {/* Left column: ASCII brand + tagline */}
-      <AsciiArt client:load />
+      <AsciiArt />
 
       {/* Right column: description + animated CLI */}
       <div class="relative flex flex-col justify-center text-center lg:text-left">
@@ -158,7 +158,7 @@ const jsonLd = [
           <p class="font-mono text-xs font-medium uppercase tracking-wider text-text-secondary mb-3">
             Install via CLI
           </p>
-          <AnimatedCommand client:load />
+          <AnimatedCommand />
         </div>
       </div>
     </div>
@@ -196,7 +196,7 @@ const jsonLd = [
     <hr class="border-border my-12" />
 
     {/* CLI Showcase */}
-    <CliShowcase client:visible />
+    <CliShowcase />
 
     <hr class="border-border my-12" />
 

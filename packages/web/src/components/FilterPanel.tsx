@@ -10,10 +10,8 @@ type FilterPanelProps = {
   onOfficialChange: (v: boolean) => void;
 };
 
-const RUNTIMES = ["node", "python", "docker", "binary"] as const;
-const TRANSPORTS = ["stdio", "remote"] as const;
-
 import { Check } from "lucide-react";
+import { RUNTIMES, TRANSPORTS } from "@/lib/server-search";
 
 function Checkbox({ checked }: { checked: boolean }) {
   return (

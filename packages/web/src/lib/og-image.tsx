@@ -3,6 +3,10 @@ import { join } from "node:path";
 import type { ReactElement, ReactNode } from "react";
 import satori, { type SatoriOptions } from "satori";
 import { renderAsync } from "@resvg/resvg-js";
+import sharp from "sharp";
+
+// Pages already render in parallel (build.concurrency), so keep libvips to one thread per call.
+sharp.concurrency(1);
 
 export const OG_SIZE = { width: 1200, height: 630 };
 export const OG_CONTENT_TYPE = "image/png" as const;
@@ -79,7 +83,7 @@ export function addOGGlow(svg: string): string {
 }
 
 /**
- * Render a Satori element tree to a PNG (replaces `next/og`'s `ImageResponse`).
+ * Render a Satori element tree to a palette PNG (satori → resvg → sharp).
  * The root element must have the `#0a0a0a` background; the corner glow is added here.
  */
 export async function renderOGImage(element: ReactElement): Promise<Uint8Array> {
@@ -90,7 +94,10 @@ export async function renderOGImage(element: ReactElement): Promise<Uint8Array> 
     fitTo: { mode: "width", value: OG_SIZE.width },
     font: { loadSystemFonts: false },
   });
-  return image.asPng();
+  // resvg's encoder compresses poorly; a 256-colour palette PNG is much smaller with no visible change at a 0.1 pixelmatch threshold (WEB_PLAN B3).
+  return sharp(image.asPng())
+    .png({ palette: true, colours: 256, dither: 1, compressionLevel: 9, effort: 4 })
+    .toBuffer();
 }
 
 /** Build a static PNG `Response` for an Astro endpoint. */
@@ -168,7 +175,7 @@ export async function createOGImage({ heading, description, pills }: OGImageOpti
         <span
           style={{
             fontSize: "16px",
-            fontWeight: 600,
+            fontWeight: 700,
             color: "white",
             backgroundColor: "#3b82f6",
             padding: "4px 12px",

@@ -2,13 +2,15 @@
 import type { GetStaticPaths } from "astro";
 import type { InternalRegistryEntry } from "@getmcp/registry";
 import { getServerMetrics } from "@getmcp/registry";
-import { Lock, BadgeCheck } from "lucide-react";
+import BadgeCheck from "@lucide/astro/icons/badge-check";
+import Lock from "@lucide/astro/icons/lock";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import JsonLd from "@/components/JsonLd.astro";
-import { ConfigViewer } from "@/components/ConfigViewer";
-import { PackageManagerCommand } from "@/components/PackageManagerCommand";
-import { ServerCard } from "@/components/ServerCard";
-import { ServerSidebar } from "@/components/ServerSidebar";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import ConfigViewer from "@/components/ConfigViewer.astro";
+import PackageManagerCommand from "@/components/PackageManagerCommand.astro";
+import ServerCard from "@/components/ServerCard.astro";
+import ServerSidebar from "@/components/ServerSidebar.astro";
 import { GUIDE_SLUGS } from "@/lib/guide-data";
 import { SITE_URL } from "@/lib/constants";
 import { toSentence } from "@/lib/format";
@@ -33,15 +35,6 @@ const metadata = resolveMetadata(
   {
     title,
     description,
-    keywords: [
-      server.name,
-      `${server.name} MCP`,
-      `${server.name} MCP server`,
-      ...server.categories,
-      "MCP server",
-      "getmcp",
-      "install MCP",
-    ],
     alternates: {
       canonical: `/servers/${id}`,
     },
@@ -125,16 +118,14 @@ const jsonLd = [
   <div class="max-w-6xl mx-auto px-6 py-12">
     <JsonLd data={jsonLd} />
 
-    {/* Breadcrumb */}
-    <nav class="text-sm text-text-secondary mb-10" aria-label="Breadcrumb">
-      <ol class="flex items-center gap-2">
-        <li>
-          <a href="/servers" class="hover:text-text transition-colors">Servers</a>
-        </li>
-        <li class="text-text-secondary/50" aria-hidden="true">/</li>
-        <li aria-current="page" class="text-text">{server.name}</li>
-      </ol>
-    </nav>
+    <Breadcrumbs
+      class="mb-10"
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Servers", href: "/servers" },
+        { label: server.name },
+      ]}
+    />
 
     {/* Hero */}
     <section class="mb-10">
@@ -146,7 +137,6 @@ const jsonLd = [
               alt={`${server.name} icon`}
               width="48"
               height="48"
-              loading="lazy"
               decoding="async"
               class="w-12 h-12 rounded-lg shrink-0"
             />
@@ -157,7 +147,7 @@ const jsonLd = [
           {
             server.isOfficial && (
               <span role="img" aria-label="Official MCP server" title="Official MCP server">
-                <BadgeCheck className="h-[1ch] text-official shrink-0" aria-hidden="true" />
+                <BadgeCheck class="h-[1ch] text-official shrink-0" aria-hidden="true" />
               </span>
             )
           }
@@ -209,7 +199,7 @@ const jsonLd = [
         {/* Getting Started */}
         <section>
           <h2 class="text-lg font-semibold mb-3">Getting Started</h2>
-          <PackageManagerCommand client:load serverId={server.id} />
+          <PackageManagerCommand serverId={server.id} />
           <p class="text-xs text-text-secondary mt-2">
             Requires {runtimeToRequirements(server.runtime)}.{" "}
             {
@@ -248,7 +238,7 @@ const jsonLd = [
                         </code>
                         {detail?.isSecret && (
                           <span class="text-warning-light text-xs" title="Secret value">
-                            <Lock className="w-3.5 h-3.5 inline" aria-label="Secret" />
+                            <Lock class="w-3.5 h-3.5 inline" aria-label="Secret" />
                           </span>
                         )}
                       </div>
@@ -266,7 +256,7 @@ const jsonLd = [
         }
 
         {/* Config generator */}
-        <ConfigViewer client:load configs={configs} />
+        <ConfigViewer configs={configs} />
       </div>
 
       {/* Sidebar */}

@@ -1,0 +1,42 @@
+---
+/**
+ * Hero logo: the outlined ASCII art plus a solid layer revealed left to right
+ * by a CSS `clip-path` animation (`animate-ascii-reveal`, motion-safe only).
+ * Without JS or with reduced motion the logo is complete from the first paint.
+ */
+
+// prettier-ignore
+const asciiArt =
+` ██████╗ ███████╗████████╗███╗   ███╗ ██████╗██████╗
+██╔════╝ ██╔════╝╚══██╔══╝████╗ ████║██╔════╝██╔══██╗
+██║  ███╗█████╗     ██║   ██╔████╔██║██║     ██████╔╝
+██║   ██║██╔══╝     ██║   ██║╚██╔╝██║██║     ██╔═══╝
+╚██████╔╝███████╗   ██║   ██║ ╚═╝ ██║╚██████╗██║
+ ╚═════╝ ╚══════╝   ╚═╝   ╚═╝     ╚═╝ ╚═════╝╚═╝`;
+const solidArt = asciiArt.replace(/[╗╔╚╝═║]/g, " ");
+---
+
+<div class="relative text-center lg:text-left py-1">
+  <div class="relative mx-auto lg:mx-0 w-fit text-left" role="img" aria-label="getmcp">
+    <pre
+      class="font-mono tracking-[-1px] leading-[125%] whitespace-pre select-none"
+      style="font-size: clamp(7px, 3.1vw, 15px); color: lab(59.4% 0 0)"
+      aria-hidden="true">{asciiArt}</pre>
+    <pre
+      class="absolute top-0 left-0 font-mono tracking-[-1px] leading-[125%] text-text whitespace-pre select-none motion-safe:animate-ascii-reveal"
+      style="font-size: clamp(7px, 3.1vw, 15px); text-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(59, 130, 246, 0.1)"
+      aria-hidden="true">{solidArt}</pre>
+
+    {/* Static CRT scanlines — hidden for reduced motion */}
+    <div
+      class="pointer-events-none absolute inset-0 motion-reduce:hidden"
+      style="background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px); mask-image: radial-gradient(ellipse at center, black 50%, transparent 100%)"
+      aria-hidden="true"
+    >
+    </div>
+  </div>
+
+  <p class="font-mono text-sm lg:text-base uppercase tracking-wider text-text font-medium mt-4">
+    The Universal MCP Installer
+  </p>
+</div>

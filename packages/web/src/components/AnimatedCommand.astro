@@ -1,0 +1,114 @@
+---
+/**
+ * Hero terminal that types and erases CLI commands in a loop. The first
+ * command is server-rendered in full (no-JS and reduced-motion state); the
+ * script starts in the "typed, pausing" state so the text never jumps to
+ * empty on load, and keeps both copy buttons' `data-copy` on the full
+ * current command (copied by `@/scripts/copy`).
+ */
+import Check from "@lucide/astro/icons/check";
+import Copy from "@lucide/astro/icons/copy";
+import Terminal from "@lucide/astro/icons/terminal";
+
+const COMMANDS = [
+  "add io.github.github/github-mcp-server",
+  "find search",
+  "list --category ai",
+  "registry list",
+];
+
+const fullCommand = `npx @getmcp/cli ${COMMANDS[0]}`;
+---
+
+<div
+  class="rounded-lg border border-border bg-code-bg overflow-hidden"
+  data-animated-command={JSON.stringify(COMMANDS)}
+>
+  {/* Header */}
+  <div class="flex items-center justify-between px-4 py-2 border-b border-border">
+    <div class="flex items-center gap-2">
+      <Terminal class="w-4 h-4 text-text-secondary shrink-0" aria-hidden="true" />
+      <span class="text-xs font-mono text-text-secondary select-none">terminal</span>
+    </div>
+
+    {/* Copy button */}
+    <button
+      type="button"
+      data-copy={fullCommand}
+      class="group text-text-secondary hover:text-text transition-colors shrink-0 p-1"
+      aria-label="Copy command"
+    >
+      <Copy class="w-4 h-4 group-data-copied:hidden" aria-hidden="true" />
+      <Check class="w-4 h-4 text-success hidden group-data-copied:block" aria-hidden="true" />
+    </button>
+  </div>
+
+  {/* Command display — click anywhere to copy */}
+  <button
+    type="button"
+    data-copy={fullCommand}
+    class="w-full text-left px-4 py-3 cursor-pointer hover:bg-white/3 transition-colors"
+    aria-label="Copy command to clipboard"
+  >
+    <pre
+      class="text-sm font-mono overflow-x-auto whitespace-nowrap select-none"><code><span class="text-accent">$</span> <span class="text-text-secondary">npx @getmcp/cli</span> <span class="text-text" data-typed>{COMMANDS[0]}</span><span class="inline-block w-[0.55em] h-[1.1em] bg-text/70 align-middle motion-reduce:hidden motion-safe:animate-[blink_1s_step-end_infinite]"></span></code></pre>
+  </button>
+</div>
+
+<script>
+  import "@/scripts/copy";
+
+  const TYPE_SPEED = 60; // ms per character when typing
+  const ERASE_SPEED = 30; // ms per character when erasing
+  const PAUSE_AFTER_TYPE = 2000; // pause with full command visible
+  const PAUSE_AFTER_ERASE = 300; // brief pause before typing next command
+
+  const root = document.querySelector<HTMLElement>("[data-animated-command]");
+  const typed = root?.querySelector<HTMLElement>("[data-typed]");
+
+  if (root && typed && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const commands: string[] = JSON.parse(root.dataset.animatedCommand ?? "[]");
+    const buttons = root.querySelectorAll<HTMLButtonElement>("button[data-copy]");
+    let index = 0;
+    let length = commands[0]?.length ?? 0;
+    let erasing = false;
+
+    const render = () => {
+      typed.textContent = commands[index].slice(0, length);
+    };
+
+    // One step per timeout, with the same timings as the old React loop.
+    const schedule = () => {
+      const after = (ms: number, step: () => void) =>
+        setTimeout(() => {
+          step();
+          schedule();
+        }, ms);
+
+      if (!erasing) {
+        if (length < commands[index].length) {
+          after(TYPE_SPEED, () => {
+            length++;
+            render();
+          });
+        } else {
+          after(PAUSE_AFTER_TYPE, () => (erasing = true));
+        }
+      } else if (length > 0) {
+        after(ERASE_SPEED, () => {
+          length--;
+          render();
+        });
+      } else {
+        after(PAUSE_AFTER_ERASE, () => {
+          index = (index + 1) % commands.length;
+          erasing = false;
+          for (const button of buttons) button.dataset.copy = `npx @getmcp/cli ${commands[index]}`;
+        });
+      }
+    };
+
+    // Starts in the "typed, pausing" state: the first command is already rendered.
+    if (commands.length > 0) schedule();
+  }
+</script>

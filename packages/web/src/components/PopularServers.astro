@@ -1,0 +1,35 @@
+---
+import { getServerMetrics } from "@getmcp/registry";
+import ServerCard from "@/components/ServerCard.astro";
+import { getPopularOfficialServers } from "@/lib/popular-servers";
+import type { ServerCardData } from "@/lib/server-detail";
+
+const servers = getPopularOfficialServers().map((s) => {
+  const metrics = getServerMetrics(s.id);
+  return {
+    id: s.id,
+    slug: s.slug,
+    name: s.name,
+    description: s.description,
+    categories: s.categories as string[],
+    runtime: s.runtime as string | undefined,
+    isRemote: "url" in s.config,
+    envCount: s.requiredEnvVars.length,
+    stars: metrics?.github?.stars,
+    downloads: metrics?.npm?.weeklyDownloads,
+    isOfficial: s.isOfficial || false,
+  };
+}) satisfies ServerCardData[];
+---
+
+<section>
+  <div class="flex items-baseline justify-between mb-4">
+    <h2 class="text-xl font-bold">Popular Official Servers</h2>
+    <a href="/servers" class="text-sm text-accent hover:underline transition-colors">
+      Browse all servers &rarr;
+    </a>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {servers.map((server) => <ServerCard server={server} />)}
+  </div>
+</section>

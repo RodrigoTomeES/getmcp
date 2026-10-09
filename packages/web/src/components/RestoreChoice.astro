@@ -1,0 +1,10 @@
+---
+/**
+ * Restores a saved radio-panels choice before first paint. Render it directly
+ * after the `[data-radio-panels][data-storage-key]` root it restores. Its CSP
+ * hash is added in `BaseLayout.astro`.
+ */
+import { RESTORE_CHOICE_SCRIPT } from "@/lib/restore-choice";
+---
+
+<script is:inline set:html={RESTORE_CHOICE_SCRIPT} />

@@ -1,109 +1,106 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
-import { ServerCard, type ServerCardData } from "./ServerCard";
+import { ServerCard } from "./ServerCard";
+import type { ServerCardData } from "@/lib/server-detail";
 import { Pagination } from "./Pagination";
 import { FilterPanel } from "./FilterPanel";
 import { FilterSheet } from "./FilterSheet";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { useDebounce } from "@/hooks/use-debounce";
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_SORT,
+  PAGE_SIZES,
+  URL_STATE_PARAMS,
+  isDefaultState,
+  readSearchState,
+  sortServers,
+  toSearchString,
+  type SortOption,
+} from "@/lib/server-search";
 
-const PAGE_SIZES = [24, 48, 72] as const;
-const DEFAULT_PAGE_SIZE = 24;
-
-type SortOption = "alphabetical" | "stars" | "downloads";
-
-function parseMulti(param: string | null): string[] {
-  return param ? param.split(",").filter(Boolean) : [];
+/** Replaces the query string (no history entry) when it differs. */
+function replaceSearch(search: string) {
+  if (search === window.location.search.slice(1)) return;
+  const { pathname, hash } = window.location;
+  window.history.replaceState(null, "", `${pathname}${search ? `?${search}` : ""}${hash}`);
 }
 
+/**
+ * `/servers` search island. The page ships only the first default page
+ * (`initialServers`) and the total; the full index is fetched from
+ * `/servers.json` after hydration.
+ */
 export function SearchBar({
-  servers,
+  initialServers,
+  total,
   categories,
 }: {
-  servers: ServerCardData[];
+  initialServers: ServerCardData[];
+  total: number;
   categories: string[];
 }) {
+  const [allServers, setAllServers] = useState<ServerCardData[] | null>(null);
+  const [loadError, setLoadError] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const query = useDebounce(inputValue, 300);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedRuntimes, setSelectedRuntimes] = useState<string[]>([]);
   const [selectedTransports, setSelectedTransports] = useState<string[]>([]);
   const [officialOnly, setOfficialOnly] = useState(false);
-  const [sortBy, setSortBy] = useState<SortOption>("stars");
+  const [sortBy, setSortBy] = useState<SortOption>(DEFAULT_SORT);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [page, setPage] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const urlSyncReady = useRef(false);
 
-  // Initialize from URL on mount
+  // Initialize from URL on mount, then load the full search index
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const q = params.get("q");
-    const cat = params.get("category");
-    const rt = params.get("runtime");
-    const tp = params.get("transport");
-    const off = params.get("official");
-    const sort = params.get("sort") as SortOption | null;
-    const pp = params.get("per_page");
-    const p = params.get("page");
+    const hasUrlState = URL_STATE_PARAMS.some((key) => params.has(key));
+    const parsed = readSearchState(window.location.search, categories);
+    setInputValue(parsed.q);
+    setSelectedCategories([...parsed.categories]);
+    setSelectedRuntimes([...parsed.runtimes]);
+    setSelectedTransports([...parsed.transports]);
+    setOfficialOnly(parsed.official);
+    setSortBy(parsed.sort);
+    setPageSize(parsed.pageSize);
+    setPage(parsed.page);
+    // Drop invalid params now: if nothing restored changes state, the sync
+    // effect below never runs again.
+    replaceSearch(toSearchString(parsed, window.location.search));
 
-    if (q) setInputValue(q);
-    if (cat) setSelectedCategories(parseMulti(cat).filter((c) => categories.includes(c)));
-    if (rt) setSelectedRuntimes(parseMulti(rt));
-    if (tp) setSelectedTransports(parseMulti(tp));
-    if (off === "true") setOfficialOnly(true);
-    if (sort === "alphabetical" || sort === "downloads") setSortBy(sort);
-    if (pp) {
-      const parsed = Number(pp);
-      if ((PAGE_SIZES as readonly number[]).includes(parsed)) setPageSize(parsed);
-    }
-    if (p) {
-      const parsed = Number.parseInt(p, 10);
-      if (parsed > 0 && Number.isFinite(parsed)) setPage(parsed);
-    }
-    // categories is stable from server component
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Plain /servers already shows its first page, so the index is a background
+    // warm-up; with search state in the URL the results depend on it.
+    let cancelled = false;
+    fetch("/servers.json", { priority: hasUrlState ? "auto" : "low" })
+      .then((r) =>
+        r.ok
+          ? (r.json() as Promise<ServerCardData[]>)
+          : Promise.reject(new Error(String(r.status))),
+      )
+      .then((data) => {
+        if (!cancelled) setAllServers(data);
+      })
+      .catch(() => {
+        if (!cancelled) setLoadError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // Runs once: `categories` is a static prop of the island.
   }, []);
 
-  // Sync state to URL (skip first run to preserve URL-restored state)
-  useEffect(() => {
-    if (!urlSyncReady.current) {
-      urlSyncReady.current = true;
-      return;
-    }
-    const params = new URLSearchParams();
-    if (query) params.set("q", query);
-    if (selectedCategories.length) params.set("category", selectedCategories.join(","));
-    if (selectedRuntimes.length) params.set("runtime", selectedRuntimes.join(","));
-    if (selectedTransports.length) params.set("transport", selectedTransports.join(","));
-    if (officialOnly) params.set("official", "true");
-    if (sortBy !== "stars") params.set("sort", sortBy);
-    if (pageSize !== DEFAULT_PAGE_SIZE) params.set("per_page", String(pageSize));
-    if (page > 1) params.set("page", String(page));
-
-    const search = params.toString();
-    const url = search ? `${window.location.pathname}?${search}` : window.location.pathname;
-    window.history.replaceState(null, "", url);
-  }, [
-    query,
-    selectedCategories,
-    selectedRuntimes,
-    selectedTransports,
-    officialOnly,
-    sortBy,
-    pageSize,
-    page,
-  ]);
-
-  // Pre-compute search strings (only rebuilds when servers change)
+  // Pre-compute search strings (only rebuilds when the index arrives)
   const searchIndex = useMemo(
     () =>
-      servers.map((s) => ({
+      (allServers ?? []).map((s) => ({
         server: s,
         searchable: [s.id, s.slug, s.name, s.description, ...(s.categories ?? [])]
           .join(" ")
           .toLowerCase(),
       })),
-    [servers],
+    [allServers],
   );
 
   const filtered = useMemo(() => {
@@ -135,15 +132,10 @@ export function SearchBar({
       result = result.filter((item) => item.searchable.includes(q));
     }
 
-    let sorted = result.map(({ server }) => server);
-
-    if (sortBy === "stars") {
-      sorted = [...sorted].sort((a, b) => (b.stars ?? -1) - (a.stars ?? -1));
-    } else if (sortBy === "downloads") {
-      sorted = [...sorted].sort((a, b) => (b.downloads ?? -1) - (a.downloads ?? -1));
-    }
-
-    return sorted;
+    return sortServers(
+      result.map(({ server }) => server),
+      sortBy,
+    );
   }, [
     searchIndex,
     query,
@@ -154,13 +146,69 @@ export function SearchBar({
     sortBy,
   ]);
 
-  const totalPages = Math.ceil(filtered.length / pageSize);
+  const ready = allServers !== null;
+  // Until the index arrives only the default view can be shown (from
+  // initialServers). Uses inputValue, not the debounced query, so a restored
+  // ?q= never flashes the default cards.
+  const isDefaultView = isDefaultState({
+    q: inputValue,
+    categories: selectedCategories,
+    runtimes: selectedRuntimes,
+    transports: selectedTransports,
+    official: officialOnly,
+    sort: sortBy,
+    pageSize,
+    page,
+  });
+  const loading = !ready && !isDefaultView;
+
+  const resultCount = ready ? filtered.length : total;
+  const totalPages = Math.ceil(resultCount / pageSize);
   const safePage = Math.min(page, Math.max(totalPages, 1));
 
-  const paginated = useMemo(
-    () => filtered.slice((safePage - 1) * pageSize, safePage * pageSize),
-    [filtered, safePage, pageSize],
-  );
+  // Sync state to the URL. The first run is skipped: the restore effect has
+  // already written the canonical URL.
+  useEffect(() => {
+    if (!urlSyncReady.current) {
+      urlSyncReady.current = true;
+      return;
+    }
+    // Wait for the debounced query, so a restored or half-typed ?q= is kept.
+    if (query !== inputValue) return;
+    replaceSearch(
+      toSearchString(
+        {
+          q: query,
+          categories: selectedCategories,
+          runtimes: selectedRuntimes,
+          transports: selectedTransports,
+          official: officialOnly,
+          sort: sortBy,
+          pageSize,
+          // Clamp only once the index is known; before that the count is a guess.
+          page: ready ? safePage : page,
+        },
+        window.location.search,
+      ),
+    );
+  }, [
+    query,
+    inputValue,
+    selectedCategories,
+    selectedRuntimes,
+    selectedTransports,
+    officialOnly,
+    sortBy,
+    pageSize,
+    page,
+    safePage,
+    ready,
+  ]);
+
+  const paginated = useMemo(() => {
+    if (ready) return filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
+    return isDefaultView ? initialServers : [];
+  }, [ready, filtered, safePage, pageSize, isDefaultView, initialServers]);
 
   const handlePageChange = useCallback((newPage: number) => {
     setPage(newPage);
@@ -173,7 +221,7 @@ export function SearchBar({
     setSelectedRuntimes([]);
     setSelectedTransports([]);
     setOfficialOnly(false);
-    setSortBy("stars");
+    setSortBy(DEFAULT_SORT);
     setPageSize(DEFAULT_PAGE_SIZE);
     setPage(1);
   };
@@ -202,7 +250,7 @@ export function SearchBar({
     selectedRuntimes.length > 0 ||
     selectedTransports.length > 0 ||
     officialOnly ||
-    sortBy !== "stars" ||
+    sortBy !== DEFAULT_SORT ||
     pageSize !== DEFAULT_PAGE_SIZE;
 
   const activeFilterCount =
@@ -211,13 +259,14 @@ export function SearchBar({
     selectedTransports.length +
     (officialOnly ? 1 : 0);
 
-  const startItem = filtered.length > 0 ? (safePage - 1) * pageSize + 1 : 0;
-  const endItem = Math.min(safePage * pageSize, filtered.length);
+  const startItem = resultCount > 0 ? (safePage - 1) * pageSize + 1 : 0;
+  const endItem = Math.min(safePage * pageSize, resultCount);
 
-  const resultsSummary =
-    totalPages > 1
-      ? `Showing ${startItem}\u2013${endItem} of ${filtered.length} servers found`
-      : `${filtered.length} server${filtered.length !== 1 ? "s" : ""} found`;
+  const resultsSummary = loading
+    ? "Loading servers\u2026"
+    : totalPages > 1
+      ? `Showing ${startItem}\u2013${endItem} of ${resultCount} servers found`
+      : `${resultCount} server${resultCount !== 1 ? "s" : ""} found`;
 
   const filterPanel = (
     <FilterPanel
@@ -309,7 +358,7 @@ export function SearchBar({
         open={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
         onClearAll={handleClearAll}
-        resultCount={filtered.length}
+        resultCount={resultCount}
       >
         {filterPanel}
       </FilterSheet>
@@ -414,6 +463,12 @@ export function SearchBar({
             )}
           </div>
 
+          {loadError && (
+            <p role="alert" className="text-sm text-text-secondary mb-4">
+              Couldn&apos;t load the full server list. Reload the page to search.
+            </p>
+          )}
+
           {/* Server grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {paginated.map((server) => (
@@ -422,9 +477,11 @@ export function SearchBar({
           </div>
 
           {/* Pagination */}
-          <Pagination page={safePage} totalPages={totalPages} onPageChange={handlePageChange} />
+          {!loading && (
+            <Pagination page={safePage} totalPages={totalPages} onPageChange={handlePageChange} />
+          )}
 
-          {filtered.length === 0 && (
+          {ready && filtered.length === 0 && (
             <div role="alert" className="text-center py-24 text-text-secondary">
               <p className="text-lg mb-2">No servers found</p>
               <p className="text-sm mb-4">

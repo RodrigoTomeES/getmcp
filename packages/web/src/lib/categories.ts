@@ -19,6 +19,9 @@ export const CATEGORY_NAMES: Record<string, string> = {
   gaming: "Gaming",
 };
 
+/** Categories that get a page, OG image and sitemap URL (only named ones, in display order). */
+export const CATEGORY_SLUGS = Object.keys(CATEGORY_NAMES);
+
 export const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   "developer-tools":
     "MCP servers for code editing, debugging, version control, and development workflows. Integrate GitHub, GitLab, and other dev platforms into your AI assistant.",

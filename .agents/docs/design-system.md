@@ -94,10 +94,9 @@ font-family: var(--font-fira-mono); /* "Fira Mono", "Fira Mono fallback: Courier
 Font files in `packages/web/assets/`:
 
 - `Inter-Regular.ttf` (400)
-- `Inter-SemiBold.ttf` (600)
 - `Inter-Bold.ttf` (700)
 
-Used exclusively for OG image generation at build time (satori + `@resvg/resvg-js`, see `src/lib/og-image.tsx`). CJK and Hebrew text falls back to the Noto Sans fonts in the same folder.
+Used exclusively for OG image generation at build time (satori + `@resvg/resvg-js`, then `sharp` re-encodes the PNG as a 256-colour palette PNG, ~65% smaller with no visible change; see `src/lib/og-image.tsx`). CJK and Hebrew text falls back to the Noto Sans fonts in the same folder.
 
 ### Font Weights
 
@@ -114,14 +113,14 @@ Used exclusively for OG image generation at build time (satori + `@resvg/resvg-j
 
 ### Headings
 
-| Level         | Classes                            | Example                  |
-| ------------- | ---------------------------------- | ------------------------ |
-| Page title    | `text-4xl font-bold`               | Homepage h1              |
-| Section title | `text-3xl font-bold`               | Server detail h1         |
-| Section h2    | `text-2xl font-bold`               | Docs sections            |
-| Subsection    | `text-lg font-semibold`            | Component section titles |
-| Card title    | `font-semibold text-lg`            | ServerCard name          |
-| Logo          | `text-xl font-bold tracking-tight` | Header branding          |
+| Level         | Classes                            | Example                        |
+| ------------- | ---------------------------------- | ------------------------------ |
+| Page title    | `text-4xl font-bold`               | Page h1 (home h1 is `sr-only`) |
+| Section title | `text-3xl font-bold`               | Server detail h1               |
+| Section h2    | `text-2xl font-bold`               | Docs sections                  |
+| Subsection    | `text-lg font-semibold`            | Component section titles       |
+| Card title    | `font-semibold text-lg`            | ServerCard name                |
+| Logo          | `text-xl font-bold tracking-tight` | Header branding                |
 
 ### Body Text
 
@@ -137,7 +136,7 @@ Used exclusively for OG image generation at build time (satori + `@resvg/resvg-j
 ### Links
 
 - Default: `text-accent hover:underline`
-- Breadcrumb: `text-text-secondary hover:text-text`
+- Breadcrumb: always `components/Breadcrumbs.astro` (`items: { label, href? }[]`, optional `class` for spacing). `<nav aria-label="Breadcrumb">` + `<ol class="flex flex-wrap items-center gap-2">`, `text-sm text-text-secondary`; links `hover:text-text`; `/` separators `aria-hidden` (`text-text-secondary/50`); last crumb `<span aria-current="page" class="text-text">`. Every trail starts with Home, matching the page `BreadcrumbList` JSON-LD (server pages: Home / Servers / {name})
 - External: `underline text-warning-light` (for warning context links)
 
 ### Lists
@@ -210,8 +209,8 @@ None. The design relies entirely on background color layering and borders for de
 
 ### ServerCard
 
-**File**: `components/ServerCard.tsx`
-**Props**: `{ server: RegistryEntryType }`
+**Files**: `components/ServerCard.astro` (static pages) and `components/ServerCard.tsx` (only inside the `/servers` SearchBar island); same markup, keep both in sync. Data type `ServerCardData` lives in `lib/server-detail.ts`.
+**Props**: `{ server: ServerCardData }`
 
 ```
 ┌─────────────────────────────────────────┐
@@ -251,7 +250,7 @@ None. The design relies entirely on background color layering and borders for de
 
 ### ConfigViewer
 
-**File**: `components/ConfigViewer.tsx`
+**File**: `components/ConfigViewer.astro`
 
 ```
 Configuration
@@ -267,14 +266,17 @@ Configuration
  └──────────────────────────────────────┘
 ```
 
-- Tab active: `border-accent bg-accent text-white font-medium`
-- Tab inactive: `border-border text-text-secondary`
+- App pills are native radios: a `<fieldset>` with an sr-only `<legend>`, each `<label>` wraps an sr-only `<input type="radio" name="config-app">`; arrow keys move the selection
+- Pill checked: `has-checked:border-accent has-checked:bg-accent/10 has-checked:text-accent`
+- Pill unchecked: `border-border text-text-secondary`, hover `not-has-checked:hover:border-text-secondary not-has-checked:hover:text-text`
+- Focus: `has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent` on the label
+- Every app panel is pre-rendered; the inactive ones carry `hidden` (no display utilities on panels)
 - Code container: `rounded-lg border border-border bg-code-bg`
 - Footer: docs link + optional warnings in a `flex flex-wrap` row
 
 ### PackageManagerCommand
 
-**File**: `components/PackageManagerCommand.tsx`
+**File**: `components/PackageManagerCommand.astro`
 
 ```
  ┌──────────────────────────────────────┐
@@ -284,8 +286,18 @@ Configuration
  └──────────────────────────────────────┘
 ```
 
-- PM tab active: `bg-surface text-text`
-- PM tab inactive: `text-text-secondary hover:text-text`
+- PM options are native radios (`name="package-manager"`, `<fieldset>` + sr-only `<legend>`), styled on the `<label>`
+- PM checked: `has-checked:bg-surface has-checked:text-text`
+- PM unchecked: `text-text-secondary hover:text-text`; focus ring as in ConfigViewer
+- The four commands are pre-rendered `<span data-panel data-copy-text>` inside one `<pre><code>`; the copy button copies the visible one
+
+### Home hero and CLI showcase
+
+**Files**: `components/AsciiArt.astro`, `components/AnimatedCommand.astro`, `components/CliShowcase.astro` (no React on the home page)
+
+- **ASCII logo**: the outlined art and the solid layer are both rendered statically inside a `role="img" aria-label="getmcp"` wrapper (both `<pre>` are `aria-hidden`). The solid layer gets `motion-safe:animate-ascii-reveal`, a 250 ms `clip-path: inset(0 100% 0 0)` → `inset(0)` wipe in `steps(40)`. Without JS or with reduced motion the logo is complete from the first paint. The CRT scanline overlay is `motion-reduce:hidden`
+- **Animated command**: the first command is server-rendered in full (no-JS and reduced-motion state). The script starts in the "typed, pausing" state (2000 ms), then erases (30 ms/char), pauses 300 ms and types the next (60 ms/char). The blinking cursor is `motion-reduce:hidden`. Both copy buttons carry `data-copy` with the full current command
+- **CLI showcase**: command cards are `<label>`s around sr-only radios (`name="cli-command"`, `<fieldset>` + sr-only `<legend>`); checked: `has-checked:border-accent has-checked:bg-accent/10`, unchecked hover: `not-has-checked:hover:border-accent/50`, focus ring via `has-focus-visible:`. Arrow keys move linearly through the cards. The 10 terminal mocks are pre-rendered `[data-panel]`s, the inactive ones `hidden`
 
 ### MetaItem
 
@@ -325,7 +337,7 @@ Configuration
 
 ### DocsSidebar
 
-**File**: `components/DocsSidebar.tsx`
+**File**: `components/DocsSidebar.astro`
 
 ```
  ON THIS PAGE       ← text-xs font-medium uppercase tracking-wider
@@ -339,7 +351,7 @@ Configuration
 - Heading: `text-xs font-medium uppercase tracking-wider text-text-secondary mb-4`
 - List: `space-y-2.5 text-sm border-l border-border pl-4`
 - Level 3 items indented with `pl-3 text-xs`
-- Supports `scroll-target-group` and `:target-current` for active state highlighting
+- Supports `scroll-target-group` and `:target-current` for active state highlighting (rules in `public/docs-scroll-spy.css`, see `css-scroll-spy.md`)
 
 ---
 
@@ -368,9 +380,12 @@ border-accent bg-accent text-white            (config tab)
 ### Icon Button (copy)
 
 ```
-text-text-secondary hover:text-text transition-colors rounded-md
-→ text-success (copied state, reverts after 2s)
+group text-text-secondary hover:text-text transition-colors rounded-md
+→ data-copied on the button for 2s: Copy icon `group-data-copied:hidden`,
+  Check icon `text-success hidden group-data-copied:block`
 ```
+
+Both icons are always rendered; `scripts/copy.ts` toggles `data-copied` and writes "Copied to clipboard" into one shared `aria-live="polite"` region (cleared by the same 2s timer). The `aria-label` stays "Copy code".
 
 ---
 
@@ -378,15 +393,17 @@ text-text-secondary hover:text-text transition-colors rounded-md
 
 ### 404 Page
 
+`NotFound.astro`, static (no React):
+
 ```
- Error 404                ← text-sm font-mono uppercase tracking-wider
- Page not found           ← text-5xl font-bold tracking-tight
- description text         ← text-lg text-text-secondary max-w-md
- [Browse servers]         ← primary CTA button
+ ASCII "404"              ← two <pre> layers in an aria-hidden wrapper (the page h1 is sr-only in 404.astro), clamp(10px, 4.2vw, 26px)
+ terminal window          ← fake `npx @getmcp/cli find <path>` with a red error line and a hint
+ [Browse servers]         ← primary CTA button + `or run npx @getmcp/cli find`
 ```
 
-- Generous vertical padding: `py-32`
-- Centered layout with constrained description width
+- Centered column with `py-20`, filling the viewport below header and footer
+- Fixed CRT scanline overlay; the sweeping scanline, the solid-layer reveal (`motion-safe:animate-ascii-reveal`) and the cursor blink only run without reduced motion
+- The requested path is filled in by a tiny script (`/unknown` without JS)
 
 ### Error Page
 
@@ -403,30 +420,42 @@ text-text-secondary hover:text-text transition-colors rounded-md
 
 ## Icons
 
-Icons come from two libraries: **lucide-react** (generic UI icons) and **@icons-pack/react-simple-icons** (brand icons).
+Generic UI icons come from **Lucide**: **@lucide/astro** in `.astro` components and **lucide-react** only inside React islands. Brand icons (GitHub, Docker in `ServerSidebar.astro`) are inline `<svg viewBox="0 0 24 24" fill="currentColor">` paths copied from simple-icons (CC0); there is no brand-icon package.
 
 - Size: `w-4 h-4` (default), `w-3.5 h-3.5` (compact metrics), `w-3 h-3` (checkbox check)
 - Style: stroke-based (lucide defaults: `strokeWidth={2}`, `strokeLinecap="round"`, `strokeLinejoin="round"`)
 - Color: `text-text-secondary` (inherits via `currentColor`)
 
-No wrapper file — consumers import directly from `lucide-react` and `@icons-pack/react-simple-icons`. Pass `aria-hidden="true"` on each usage.
+No wrapper file — consumers import icons directly. Pass `aria-hidden="true"` on each decorative usage (an icon with `aria-label` keeps its label in both Lucide packages).
 
-Icons used: `Search`, `SlidersHorizontal`, `Terminal`, `Copy`, `Check`, `X`, `Lock`, `Star`, `Download`, `GitFork`, `CircleDot`, `ExternalLink`, `BadgeCheck`, `SiGithub`, `SiDocker`, custom logo.
+In `.astro` components use **@lucide/astro** with per-icon deep imports (`import Copy from "@lucide/astro/icons/copy"`); never the barrel import, which compiles every icon.
+
+Icons used: `Search`, `SlidersHorizontal`, `Terminal`, `Copy`, `Check`, `X`, `Lock`, `Star`, `Download`, `GitFork`, `CircleDot`, `ExternalLink`, `BadgeCheck`, GitHub and Docker brand paths, custom logo.
+
+### Favicons and app icons
+
+Generated from `public/icon.svg` by `packages/web/scripts/generate-icons.ts` (run it manually after changing the logo): the glyph at 75% size on a full-bleed `#0a0a0a` square, so it stays legible on any launcher or tab background. Outputs `favicon.ico` (32×32), `apple-touch-icon.png` (180×180), `icon-192.png` and `icon-512.png`. `manifest.webmanifest` lists the 192/512 icons with `theme_color` and `background_color` `#0a0a0a`. The SVG itself is still served as the scalable favicon.
 
 ### Logo
 
-Custom SVG (download arrow + node network). Stroke: `#ededed`, strokeWidth `2.2`. Displayed at `w-6 h-6` in header.
+Custom SVG (download arrow + node network). Stroke: `#ededed`, strokeWidth `2.2`. Displayed at `h-6 w-auto` in the header as `<img src="/icon.svg" alt="">` (decorative: the parent link has `aria-label="getmcp home"`), with no `fetchpriority` (reserved for the LCP image).
+
+Header row: `flex flex-wrap items-center justify-between gap-x-4 gap-y-2`, so on very narrow screens the nav wraps to a second line instead of overlapping the logo. The "beta" badge is hidden below `sm` (`max-sm:hidden`).
 
 ---
 
 ## Animations & Transitions
 
-| Pattern              | Class               | Duration | Usage                        |
-| -------------------- | ------------------- | -------- | ---------------------------- |
-| Color change         | `transition-colors` | 150ms    | Hover text/border/background |
-| All properties       | `transition-all`    | 150ms    | Card hover (bg + border)     |
-| Loading skeleton     | `animate-pulse`     | default  | Loading states               |
-| Copy button feedback | (JS timeout)        | 2000ms   | Checkmark → clipboard revert |
+| Pattern              | Class                                              | Duration | Usage                                                 |
+| -------------------- | -------------------------------------------------- | -------- | ----------------------------------------------------- |
+| Color change         | `transition-colors`                                | 150ms    | Hover text/border/background                          |
+| All properties       | `transition-all`                                   | 150ms    | Card hover (bg + border)                              |
+| Loading skeleton     | `animate-pulse`                                    | default  | Loading states                                        |
+| Copy button feedback | (JS timeout)                                       | 2000ms   | Checkmark → clipboard revert                          |
+| ASCII logo reveal    | `motion-safe:animate-ascii-reveal`                 | 250ms    | Home hero solid layer (`clip-path` wipe, `steps(40)`) |
+| Typing cursor        | `motion-safe:animate-[blink_1s_step-end_infinite]` | 1s       | Hero command cursor (hidden with reduced motion)      |
+
+**Page transitions**: cross-document view transitions with the browser's default cross-fade (`@view-transition { navigation: auto; }` in `globals.css`, inside `@media (prefers-reduced-motion: no-preference)`, so reduced motion gets plain navigations). No `view-transition-name` morphs. `BaseLayout` holds the first render with `<link rel="expect" href="#site-header" blocking="render">` so the fade never lands on a blank page. Browsers without support navigate normally.
 
 ---
 
@@ -515,7 +544,7 @@ Dedicated landing pages for each of the 14 server categories.
 - **Layout**: `max-w-6xl mx-auto px-6 py-12`
 - **Server grid**: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4`
 - **JSON-LD**: `CollectionPage` + `ItemList` of servers + `BreadcrumbList`
-- **Breadcrumb styling**: `text-sm text-text-secondary hover:text-text`
+- **Breadcrumb**: `Breadcrumbs.astro` (see Links); pages 2+ keep the category name as the last crumb
 
 ### Guide Pages (`/guides/[app]`)
 
@@ -548,8 +577,8 @@ Per-app installation and configuration guides with generator metadata.
 │ □ VS Code 1.80+                         │
 │ □ MCP CLI installed                     │
 │                                         │
-│ Popular Servers for VS Code             │  ← Compact 2-col grid
-│ [Server] [Server]                       │     (names + badges only)
+│ Popular MCP Servers                     │  ← Compact 2-col grid
+│ [Server] [Server]                       │     (name + description cards)
 │ [Server] [Server]                       │
 │                                         │
 │ Troubleshooting                         │  ← FAQ or common issues
@@ -562,7 +591,7 @@ Per-app installation and configuration guides with generator metadata.
 ```
 
 - **Layout**: `max-w-3xl mx-auto px-6 py-12`
-- **Breadcrumb**: Link styled as `text-text-secondary hover:text-text text-sm`
+- **Breadcrumb**: `Breadcrumbs.astro` (Home / Guides / {App}, see Links)
 - **Section spacing**: `mb-10` between major sections
 - **Code blocks**: `rounded-lg border border-border bg-code-bg p-4 font-mono text-sm`
 - **Metadata grid** (`dl`): `grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-5 py-6 border-y border-border`
@@ -611,10 +640,11 @@ Mobile (<md):
 ```
 
 - **Mobile select**: `md:hidden` applied to `<select>` element
-- **Desktop pills**: `hidden md:flex` for pill buttons
-- **Preference storage**: `localStorage.getItem("getmcp-preferred-app")` / `localStorage.setItem("getmcp-preferred-app", appId)`
+- **Desktop pills**: `hidden md:flex` on the radio `<fieldset>`
+- **Sync**: `scripts/radio-panels.ts` keeps the select, the radios and the visible panel in sync; radios and select use `autocomplete="off"`
+- **Preference storage**: saved under `getmcp-preferred-app` on change; `RestoreChoice.astro` restores it inline before first paint
 - **Select styling**: `rounded-md border border-border bg-surface text-text p-2`
-- **File**: `packages/web/src/components/ConfigViewer.tsx`
+- **File**: `packages/web/src/components/ConfigViewer.astro`
 
 ### Search Filter Pills
 
@@ -658,19 +688,21 @@ Enhanced metadata display on server listing cards.
 - **Runtime badge**: `bg-surface-hover text-text-secondary font-mono text-xs px-2 py-0.5 rounded-full`
 - **Author byline**: `text-xs text-text-secondary ml-auto` (absolute right on card, or flex justify-between)
 - **Transport badge**: Existing `text-xs px-2 py-0.5 rounded-full font-medium` (green for stdio, purple for remote)
-- **File**: `packages/web/src/components/ServerCard.tsx`
+- **Files**: `packages/web/src/components/ServerCard.astro` and `packages/web/src/components/ServerCard.tsx` (keep in sync)
 
 ---
 
 ## Dependencies
 
-| Package                      | Purpose                   |
-| ---------------------------- | ------------------------- |
-| `astro@^7.3.5`               | Framework (static output) |
-| `@astrojs/react@^7.0.0`      | React islands             |
-| `react@^19.3.0`              | UI library                |
-| `tailwindcss@^4.3.3`         | CSS framework             |
-| `@tailwindcss/vite@^4.3.3`   | Vite integration          |
-| `satori` + `@resvg/resvg-js` | OG image generation       |
+| Package                                | Purpose                   |
+| -------------------------------------- | ------------------------- |
+| `astro@^7.3.5`                         | Framework (static output) |
+| `@astrojs/react@^7.0.0`                | React islands             |
+| `react@^19.3.0`                        | UI library                |
+| `tailwindcss@^4.3.3`                   | CSS framework             |
+| `@tailwindcss/vite@^4.3.3`             | Vite integration          |
+| `@lucide/astro`                        | Icons in `.astro` files   |
+| `lucide-react`                         | Icons in React islands    |
+| `satori` + `@resvg/resvg-js` + `sharp` | OG image generation       |
 
 No UI component library (shadcn, Radix, etc.). All components are custom-built.

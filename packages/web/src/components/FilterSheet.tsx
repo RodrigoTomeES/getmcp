@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
 
 type FilterSheetProps = {
@@ -9,6 +9,12 @@ type FilterSheetProps = {
   children: ReactNode;
 };
 
+/**
+ * Mobile filters as a native modal `<dialog>`. `showModal()` makes the rest of
+ * the page inert (focus trap), handles Esc and restores focus on close;
+ * `closedby="any"` adds backdrop light dismiss. The native `close` event calls
+ * `onClose`, so the parent's `open` state stays in sync.
+ */
 export function FilterSheet({
   open,
   onClose,
@@ -16,84 +22,46 @@ export function FilterSheet({
   resultCount,
   children,
 }: FilterSheetProps) {
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const previousFocus = useRef<HTMLElement | null>(null);
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-        return;
-      }
-
-      // Focus trap: cycle Tab within the sheet
-      if (e.key === "Tab" && sheetRef.current) {
-        const focusable = sheetRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        );
-        if (focusable.length === 0) return;
-
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-
-        if (e.shiftKey) {
-          if (document.activeElement === first) {
-            e.preventDefault();
-            last.focus();
-          }
-        } else {
-          if (document.activeElement === last) {
-            e.preventDefault();
-            first.focus();
-          }
-        }
-      }
-    },
-    [onClose],
-  );
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    if (open) {
-      previousFocus.current = document.activeElement as HTMLElement | null;
-      document.body.style.overflow = "hidden";
-      document.addEventListener("keydown", handleKeyDown);
-      // Focus the sheet for screen readers
-      sheetRef.current?.focus();
-    } else {
-      document.body.style.overflow = "";
-      document.removeEventListener("keydown", handleKeyDown);
-      previousFocus.current?.focus();
-    }
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (open && !dialog.open) dialog.showModal();
+    else if (!open && dialog.open) dialog.close();
+  }, [open]);
 
-    return () => {
-      document.body.style.overflow = "";
-      document.removeEventListener("keydown", handleKeyDown);
+  // Light-dismiss fallback for browsers without `closedby` (Safari).
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog || "closedBy" in HTMLDialogElement.prototype) return;
+
+    const onClick = (event: MouseEvent) => {
+      // Backdrop clicks target the dialog itself; ignore clicks on its content.
+      if (event.target !== dialog) return;
+      const rect = dialog.getBoundingClientRect();
+      const inside =
+        rect.top <= event.clientY &&
+        event.clientY <= rect.bottom &&
+        rect.left <= event.clientX &&
+        event.clientX <= rect.right;
+      if (!inside) dialog.close();
     };
-  }, [open, handleKeyDown]);
+
+    dialog.addEventListener("click", onClick);
+    return () => dialog.removeEventListener("click", onClick);
+  }, []);
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
-          open ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        aria-hidden="true"
-        onClick={onClose}
-      />
-
-      {/* Sheet */}
-      <div
-        ref={sheetRef}
-        id="filter-sheet"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Filters"
-        tabIndex={-1}
-        className={`fixed bottom-0 inset-x-0 z-50 bg-surface rounded-t-2xl max-h-[85vh] flex flex-col transition-transform duration-300 ease-out outline-none ${
-          open ? "translate-y-0" : "translate-y-full"
-        }`}
-      >
+    <dialog
+      ref={dialogRef}
+      id="filter-sheet"
+      closedby="any"
+      aria-label="Filters"
+      onClose={onClose}
+      className="m-0 mt-auto w-full max-w-none max-h-[85dvh] p-0 bg-surface text-text rounded-t-2xl backdrop:bg-black/50"
+    >
+      <div className="relative flex flex-col max-h-[85dvh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-3 pb-2">
           <div className="absolute left-1/2 -translate-x-1/2 top-3">
@@ -131,6 +99,6 @@ export function FilterSheet({
           </button>
         </div>
       </div>
-    </>
+    </dialog>
   );
 }

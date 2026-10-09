@@ -1,0 +1,56 @@
+---
+import Terminal from "@lucide/astro/icons/terminal";
+
+const SMART_FEATURES = [
+  "Auto-detects installed AI apps on your system",
+  "Never overwrites existing configs — merge only",
+  "Detects config format automatically (JSON/JSONC/YAML/TOML)",
+  "Tracks global vs project scope per app",
+  "Incremental registry sync — only fetches changes",
+];
+
+// Command, padding to align the comments, comment. Rendered inside <pre>, so
+// the line is written on one line below to keep the whitespace exact.
+const POWER_FLAGS = [
+  ["getmcp add github --dry-run", "    ", "# Preview changes"],
+  ["getmcp ls --json", "               ", "# Machine-readable"],
+  ["getmcp rm slack --yes", "          ", "# Skip prompts"],
+  ["getmcp dr", "                      ", "# Alias for doctor"],
+  ["getmcp add pg --app=cursor", "     ", "# Target one app"],
+];
+---
+
+<section class="mb-12">
+  <h2 class="text-xl font-bold mb-8">Made for developers who hate friction</h2>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    {/* Left: Smart Automation */}
+    <div class="rounded-lg border border-border bg-surface p-5">
+      <h3 class="font-bold text-text mb-4">Smart Automation</h3>
+      <ul class="space-y-3">
+        {
+          SMART_FEATURES.map((feature) => (
+            <li class="flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-success shrink-0" aria-hidden="true" />
+              <span class="text-sm text-text-secondary">{feature}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    {/* Right: Power Flags */}
+    <div class="rounded-lg border border-border bg-code-bg overflow-hidden">
+      <div class="flex items-center gap-2 px-4 py-2 border-b border-border">
+        <Terminal class="w-4 h-4 text-text-secondary shrink-0" aria-hidden="true" />
+        <span class="text-xs font-mono text-text-secondary select-none">power flags</span>
+      </div>
+      <pre class="px-4 py-3 font-mono text-sm leading-loose overflow-x-auto"><code>{POWER_FLAGS.map(([cmd, pad, comment], i) => <>{i > 0 ? "\n" : ""}<span class="text-accent">$</span>{" "}<span class="text-text">{cmd}</span>{pad}<span class="text-text-secondary">{comment}</span></>)}</code></pre>
+    </div>
+  </div>
+
+  <p class="text-sm text-text-secondary text-center mt-6">
+    Also available as a library:{" "}
+    <code class="text-accent">import {"{ detectApps }"} from &quot;@getmcp/cli&quot;</code>
+  </p>
+</section>

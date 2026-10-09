@@ -29,16 +29,29 @@
   --color-warning-border: color-mix(in srgb, #f59e0b 30%, transparent);
   --color-warning-subtle: color-mix(in srgb, #f59e0b 12%, transparent);
   --color-warning-light: color-mix(in srgb, #f59e0b 80%, white);
+
+  /* Home hero: solid ASCII logo wipe (used as motion-safe:animate-ascii-reveal) */
+  --animate-ascii-reveal: ascii-reveal 250ms steps(40) both;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
   }
+
+  /* Cross-document view transitions (default cross-fade); off for reduced motion. */
+  @view-transition {
+    navigation: auto;
+  }
 }
 
 html {
   scroll-padding-block-start: 6rem;
+}
+
+/* Keep the page from scrolling behind an open modal <dialog> (FilterSheet). */
+html:has(dialog:modal) {
+  overflow: hidden;
 }
 
 body {
@@ -60,14 +73,12 @@ body {
   }
 }
 
-@keyframes fade-in-up {
+@keyframes ascii-reveal {
   from {
-    opacity: 0;
-    transform: translateY(8px);
+    clip-path: inset(0 100% 0 0);
   }
   to {
-    opacity: 1;
-    transform: translateY(0);
+    clip-path: inset(0);
   }
 }
 

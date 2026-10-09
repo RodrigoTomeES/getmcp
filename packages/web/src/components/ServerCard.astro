@@ -1,0 +1,97 @@
+---
+/**
+ * Server card for static pages (server, category and home pages).
+ * Keep in sync with ServerCard.tsx, which renders the same markup inside the
+ * /servers SearchBar island.
+ */
+import BadgeCheck from "@lucide/astro/icons/badge-check";
+import Download from "@lucide/astro/icons/download";
+import Star from "@lucide/astro/icons/star";
+import { compactNumber } from "@/lib/format";
+import type { ServerCardData } from "@/lib/server-detail";
+
+interface Props {
+  server: ServerCardData;
+}
+
+const { server } = Astro.props;
+const transport = server.isRemote ? "remote" : "stdio";
+const hasStats =
+  (server.stars != null && server.stars > 0) || (server.downloads != null && server.downloads > 0);
+const hasCategories = server.categories && server.categories.length > 0;
+const hasMetadata = hasStats || server.runtime || hasCategories || server.envCount > 0;
+---
+
+<a
+  href={`/servers/${server.slug}`}
+  class="group flex flex-col rounded-lg border border-border bg-surface p-5 hover:bg-surface-hover hover:border-accent/50 transition-all"
+>
+  <div class="flex items-baseline justify-between gap-3 mb-2">
+    <h3
+      class="font-semibold text-lg group-hover:text-accent transition-colors leading-snug inline-flex items-baseline"
+    >
+      {server.name}{
+        server.isOfficial && (
+          <span role="img" aria-label="Official MCP server" title="Official MCP server">
+            <BadgeCheck class="h-[1ch] text-official shrink-0" aria-hidden="true" />
+          </span>
+        )
+      }
+    </h3>
+    <span
+      class={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
+        server.isRemote
+          ? "bg-transport-remote-bg text-transport-remote"
+          : "bg-transport-stdio-bg text-transport-stdio"
+      }`}
+    ><span class="sr-only">Transport: </span>{transport}</span>
+  </div>
+
+  <p class="text-sm text-text-secondary mb-3 line-clamp-2 leading-relaxed">{server.description}</p>
+
+  {
+    hasMetadata && (
+      <div class="flex flex-col gap-2 mt-auto">
+        {/* Row 1: metrics + runtime */}
+        {(hasStats || server.runtime) && (
+          <div class="flex items-center gap-2 flex-wrap">
+            {server.stars != null && server.stars > 0 && (
+              <span
+                class="text-xs px-2 py-0.5 rounded-full bg-surface-hover text-text-secondary inline-flex items-center gap-1"
+                aria-label={`${server.stars.toLocaleString()} GitHub stars`}
+              >
+                <Star class="w-3 h-3" aria-hidden="true" />
+                <span aria-hidden="true">{compactNumber(server.stars)}</span>
+              </span>
+            )}
+            {server.downloads != null && server.downloads > 0 && (
+              <span
+                class="text-xs px-2 py-0.5 rounded-full bg-surface-hover text-text-secondary inline-flex items-center gap-1"
+                aria-label={`${server.downloads.toLocaleString()} downloads per week`}
+              >
+                <Download class="w-3 h-3" aria-hidden="true" />
+                <span aria-hidden="true">{compactNumber(server.downloads)}<span class="opacity-60">/w</span></span>
+              </span>
+            )}
+            {server.runtime && (
+              <span class="text-xs px-2 py-0.5 rounded-full bg-surface-hover text-text-secondary font-mono">
+                {server.runtime}
+              </span>
+            )}
+          </div>
+        )}
+        {/* Row 2: categories + env vars */}
+        {(hasCategories || server.envCount > 0) && (
+          <div class="flex items-center gap-2 flex-wrap">
+            {server.categories?.map((cat) => (
+              <span class="text-xs px-2 py-0.5 rounded-full bg-tag-bg text-tag-text">{cat}</span>
+            ))}
+            {server.envCount > 0 && (
+              <span class="text-xs px-2 py-0.5 rounded-full bg-warning-bg text-warning">{server.envCount} env var{server.envCount > 1 ? "s" : ""}</span>
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
+</a>

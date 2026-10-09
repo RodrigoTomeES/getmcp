@@ -1017,41 +1017,47 @@ When `--refresh` is used interactively, the CLI prompts the user to choose betwe
 
 A fully static Astro website that serves as a public directory for MCP servers. Think "npm registry for MCP servers" with one-click config generation.
 
-**Tech stack**: Astro 7.3+ (`output: "static"`, `build.format: "file"`), React 19 islands for interactive components, Tailwind CSS 4.3+ (`@tailwindcss/vite`), Cloudflare Web Analytics, with `@getmcp/core`, `@getmcp/generators`, and `@getmcp/registry` imported directly at build time. Every page — including one page per registry server slug — is prerendered; there is no server runtime.
+**Tech stack**: Astro 7.3+ (`output: "static"`, `build.format: "file"`), React 19 only for the `/servers` search island (every other page uses `.astro` components with small module scripts), Tailwind CSS 4.3+ (`@tailwindcss/vite`), Cloudflare Web Analytics (optional public build-time token `PUBLIC_CF_ANALYTICS_TOKEN`, declared with `astro:env` in `astro.config.mjs`; no beacon when unset), with `@getmcp/core`, `@getmcp/generators`, and `@getmcp/registry` imported directly at build time. Every page — including one page per registry server slug — is prerendered; there is no server runtime.
 
 **Build output**:
 
 - HTML for every route below, with URLs without trailing slash (`/servers/foo` → `servers/foo.html`).
-- OG images generated at build time with satori + resvg (`*/opengraph-image.png`), one per page including every server.
-- Sitemap index (`/sitemap.xml`) plus chunked sitemaps (`/sitemap-<n>.xml`, 10,000 URLs each) and a static `robots.txt`.
-- `npm run build -w @getmcp/web` prints a size report (`scripts/measure.ts`: file counts, total size, per-page sizes, comparison against static hosting limits) and writes it to the GitHub Actions job summary (`.github/workflows/web.yml`).
+- OG images generated at build time with satori + resvg (`*/opengraph-image.png`), one per page including every server, then re-encoded by sharp as 256-colour palette PNGs (~24 KB each instead of ~70 KB).
+- `/servers.json`: the search index for the `/servers` island (every server as `ServerCardData`); the `/servers` HTML ships only the first page.
+- `/servers` keeps its search state in the query string (`q`, `category`, `runtime`, `transport`, `official`, `sort`, `per_page`, `page`). On load the island validates it (`readSearchState()`: whitelisted and deduped lists, known sort and page size, positive-integer page) and rewrites the URL to its canonical form with `replaceState`; an out-of-range `page` is clamped once the index arrives. Other params (e.g. `utm_*`) are kept.
+- Sitemap index (`/sitemap.xml`) plus chunked sitemaps (`/sitemap-<n>.xml`, 10,000 URLs each) with per-URL `lastmod` (newer of the registry `updatedAt` and the last GitHub push; home, `/servers` and categories use their newest server; docs and guides omit it; each index entry uses its chunk's newest date), and a static `robots.txt`.
+- Every page carries native speculation rules (one document rule, `prefetch` with `eagerness: "moderate"`, excluding `*.png`, `*.xml` and `*.json`) and opts in to cross-document view transitions (default cross-fade, disabled with reduced motion). Both are progressive enhancements; unsupported browsers ignore them.
+- Every page carries a Content Security Policy as a `<meta http-equiv>` from Astro's `security.csp` (`astro.config.mjs`): `default-src 'self'`, `img-src 'self' data: https:` (remote server icons), `font-src 'self'`, `connect-src 'self' https://cloudflareinsights.com`, `object-src 'none'`, `base-uri 'none'`, `form-action 'self'`, `script-src 'self' https://static.cloudflareinsights.com` plus hashes (no `'unsafe-inline'`), `style-src 'self'` plus hashes, and `style-src-attr 'unsafe-inline'` (inline `style` attributes and React style props). Astro hashes its own bundled scripts, island loaders and inline styles (Fonts API); the two `is:inline` scripts (speculation rules and `RESTORE_CHOICE_SCRIPT`) get their sha256 via `Astro.csp.insertScriptHash()` in `BaseLayout.astro`'s frontmatter, because hashes added from a `<body>` component arrive after the policy is rendered. JSON-LD blocks are data and need no hash; the /docs scroll-spy rules are a `public/` stylesheet covered by `'self'`. Astro emits the meta at the end of `<head>`, so it governs everything after it (the whole body). The policy is an allowlist rather than `'strict-dynamic'` (static site with a single third-party script, the Cloudflare beacon); a meta CSP cannot be report-only nor carry `frame-ancestors` or `report-to`, so those, HSTS, `X-Content-Type-Options`, `X-Frame-Options` and `Referrer-Policy` must be sent as host headers (ROADMAP 6b phase 2). CSP is not applied in `astro dev`; check built output.
+- `npm run build -w @getmcp/web` (plain `astro build`) prints a size report (`integrations/build-report.ts`, an `astro:build:done` integration: file counts, total size, per-page sizes, comparison against static hosting limits) and writes it to the GitHub Actions job summary (`.github/workflows/web.yml`).
 
 ### Routes
 
 The web application provides the following public routes:
 
-| Route              | Purpose                                                                        |
-| ------------------ | ------------------------------------------------------------------------------ |
-| `/`                | Homepage with hero section, search, and recent servers                         |
-| `/docs`            | Documentation page (getting started, supported apps, library usage)            |
-| `/servers`         | Server directory index page with search and category/runtime/transport filters |
-| `/servers/[id]`    | Individual server detail page with config generators for all 19 apps           |
-| `/category/[slug]` | 14 category landing pages with per-category server grids and descriptions      |
-| `/guides/[app]`    | 19 app-specific MCP setup guides (config details, examples, troubleshooting)   |
+| Route              | Purpose                                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `/`                | Homepage with hero section, search, and recent servers                                                             |
+| `/docs`            | Documentation page (getting started, supported apps, library usage)                                                |
+| `/servers`         | Server directory index page with search and category/runtime/transport filters (index loaded from `/servers.json`) |
+| `/servers/[id]`    | Individual server detail page with config generators for all 19 apps                                               |
+| `/category/[slug]` | 14 category landing pages, 48 servers per page sorted by GitHub stars; later pages at `/category/[slug]/[n]`       |
+| `/guides/[app]`    | 19 app-specific MCP setup guides (config details, examples, troubleshooting)                                       |
 
 ### JSON-LD Schemas
 
 The site uses structured data (JSON-LD) for SEO and schema.org compliance:
 
-- **BreadcrumbList** — Category and guide navigation breadcrumbs
+- **BreadcrumbList** — Servers, server detail, category and guide trails (each starts with Home; the visible trail is rendered by `Breadcrumbs.astro`)
 - **CollectionPage** — Server directory index (`/servers`)
-- **ItemList** — Category server grids (`/category/[slug]`)
+- **ItemList** — Category server grids (`/category/[slug]`), current page only
 - **TechArticle** — App-specific guides (`/guides/[app]`)
 - **SoftwareApplication** (fixed) — Organization schema in root layout
 - **WebApplication** — Root application metadata
 - **Organization** — getmcp organization metadata
 
 All schemas include proper `@context`, `@type`, and required properties per schema.org specification.
+
+Every JSON-LD block is rendered by `components/JsonLd.astro`, which serialises it with `serializeJsonLd()` (`lib/json-ld.ts`): `JSON.stringify` with every `<` escaped as a JSON unicode escape, so third-party registry text cannot close the `<script>` or open an HTML comment.
 
 ---
 

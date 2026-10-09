@@ -26,9 +26,9 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22.17) with
 | `packages/generators` | `@getmcp/generators` | 19 config generators (one per AI app), each transforms canonical format to app-native format                                                                                                                                    |
 | `packages/registry`   | `@getmcp/registry`   | Catalog of MCP server definitions with search/filter API                                                                                                                                                                        |
 | `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `doctor`, `import`, `sync`, `registry` commands with app auto-detection, config merging, multi-registry support, and installation tracking via `getmcp-lock.json` |
-| `packages/web`        | `@getmcp/web`        | Astro static web directory for browsing servers and generating config snippets (React islands for interactivity), with Cloudflare Web Analytics                                                                                 |
+| `packages/web`        | `@getmcp/web`        | Astro static web directory for browsing servers and generating config snippets (static `.astro` components with small scripts; React only for the `/servers` search island), with Cloudflare Web Analytics                      |
 
-**Tech stack**: TypeScript 5.7+, Zod 4.0+, Vitest 3.0+, Astro 7.3+ (web, static output), React 19 (web islands), Tailwind CSS 4.3+ (web), `@clack/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
+**Tech stack**: TypeScript 5.7+, Zod 4.0+, Vitest 3.0+, Astro 7.3+ (web, static output), React 19 (web `/servers` search island), Tailwind CSS 4.3+ (web), `@clack/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
 
 > See `.agents/docs/SPECIFICATION.md` Section 3 for the full architecture breakdown.
 
@@ -61,7 +61,7 @@ Server data is synced from the [official MCP registry](https://registry.modelcon
 5. Register the generator in `packages/generators/src/index.ts`
 6. Add stdio + remote tests in `packages/generators/tests/generators.test.ts`
 7. Add detection paths in `packages/cli/src/detect.ts` if the app has a known config file location
-8. Update `packages/web/src/components/ConfigViewer.tsx` to include the new app tab
+8. Add a guide entry in `packages/web/src/lib/guide-data.ts` (its name is the app label); `ConfigViewer.astro` lists every generator automatically
 
 ### Modifying an existing generator's transformation rules
 
@@ -95,7 +95,7 @@ This is not optional — documentation drift causes confusion and wastes time. T
 
 ## Testing
 
-- **757 tests** across 35 test files
+- **818 tests** across 39 test files
 - Run all tests: `npx vitest` (from repo root)
 - Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc. (`npx vitest --project web` for the web package)
 - Test locations:
@@ -104,7 +104,8 @@ This is not optional — documentation drift causes confusion and wastes time. T
   - `packages/registry/tests/` — entry validation, lookup, search, categories, content integrity, fetch-metrics
   - `packages/cli/tests/` — app-selection, bin flags, config-file I/O, credentials, detect, errors, format, lock file, preferences, registry-cache, registry-config, utils
   - `packages/cli/tests/commands/` — add, check, doctor, find, import, list, registry, remove, sync, update command tests
-  - `packages/web/tests/` — metadata resolution, sitemap, server detail helpers, OG image rendering, text formatting (`toSentence`)
+  - `packages/web/tests/` — metadata resolution, sitemap, server detail helpers, OG image rendering, text and date formatting (`toSentence`, `formatDate`, `formatRelativeTime`), JSON-LD escaping, server sorting and default search state, guides popular servers, pagination helpers (`getPageNumbers`, `categoryPageUrl`)
+- Quick local web build (never run a full build locally: ~32 min, ~79,500 files): from `packages/web` run `WEB_MAX_SERVER_PAGES=200 npx astro build --outDir node_modules/.partial-dist`, then delete that folder. `WEB_MAX_SERVER_PAGES` caps the `/servers/[id]` pages and OG images (`src/lib/server-paths.ts`) and always keeps a fixed set of representative slugs (e.g. `github-github`). The `outDir` must be on the same drive as the repo (Astro moves assets with `fs.rename`, which fails with `EXDEV` across drives); `node_modules` is git-ignored. Visual regression against production: see `tools/vrt/README.md` (not a workspace; `npm run setup` inside it installs Playwright). Known issue: a stale `packages/web/dist` (~79,500 files) can make Tailwind's `@tailwindcss/oxide` source scanner hang, which stalls `astro dev` and the partial build; if that happens, move `dist` out of the way (do not mass-delete it on the slow HDD) or temporarily add `@source not "../../dist";` to `src/styles/globals.css` without committing it.
 
 ---
 
@@ -127,6 +128,26 @@ Follows [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.
 
 ---
 
+## Browser Support (web)
+
+Progressive enhancement: features that are not Baseline widely available may be used only when the site still works without them (e.g. cross-document view transitions, speculation rules, `<dialog closedby>` with its small fallback). No polyfills. See the `modern-web-guidance` skill for per-feature fallbacks.
+
+---
+
+## Notes for AI agents
+
+- `CLAUDE.md` is a symlink to `AGENTS.md`: edit `AGENTS.md`. Never run `sed -i` or a formatter on `CLAUDE.md` (it replaces the symlink with a file). If `git status` shows `T CLAUDE.md`, restore it with `git checkout -- CLAUDE.md`.
+- Format only the files you changed (`npx oxfmt <file> ...`). Running it on whole folders rewrites line endings of untouched files. It can also mangle Markdown: underscores read as emphasis, as in `WEB_PLAN` becoming `WEB*PLAN` inside `_..._` italics. Check the output after formatting.
+- Long-running or parallel agents must not leak processes. `astro dev` for this site holds ~40k registry entries and can grow to several GB; a run once exhausted 32 GB of RAM.
+  - Prefer the partial build over `astro dev`.
+  - Start any dev server as `NODE_OPTIONS=--max-old-space-size=4096 timeout 1200 npx astro dev --port <port> --ignore-lock`, one at a time, and stop it right after.
+  - Never launch Edge/Chrome directly: use Playwright with `browser.close()` in `finally` and a `timeout`.
+  - Never stop the user's own dev server (port 4321).
+- Production (getmcp.es) rebuilds once a day after the registry sync, so same-day captures of it stay valid. Do not recapture it repeatedly.
+- The web improvement plan lives in `WEB_PLAN.md` at the repo root (items by ID, decisions, status, commit per task). Read it before working on an item, and update the item's status afterwards.
+
+---
+
 ## Installed Skills
 
 Skills are installed under `.agents/skills/`. See the skill files for triggers and descriptions.
@@ -139,7 +160,7 @@ Skills are installed under `.agents/skills/`. See the skill files for triggers a
 - **[`ROADMAP.md`](./.agents/docs/ROADMAP.md)** — Planned improvements and open tasks
 - **[`design-system.md`](./.agents/docs/design-system.md)** — Web package design system: colors, fonts, typography, components, layout patterns, and OG image specs
 - **[`competence.md`](./.agents/docs/competence.md)** — Competence analysis
-- **[`css-scroll-spy.md`](./.agents/docs/css-scroll-spy.md)** — CSS scroll spy pattern: inline `<style>` technique (kept out of the CSS pipeline)
+- **[`css-scroll-spy.md`](./.agents/docs/css-scroll-spy.md)** — CSS scroll spy pattern: rules in a `public/` stylesheet (kept out of the CSS pipeline)
 - **[`file-map.md`](./.agents/docs/file-map.md)** — Complete file-by-file reference for all 5 packages
 - **[`publishing.md`](./.agents/docs/publishing.md)** — Auto-release workflow, OIDC trusted publishing, trigger paths, edge cases
 - **[`commit-convention.md`](./.agents/docs/commit-convention.md)** — Conventional Commits types, scopes, and examples

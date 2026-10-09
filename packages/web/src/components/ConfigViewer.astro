@@ -1,0 +1,102 @@
+---
+/**
+ * Config snippet for every AI app: a native radio group (pills, md and up)
+ * plus a `<select>` (mobile), every panel pre-rendered with the inactive ones
+ * `hidden`, switched by `@/scripts/radio-panels`. New generators show up
+ * automatically (the configs come from `preGenerateConfigs`).
+ */
+import CodeBlock from "@/components/CodeBlock.astro";
+import RestoreChoice from "@/components/RestoreChoice.astro";
+import { APP_LABELS } from "@/lib/guide-data";
+import type { PreGeneratedConfig } from "@/lib/server-detail";
+
+interface Props {
+  configs: Record<string, PreGeneratedConfig>;
+}
+
+const { configs } = Astro.props;
+const appIds = Object.keys(configs);
+const label = (appId: string) => APP_LABELS[appId] ?? appId;
+---
+
+<div data-radio-panels data-storage-key="getmcp-preferred-app">
+  <h2 class="text-lg font-semibold mb-4">Configuration</h2>
+
+  <select
+    autocomplete="off"
+    class="select-custom md:hidden w-full mb-4 items-center rounded-lg border border-border bg-surface text-text py-2.5 px-3 focus:outline-none focus:border-accent transition-colors"
+    aria-label="Select AI application"
+  >
+    {appIds.map((appId) => <option value={appId}>{label(appId)}</option>)}
+  </select>
+
+  <fieldset class="hidden md:flex flex-wrap gap-1.5 mb-5 min-w-0">
+    <legend class="sr-only">AI application</legend>
+    {
+      appIds.map((appId, i) => (
+        <label
+          for={`config-app-${appId}`}
+          class="text-xs px-3 py-1.5 rounded-full border font-medium transition-colors cursor-pointer border-border text-text-secondary not-has-checked:hover:border-text-secondary not-has-checked:hover:text-text has-checked:border-accent has-checked:bg-accent/10 has-checked:text-accent has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent"
+        >
+          <input
+            type="radio"
+            id={`config-app-${appId}`}
+            name="config-app"
+            value={appId}
+            checked={i === 0}
+            autocomplete="off"
+            class="sr-only"
+          />
+          {label(appId)}
+        </label>
+      ))
+    }
+  </fieldset>
+
+  {
+    appIds.map((appId, i) => {
+      const config = configs[appId];
+      return (
+        <div data-panel={appId} hidden={i !== 0}>
+          <p class="text-xs text-text-secondary mb-3">
+            Config file: <code class="text-accent font-mono">{config.configPath}</code>
+          </p>
+
+          <CodeBlock label={config.format} code={config.serialized} />
+
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3">
+            <a
+              href={config.docsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-xs text-accent hover:underline"
+            >
+              {label(appId)} MCP documentation
+              <span class="sr-only"> (opens in new tab)</span>
+            </a>
+
+            {appId === "pycharm" && (
+              <p class="text-xs text-warning">
+                Requires the{" "}
+                <a
+                  href="https://plugins.jetbrains.com/plugin/22282-jetbrains-ai-assistant"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="underline text-warning-light"
+                >
+                  JetBrains AI Assistant
+                </a>{" "}
+                plugin.
+              </p>
+            )}
+          </div>
+        </div>
+      );
+    })
+  }
+</div>
+<RestoreChoice />
+
+<script>
+  import "@/scripts/radio-panels";
+</script>

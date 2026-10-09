@@ -1,0 +1,68 @@
+---
+// <pre> contents, kept in the frontmatter so the template literals are
+// plain JavaScript (escapes and indentation stay exact).
+const MANIFEST_EXAMPLE = `{
+  "servers": {
+    "github": {},
+    "slack": {
+      "env": {
+        "SLACK_TOKEN": ""
+      }
+    }
+  }
+}`;
+const REGISTRY_EXAMPLE = `$ getmcp registry add \\
+    https://mcp.company.com
+$ getmcp registry login company \\
+    --method bearer`;
+const LOCK_FILE_EXAMPLE = `getmcp-lock.json
+├── servers: { github, slack }
+├── installedAt: per-app paths
+└── lastSync: 2026-03-04`;
+---
+
+<section class="mb-12">
+  <h2 class="text-xl font-bold mb-2">Built for teams. Ready for enterprise.</h2>
+  <p class="text-text-secondary mb-8 max-w-2xl">
+    Share server configurations across your team. Connect private registries. Keep everyone in
+    sync.
+  </p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    {/* Card 1 — Project Manifests */}
+    <div class="rounded-lg border border-border bg-surface p-5">
+      <h3 class="font-bold text-text mb-2">Declare once, sync everywhere</h3>
+      <p class="text-sm text-text-secondary">
+        Commit a <code class="text-accent">getmcp.json</code> to your repo. Your team runs{" "}
+        <code class="text-accent">getmcp sync</code> and every app is configured instantly.
+      </p>
+      <pre
+        class="bg-code-bg rounded-md p-3 font-mono text-xs text-text-secondary mt-3 overflow-x-auto">{MANIFEST_EXAMPLE}</pre>
+    </div>
+
+    {/* Card 2 — Private Registries */}
+    <div class="rounded-lg border border-border bg-surface p-5">
+      <h3 class="font-bold text-text mb-2">Your servers, your registry</h3>
+      <p class="text-sm text-text-secondary">
+        Add multiple registries - public or private. Authenticate with bearer tokens, basic auth, or
+        custom headers. Use env vars for CI/CD.
+      </p>
+      <pre
+        class="bg-code-bg rounded-md p-3 font-mono text-xs text-text-secondary mt-3 overflow-x-auto">{REGISTRY_EXAMPLE}</pre>
+      <a href="/docs#custom-registries" class="inline-block mt-3 text-sm text-accent hover:underline">
+        Learn more →
+      </a>
+    </div>
+
+    {/* Card 3 — Lock File */}
+    <div class="rounded-lg border border-border bg-surface p-5">
+      <h3 class="font-bold text-text mb-2">Lock file for consistency</h3>
+      <p class="text-sm text-text-secondary">
+        <code class="text-accent">getmcp-lock.json</code> tracks what&apos;s installed, where, and when.
+        Commit it to version control — no more &ldquo;works on my machine&rdquo;.
+      </p>
+      <pre
+        class="bg-code-bg rounded-md p-3 font-mono text-xs text-text-secondary mt-3 overflow-x-auto">{LOCK_FILE_EXAMPLE}</pre>
+    </div>
+  </div>
+</section>

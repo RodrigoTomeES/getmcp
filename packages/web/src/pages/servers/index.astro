@@ -1,10 +1,13 @@
 ---
-import { getAllServers, getCategories, getAllMetrics } from "@getmcp/registry";
+import { getAllServers, getCategories } from "@getmcp/registry";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import JsonLd from "@/components/JsonLd.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import { SearchBar } from "@/components/SearchBar";
 import { APP_COUNT, SITE_URL } from "@/lib/constants";
 import { resolveMetadata } from "@/lib/metadata";
+import { toServerCardData } from "@/lib/server-detail";
+import { DEFAULT_PAGE_SIZE, DEFAULT_SORT, sortServers } from "@/lib/server-search";
 import { SERVERS_OG } from "@/lib/og-pages";
 
 const metadata = resolveMetadata(
@@ -34,24 +37,11 @@ const metadata = resolveMetadata(
 const servers = getAllServers();
 const categories = getCategories();
 const count = servers.length;
-const metricsMap = getAllMetrics();
-
-const minimalServers = servers.map((s) => {
-  const metrics = metricsMap.get(s.id);
-  return {
-    id: s.id,
-    slug: s.slug,
-    name: s.name,
-    description: s.description,
-    categories: s.categories,
-    runtime: s.runtime,
-    isRemote: "url" in s.config,
-    envCount: s.requiredEnvVars.length,
-    stars: metrics?.github?.stars,
-    downloads: metrics?.npm?.weeklyDownloads ?? metrics?.pypi?.weeklyDownloads,
-    isOfficial: s.isOfficial,
-  };
-});
+// Only the first page ships as props; the island fetches the full index from /servers.json.
+const initialServers = sortServers(servers.map(toServerCardData), DEFAULT_SORT).slice(
+  0,
+  DEFAULT_PAGE_SIZE,
+);
 
 const jsonLd = [
   {
@@ -90,16 +80,7 @@ const jsonLd = [
   <div class="max-w-6xl mx-auto px-6 py-10 md:py-16">
     <JsonLd data={jsonLd} />
 
-    {/* Breadcrumb */}
-    <nav aria-label="Breadcrumb" class="text-sm text-text-secondary mb-8">
-      <ol class="flex items-center gap-2">
-        <li>
-          <a href="/" class="hover:text-text transition-colors">Home</a>
-        </li>
-        <li class="text-text-secondary/50" aria-hidden="true">/</li>
-        <li aria-current="page" class="text-text">Servers</li>
-      </ol>
-    </nav>
+    <Breadcrumbs class="mb-8" items={[{ label: "Home", href: "/" }, { label: "Servers" }]} />
 
     {/* Header */}
     <div class="mb-12">
@@ -110,6 +91,6 @@ const jsonLd = [
     </div>
 
     {/* Search + server listing */}
-    <SearchBar client:load servers={minimalServers} categories={categories} />
+    <SearchBar client:load initialServers={initialServers} total={count} categories={categories} />
   </div>
 </BaseLayout>

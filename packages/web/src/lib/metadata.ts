@@ -28,10 +28,8 @@ export type Twitter = {
 export type PageMetadata = {
   title?: string;
   description?: string;
-  keywords?: string[];
   alternates?: {
     canonical?: string;
-    languages?: Record<string, string>;
   };
   openGraph?: OpenGraph;
   twitter?: Twitter;
@@ -49,25 +47,6 @@ const DEFAULT_DESCRIPTION = `Install and configure MCP servers across Claude Des
 
 export const ROOT_METADATA: PageMetadata = {
   description: DEFAULT_DESCRIPTION,
-  keywords: [
-    "MCP",
-    "MCP server",
-    "install MCP",
-    "Model Context Protocol",
-    "Claude Desktop MCP",
-    "VS Code MCP",
-    "Cursor MCP",
-    "MCP config generator",
-    "MCP CLI",
-    "getmcp",
-    "MCP registry",
-    "MCP server installer",
-    "MCP configuration",
-    "Windsurf MCP",
-    "Codex MCP",
-    "team MCP setup",
-    "private MCP registry",
-  ],
   openGraph: {
     siteName: "getmcp",
     locale: "en_US",
@@ -79,12 +58,6 @@ export const ROOT_METADATA: PageMetadata = {
     card: "summary_large_image",
     site: "@getmcp",
     creator: "@RodrigoTomeES",
-  },
-  alternates: {
-    languages: {
-      en: SITE_URL,
-      "x-default": SITE_URL,
-    },
   },
 };
 

@@ -79,7 +79,7 @@ Critical gaps in test coverage.
 - [x] **Add error path tests for `toStdioFields`/`toRemoteFields`** — Tests exist in `generators.test.ts` (`toStdioFields error handling > throws for remote config`, `toRemoteFields error handling > throws for stdio config`).
   - File: `packages/generators/tests/generators.test.ts`
 
-- [ ] **Add tests for web package** — Unit tests now cover metadata resolution, sitemap generation, server detail helpers and OG rendering (`packages/web/tests/`). Still missing: component tests for `ConfigViewer`, `SearchBar`, `ServerCard`; snapshot tests for key layouts.
+- [ ] **Add tests for web package** — Unit tests now cover metadata resolution, sitemap generation, server detail helpers and OG rendering (`packages/web/tests/`). Still missing: tests for `ConfigViewer.astro` / `scripts/radio-panels.ts`, `SearchBar`, `ServerCard`; snapshot tests for key layouts.
   - Directory: `packages/web/`
 
 ---
@@ -203,10 +203,22 @@ The site was taken down on Vercel's free tier for excessive traffic. Phase 1 por
 
 - [x] **Phase 1: port Next.js App Router site to Astro (static output)** — Same routes, markup, metadata, JSON-LD, OG images (satori + resvg at build time, one per server), sitemap (now chunked) and client behavior (React islands). Vercel Analytics/Speed Insights replaced by Cloudflare Web Analytics (`PUBLIC_CF_ANALYTICS_TOKEN`). `vercel.json` removed.
   - Files: `packages/web/astro.config.mjs`, `packages/web/src/pages/**`, `packages/web/src/layouts/BaseLayout.astro`, `packages/web/src/lib/{metadata,og-image,og-pages,og-server,server-detail,server-paths,sitemap}.ts(x)`
-- [x] **Build size report** — `packages/web/scripts/measure.ts` reports file count, total size, per-page sizes and hosting-limit checks (GitHub Pages 1 GB, Cloudflare 20k/100k files, 25 MiB per file) in the GitHub Actions job summary.
-  - Files: `packages/web/scripts/build.ts`, `packages/web/scripts/measure.ts`, `.github/workflows/web.yml`
-- [ ] **Phase 2: choose hosting and deploy** — Options: GitHub Pages + Cloudflare proxy, Cloudflare R2 + CDN, or Cloudflare Workers Paid (static assets). Decide from the size report, then add a deploy workflow (on push and after the daily registry sync), move `getmcp.es` DNS to Cloudflare, emit the security headers from `packages/web/src/lib/security-headers.ts` in the host format (previously served by `next.config.ts`), and delete the Vercel project.
-- [ ] **Optional size optimizations (only if phase 2 needs them)** — Generate the 19 configs client-side instead of embedding them per page, load the `/servers` search index with `fetch` instead of island props, move server OG images to object storage.
+- [x] **Build size report** — The `packages/web/integrations/build-report.ts` Astro integration (runs on every `astro build`) reports file count, total size, per-page sizes and hosting-limit checks (GitHub Pages 1 GB, Cloudflare 20k/100k files, 25 MiB per file) in the GitHub Actions job summary.
+  - Files: `packages/web/integrations/build-report.ts`, `packages/web/astro.config.mjs`, `.github/workflows/web.yml` (build time covers `astro:build:start` → `astro:build:done`, so it is not strictly comparable with reports from the earlier `scripts/build.ts` wrapper)
+- [ ] **Phase 2: choose hosting and deploy** — Options: GitHub Pages + Cloudflare proxy, Cloudflare R2 + CDN, or Cloudflare Workers Paid (static assets). Decide from the size report, then add a deploy workflow (on push and after the daily registry sync), move `getmcp.es` DNS to Cloudflare, emit the security headers that a `<meta>` CSP cannot send, in the host format (previously served by `next.config.ts`): `Strict-Transport-Security: max-age=31536000; includeSubDomains`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` plus CSP `frame-ancestors 'none'` (and `report-to` if CSP reporting is wanted), `Referrer-Policy: strict-origin-when-cross-origin`; keep Cloudflare features that inject inline scripts (Rocket Loader, Email Obfuscation, automatic analytics injection) off, since the CSP would block them; set `PUBLIC_CF_ANALYTICS_TOKEN` in the new build environment (today a Vercel project environment variable; it is optional, so a missing token silently ships no analytics), and delete the Vercel project.
+  - Route check (WEB_PLAN C8): each OG image endpoint creates a folder next to its page (`servers/foo.html` beside `servers/foo/opengraph-image.png`, same for guides and categories). Check on the chosen host that `/servers/foo` serves `servers/foo.html` and does not redirect to `/servers/foo/`; if it does, move the OG endpoints under `/og/…`.
+- [ ] **Optional size optimizations (only if phase 2 needs them)** — Generate the 19 configs client-side instead of embedding them per page, move server OG images to object storage. OG PNGs are already ~65% smaller (256-colour palette via sharp, WEB_PLAN B3, `packages/web/src/lib/og-image.tsx`); its ~45 ms per image adds ~4 min to the full build, so check the build duration against the host limit (Vercel: 45 min) on the first CI run.
+- [x] **`/servers` search index from a static JSON endpoint** (WEB_PLAN B1) — The page ships only the first 24 cards; the `SearchBar` island fetches `/servers.json` (~10 MB raw, ~1.8 MB brotli) after hydration instead of ~19.8 MB of island props.
+  - Files: `packages/web/src/pages/servers.json.ts`, `packages/web/src/pages/servers/index.astro`, `packages/web/src/components/SearchBar.tsx`, `packages/web/src/lib/server-search.ts`
+- [x] **Canonical `/servers` URL state** (WEB_PLAN E8) — The query string is validated on load and rewritten with `replaceState`: invalid values are dropped, list params whitelisted and deduped, an out-of-range `?page=` is clamped once the index loads, a restored `?q=` survives the search debounce, and unknown params such as `utm_source` are kept.
+  - Files: `packages/web/src/lib/server-search.ts`, `packages/web/src/components/SearchBar.tsx`, `packages/web/src/components/FilterPanel.tsx`
+- [ ] **Migrate `/servers` search to Pagefind** — Replace the full `/servers.json` download with Pagefind's chunked index, so visitors who never search download almost nothing.
+- [x] **Static pages without React** (WEB_PLAN A1/A2) — Server pages and guides done (A1): `ConfigViewer.astro` and `PackageManagerCommand.astro` with native radio groups (`scripts/radio-panels.ts`, inline restore in `RestoreChoice.astro`), no `client.*.js` on those pages. Home page done (A2a): `AsciiArt.astro` (CSS `clip-path` reveal), `AnimatedCommand.astro` (small script) and `CliShowcase.astro` (radio panels). 404 (A2b, `NotFound.astro`), server-only components (A2c, `.astro` ports; `ServerCard` duplicated for the `SearchBar` island) and docs done (A2d): `DocsContent.astro` and `DocsSidebar.astro` (scroll-spy rules in `public/docs-scroll-spy.css`), `CodeBlock.tsx` and `hooks/use-clipboard.ts` removed. React remains only in the `/servers` `SearchBar` island.
+  - Files: `packages/web/src/components/*.astro`, `packages/web/src/scripts/{copy,radio-panels}.ts`, `packages/web/src/pages/docs.astro`, `packages/web/public/docs-scroll-spy.css`
+- [x] **Prefetch and page transitions** (WEB_PLAN A5) — Native speculation rules (document rule, `prefetch`, `"moderate"`, excluding `*.png`/`*.xml`/`*.json`) and cross-document view transitions (`@view-transition`, reduced-motion opt-out, `rel="expect"` on the header). The CSP allows the inline speculation rules script by hash (A7).
+  - Files: `packages/web/src/layouts/BaseLayout.astro`, `packages/web/src/styles/globals.css`
+- [x] **Content Security Policy** (WEB_PLAN A7) — Astro's built-in `security.csp` emits a `<meta>` CSP on every page: allowlist (`'self'` + the Cloudflare beacon host), no `'unsafe-inline'` for scripts, Astro-generated hashes plus `Astro.csp.insertScriptHash` for the `is:inline` speculation rules and radio-restore scripts, `style-src-attr 'unsafe-inline'`. `src/lib/security-headers.ts` removed; its host-only headers are listed in phase 2.
+  - Files: `packages/web/astro.config.mjs`, `packages/web/src/layouts/BaseLayout.astro`
 - [ ] **Faster rebuilds** — Evaluate `experimental.incrementalBuild` (Astro 7.2+, with a `cacheKey` per server page) and persist the cache in CI.
 
 ---
@@ -223,6 +235,7 @@ Major content expansion and UX improvements to the web directory.
 
 - [x] **Add twitter:site/creator + hreflang tags** — Added social media metadata and language/region hints.
   - File: `packages/web/src/app/layout.tsx`
+  - hreflang removed in WEB_PLAN E6: it never reached indexable pages (alternates were replaced by canonical), only the noindex 404; single-language site (`<html lang="en">` stays).
 
 - [x] **Optimize title tags across all page types** — Refined titles for homepage, server details, docs, and category pages with consistent SEO patterns.
   - Files: `packages/web/src/app/layout.tsx`, `packages/web/src/app/page.tsx`, `packages/web/src/app/servers/[id]/page.tsx`, `packages/web/src/app/docs/page.tsx`
@@ -277,6 +290,8 @@ Major content expansion and UX improvements to the web directory.
 
 - [x] **Improve sitemap with priority tiers and all new routes** — Updated sitemap to include category pages, guides, and /servers with proper priority levels.
   - File: `packages/web/src/app/sitemap.ts`
+- [x] **Real per-URL `lastmod` in the sitemap** — Replaced the build date on every URL with the newer of the registry `updatedAt` and the last GitHub push per server; listing pages and sitemap-index entries use their newest server, docs and guides omit `lastmod`.
+  - Files: `packages/web/src/lib/sitemap.ts`, `packages/web/src/pages/sitemap.xml.ts`, `packages/web/src/pages/sitemap-[n].xml.ts`
 
 - [x] **OG images for all new page types** — Generated Open Graph images for category pages, guide pages, and servers index.
   - Files: `packages/web/src/app/servers/opengraph-image.tsx`, `packages/web/src/app/category/[slug]/opengraph-image.tsx`, `packages/web/src/app/guides/[app]/opengraph-image.tsx`

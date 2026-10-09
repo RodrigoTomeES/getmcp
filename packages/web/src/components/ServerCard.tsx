@@ -1,19 +1,9 @@
 import { compactNumber } from "@/lib/format";
 import { Star, Download, BadgeCheck } from "lucide-react";
+import type { ServerCardData } from "@/lib/server-detail";
 
-export type ServerCardData = {
-  id: string;
-  slug: string;
-  name: string;
-  description: string;
-  categories?: string[];
-  runtime?: string;
-  isRemote: boolean;
-  envCount: number;
-  stars?: number;
-  downloads?: number;
-  isOfficial?: boolean;
-};
+// Keep in sync with ServerCard.astro (static pages); this copy only renders
+// inside the /servers SearchBar island.
 
 export function ServerCard({ server }: { server: ServerCardData }) {
   const transport = server.isRemote ? "remote" : "stdio";

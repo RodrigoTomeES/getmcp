@@ -1,0 +1,152 @@
+---
+import type { GetStaticPaths, Page } from "astro";
+import { getServersByCategory } from "@getmcp/registry";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import JsonLd from "@/components/JsonLd.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import { Pagination } from "@/components/Pagination";
+import ServerCard from "@/components/ServerCard.astro";
+import { CATEGORY_NAMES, CATEGORY_DESCRIPTIONS, CATEGORY_SLUGS } from "@/lib/categories";
+import { APP_COUNT, SITE_URL } from "@/lib/constants";
+import { resolveMetadata } from "@/lib/metadata";
+import { toServerCardData, type ServerCardData } from "@/lib/server-detail";
+import { CATEGORY_OG } from "@/lib/og-pages";
+import { CATEGORY_PAGE_SIZE, categoryPageUrl } from "@/lib/pagination";
+import { sortServers } from "@/lib/server-search";
+
+// Only categories with a display name get a page. Page 1 is /category/<slug>,
+// the rest /category/<slug>/<n>, most GitHub stars first (like /servers).
+export const getStaticPaths = (({ paginate }) =>
+  CATEGORY_SLUGS.flatMap((slug) =>
+    paginate(sortServers(getServersByCategory(slug).map(toServerCardData), "stars"), {
+      params: { slug },
+      pageSize: CATEGORY_PAGE_SIZE,
+    }),
+  )) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<ServerCardData>;
+}
+
+const { slug } = Astro.params as { slug: string };
+const { page } = Astro.props;
+const n = page.currentPage;
+const name = CATEGORY_NAMES[slug];
+const description = CATEGORY_DESCRIPTIONS[slug] ?? "";
+const canonicalPath = categoryPageUrl(slug, n);
+const pageSuffix = n > 1 ? ` Page ${n} of ${page.lastPage}.` : "";
+
+const metaDescription = CATEGORY_DESCRIPTIONS[slug] ?? `Browse ${name} MCP servers.`;
+const metadata = resolveMetadata(
+  {
+    title: n > 1 ? `${name} MCP Servers — Page ${n}` : `${name} MCP Servers — Browse & Install`,
+    description: `${metaDescription} ${page.total} servers available. Install with one command across ${APP_COUNT} AI apps.${pageSuffix}`,
+    alternates: {
+      canonical: canonicalPath,
+    },
+    openGraph: {
+      title: `${name} MCP Servers — getmcp`,
+      description: `${metaDescription} Install with one command across ${APP_COUNT} AI apps.`,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${name} MCP Servers — getmcp`,
+      description: `${metaDescription} Install with one command across ${APP_COUNT} AI apps.`,
+    },
+  },
+  { ogImage: { path: `/category/${slug}/opengraph-image.png`, alt: CATEGORY_OG.alt } },
+);
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `${name} MCP Servers`,
+    description,
+    url: `${SITE_URL}${canonicalPath}`,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${SITE_URL}${canonicalPath}`,
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `${name} MCP Servers`,
+    numberOfItems: page.data.length,
+    itemListElement: page.data.map((s, i) => ({
+      "@type": "ListItem",
+      position: page.start + i + 1,
+      name: s.name,
+      url: `${SITE_URL}/servers/${s.slug}`,
+    })),
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Servers", item: `${SITE_URL}/servers` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name,
+        item: `${SITE_URL}/category/${slug}`,
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout metadata={metadata}>
+  <div class="max-w-6xl mx-auto px-6 py-10 md:py-16">
+    <JsonLd data={jsonLd} />
+
+    <Breadcrumbs
+      class="mb-8"
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Servers", href: "/servers" },
+        { label: name },
+      ]}
+    />
+
+    {/* Header */}
+    <div class="mb-10">
+      <h1 class="text-3xl font-bold tracking-tight mb-3">{name} MCP Servers</h1>
+      <p class="text-lg text-text-secondary leading-relaxed max-w-2xl">{description}</p>
+      <p class="text-sm text-text-secondary mt-2">
+        {page.total} server{page.total !== 1 ? "s" : ""} available
+        {page.lastPage > 1 && ` · Page ${n} of ${page.lastPage}`}
+      </p>
+    </div>
+
+    {/* Server grid */}
+    {
+      page.data.length > 0 ? (
+        <>
+          <h2 class="sr-only">Server listing</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {page.data.map((server) => (
+              <ServerCard server={server} />
+            ))}
+          </div>
+          <Pagination
+            page={n}
+            totalPages={page.lastPage}
+            hrefFor={(p: number) => categoryPageUrl(slug, p)}
+          />
+        </>
+      ) : (
+        <div class="text-center py-20 text-text-secondary">
+          <p class="text-lg mb-2">No servers in this category yet</p>
+          <p class="text-sm">
+            Check back soon or{" "}
+            <a href="/servers" class="text-accent hover:underline">browse all servers</a>.
+          </p>
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>

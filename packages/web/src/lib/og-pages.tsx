@@ -1,11 +1,11 @@
 import { getServerCount, getServersByCategory } from "@getmcp/registry";
 import { createOGImage } from "@/lib/og-image";
 import { CATEGORY_NAMES } from "@/lib/categories";
+import { GUIDES } from "@/lib/guide-data";
 import { APP_COUNT } from "@/lib/constants";
 
 /*
- * OG images for the non-server routes (ported 1:1 from the Next.js
- * `opengraph-image.tsx` files). Each entry holds the image `alt` text and a
+ * OG images for the non-server routes. Each entry holds the image `alt` text and a
  * renderer, so pages and endpoints share a single source of truth.
  */
 
@@ -83,33 +83,11 @@ export const CATEGORY_OG = {
   },
 };
 
-/** Short app names used in guide OG images (differs from APP_LABELS for VS Code). */
-export const GUIDE_NAMES: Record<string, string> = {
-  "claude-desktop": "Claude Desktop",
-  vscode: "VS Code",
-  cursor: "Cursor",
-  windsurf: "Windsurf",
-  goose: "Goose",
-  "claude-code": "Claude Code",
-  cline: "Cline",
-  "roo-code": "Roo Code",
-  opencode: "OpenCode",
-  zed: "Zed",
-  pycharm: "PyCharm",
-  codex: "Codex",
-  "gemini-cli": "Gemini CLI",
-  continue: "Continue",
-  "amazon-q": "Amazon Q Developer",
-  trae: "Trae",
-  "bolt-ai": "BoltAI",
-  "libre-chat": "LibreChat",
-  antigravity: "Antigravity",
-};
-
 export const GUIDE_OG = {
   alt: "getmcp — MCP Setup Guide",
   render(app: string) {
-    const name = GUIDE_NAMES[app] ?? app;
+    const guide = GUIDES[app];
+    const name = guide ? (guide.shortName ?? guide.name) : app;
 
     return createOGImage({
       heading: [<span key="1">MCP Setup Guide</span>, <span key="2">for {name}</span>],

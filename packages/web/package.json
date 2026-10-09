@@ -6,9 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "tsx scripts/build.ts",
+    "build": "astro build",
     "preview": "astro preview",
-    "measure": "tsx scripts/measure.ts",
     "lint": "astro check"
   },
   "dependencies": {
@@ -16,7 +15,7 @@
     "@getmcp/core": "*",
     "@getmcp/generators": "*",
     "@getmcp/registry": "*",
-    "@icons-pack/react-simple-icons": "^13.15.1",
+    "@lucide/astro": "^1.53.0",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.5",
@@ -24,6 +23,7 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "satori": "^0.35.0",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {

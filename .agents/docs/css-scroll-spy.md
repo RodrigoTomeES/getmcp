@@ -6,30 +6,49 @@ Use the native CSS scroll spy via `scroll-target-group: auto` + `:target-current
 
 ## Build Constraint
 
-**The `@supports (scroll-target-group: auto)` block MUST be placed in an inline `<style>` tag inside the component, NOT in `globals.css` or any file processed by Tailwind/Vite.** The pattern was introduced because Turbopack's CSS parser (Next.js era) could not handle `scroll-target-group` or `:target-current`; it is kept inline after the move to Astro so the rule never goes through a CSS pipeline that may not understand these new properties. `DocsSidebar.tsx` is rendered to static HTML by Astro, so the inline `<style>` ends up in the page as-is.
+**The `@supports (scroll-target-group: auto)` block MUST stay out of `globals.css` and any file processed by Tailwind/Vite.** The pattern was introduced because Turbopack's CSS parser (Next.js era) could not handle `scroll-target-group` or `:target-current`; it is kept out of the pipeline after the move to Astro so the rule never goes through a CSS toolchain that may not understand these new properties.
+
+The rules live in `packages/web/public/docs-scroll-spy.css`, which Astro copies to the output untouched. `pages/docs.astro` links it in the head (through the layout's `head` slot), so only /docs loads it, and no inline `<style>` is needed: the site's CSP (`security.csp`) allows it through `style-src 'self'`, without a hash.
 
 ## Implementation Pattern
 
-```tsx
+`public/docs-scroll-spy.css`:
+
+```css
+@supports (scroll-target-group: auto) {
+  nav[aria-label="Table of contents"] ul {
+    scroll-target-group: auto;
+  }
+  nav[aria-label="Table of contents"] a:target-current {
+    color: var(--color-accent);
+  }
+  nav[aria-label="Table of contents"] li:has(a:target-current) {
+    border-left-color: var(--color-accent);
+  }
+}
+```
+
+`pages/docs.astro`:
+
+```astro
+<BaseLayout metadata={metadata}>
+  <link rel="stylesheet" href="/docs-scroll-spy.css" slot="head" />
+  <DocsContent />
+</BaseLayout>
+```
+
+`components/DocsSidebar.astro`:
+
+```astro
 <nav aria-label="Table of contents">
-  <style>{`
-    @supports (scroll-target-group: auto) {
-      nav[aria-label="Table of contents"] ul {
-        scroll-target-group: auto;
-      }
-      nav[aria-label="Table of contents"] a:target-current {
-        color: var(--color-accent);
-        font-weight: 500;
-      }
-      nav[aria-label="Table of contents"] li:has(a:target-current) {
-        border-left-color: var(--color-accent);
-      }
+  <ul class="border-l border-border pl-4">
+    {
+      sections.map((section) => (
+        <li>
+          <a href={`#${section.id}`}>{section.label}</a>
+        </li>
+      ))
     }
-  `}</style>
-  <ul>
-    <li className="border-l-2 border-border pl-4 transition-colors">
-      <a href="#section-id">Section</a>
-    </li>
   </ul>
 </nav>
 ```
@@ -39,15 +58,16 @@ Use the native CSS scroll spy via `scroll-target-group: auto` + `:target-current
 - **`scroll-target-group: auto`** on the `<ul>` enables the browser's native scroll spy
 - **`:target-current`** on `<a>` targets the currently active link (the section visible in the viewport)
 - **`:has(a:target-current)`** on `<li>` allows styling the parent item (e.g., accent left border)
-- **`border-l-2`** must be on each `<li>` (not the `<ul>`) so active state can highlight individual items
-- **`transition-colors`** on `<li>` ensures smooth border color transitions
+- For a per-item highlight, put the left border on each `<li>` (e.g. `border-l-2`) instead of the `<ul>`
 - Scope selectors with `nav[aria-label="..."]` to avoid conflicts with other navigation elements
 
 ### Progressive Enhancement
 
-- **Supported browsers** (Chrome 133+): active section gets accent text + font-weight + accent left border
+- **Supported browsers** (Chrome 133+): active section gets accent text and accent left border
 - **Unsupported browsers**: sidebar renders with default border color and text styling, no errors
 
 ## Reference
 
-- Current implementation: `packages/web/src/components/DocsSidebar.tsx`
+- Rules: `packages/web/public/docs-scroll-spy.css`
+- Markup: `packages/web/src/components/DocsSidebar.astro`
+- Linked from: `packages/web/src/pages/docs.astro`

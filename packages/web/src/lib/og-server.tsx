@@ -5,7 +5,7 @@ import { OG_FONT_FAMILY, renderOGImage, stripEmoji } from "@/lib/og-image";
 
 export const SERVER_OG_ALT = "MCP Server Configuration";
 
-/** OG image for `/servers/[id]` (ported from the Next.js `opengraph-image.tsx`). */
+/** OG image for `/servers/[id]`. */
 export async function createServerOGImage(server: InternalRegistryEntry) {
   const isStdio = isStdioConfig(server.config);
   const transport = isStdio ? "stdio" : "remote";
@@ -85,7 +85,7 @@ export async function createServerOGImage(server: InternalRegistryEntry) {
         <span
           style={{
             fontSize: "16px",
-            fontWeight: 600,
+            fontWeight: 700,
             color: "white",
             backgroundColor: "#3b82f6",
             padding: "4px 12px",
