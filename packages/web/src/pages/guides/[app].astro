@@ -6,7 +6,7 @@ import { getServerBySlug } from "@getmcp/registry";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import CodeBlock from "@/components/CodeBlock.astro";
-import { PackageManagerCommand } from "@/components/PackageManagerCommand";
+import PackageManagerCommand from "@/components/PackageManagerCommand.astro";
 import { SITE_URL } from "@/lib/constants";
 import { GUIDES, GUIDE_SLUGS, type GuideData } from "@/lib/guide-data";
 import { resolveMetadata } from "@/lib/metadata";
@@ -141,7 +141,7 @@ const jsonLd = [
       <p class="text-text-secondary mb-4">
         The fastest way to install MCP servers in {guide.name} is with the getmcp CLI:
       </p>
-      <PackageManagerCommand client:load />
+      <PackageManagerCommand />
     </section>
 
     {/* Config format */}

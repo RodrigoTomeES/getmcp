@@ -79,7 +79,7 @@ Critical gaps in test coverage.
 - [x] **Add error path tests for `toStdioFields`/`toRemoteFields`** — Tests exist in `generators.test.ts` (`toStdioFields error handling > throws for remote config`, `toRemoteFields error handling > throws for stdio config`).
   - File: `packages/generators/tests/generators.test.ts`
 
-- [ ] **Add tests for web package** — Unit tests now cover metadata resolution, sitemap generation, server detail helpers and OG rendering (`packages/web/tests/`). Still missing: component tests for `ConfigViewer`, `SearchBar`, `ServerCard`; snapshot tests for key layouts.
+- [ ] **Add tests for web package** — Unit tests now cover metadata resolution, sitemap generation, server detail helpers and OG rendering (`packages/web/tests/`). Still missing: tests for `ConfigViewer.astro` / `scripts/radio-panels.ts`, `SearchBar`, `ServerCard`; snapshot tests for key layouts.
   - Directory: `packages/web/`
 
 ---
@@ -207,6 +207,7 @@ The site was taken down on Vercel's free tier for excessive traffic. Phase 1 por
   - Files: `packages/web/scripts/build.ts`, `packages/web/scripts/measure.ts`, `.github/workflows/web.yml`
 - [ ] **Phase 2: choose hosting and deploy** — Options: GitHub Pages + Cloudflare proxy, Cloudflare R2 + CDN, or Cloudflare Workers Paid (static assets). Decide from the size report, then add a deploy workflow (on push and after the daily registry sync), move `getmcp.es` DNS to Cloudflare, emit the security headers from `packages/web/src/lib/security-headers.ts` in the host format (previously served by `next.config.ts`), and delete the Vercel project.
 - [ ] **Optional size optimizations (only if phase 2 needs them)** — Generate the 19 configs client-side instead of embedding them per page, load the `/servers` search index with `fetch` instead of island props, move server OG images to object storage.
+- [ ] **Static pages without React** (WEB_PLAN A1/A2) — Server pages and guides done (A1): `ConfigViewer.astro` and `PackageManagerCommand.astro` with native radio groups (`scripts/radio-panels.ts`, inline restore in `RestoreChoice.astro`), no `client.*.js` on those pages. Home, 404 and docs remain (A2).
 - [ ] **Faster rebuilds** — Evaluate `experimental.incrementalBuild` (Astro 7.2+, with a `cacheKey` per server page) and persist the cache in CI.
 
 ---

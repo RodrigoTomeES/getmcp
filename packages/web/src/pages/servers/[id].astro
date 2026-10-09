@@ -5,8 +5,8 @@ import { getServerMetrics } from "@getmcp/registry";
 import { Lock, BadgeCheck } from "lucide-react";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import JsonLd from "@/components/JsonLd.astro";
-import { ConfigViewer } from "@/components/ConfigViewer";
-import { PackageManagerCommand } from "@/components/PackageManagerCommand";
+import ConfigViewer from "@/components/ConfigViewer.astro";
+import PackageManagerCommand from "@/components/PackageManagerCommand.astro";
 import { ServerCard } from "@/components/ServerCard";
 import { ServerSidebar } from "@/components/ServerSidebar";
 import { GUIDE_SLUGS } from "@/lib/guide-data";
@@ -209,7 +209,7 @@ const jsonLd = [
         {/* Getting Started */}
         <section>
           <h2 class="text-lg font-semibold mb-3">Getting Started</h2>
-          <PackageManagerCommand client:load serverId={server.id} />
+          <PackageManagerCommand serverId={server.id} />
           <p class="text-xs text-text-secondary mt-2">
             Requires {runtimeToRequirements(server.runtime)}.{" "}
             {
@@ -266,7 +266,7 @@ const jsonLd = [
         }
 
         {/* Config generator */}
-        <ConfigViewer client:load configs={configs} />
+        <ConfigViewer configs={configs} />
       </div>
 
       {/* Sidebar */}

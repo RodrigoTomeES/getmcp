@@ -1,0 +1,73 @@
+---
+/**
+ * `getmcp add` command for each package manager: one native radio group and
+ * four pre-rendered commands (the inactive ones `hidden`), switched by
+ * `@/scripts/radio-panels` and copied by `@/scripts/copy`.
+ */
+import Check from "@lucide/astro/icons/check";
+import Copy from "@lucide/astro/icons/copy";
+import Terminal from "@lucide/astro/icons/terminal";
+import RestoreChoice from "@/components/RestoreChoice.astro";
+import { DEFAULT_PM, getCommand, PACKAGE_MANAGERS, STORAGE_KEY } from "@/lib/package-manager";
+
+interface Props {
+  serverId?: string;
+}
+
+const { serverId } = Astro.props;
+---
+
+<div
+  class="rounded-lg border border-border bg-code-bg overflow-hidden"
+  data-radio-panels
+  data-storage-key={STORAGE_KEY}
+  data-copy-root
+>
+  <div class="flex items-center gap-2 px-4 py-2 border-b border-border">
+    <Terminal class="w-4 h-4 text-text-secondary shrink-0" aria-hidden="true" />
+
+    <fieldset class="flex gap-1 flex-1 min-w-0">
+      <legend class="sr-only">Package manager</legend>
+      {
+        PACKAGE_MANAGERS.map((pm) => (
+          <label
+            for={`package-manager-${pm}`}
+            class="text-xs px-2.5 py-1 rounded-md transition-colors font-medium cursor-pointer text-text-secondary hover:text-text has-checked:bg-surface has-checked:text-text has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent"
+          >
+            <input
+              type="radio"
+              id={`package-manager-${pm}`}
+              name="package-manager"
+              value={pm}
+              checked={pm === DEFAULT_PM}
+              autocomplete="off"
+              class="sr-only"
+            />
+            {pm}
+          </label>
+        ))
+      }
+    </fieldset>
+
+    <button
+      type="button"
+      data-copy
+      class="group text-text-secondary hover:text-text transition-colors shrink-0 p-1 rounded-md"
+      aria-label="Copy command"
+    >
+      <Copy class="w-4 h-4 group-data-copied:hidden" aria-hidden="true" />
+      <Check class="w-4 h-4 text-success hidden group-data-copied:block" aria-hidden="true" />
+    </button>
+  </div>
+
+  <div class="px-4 py-3">
+    <pre
+      class="text-sm font-mono overflow-x-auto"><code>{PACKAGE_MANAGERS.map((pm) => <span data-panel={pm} data-copy-text hidden={pm !== DEFAULT_PM}>{getCommand(pm, serverId)}</span>)}</code></pre>
+  </div>
+</div>
+<RestoreChoice />
+
+<script>
+  import "@/scripts/radio-panels";
+  import "@/scripts/copy";
+</script>

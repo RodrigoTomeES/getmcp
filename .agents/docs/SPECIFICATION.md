@@ -1017,7 +1017,7 @@ When `--refresh` is used interactively, the CLI prompts the user to choose betwe
 
 A fully static Astro website that serves as a public directory for MCP servers. Think "npm registry for MCP servers" with one-click config generation.
 
-**Tech stack**: Astro 7.3+ (`output: "static"`, `build.format: "file"`), React 19 islands for interactive components, Tailwind CSS 4.3+ (`@tailwindcss/vite`), Cloudflare Web Analytics, with `@getmcp/core`, `@getmcp/generators`, and `@getmcp/registry` imported directly at build time. Every page — including one page per registry server slug — is prerendered; there is no server runtime.
+**Tech stack**: Astro 7.3+ (`output: "static"`, `build.format: "file"`), React 19 islands for the remaining interactive components (server pages and guides use `.astro` components with small module scripts), Tailwind CSS 4.3+ (`@tailwindcss/vite`), Cloudflare Web Analytics, with `@getmcp/core`, `@getmcp/generators`, and `@getmcp/registry` imported directly at build time. Every page — including one page per registry server slug — is prerendered; there is no server runtime.
 
 **Build output**:
 

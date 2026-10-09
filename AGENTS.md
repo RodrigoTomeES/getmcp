@@ -26,7 +26,7 @@ This is a **TypeScript monorepo** (npm workspaces, ESM-only, Node >= 22.17) with
 | `packages/generators` | `@getmcp/generators` | 19 config generators (one per AI app), each transforms canonical format to app-native format                                                                                                                                    |
 | `packages/registry`   | `@getmcp/registry`   | Catalog of MCP server definitions with search/filter API                                                                                                                                                                        |
 | `packages/cli`        | `@getmcp/cli`        | CLI tool: `add`, `remove`, `list`, `find`, `check`, `update`, `doctor`, `import`, `sync`, `registry` commands with app auto-detection, config merging, multi-registry support, and installation tracking via `getmcp-lock.json` |
-| `packages/web`        | `@getmcp/web`        | Astro static web directory for browsing servers and generating config snippets (React islands for interactivity), with Cloudflare Web Analytics                                                                                 |
+| `packages/web`        | `@getmcp/web`        | Astro static web directory for browsing servers and generating config snippets (static `.astro` components with small scripts; React islands only where still needed), with Cloudflare Web Analytics                            |
 
 **Tech stack**: TypeScript 5.7+, Zod 4.0+, Vitest 3.0+, Astro 7.3+ (web, static output), React 19 (web islands), Tailwind CSS 4.3+ (web), `@clack/prompts` (CLI). **Linting/Formatting**: oxlint + oxfmt, enforced via lefthook pre-commit hook.
 
@@ -61,7 +61,7 @@ Server data is synced from the [official MCP registry](https://registry.modelcon
 5. Register the generator in `packages/generators/src/index.ts`
 6. Add stdio + remote tests in `packages/generators/tests/generators.test.ts`
 7. Add detection paths in `packages/cli/src/detect.ts` if the app has a known config file location
-8. Update `packages/web/src/components/ConfigViewer.tsx` to include the new app tab
+8. Add a guide entry in `packages/web/src/lib/guide-data.ts` (its name is the app label); `ConfigViewer.astro` lists every generator automatically
 
 ### Modifying an existing generator's transformation rules
 

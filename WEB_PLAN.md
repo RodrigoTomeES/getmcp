@@ -30,7 +30,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 
 ## A. Funciones nativas de Astro
 
-- [ ] **A1. Quitar React de las fichas de servidor.**
+- [x] **A1. Quitar React de las fichas de servidor.** Hecho: `ConfigViewer.astro` y `PackageManagerCommand.astro` con radios nativos en `<fieldset>` (`name="config-app"` / `"package-manager"`, `autocomplete="off"`), `scripts/radio-panels.ts` y `RestoreChoice.astro` (script inline constante en `lib/restore-choice.ts`; A7 debe añadir su hash). Fichas y guías sin `astro-island` ni `client.*.js`; texto visible y `<pre>` idénticos al antes. Parpadeo verificado: con los módulos bloqueados, la restauración inline ya muestra la opción guardada. Sin `hidden="until-found"`. El título "Configuration" pasa a `h2`.
   - Pasar `ConfigViewer` y `PackageManagerCommand` a `.astro`, con los paneles pre-renderizados y `hidden`.
   - **Selector:** usar un grupo de `<input type="radio">` nativo con aspecto de pastilla, en lugar de los `role="tab"` actuales.
     - Da gratis el teclado (flechas) y la semántica. Hoy los `role="tab"` no responden a las flechas, y las guías piden que si usas `role="tab"` se comporte como una pestaña completa.
@@ -154,10 +154,10 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 
 ## E. Accesibilidad y SEO
 
-- [ ] **E1. Encabezados:** el 404 no tiene `h1`; "Configuration" en `ConfigViewer.tsx:47` es `h3` entre `h2`; las categorías saltan de `h1` a las tarjetas `h3`.
+- [ ] **E1. Encabezados:** el 404 no tiene `h1`; "Configuration" en `ConfigViewer.tsx:47` es `h3` entre `h2` (ya `h2` desde A1); las categorías saltan de `h1` a las tarjetas `h3`.
 - [ ] **E2. ARIA y teclado:**
-  - Las pestañas de `ConfigViewer` no se manejan con las flechas, y el tabpanel apunta a pestañas ocultas en móvil (se resuelve con los radios de A1).
-  - `PackageManagerCommand` no comunica qué opción está elegida (se resuelve con los radios de A1).
+  - [x] Las pestañas de `ConfigViewer` no se manejan con las flechas, y el tabpanel apunta a pestañas ocultas en móvil. Resuelto en A1 (radios nativos).
+  - [x] `PackageManagerCommand` no comunica qué opción está elegida. Resuelto en A1 (radios nativos).
   - [x] El "Copied" de los botones de copiar no se anuncia: añadir una región `aria-live="polite"`. _(guía: `accessibility`, sección Live Regions)_ Hecho en E7 (`scripts/copy.ts`).
   - `FilterSheet` sigue siendo enfocable cuando está cerrado. Propuesta: `<dialog>` nativo abierto con `showModal()`, con `closedby="any"` para cerrar al tocar fuera. _(guías: `accessibility` sección 12, `light-dismiss-a-dialog`)_
     - `showModal()` vuelve inerte el resto de la página, así que el focus trap hecho a mano (`FilterSheet.tsx:22-53`) se elimina.

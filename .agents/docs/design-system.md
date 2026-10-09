@@ -251,7 +251,7 @@ None. The design relies entirely on background color layering and borders for de
 
 ### ConfigViewer
 
-**File**: `components/ConfigViewer.tsx`
+**File**: `components/ConfigViewer.astro`
 
 ```
 Configuration
@@ -267,14 +267,17 @@ Configuration
  └──────────────────────────────────────┘
 ```
 
-- Tab active: `border-accent bg-accent text-white font-medium`
-- Tab inactive: `border-border text-text-secondary`
+- App pills are native radios: a `<fieldset>` with an sr-only `<legend>`, each `<label>` wraps an sr-only `<input type="radio" name="config-app">`; arrow keys move the selection
+- Pill checked: `has-checked:border-accent has-checked:bg-accent/10 has-checked:text-accent`
+- Pill unchecked: `border-border text-text-secondary`, hover `not-has-checked:hover:border-text-secondary not-has-checked:hover:text-text`
+- Focus: `has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent` on the label
+- Every app panel is pre-rendered; the inactive ones carry `hidden` (no display utilities on panels)
 - Code container: `rounded-lg border border-border bg-code-bg`
 - Footer: docs link + optional warnings in a `flex flex-wrap` row
 
 ### PackageManagerCommand
 
-**File**: `components/PackageManagerCommand.tsx`
+**File**: `components/PackageManagerCommand.astro`
 
 ```
  ┌──────────────────────────────────────┐
@@ -284,8 +287,10 @@ Configuration
  └──────────────────────────────────────┘
 ```
 
-- PM tab active: `bg-surface text-text`
-- PM tab inactive: `text-text-secondary hover:text-text`
+- PM options are native radios (`name="package-manager"`, `<fieldset>` + sr-only `<legend>`), styled on the `<label>`
+- PM checked: `has-checked:bg-surface has-checked:text-text`
+- PM unchecked: `text-text-secondary hover:text-text`; focus ring as in ConfigViewer
+- The four commands are pre-rendered `<span data-panel data-copy-text>` inside one `<pre><code>`; the copy button copies the visible one
 
 ### MetaItem
 
@@ -616,10 +621,11 @@ Mobile (<md):
 ```
 
 - **Mobile select**: `md:hidden` applied to `<select>` element
-- **Desktop pills**: `hidden md:flex` for pill buttons
-- **Preference storage**: `localStorage.getItem("getmcp-preferred-app")` / `localStorage.setItem("getmcp-preferred-app", appId)`
+- **Desktop pills**: `hidden md:flex` on the radio `<fieldset>`
+- **Sync**: `scripts/radio-panels.ts` keeps the select, the radios and the visible panel in sync; radios and select use `autocomplete="off"`
+- **Preference storage**: saved under `getmcp-preferred-app` on change; `RestoreChoice.astro` restores it inline before first paint
 - **Select styling**: `rounded-md border border-border bg-surface text-text p-2`
-- **File**: `packages/web/src/components/ConfigViewer.tsx`
+- **File**: `packages/web/src/components/ConfigViewer.astro`
 
 ### Search Filter Pills
 

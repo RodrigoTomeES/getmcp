@@ -2,8 +2,15 @@ import { getAllServers, getServerMetrics } from "@getmcp/registry";
 import type { InternalRegistryEntry } from "@getmcp/registry";
 import { generators } from "@getmcp/generators";
 import type { AppIdType } from "@getmcp/core";
-import type { PreGeneratedConfig } from "@/components/ConfigViewer";
 import type { ServerCardData } from "@/components/ServerCard";
+
+/** One app's config snippet for a server, rendered by `ConfigViewer.astro`. */
+export type PreGeneratedConfig = {
+  serialized: string;
+  configPath: string;
+  format: string;
+  docsUrl: string;
+};
 
 const RELATED_LIMIT = 4;
 
