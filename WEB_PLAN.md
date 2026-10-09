@@ -151,7 +151,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 
 - [ ] **D1. Restos de Next.js:** borrar `packages/web/.next/`, `next-env.d.ts` y `tsconfig.tsbuildinfo` (761 KB). Quitar del `.gitignore` las entradas que se añadieron para ignorarlos. Revisar el `include: ["**/*"]` de `tsconfig.json`.
 - [ ] **D2. Código y assets muertos:** `src/lib/security-headers.ts` (o se resuelve en A7), `@keyframes fade-in-up` (`globals.css`), `assets/Inter-SemiBold.ttf`. También `public/logo.svg` y `logo-light.svg`, que solo usa el README.
-- [ ] **D3. Comentarios de Next.js y Vercel:** `SearchBar.tsx:63` y `ConfigViewer.tsx:30` ("server component" y `eslint-disable`), `BaseLayout.astro:17`, `og-image.tsx:82`.
+- [ ] **D3. Comentarios de Next.js y Vercel:** ~~`SearchBar.tsx:63`~~ (hecho en E8) y `ConfigViewer.tsx:30` ("server component" y `eslint-disable`), `BaseLayout.astro:17`, `og-image.tsx:82`.
 - [x] **D4. Cifras escritas a mano.** Hecho en `f3b6385`. Queda opcional: "10 commands" (`StatsBar.tsx`, `CliShowcase.tsx`) podría salir de `COMMANDS.length`.
 
 ## E. Accesibilidad y SEO
@@ -180,7 +180,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
   - Hecho: `scripts/code-copy.ts` pasa a `scripts/copy.ts`, con contrato de atributos (`data-copy`, `data-copy-root`, `data-copy-text`, `data-copied`) y una región `aria-live` compartida. Nuevo `CodeBlock.astro` (iconos de `@lucide/astro`) en las guías. El script ya no se importa en `BaseLayout`, solo en los componentes y páginas con botones de copiar (`/docs` lo importa de forma transitoria hasta A2d).
   - Pendiente (fuera de alcance): en `/docs` todos los botones se llaman "Copy code"; se podría añadir `aria-describedby` hacia el encabezado de la sección.
   - Pendiente (fuera de alcance): hoy ninguna guía muestra el ejemplo de configuración, porque los `popularServers` de `lib/guide-data.ts` (`github`, `filesystem`…) no coinciden con ningún slug del registro y `getSampleConfig()` devuelve `null`. Hay que pasarlos a slugs reales.
-- [ ] **E8. `?page=` fuera de rango en `/servers`:** se corrige en pantalla, pero la URL conserva el valor erróneo.
+- [x] **E8. `?page=` fuera de rango en `/servers`:** se corrige en pantalla, pero la URL conserva el valor erróneo. _Hecho: `readSearchState()` y `toSearchString()` en `lib/server-search.ts` validan la URL (listas con lista blanca y sin duplicados, `sort`/`per_page` conocidos, `page` entero positivo) y la isla la reescribe en forma canónica con `replaceState` al cargar; `?page=` se acota cuando llega el índice, `?q=` restaurado ya no se pierde durante el debounce y se conservan parámetros ajenos (`utm_\*`). `RUNTIMES`/`TRANSPORTS`pasan a`server-search.ts`. Se quitó el comentario "server component" y el `eslint-disable`de`SearchBar.tsx` (D3 ya no debe tocar ese archivo).\_
 
 ## Orden sugerido
 

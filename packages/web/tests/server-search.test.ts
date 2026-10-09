@@ -4,7 +4,9 @@ import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT,
   isDefaultState,
+  readSearchState,
   sortServers,
+  toSearchString,
   type SearchState,
 } from "../src/lib/server-search";
 
@@ -99,5 +101,91 @@ describe("isDefaultState", () => {
     ["a later page", { page: 2 }],
   ])("is false with %s", (_, change) => {
     expect(isDefaultState({ ...base, ...change })).toBe(false);
+  });
+});
+
+describe("readSearchState", () => {
+  const categories = ["ai", "database"];
+  const read = (search: string) => readSearchState(search, categories);
+
+  it("returns the defaults for an empty query string", () => {
+    expect(isDefaultState(read(""))).toBe(true);
+  });
+
+  it("reads every param", () => {
+    expect(
+      read(
+        "?q=git+hub&category=ai,database&runtime=node&transport=remote&official=true&sort=downloads&per_page=48&page=3",
+      ),
+    ).toEqual({
+      q: "git hub",
+      categories: ["ai", "database"],
+      runtimes: ["node"],
+      transports: ["remote"],
+      official: true,
+      sort: "downloads",
+      pageSize: 48,
+      page: 3,
+    });
+  });
+
+  it.each(["abc", "0", "-2", "1.5", "2abc", ""])("falls back to page 1 for page=%s", (page) => {
+    expect(read(`page=${page}`).page).toBe(1);
+  });
+
+  it("falls back to the default sort and page size for unknown values", () => {
+    const state = read("sort=bogus&per_page=5");
+    expect(state.sort).toBe(DEFAULT_SORT);
+    expect(state.pageSize).toBe(DEFAULT_PAGE_SIZE);
+  });
+
+  it("drops unknown categories, runtimes and transports", () => {
+    const state = read("category=ai,bogus&runtime=bogus,python&transport=foo");
+    expect(state.categories).toEqual(["ai"]);
+    expect(state.runtimes).toEqual(["python"]);
+    expect(state.transports).toEqual([]);
+  });
+
+  it("dedupes multi-value params", () => {
+    const state = read("category=ai,ai&runtime=node,node&transport=stdio,stdio");
+    expect(state.categories).toEqual(["ai"]);
+    expect(state.runtimes).toEqual(["node"]);
+    expect(state.transports).toEqual(["stdio"]);
+  });
+
+  it("only accepts official=true", () => {
+    expect(read("official=1").official).toBe(false);
+  });
+});
+
+describe("toSearchString", () => {
+  const categories = ["ai", "database"];
+  const canonical = (search: string) => toSearchString(readSearchState(search, categories), search);
+
+  it.each([
+    "",
+    "q=github",
+    "q=git+hub&category=ai,database&runtime=node&transport=remote&official=true&sort=downloads&per_page=48&page=3",
+    "sort=downloads&page=2",
+    "utm_source=x",
+  ])("keeps the canonical %j unchanged", (search) => {
+    expect(canonical(search)).toBe(search);
+  });
+
+  it("removes invalid params", () => {
+    expect(canonical("page=abc&sort=bogus&runtime=bogus")).toBe("");
+  });
+
+  it("omits defaults and page 1", () => {
+    expect(canonical("page=1&sort=stars&per_page=24&official=false")).toBe("");
+  });
+
+  it("keeps unknown params after the search state", () => {
+    expect(canonical("utm_source=x&page=2&q=github")).toBe("q=github&page=2&utm_source=x");
+  });
+
+  it("writes the given page", () => {
+    const state = readSearchState("q=github&page=50", categories);
+    expect(toSearchString({ ...state, page: 4 }, "q=github&page=50")).toBe("q=github&page=4");
   });
 });

@@ -1024,6 +1024,7 @@ A fully static Astro website that serves as a public directory for MCP servers. 
 - HTML for every route below, with URLs without trailing slash (`/servers/foo` → `servers/foo.html`).
 - OG images generated at build time with satori + resvg (`*/opengraph-image.png`), one per page including every server.
 - `/servers.json`: the search index for the `/servers` island (every server as `ServerCardData`); the `/servers` HTML ships only the first page.
+- `/servers` keeps its search state in the query string (`q`, `category`, `runtime`, `transport`, `official`, `sort`, `per_page`, `page`). On load the island validates it (`readSearchState()`: whitelisted and deduped lists, known sort and page size, positive-integer page) and rewrites the URL to its canonical form with `replaceState`; an out-of-range `page` is clamped once the index arrives. Other params (e.g. `utm_*`) are kept.
 - Sitemap index (`/sitemap.xml`) plus chunked sitemaps (`/sitemap-<n>.xml`, 10,000 URLs each) and a static `robots.txt`.
 - `npm run build -w @getmcp/web` prints a size report (`scripts/measure.ts`: file counts, total size, per-page sizes, comparison against static hosting limits) and writes it to the GitHub Actions job summary (`.github/workflows/web.yml`).
 

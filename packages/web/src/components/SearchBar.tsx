@@ -10,25 +10,20 @@ import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT,
   PAGE_SIZES,
+  URL_STATE_PARAMS,
   isDefaultState,
+  readSearchState,
   sortServers,
+  toSearchString,
   type SortOption,
 } from "@/lib/server-search";
 
-function parseMulti(param: string | null): string[] {
-  return param ? param.split(",").filter(Boolean) : [];
+/** Replaces the query string (no history entry) when it differs. */
+function replaceSearch(search: string) {
+  if (search === window.location.search.slice(1)) return;
+  const { pathname, hash } = window.location;
+  window.history.replaceState(null, "", `${pathname}${search ? `?${search}` : ""}${hash}`);
 }
-
-const URL_STATE_PARAMS = [
-  "q",
-  "category",
-  "runtime",
-  "transport",
-  "official",
-  "sort",
-  "per_page",
-  "page",
-];
 
 /**
  * `/servers` search island. The page ships only the first default page
@@ -62,29 +57,18 @@ export function SearchBar({
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const hasUrlState = URL_STATE_PARAMS.some((key) => params.has(key));
-    const q = params.get("q");
-    const cat = params.get("category");
-    const rt = params.get("runtime");
-    const tp = params.get("transport");
-    const off = params.get("official");
-    const sort = params.get("sort") as SortOption | null;
-    const pp = params.get("per_page");
-    const p = params.get("page");
-
-    if (q) setInputValue(q);
-    if (cat) setSelectedCategories(parseMulti(cat).filter((c) => categories.includes(c)));
-    if (rt) setSelectedRuntimes(parseMulti(rt));
-    if (tp) setSelectedTransports(parseMulti(tp));
-    if (off === "true") setOfficialOnly(true);
-    if (sort === "alphabetical" || sort === "downloads") setSortBy(sort);
-    if (pp) {
-      const parsed = Number(pp);
-      if ((PAGE_SIZES as readonly number[]).includes(parsed)) setPageSize(parsed);
-    }
-    if (p) {
-      const parsed = Number.parseInt(p, 10);
-      if (parsed > 0 && Number.isFinite(parsed)) setPage(parsed);
-    }
+    const parsed = readSearchState(window.location.search, categories);
+    setInputValue(parsed.q);
+    setSelectedCategories([...parsed.categories]);
+    setSelectedRuntimes([...parsed.runtimes]);
+    setSelectedTransports([...parsed.transports]);
+    setOfficialOnly(parsed.official);
+    setSortBy(parsed.sort);
+    setPageSize(parsed.pageSize);
+    setPage(parsed.page);
+    // Drop invalid params now: if nothing restored changes state, the sync
+    // effect below never runs again.
+    replaceSearch(toSearchString(parsed, window.location.search));
 
     // Plain /servers already shows its first page, so the index is a background
     // warm-up; with search state in the URL the results depend on it.
@@ -104,39 +88,8 @@ export function SearchBar({
     return () => {
       cancelled = true;
     };
-    // categories is stable from server component
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Runs once: `categories` is a static prop of the island.
   }, []);
-
-  // Sync state to URL (skip first run to preserve URL-restored state)
-  useEffect(() => {
-    if (!urlSyncReady.current) {
-      urlSyncReady.current = true;
-      return;
-    }
-    const params = new URLSearchParams();
-    if (query) params.set("q", query);
-    if (selectedCategories.length) params.set("category", selectedCategories.join(","));
-    if (selectedRuntimes.length) params.set("runtime", selectedRuntimes.join(","));
-    if (selectedTransports.length) params.set("transport", selectedTransports.join(","));
-    if (officialOnly) params.set("official", "true");
-    if (sortBy !== DEFAULT_SORT) params.set("sort", sortBy);
-    if (pageSize !== DEFAULT_PAGE_SIZE) params.set("per_page", String(pageSize));
-    if (page > 1) params.set("page", String(page));
-
-    const search = params.toString();
-    const url = search ? `${window.location.pathname}?${search}` : window.location.pathname;
-    window.history.replaceState(null, "", url);
-  }, [
-    query,
-    selectedCategories,
-    selectedRuntimes,
-    selectedTransports,
-    officialOnly,
-    sortBy,
-    pageSize,
-    page,
-  ]);
 
   // Pre-compute search strings (only rebuilds when the index arrives)
   const searchIndex = useMemo(
@@ -212,6 +165,45 @@ export function SearchBar({
   const resultCount = ready ? filtered.length : total;
   const totalPages = Math.ceil(resultCount / pageSize);
   const safePage = Math.min(page, Math.max(totalPages, 1));
+
+  // Sync state to the URL. The first run is skipped: the restore effect has
+  // already written the canonical URL.
+  useEffect(() => {
+    if (!urlSyncReady.current) {
+      urlSyncReady.current = true;
+      return;
+    }
+    // Wait for the debounced query, so a restored or half-typed ?q= is kept.
+    if (query !== inputValue) return;
+    replaceSearch(
+      toSearchString(
+        {
+          q: query,
+          categories: selectedCategories,
+          runtimes: selectedRuntimes,
+          transports: selectedTransports,
+          official: officialOnly,
+          sort: sortBy,
+          pageSize,
+          // Clamp only once the index is known; before that the count is a guess.
+          page: ready ? safePage : page,
+        },
+        window.location.search,
+      ),
+    );
+  }, [
+    query,
+    inputValue,
+    selectedCategories,
+    selectedRuntimes,
+    selectedTransports,
+    officialOnly,
+    sortBy,
+    pageSize,
+    page,
+    safePage,
+    ready,
+  ]);
 
   const paginated = useMemo(() => {
     if (ready) return filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
