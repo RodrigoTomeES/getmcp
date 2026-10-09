@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
-import { ServerCard, type ServerCardData } from "./ServerCard";
+import { ServerCard } from "./ServerCard";
+import type { ServerCardData } from "@/lib/server-detail";
 import { Pagination } from "./Pagination";
 import { FilterPanel } from "./FilterPanel";
 import { FilterSheet } from "./FilterSheet";

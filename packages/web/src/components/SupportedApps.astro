@@ -1,0 +1,38 @@
+---
+import { generators } from "@getmcp/generators";
+
+const apps = Object.values(generators).map((g) => ({
+  id: g.app.id,
+  name: g.app.name,
+  format: g.app.configFormat.toUpperCase(),
+}));
+---
+
+<section>
+  <div class="flex items-baseline justify-between mb-4">
+    <h2 class="text-xl font-bold">{apps.length} Supported Apps</h2>
+    <a href="/guides" class="text-sm text-accent hover:underline transition-colors">
+      See setup guides &rarr;
+    </a>
+  </div>
+  <p class="text-sm text-text-secondary mb-4">
+    getmcp generates the correct config format for each app automatically.
+  </p>
+  <div class="flex flex-wrap gap-2">
+    {
+      apps.map((app) => (
+        <a
+          href={`/guides/${app.id}`}
+          class="group flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-2 hover:bg-surface-hover hover:border-accent/50 transition-colors"
+        >
+          <span class="text-sm font-medium group-hover:text-accent transition-colors">
+            {app.name}
+          </span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-surface-hover text-text-secondary font-mono">
+            {app.format}
+          </span>
+        </a>
+      ))
+    }
+  </div>
+</section>

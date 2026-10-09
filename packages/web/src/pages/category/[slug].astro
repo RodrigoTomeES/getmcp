@@ -3,10 +3,11 @@ import type { GetStaticPaths } from "astro";
 import { getCategories, getServersByCategory } from "@getmcp/registry";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import JsonLd from "@/components/JsonLd.astro";
-import { ServerCard, type ServerCardData } from "@/components/ServerCard";
+import ServerCard from "@/components/ServerCard.astro";
 import { CATEGORY_NAMES, CATEGORY_DESCRIPTIONS } from "@/lib/categories";
 import { APP_COUNT, SITE_URL } from "@/lib/constants";
 import { resolveMetadata } from "@/lib/metadata";
+import type { ServerCardData } from "@/lib/server-detail";
 import { CATEGORY_OG } from "@/lib/og-pages";
 
 // Only categories with a display name get a page (the Next.js page called

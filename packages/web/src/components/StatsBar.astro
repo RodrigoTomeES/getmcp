@@ -1,0 +1,28 @@
+---
+interface Props {
+  serverCount: number;
+  appCount: number;
+}
+
+const { serverCount, appCount } = Astro.props;
+const stats = [
+  { value: String(appCount), label: "AI Apps" },
+  { value: `${serverCount}+`, label: "Servers" },
+  { value: "10", label: "Commands" },
+  { value: "4", label: "Config Formats" },
+];
+---
+
+<div class="flex items-center justify-center gap-6 md:gap-8 py-6 flex-wrap">
+  {
+    stats.map((stat, i) => (
+      <div class="flex items-center gap-6 md:gap-8">
+        {i > 0 && <span class="hidden md:block w-px h-8 bg-border" aria-hidden="true" />}
+        <div class="text-center">
+          <p class="text-2xl font-bold text-text">{stat.value}</p>
+          <p class="text-xs text-text-secondary uppercase tracking-wider">{stat.label}</p>
+        </div>
+      </div>
+    ))
+  }
+</div>

@@ -2,7 +2,25 @@ import { getAllServers, getServerMetrics } from "@getmcp/registry";
 import type { InternalRegistryEntry } from "@getmcp/registry";
 import { generators } from "@getmcp/generators";
 import type { AppIdType } from "@getmcp/core";
-import type { ServerCardData } from "@/components/ServerCard";
+
+/**
+ * Data for one server card, rendered by `ServerCard.astro` (static pages) and
+ * `ServerCard.tsx` (the `/servers` SearchBar island). Client code imports it
+ * type-only so this module stays out of the client bundle.
+ */
+export type ServerCardData = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  categories?: string[];
+  runtime?: string;
+  isRemote: boolean;
+  envCount: number;
+  stars?: number;
+  downloads?: number;
+  isOfficial?: boolean;
+};
 
 /** One app's config snippet for a server, rendered by `ConfigViewer.astro`. */
 export type PreGeneratedConfig = {

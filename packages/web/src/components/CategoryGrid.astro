@@ -1,0 +1,33 @@
+---
+import { getServersByCategory } from "@getmcp/registry";
+import { CATEGORY_NAMES, CATEGORY_DESCRIPTIONS } from "@/lib/categories";
+
+const categories = Object.keys(CATEGORY_NAMES).map((slug) => ({
+  slug,
+  name: CATEGORY_NAMES[slug],
+  desc: CATEGORY_DESCRIPTIONS[slug] ?? "",
+  count: getServersByCategory(slug).length,
+}));
+---
+
+<section>
+  <h2 class="text-xl font-bold mb-4">Browse by Category</h2>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+    {
+      categories.map(({ slug, name, desc, count }) => (
+        <a
+          href={`/category/${slug}`}
+          class="group flex flex-col rounded-lg border border-border bg-surface p-4 hover:bg-surface-hover hover:border-accent/50 transition-colors"
+        >
+          <div class="flex items-baseline justify-between gap-2 mb-1.5">
+            <h3 class="font-medium text-sm group-hover:text-accent transition-colors truncate">
+              {name}
+            </h3>
+            <span class="text-xs text-text-secondary shrink-0">{count}</span>
+          </div>
+          <p class="text-xs text-text-secondary line-clamp-2 leading-relaxed">{desc}</p>
+        </a>
+      ))
+    }
+  </div>
+</section>

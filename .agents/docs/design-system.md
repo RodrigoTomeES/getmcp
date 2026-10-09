@@ -210,8 +210,8 @@ None. The design relies entirely on background color layering and borders for de
 
 ### ServerCard
 
-**File**: `components/ServerCard.tsx`
-**Props**: `{ server: RegistryEntryType }`
+**Files**: `components/ServerCard.astro` (static pages) and `components/ServerCard.tsx` (only inside the `/servers` SearchBar island); same markup, keep both in sync. Data type `ServerCardData` lives in `lib/server-detail.ts`.
+**Props**: `{ server: ServerCardData }`
 
 ```
 ┌─────────────────────────────────────────┐
@@ -421,17 +421,17 @@ Both icons are always rendered; `scripts/copy.ts` toggles `data-copied` and writ
 
 ## Icons
 
-Icons come from two libraries: **lucide-react** (generic UI icons) and **@icons-pack/react-simple-icons** (brand icons).
+Generic UI icons come from **Lucide**: **@lucide/astro** in `.astro` components and **lucide-react** only inside React islands. Brand icons (GitHub, Docker in `ServerSidebar.astro`) are inline `<svg viewBox="0 0 24 24" fill="currentColor">` paths copied from simple-icons (CC0); there is no brand-icon package.
 
 - Size: `w-4 h-4` (default), `w-3.5 h-3.5` (compact metrics), `w-3 h-3` (checkbox check)
 - Style: stroke-based (lucide defaults: `strokeWidth={2}`, `strokeLinecap="round"`, `strokeLinejoin="round"`)
 - Color: `text-text-secondary` (inherits via `currentColor`)
 
-No wrapper file — consumers import directly from `lucide-react` and `@icons-pack/react-simple-icons`. Pass `aria-hidden="true"` on each usage.
+No wrapper file — consumers import icons directly. Pass `aria-hidden="true"` on each decorative usage (an icon with `aria-label` keeps its label in both Lucide packages).
 
 In `.astro` components use **@lucide/astro** with per-icon deep imports (`import Copy from "@lucide/astro/icons/copy"`); never the barrel import, which compiles every icon.
 
-Icons used: `Search`, `SlidersHorizontal`, `Terminal`, `Copy`, `Check`, `X`, `Lock`, `Star`, `Download`, `GitFork`, `CircleDot`, `ExternalLink`, `BadgeCheck`, `SiGithub`, `SiDocker`, custom logo.
+Icons used: `Search`, `SlidersHorizontal`, `Terminal`, `Copy`, `Check`, `X`, `Lock`, `Star`, `Download`, `GitFork`, `CircleDot`, `ExternalLink`, `BadgeCheck`, GitHub and Docker brand paths, custom logo.
 
 ### Logo
 
@@ -681,7 +681,7 @@ Enhanced metadata display on server listing cards.
 - **Runtime badge**: `bg-surface-hover text-text-secondary font-mono text-xs px-2 py-0.5 rounded-full`
 - **Author byline**: `text-xs text-text-secondary ml-auto` (absolute right on card, or flex justify-between)
 - **Transport badge**: Existing `text-xs px-2 py-0.5 rounded-full font-medium` (green for stdio, purple for remote)
-- **File**: `packages/web/src/components/ServerCard.tsx`
+- **Files**: `packages/web/src/components/ServerCard.astro` and `packages/web/src/components/ServerCard.tsx` (keep in sync)
 
 ---
 
@@ -694,6 +694,8 @@ Enhanced metadata display on server listing cards.
 | `react@^19.3.0`              | UI library                |
 | `tailwindcss@^4.3.3`         | CSS framework             |
 | `@tailwindcss/vite@^4.3.3`   | Vite integration          |
+| `@lucide/astro`              | Icons in `.astro` files   |
+| `lucide-react`               | Icons in React islands    |
 | `satori` + `@resvg/resvg-js` | OG image generation       |
 
 No UI component library (shadcn, Radix, etc.). All components are custom-built.

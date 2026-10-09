@@ -2,13 +2,14 @@
 import type { GetStaticPaths } from "astro";
 import type { InternalRegistryEntry } from "@getmcp/registry";
 import { getServerMetrics } from "@getmcp/registry";
-import { Lock, BadgeCheck } from "lucide-react";
+import BadgeCheck from "@lucide/astro/icons/badge-check";
+import Lock from "@lucide/astro/icons/lock";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import ConfigViewer from "@/components/ConfigViewer.astro";
 import PackageManagerCommand from "@/components/PackageManagerCommand.astro";
-import { ServerCard } from "@/components/ServerCard";
-import { ServerSidebar } from "@/components/ServerSidebar";
+import ServerCard from "@/components/ServerCard.astro";
+import ServerSidebar from "@/components/ServerSidebar.astro";
 import { GUIDE_SLUGS } from "@/lib/guide-data";
 import { SITE_URL } from "@/lib/constants";
 import { toSentence } from "@/lib/format";
@@ -157,7 +158,7 @@ const jsonLd = [
           {
             server.isOfficial && (
               <span role="img" aria-label="Official MCP server" title="Official MCP server">
-                <BadgeCheck className="h-[1ch] text-official shrink-0" aria-hidden="true" />
+                <BadgeCheck class="h-[1ch] text-official shrink-0" aria-hidden="true" />
               </span>
             )
           }
@@ -248,7 +249,7 @@ const jsonLd = [
                         </code>
                         {detail?.isSecret && (
                           <span class="text-warning-light text-xs" title="Secret value">
-                            <Lock className="w-3.5 h-3.5 inline" aria-label="Secret" />
+                            <Lock class="w-3.5 h-3.5 inline" aria-label="Secret" />
                           </span>
                         )}
                       </div>
