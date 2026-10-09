@@ -28,8 +28,6 @@ export type GuideData = {
   prerequisites: string[];
   /** Common issues users encounter and how to fix them */
   troubleshooting: string[];
-  /** Server IDs from the registry that are popular with this app */
-  popularServers: string[];
 };
 
 export const GUIDES: Record<string, GuideData> = {
@@ -57,7 +55,6 @@ export const GUIDES: Record<string, GuideData> = {
       "Environment variables not resolving: Variables in the env block must be string literals — they are not interpolated from your shell environment. Set them explicitly in the config or use the getmcp CLI which prompts for values.",
       "Server crashes immediately: Check the Claude Desktop logs at ~/Library/Logs/Claude/ (macOS) or %AppData%\\Claude\\logs\\ (Windows) for the server's stderr output.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "slack", "sequential-thinking"],
   },
 
   vscode: {
@@ -83,7 +80,6 @@ export const GUIDES: Record<string, GuideData> = {
       "streamable-http transport not recognized: VS Code uses http as the type value for what getmcp calls streamable-http. The CLI handles this mapping automatically.",
       "Server tools not appearing in Copilot Chat: Open the Copilot Chat panel, click the tools icon, and verify the server is listed and enabled. Reload the VS Code window if the server was just added.",
     ],
-    popularServers: ["github", "playwright", "postgres", "filesystem", "docker"],
   },
 
   cursor: {
@@ -111,7 +107,6 @@ export const GUIDES: Record<string, GuideData> = {
       "MCP tools not available in Composer: Open Cursor Settings, go to Features > MCP, and verify the server status shows a green indicator. Toggle the server off and on to force a reconnect.",
       "Rate limits from the AI model: MCP tool calls count toward your Cursor AI usage. If you hit limits, check your Cursor subscription and usage dashboard.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "sequential-thinking", "memory"],
   },
 
   windsurf: {
@@ -138,7 +133,6 @@ export const GUIDES: Record<string, GuideData> = {
       "Environment variable interpolation: Windsurf supports ${env:VARIABLE_NAME} syntax in config values, which reads from your system environment. This is different from the env block which sets variables for the server process.",
       "MCP not available in Cascade: MCP support is available in Windsurf 1.0+. Check Help > About Windsurf and update if you are on an older version.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "postgres", "playwright"],
   },
 
   goose: {
@@ -165,7 +159,6 @@ export const GUIDES: Record<string, GuideData> = {
       "cmd field vs command: Goose uses cmd, not command. If you manually copy a config from another app, rename the field. The getmcp CLI handles this automatically.",
       "Timeout unit mismatch: Goose expects timeout in seconds, not milliseconds. The getmcp generator converts automatically (dividing by 1000 and rounding up), but manual edits need to use the correct unit.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "docker", "slack"],
   },
 
   "claude-code": {
@@ -192,7 +185,6 @@ export const GUIDES: Record<string, GuideData> = {
       "type field for remote servers: Claude Code uses type (not transport) to identify the remote protocol. Valid values are http, streamable-http, and sse. The getmcp CLI writes the correct field automatically.",
       "Permission prompts on first use: Claude Code may prompt you to confirm allowing a new MCP server tool. This is a one-time security prompt per server per project.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "sequential-thinking", "memory"],
   },
 
   cline: {
@@ -222,7 +214,6 @@ export const GUIDES: Record<string, GuideData> = {
       "alwaysAllow not persisting: Cline manages the alwaysAllow list through its own UI. After adding a server with getmcp, open the Cline MCP settings panel to configure which tools are pre-approved.",
       "Extension ID changed: If you see errors about the extension path, verify the extension is still published under saoudrizwan.claude-dev. The config path includes the extension ID.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "postgres", "playwright"],
   },
 
   "roo-code": {
@@ -252,7 +243,6 @@ export const GUIDES: Record<string, GuideData> = {
       "Conflict with Cline: Roo Code and Cline store configs in separate directories (different extension IDs). Having both installed is fine, but you need to add servers to each separately.",
       "Server not appearing in the Roo Code panel: After editing the config file directly, use the Roo Code MCP settings panel in VS Code to reload. Sometimes a full VS Code window reload (Ctrl+Shift+P > Developer: Reload Window) is needed.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "sequential-thinking", "memory"],
   },
 
   opencode: {
@@ -276,7 +266,6 @@ export const GUIDES: Record<string, GuideData> = {
       "Config not found: OpenCode looks for opencode.json in the current working directory. Make sure you run opencode from the project root, or create the config file there.",
       "JSONC parse error: opencode.json supports JavaScript-style comments. If you get a parse error, check for trailing commas after the last item in an object or array — those are not valid even in JSONC.",
     ],
-    popularServers: ["github", "filesystem", "postgres", "brave-search", "docker"],
   },
 
   zed: {
@@ -302,7 +291,6 @@ export const GUIDES: Record<string, GuideData> = {
       "settings.json parse error: Zed's settings.json is strict JSON (no comments, no trailing commas). If Zed shows a settings parse error after editing, use a JSON validator to find the syntax issue.",
       "Extension-based servers vs config-based servers: Some MCP servers are available as Zed extensions from the marketplace. These are installed differently from config-based servers and managed via Extensions > Installed. Both can be active at the same time.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "postgres", "sequential-thinking"],
   },
 
   pycharm: {
@@ -327,7 +315,6 @@ export const GUIDES: Record<string, GuideData> = {
       "Config directory not created: PyCharm does not create .ai/mcp/ automatically. Create the directories and file manually, or use the getmcp CLI which creates them if they do not exist.",
       "MCP tools not appearing in AI chat: Ensure the AI Assistant plugin is enabled (not just installed) and that you are signed into a JetBrains account with an active AI subscription. Check Help > Diagnostic Tools > Show Log for plugin errors.",
     ],
-    popularServers: ["github", "postgres", "filesystem", "docker", "sequential-thinking"],
   },
 
   codex: {
@@ -354,7 +341,6 @@ export const GUIDES: Record<string, GuideData> = {
       "http_headers vs headers: Remote server configs use http_headers for custom HTTP headers, not headers. If a server requires authentication headers and they are not being sent, check that you are using the correct field name.",
       "startup_timeout_sec units: Codex measures timeout in seconds, not milliseconds. If you set a timeout manually, use seconds (e.g., 30 not 30000). The getmcp CLI converts automatically from the canonical millisecond value.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "sequential-thinking", "memory"],
   },
 
   "gemini-cli": {
@@ -381,7 +367,6 @@ export const GUIDES: Record<string, GuideData> = {
       "API key errors when running a server: The env block in the server config sets environment variables for the server process. Ensure the required API key is spelled correctly and is a non-empty string.",
       "Tool calls returning errors: Run Gemini CLI with the --debug flag to see detailed logs of MCP server communication and identify where the failure occurs.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "sequential-thinking", "memory"],
   },
 
   continue: {
@@ -407,7 +392,6 @@ export const GUIDES: Record<string, GuideData> = {
       "MCP tools not triggering during chat: Continue must be configured to allow tool use. Check the Continue settings panel for the Allow Tools option and ensure it is enabled for your model provider.",
       "Server process fails to start: Continue inherits the editor's PATH, which may differ from your shell's PATH. Specify absolute paths to node or python binaries in the command field if you encounter spawn errors.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "postgres", "docker"],
   },
 
   "amazon-q": {
@@ -434,7 +418,6 @@ export const GUIDES: Record<string, GuideData> = {
       "Authentication errors from MCP servers: API keys and tokens must be set as string values in the env block. They are not inherited from your AWS credentials file.",
       "Conflict with AWS CLI credentials: The ~/.aws/amazonq/ directory is separate from ~/.aws/credentials. MCP config changes do not affect your AWS CLI authentication.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "docker", "postgres"],
   },
 
   trae: {
@@ -458,7 +441,6 @@ export const GUIDES: Record<string, GuideData> = {
       "Project config not shared with teammates: The .trae/mcp.json file should be committed to source control. Teammates can run getmcp sync after checkout to install servers into their own detected apps.",
       "Environment variables exposed in source control: Avoid hardcoding API keys in .trae/mcp.json if the file is committed. Use the getmcp CLI which prompts for values separately, or reference variables via your CI/CD secrets.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "sequential-thinking", "memory"],
   },
 
   "bolt-ai": {
@@ -483,7 +465,6 @@ export const GUIDES: Record<string, GuideData> = {
       "getmcp skips BoltAI on your machine: BoltAI is macOS-only. The getmcp CLI will not detect or generate configs for BoltAI on Linux or Windows — this is expected behavior.",
       "Sandbox restrictions blocking server binaries: If BoltAI is installed from the Mac App Store, sandbox restrictions may prevent it from launching certain server processes. Try installing BoltAI directly from boltai.com instead.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "sequential-thinking", "memory"],
   },
 
   "libre-chat": {
@@ -508,7 +489,6 @@ export const GUIDES: Record<string, GuideData> = {
       "YAML indentation errors: YAML is whitespace-sensitive and does not allow tab characters. Use spaces only and verify the indentation with a YAML validator before restarting.",
       "Server process cannot find binaries: The MCP server process runs inside the LibreChat container (if using Docker). Install required runtimes (Node.js, Python, uv) inside the Docker image or mount them as volumes.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "sequential-thinking", "postgres"],
   },
 
   antigravity: {
@@ -535,7 +515,6 @@ export const GUIDES: Record<string, GuideData> = {
       "Conflict with Gemini CLI settings: Antigravity and Gemini CLI both live under ~/.gemini but in separate subdirectories. Changes to ~/.gemini/antigravity/mcp_config.json do not affect Gemini CLI's ~/.gemini/settings.json and vice versa.",
       "Tool calls failing with permission errors: Check that the MCP server binary has execute permission and that its required environment variables are set in the env block of the config entry.",
     ],
-    popularServers: ["github", "filesystem", "brave-search", "sequential-thinking", "memory"],
   },
 };
 

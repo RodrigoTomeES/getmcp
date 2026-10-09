@@ -123,10 +123,11 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 
 ## C. Fallos (ya existían en Next.js)
 
-- [ ] **C1. Las 19 guías muestran "Popular Servers" vacío y sin "Example configuration".**
+- [x] **C1. Las 19 guías muestran "Popular Servers" vacío y sin "Example configuration".**
   - Los slugs de `src/lib/guide-data.ts` (`github`, `filesystem`, `brave-search`…) ya no existen; los reales son tipo `brave-brave-search`.
   - `src/pages/guides/[app].astro:52-68` falla en silencio. Además `sampleServerId = guide.popularServers[0]` puede no coincidir con el servidor elegido.
   - Propuesta: elegirlos desde el registry o las métricas, o validar los slugs en el build.
+  - Hecho: se quita `popularServers` de `GuideData`. Las guías usan `getPopularOfficialServers()` (`src/lib/popular-servers.ts`, los 6 oficiales con más estrellas, igual que la home) con el título "Popular MCP Servers". El ejemplo usa el primero, con clave `server.id` y enlace a `server.slug`. `getPopularOfficialServers()` descarta entradas cuyo slug lleva a otro servidor. Tests en `tests/guides.test.ts`.
 - [x] **C2. El JSON-LD no se escapa.**
   - `src/components/JsonLd.astro:9` usa `set:html={JSON.stringify(data)}` con descripciones de terceros. Un `</script>` en el registry rompería la página.
   - Arreglo: `.replace(/</g, "\\u003c")`. Mismo patrón en `DocsContent.tsx:12-57`.

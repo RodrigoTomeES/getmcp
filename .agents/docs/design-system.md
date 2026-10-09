@@ -570,7 +570,7 @@ Per-app installation and configuration guides with generator metadata.
 │ □ VS Code 1.80+                         │
 │ □ MCP CLI installed                     │
 │                                         │
-│ Popular Servers for VS Code             │  ← Compact 2-col grid
+│ Popular MCP Servers                     │  ← Compact 2-col grid
 │ [Server] [Server]                       │     (names + badges only)
 │ [Server] [Server]                       │
 │                                         │
