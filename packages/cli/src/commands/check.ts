@@ -9,12 +9,61 @@
 import * as p from "@clack/prompts";
 import { getServer } from "@getmcp/registry";
 import { getTrackedServers } from "../lock.js";
-import { detectApps, resolveAppForScope } from "../detect.js";
+import {
+  detectApps,
+  resolveAppForScope,
+  getReadableConfigPaths,
+  type DetectedApp,
+} from "../detect.js";
 import { listServersInConfig } from "../config-file.js";
 import { shortenPath } from "../utils.js";
 
 export interface CheckOptions {
   json?: boolean;
+}
+
+interface ServerLookup {
+  status: "present" | "missing" | "unreadable";
+  path?: string;
+}
+
+/**
+ * Look for a tracked server in an app's config.
+ *
+ * When the lock file records the scope, only that scope is checked — that is
+ * where `add` wrote it. Entries predating scope tracking have no recorded
+ * scope; rather than assuming "project" and reporting a global install as
+ * missing, every config the app actually has is searched.
+ */
+function lookupServer(
+  app: DetectedApp,
+  serverId: string,
+  recordedScope: "project" | "global" | undefined,
+): ServerLookup {
+  if (recordedScope) {
+    const resolved = resolveAppForScope(app, recordedScope);
+    try {
+      const servers = listServersInConfig(resolved.configPath);
+      return servers.includes(serverId)
+        ? { status: "present", path: resolved.configPath }
+        : { status: "missing" };
+    } catch {
+      return { status: "unreadable" };
+    }
+  }
+
+  let unreadable = false;
+  for (const { path } of getReadableConfigPaths(app)) {
+    try {
+      if (listServersInConfig(path).includes(serverId)) {
+        return { status: "present", path };
+      }
+    } catch {
+      unreadable = true;
+    }
+  }
+
+  return unreadable ? { status: "unreadable" } : { status: "missing" };
 }
 
 export async function checkCommand(options: CheckOptions = {}): Promise<void> {
@@ -36,18 +85,8 @@ export async function checkCommand(options: CheckOptions = {}): Promise<void> {
           return { app: appId, scope: appScope, status: "app-not-detected" as const };
         }
         const app = appConfigMap.get(appId)!;
-        const resolvedApp = appScope === "global" ? resolveAppForScope(app, "global") : app;
-        try {
-          const servers = listServersInConfig(resolvedApp.configPath);
-          const found = servers.includes(serverId);
-          return {
-            app: appId,
-            scope: appScope,
-            status: found ? ("present" as const) : ("missing" as const),
-          };
-        } catch {
-          return { app: appId, scope: appScope, status: "unreadable" as const };
-        }
+        const lookup = lookupServer(app, serverId, installation.scopes?.[appId]);
+        return { app: appId, scope: appScope, status: lookup.status };
       });
 
       return {
@@ -101,17 +140,14 @@ export async function checkCommand(options: CheckOptions = {}): Promise<void> {
       }
 
       const app = appConfigMap.get(appId)!;
-      const appScope = installation.scopes?.[appId] ?? "project";
-      const resolvedApp = appScope === "global" ? resolveAppForScope(app, "global") : app;
-      try {
-        const servers = listServersInConfig(resolvedApp.configPath);
-        if (servers.includes(serverId)) {
-          presentIn.push(`${app.name} (${shortenPath(resolvedApp.configPath)})`);
-        } else {
-          missingFrom.push(`${app.name} (removed from config)`);
-        }
-      } catch {
+      const lookup = lookupServer(app, serverId, installation.scopes?.[appId]);
+
+      if (lookup.status === "present") {
+        presentIn.push(`${app.name} (${shortenPath(lookup.path!)})`);
+      } else if (lookup.status === "unreadable") {
         missingFrom.push(`${app.name} (config not readable)`);
+      } else {
+        missingFrom.push(`${app.name} (removed from config)`);
       }
     }
 

@@ -13,7 +13,7 @@ import {
   getServersByCategory,
   getServerCount,
 } from "@getmcp/registry";
-import { detectInstalledApps } from "../detect.js";
+import { detectInstalledApps, getReadableConfigPaths, type DetectedApp } from "../detect.js";
 import { listServersInConfig } from "../config-file.js";
 import { shortenPath } from "../utils.js";
 
@@ -137,22 +137,45 @@ async function listByCategory(category: string, opts: OutputOptions = {}): Promi
   console.log(lines.join("\n"));
 }
 
+/**
+ * Read every config an app actually has (project and/or global).
+ * `unreadable` is true when at least one existing config failed to parse.
+ */
+function readAppConfigs(app: DetectedApp): {
+  configs: { scope: "project" | "global"; path: string; servers: string[] }[];
+  servers: string[];
+  unreadable: boolean;
+} {
+  const configs: { scope: "project" | "global"; path: string; servers: string[] }[] = [];
+  const servers = new Set<string>();
+  let unreadable = false;
+
+  for (const { scope, path } of getReadableConfigPaths(app)) {
+    try {
+      const found = listServersInConfig(path);
+      configs.push({ scope, path, servers: found });
+      for (const server of found) servers.add(server);
+    } catch {
+      unreadable = true;
+    }
+  }
+
+  return { configs, servers: [...servers], unreadable };
+}
+
 async function listInstalledServers(opts: OutputOptions = {}): Promise<void> {
   const apps = detectInstalledApps();
 
   if (opts.json) {
     const data = apps.map((app) => {
-      let servers: string[] = [];
-      try {
-        servers = listServersInConfig(app.configPath);
-      } catch {
-        // config not readable
-      }
+      const { configs, servers } = readAppConfigs(app);
       return {
         id: app.id,
         name: app.name,
+        // Kept for backwards compatibility; `configs` is authoritative
         configPath: app.configPath,
         servers,
+        configs,
       };
     });
     console.log(JSON.stringify(data, null, 2));
@@ -161,13 +184,8 @@ async function listInstalledServers(opts: OutputOptions = {}): Promise<void> {
 
   if (opts.quiet) {
     for (const app of apps) {
-      try {
-        const servers = listServersInConfig(app.configPath);
-        for (const server of servers) {
-          console.log(`${app.id}:${server}`);
-        }
-      } catch {
-        // config not readable
+      for (const server of readAppConfigs(app).servers) {
+        console.log(`${app.id}:${server}`);
       }
     }
     return;
@@ -181,15 +199,25 @@ async function listInstalledServers(opts: OutputOptions = {}): Promise<void> {
   p.intro(`Detected AI applications (${apps.length}):`);
 
   for (const app of apps) {
-    let serversLine: string;
+    const { configs, servers, unreadable } = readAppConfigs(app);
 
-    try {
-      const servers = listServersInConfig(app.configPath);
-      serversLine = servers.length > 0 ? servers.join(", ") : "(none configured)";
-    } catch {
-      serversLine = "(config not readable)";
-    }
+    const serversLine =
+      servers.length > 0
+        ? servers.join(", ")
+        : unreadable
+          ? "(config not readable)"
+          : "(none configured)";
 
-    p.log.info(`${app.name}\n  Config: ${shortenPath(app.configPath)}\n  Servers: ${serversLine}`);
+    // Label scope only when the app has configs in both scopes
+    const configLine =
+      configs.length > 0
+        ? configs
+            .map((c) =>
+              configs.length > 1 ? `${shortenPath(c.path)} (${c.scope})` : shortenPath(c.path),
+            )
+            .join(", ")
+        : shortenPath(app.configPath);
+
+    p.log.info(`${app.name}\n  Config: ${configLine}\n  Servers: ${serversLine}`);
   }
 }
