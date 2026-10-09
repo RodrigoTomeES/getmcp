@@ -171,7 +171,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 - [ ] **E4. "Actualizado hace X" congelado en el build:** `ServerSidebar.tsx:232-234` usa `relativeTime(lastPush)` en el HTML estático.
   - Propuesta: `<time datetime="…">` con la fecha absoluta en el HTML, y un script mínimo que la reescribe como relativa con `Intl.RelativeTimeFormat`, que es Baseline amplio.
   - Sin JS se ve la fecha absoluta, que nunca queda desfasada.
-- [ ] **E5. Sitemap con `lastmod` real:** `lib/sitemap.ts:77` pone la fecha del build a todas las URLs, así que Google ve unos 40.000 cambios al día. Usar la fecha real (por ejemplo `lastPush` de las métricas).
+- [x] **E5. Sitemap con `lastmod` real:** `lib/sitemap.ts:77` pone la fecha del build a todas las URLs, así que Google ve unos 40.000 cambios al día. Usar la fecha real (por ejemplo `lastPush` de las métricas). _Hecho: cada ficha usa la fecha más reciente entre `updatedAt` del registro oficial y `lastPush` de GitHub (`serverLastModified()`); la home, `/servers` y las categorías (solo la página 1) usan la de su servidor más reciente; docs y guías omiten `<lastmod>`; cada entrada del índice usa la fecha más reciente de su trozo. Las URLs de fichas salen de `getServerPaths()`. Si E4 quita la fecha "Updated" de la ficha, quitar también `lastPush`._
 - [ ] **E6. Head:**
   - Falta `og:url`.
   - El 404 hereda el `hreflang` de la home (`metadata.ts:84-89`).

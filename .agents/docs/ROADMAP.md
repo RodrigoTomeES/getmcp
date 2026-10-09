@@ -285,6 +285,8 @@ Major content expansion and UX improvements to the web directory.
 
 - [x] **Improve sitemap with priority tiers and all new routes** — Updated sitemap to include category pages, guides, and /servers with proper priority levels.
   - File: `packages/web/src/app/sitemap.ts`
+- [x] **Real per-URL `lastmod` in the sitemap** — Replaced the build date on every URL with the newer of the registry `updatedAt` and the last GitHub push per server; listing pages and sitemap-index entries use their newest server, docs and guides omit `lastmod`.
+  - Files: `packages/web/src/lib/sitemap.ts`, `packages/web/src/pages/sitemap.xml.ts`, `packages/web/src/pages/sitemap-[n].xml.ts`
 
 - [x] **OG images for all new page types** — Generated Open Graph images for category pages, guide pages, and servers index.
   - Files: `packages/web/src/app/servers/opengraph-image.tsx`, `packages/web/src/app/category/[slug]/opengraph-image.tsx`, `packages/web/src/app/guides/[app]/opengraph-image.tsx`
