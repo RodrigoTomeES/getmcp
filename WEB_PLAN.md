@@ -136,7 +136,8 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
   - Afectaba a unas 31.000 fichas: 30.059 descripciones terminan en `.` y 1.016 en otra puntuación.
   - Arreglo: `toSentence()` en `src/lib/format.ts`. Recorta espacios, quita un `,` `:` o `;` final y añade punto solo si no termina ya en `.` `!` `?` `…`. Tests en `tests/format.test.ts`.
   - Las 5 descripciones que ya vienen mal del registry ("SEO..", "quickly!.") se dejan como están.
-- [ ] **C4. La home no tiene `h1` accesible:** `class="absolute hidden"` (`src/pages/index.astro:137`). Cambiar a `sr-only`.
+- [x] **C4. La home no tiene `h1` accesible:** `class="absolute hidden"` (`src/pages/index.astro:137`). Cambiar a `sr-only`.
+  - Hecho: el `h1` de la home usa `sr-only` (`display:none` lo sacaba del árbol de accesibilidad). Al ser `position:absolute` no ocupa celda del grid, así que el hero no cambia.
 - [x] **C5. El orden "alfabético" de `/servers`** ordena por ID inverso (`SearchBar.tsx:140-145`); debería ordenar por nombre.
   - Hecho: `sortServers()` en `src/lib/server-search.ts` (con `SortOption`, `DEFAULT_SORT`, `PAGE_SIZES`, `DEFAULT_PAGE_SIZE`). "Alphabetical" ordena por nombre con `Intl.Collator("en", { sensitivity: "base", numeric: true })`; los nombres que empiezan por puntuación van primero. Tests en `tests/server-search.test.ts`.
 - [x] **C6. El botón "Browse servers" del 404 apuntaba a `/`.** Hecho en `430a357`.
