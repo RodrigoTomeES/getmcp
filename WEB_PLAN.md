@@ -119,7 +119,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
     - **WebP:** algo más pequeño, pero su compatibilidad en previsualizaciones de enlaces no está garantizada.
   - **Elegido:** `sharp` con `png({ palette: true, colours: 256, dither: 1, compressionLevel: 9, effort: 4 })` sobre la salida de `resvg`. Cuesta ~45 ms por imagen, unos +4 min de build con concurrencia 8.
   - **Revisión del usuario:** al terminar, enseñar imágenes antes/después de varias OG. Si no convence, cambiar a sin pérdida (`png({ compressionLevel: 9 })`).
-  - Borrar de paso `assets/Inter-SemiBold.ttf`, que no se usa (ver D2).
+  - Borrar de paso `assets/Inter-SemiBold.ttf`, que no se usa (hecho en D2).
 
 ## C. Fallos (ya existían en Next.js)
 
@@ -153,7 +153,8 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 ## D. Limpieza
 
 - [ ] **D1. Restos de Next.js:** borrar `packages/web/.next/`, `next-env.d.ts` y `tsconfig.tsbuildinfo` (761 KB). Quitar del `.gitignore` las entradas que se añadieron para ignorarlos. Revisar el `include: ["**/*"]` de `tsconfig.json`.
-- [ ] **D2. Código y assets muertos:** `src/lib/security-headers.ts` (o se resuelve en A7), `@keyframes fade-in-up` (`globals.css`), `assets/Inter-SemiBold.ttf`. También `public/logo.svg` y `logo-light.svg`, que solo usa el README.
+- [x] **D2. Código y assets muertos:** `src/lib/security-headers.ts` (o se resuelve en A7), `@keyframes fade-in-up` (`globals.css`), `assets/Inter-SemiBold.ttf`. También `public/logo.svg` y `logo-light.svg`, que solo usa el README.
+  - **Hecho:** borrados `@keyframes fade-in-up` e `Inter-SemiBold.ttf` (las plantillas OG piden ahora `fontWeight: 700`, que es lo que satori ya renderizaba). Los logos del README se movieron a `.github/assets/`. `security-headers.ts` queda para A7.
 - [ ] **D3. Comentarios de Next.js y Vercel:** ~~`SearchBar.tsx:63`~~ (hecho en E8) y `ConfigViewer.tsx:30` ("server component" y `eslint-disable`), `BaseLayout.astro:17`, `og-image.tsx:82`.
 - [x] **D4. Cifras escritas a mano.** Hecho en `f3b6385`. Queda opcional: "10 commands" (`StatsBar.tsx`, `CliShowcase.tsx`) podría salir de `COMMANDS.length`.
 

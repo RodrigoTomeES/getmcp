@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="packages/web/public/logo.svg">
-    <source media="(prefers-color-scheme: light)" srcset="packages/web/public/logo-light.svg">
-    <img alt="getmcp" src="packages/web/public/logo-light.svg" width="280">
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/logo.svg">
+    <source media="(prefers-color-scheme: light)" srcset=".github/assets/logo-light.svg">
+    <img alt="getmcp" src=".github/assets/logo-light.svg" width="280">
   </picture>
 </p>
 

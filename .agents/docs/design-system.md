@@ -94,7 +94,6 @@ font-family: var(--font-fira-mono); /* "Fira Mono", "Fira Mono fallback: Courier
 Font files in `packages/web/assets/`:
 
 - `Inter-Regular.ttf` (400)
-- `Inter-SemiBold.ttf` (600)
 - `Inter-Bold.ttf` (700)
 
 Used exclusively for OG image generation at build time (satori + `@resvg/resvg-js`, see `src/lib/og-image.tsx`). CJK and Hebrew text falls back to the Noto Sans fonts in the same folder.

@@ -85,7 +85,7 @@ export async function createServerOGImage(server: InternalRegistryEntry) {
         <span
           style={{
             fontSize: "16px",
-            fontWeight: 600,
+            fontWeight: 700,
             color: "white",
             backgroundColor: "#3b82f6",
             padding: "4px 12px",
