@@ -10,7 +10,7 @@ import Download from "@lucide/astro/icons/download";
 import ExternalLink from "@lucide/astro/icons/external-link";
 import GitFork from "@lucide/astro/icons/git-fork";
 import Star from "@lucide/astro/icons/star";
-import { compactNumber, relativeTime } from "@/lib/format";
+import { compactNumber, formatDate } from "@/lib/format";
 
 type Metrics = NonNullable<ReturnType<typeof getServerMetrics>>;
 
@@ -67,7 +67,8 @@ if (metrics?.docker?.pulls != null && metrics.docker.pulls > 0) {
 }
 const hasStats = stats.length > 0;
 
-const details: Array<{ label: string; value: string; mono?: boolean }> = [];
+// `dateTime` renders the value as a <time>, rewritten as relative text by `@/scripts/relative-time`.
+const details: Array<{ label: string; value: string; mono?: boolean; dateTime?: string }> = [];
 if (server.isOfficial) details.push({ label: "Status", value: "Official" });
 if (server.author) details.push({ label: "Author", value: server.author });
 if (version) details.push({ label: "Version", value: version, mono: true });
@@ -76,8 +77,10 @@ if (server.runtime) details.push({ label: "Runtime", value: server.runtime });
 if (server.language) details.push({ label: "Language", value: server.language });
 if (server.package) details.push({ label: "Package", value: server.package, mono: true });
 details.push({ label: "Transport", value: isRemote ? "Remote" : "Stdio" });
-if (metrics?.github?.lastPush) {
-  details.push({ label: "Updated", value: relativeTime(metrics.github.lastPush) });
+const lastPush = metrics?.github?.lastPush;
+const updated = lastPush ? formatDate(lastPush) : null;
+if (lastPush && updated) {
+  details.push({ label: "Updated", value: updated, dateTime: lastPush });
 }
 
 const hasLinks = server.repository || server.homepage;
@@ -132,7 +135,15 @@ const hasSections = hasStats || details.length > 0 || hasLinks || visibleTags.le
             <div class="flex items-center justify-between gap-4">
               <span class="text-xs text-text-secondary shrink-0">{d.label}</span>
               <span class="text-sm text-text truncate text-right">
-                <span class={d.mono ? "font-mono" : ""} title={d.value}>{d.value}</span>
+                {d.dateTime ? (
+                  <time datetime={d.dateTime} data-relative-time title={d.value}>
+                    {d.value}
+                  </time>
+                ) : (
+                  <span class={d.mono ? "font-mono" : ""} title={d.value}>
+                    {d.value}
+                  </span>
+                )}
               </span>
             </div>
           ))}
@@ -190,3 +201,7 @@ const hasSections = hasStats || details.length > 0 || hasLinks || visibleTags.le
     </div>
   )
 }
+
+<script>
+  import "@/scripts/relative-time";
+</script>
