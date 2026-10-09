@@ -137,7 +137,7 @@ Used exclusively for OG image generation at build time (satori + `@resvg/resvg-j
 ### Links
 
 - Default: `text-accent hover:underline`
-- Breadcrumb: `text-text-secondary hover:text-text`
+- Breadcrumb: always `components/Breadcrumbs.astro` (`items: { label, href? }[]`, optional `class` for spacing). `<nav aria-label="Breadcrumb">` + `<ol class="flex flex-wrap items-center gap-2">`, `text-sm text-text-secondary`; links `hover:text-text`; `/` separators `aria-hidden` (`text-text-secondary/50`); last crumb `<span aria-current="page" class="text-text">`. Every trail starts with Home, matching the page `BreadcrumbList` JSON-LD (server pages: Home / Servers / {name})
 - External: `underline text-warning-light` (for warning context links)
 
 ### Lists
@@ -537,7 +537,7 @@ Dedicated landing pages for each of the 14 server categories.
 - **Layout**: `max-w-6xl mx-auto px-6 py-12`
 - **Server grid**: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4`
 - **JSON-LD**: `CollectionPage` + `ItemList` of servers + `BreadcrumbList`
-- **Breadcrumb styling**: `text-sm text-text-secondary hover:text-text`
+- **Breadcrumb**: `Breadcrumbs.astro` (see Links); pages 2+ keep the category name as the last crumb
 
 ### Guide Pages (`/guides/[app]`)
 
@@ -584,7 +584,7 @@ Per-app installation and configuration guides with generator metadata.
 ```
 
 - **Layout**: `max-w-3xl mx-auto px-6 py-12`
-- **Breadcrumb**: Link styled as `text-text-secondary hover:text-text text-sm`
+- **Breadcrumb**: `Breadcrumbs.astro` (Home / Guides / {App}, see Links)
 - **Section spacing**: `mb-10` between major sections
 - **Code blocks**: `rounded-lg border border-border bg-code-bg p-4 font-mono text-sm`
 - **Metadata grid** (`dl`): `grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-5 py-6 border-y border-border`

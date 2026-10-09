@@ -167,7 +167,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
     - Safari no soporta `closedby`: las guías dan un fallback de unas 10 líneas que cierra con un clic en el `::backdrop`.
   - [x] El `aria-label` de `AsciiArt.tsx:81` está en un `<pre>` sin rol. Resuelto en A2a (`role="img"` en el envoltorio de `AsciiArt.astro`).
   - El `<img>` del logo de la cabecera debería llevar `alt=""`. Lo cierra A8 (dueño de ese `<img>`); no se toca en E2.
-- [ ] **E3. Breadcrumbs consistentes:** categoría y guías usan `<span>`, sin `<ol>` ni `aria-current`.
+- [x] **E3. Breadcrumbs consistentes:** categoría y guías usan `<span>`, sin `<ol>` ni `aria-current`. _Hecho: `components/Breadcrumbs.astro` (`items: { label, href? }[]`) en /servers, fichas, categorías (también páginas 2+, último elemento = nombre de la categoría) y guías: `nav[aria-label=Breadcrumb]` > `ol` con `flex-wrap`, separadores `/` con `aria-hidden`, último elemento `aria-current="page"` con `wrap-anywhere`. Todas empiezan por Home, como su JSON-LD (las fichas ganan "Home /"). Verificado en el build parcial y con Chromium a 390 px: sin scroll horizontal, los nombres largos se parten._
 - [ ] **E4. "Actualizado hace X" congelado en el build:** `ServerSidebar.tsx:232-234` usa `relativeTime(lastPush)` en el HTML estático.
   - Propuesta: `<time datetime="…">` con la fecha absoluta en el HTML, y un script mínimo que la reescribe como relativa con `Intl.RelativeTimeFormat`, que es Baseline amplio.
   - Sin JS se ve la fecha absoluta, que nunca queda desfasada.

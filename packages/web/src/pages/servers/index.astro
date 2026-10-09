@@ -2,6 +2,7 @@
 import { getAllServers, getCategories } from "@getmcp/registry";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import JsonLd from "@/components/JsonLd.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import { SearchBar } from "@/components/SearchBar";
 import { APP_COUNT, SITE_URL } from "@/lib/constants";
 import { resolveMetadata } from "@/lib/metadata";
@@ -79,16 +80,7 @@ const jsonLd = [
   <div class="max-w-6xl mx-auto px-6 py-10 md:py-16">
     <JsonLd data={jsonLd} />
 
-    {/* Breadcrumb */}
-    <nav aria-label="Breadcrumb" class="text-sm text-text-secondary mb-8">
-      <ol class="flex items-center gap-2">
-        <li>
-          <a href="/" class="hover:text-text transition-colors">Home</a>
-        </li>
-        <li class="text-text-secondary/50" aria-hidden="true">/</li>
-        <li aria-current="page" class="text-text">Servers</li>
-      </ol>
-    </nav>
+    <Breadcrumbs class="mb-8" items={[{ label: "Home", href: "/" }, { label: "Servers" }]} />
 
     {/* Header */}
     <div class="mb-12">

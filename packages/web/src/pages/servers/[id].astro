@@ -6,6 +6,7 @@ import BadgeCheck from "@lucide/astro/icons/badge-check";
 import Lock from "@lucide/astro/icons/lock";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import JsonLd from "@/components/JsonLd.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import ConfigViewer from "@/components/ConfigViewer.astro";
 import PackageManagerCommand from "@/components/PackageManagerCommand.astro";
 import ServerCard from "@/components/ServerCard.astro";
@@ -126,16 +127,14 @@ const jsonLd = [
   <div class="max-w-6xl mx-auto px-6 py-12">
     <JsonLd data={jsonLd} />
 
-    {/* Breadcrumb */}
-    <nav class="text-sm text-text-secondary mb-10" aria-label="Breadcrumb">
-      <ol class="flex items-center gap-2">
-        <li>
-          <a href="/servers" class="hover:text-text transition-colors">Servers</a>
-        </li>
-        <li class="text-text-secondary/50" aria-hidden="true">/</li>
-        <li aria-current="page" class="text-text">{server.name}</li>
-      </ol>
-    </nav>
+    <Breadcrumbs
+      class="mb-10"
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Servers", href: "/servers" },
+        { label: server.name },
+      ]}
+    />
 
     {/* Hero */}
     <section class="mb-10">

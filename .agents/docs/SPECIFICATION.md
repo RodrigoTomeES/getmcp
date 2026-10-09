@@ -1045,7 +1045,7 @@ The web application provides the following public routes:
 
 The site uses structured data (JSON-LD) for SEO and schema.org compliance:
 
-- **BreadcrumbList** — Category and guide navigation breadcrumbs
+- **BreadcrumbList** — Servers, server detail, category and guide trails (each starts with Home; the visible trail is rendered by `Breadcrumbs.astro`)
 - **CollectionPage** — Server directory index (`/servers`)
 - **ItemList** — Category server grids (`/category/[slug]`), current page only
 - **TechArticle** — App-specific guides (`/guides/[app]`)

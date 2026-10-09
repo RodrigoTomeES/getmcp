@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import JsonLd from "@/components/JsonLd.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import { GUIDES, GUIDE_SLUGS } from "@/lib/guide-data";
 import { APP_COUNT, SITE_URL } from "@/lib/constants";
 import { resolveMetadata } from "@/lib/metadata";
@@ -69,12 +70,7 @@ const jsonLd = [
   <div class="max-w-6xl mx-auto px-6 py-10 md:py-16">
     <JsonLd data={jsonLd} />
 
-    {/* Breadcrumb */}
-    <nav class="text-sm text-text-secondary mb-8" aria-label="Breadcrumb">
-      <a href="/" class="hover:text-text transition-colors">Home</a>
-      <span class="mx-2 text-text-secondary/50">/</span>
-      <span class="text-text">Guides</span>
-    </nav>
+    <Breadcrumbs class="mb-8" items={[{ label: "Home", href: "/" }, { label: "Guides" }]} />
 
     {/* Header */}
     <div class="mb-10">

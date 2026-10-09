@@ -1,0 +1,48 @@
+---
+/**
+ * Visible breadcrumb trail. Every trail starts with Home, matching the
+ * BreadcrumbList JSON-LD of each page. The last item is the current page
+ * (no link, aria-current="page"); "/" separators are hidden from assistive tech.
+ */
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+  class?: string;
+}
+
+const { items, class: className } = Astro.props;
+const lastIndex = items.length - 1;
+---
+
+<nav aria-label="Breadcrumb" class:list={["text-sm text-text-secondary", className]}>
+  <ol class="flex flex-wrap items-center gap-2">
+    {
+      items.map((item, i) =>
+        i === lastIndex ? (
+          <li>
+            <span aria-current="page" class="text-text wrap-anywhere">
+              {item.label}
+            </span>
+          </li>
+        ) : (
+          <li class="flex items-center gap-2">
+            {item.href ? (
+              <a href={item.href} class="hover:text-text transition-colors">
+                {item.label}
+              </a>
+            ) : (
+              <span>{item.label}</span>
+            )}
+            <span aria-hidden="true" class="text-text-secondary/50">
+              /
+            </span>
+          </li>
+        ),
+      )
+    }
+  </ol>
+</nav>
