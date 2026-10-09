@@ -1,5 +1,6 @@
 ---
 import { Font } from "astro:assets";
+import { PUBLIC_CF_ANALYTICS_TOKEN } from "astro:env/client";
 import "@/styles/globals.css";
 import { absoluteUrl, type ResolvedMetadata } from "@/lib/metadata";
 import { OG_SIZE } from "@/lib/og-image";
@@ -19,8 +20,8 @@ const { title, description, alternates, openGraph, twitter, ogImage, noindex } =
   metadata;
 const ogImageUrl = ogImage && absoluteUrl(ogImage.path);
 
-// Cloudflare Web Analytics beacon (replaces Vercel Analytics + Speed Insights).
-const analyticsToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
+// Cloudflare Web Analytics beacon (only rendered when the token is set).
+const analyticsToken = PUBLIC_CF_ANALYTICS_TOKEN;
 
 // Native speculation rules (Chromium only; other browsers ignore the script).
 // One document rule prefetches same-origin pages on hover/pointerdown

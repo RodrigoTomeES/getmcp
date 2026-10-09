@@ -1,4 +1,4 @@
-import { defineConfig, fontProviders } from "astro/config";
+import { defineConfig, envField, fontProviders } from "astro/config";
 import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 import buildReport from "./integrations/build-report.ts";
@@ -27,6 +27,16 @@ export default defineConfig({
       fallbacks: ["monospace"],
     },
   ],
+  env: {
+    schema: {
+      // Cloudflare Web Analytics site token; unset = no beacon. Must be set where the build runs.
+      PUBLIC_CF_ANALYTICS_TOKEN: envField.string({
+        context: "client",
+        access: "public",
+        optional: true,
+      }),
+    },
+  },
   // buildReport logs the build size report (and writes the GitHub job summary).
   integrations: [react(), buildReport()],
   vite: {

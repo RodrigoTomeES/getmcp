@@ -82,8 +82,9 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
     - **No** apuntar a `#main-content`: en `/servers` (19,8 MB) bloquearía el render hasta parsear todo.
     - Firefox no soporta las transiciones entre documentos: navega sin animación.
   - **No** usar `<ClientRouter />`: es incompatible con `security.csp` y obliga a re-enlazar scripts.
-- [ ] **A6. `astro:env`** para `PUBLIC_CF_ANALYTICS_TOKEN`.
+- [x] **A6. `astro:env`** para `PUBLIC_CF_ANALYTICS_TOKEN`.
   - `envField.string({ context: "client", access: "public", optional: true })`, y borrar la declaración a mano de `src/env.d.ts`.
+  - **Hecho:** `env.schema` en `astro.config.mjs`; `BaseLayout.astro` lo importa de `astro:env/client` y solo pinta el beacon si hay token. `src/env.d.ts` borrado. El token se configura como variable de entorno del proyecto en Vercel (donde corre el build); recordatorio en ROADMAP fase 2 para moverlo si cambia el host. El comentario de Vercel de `BaseLayout.astro` (D3, en realidad la línea 22) ya está reescrito. Verificado con `astro dev`: con `PUBLIC_CF_ANALYTICS_TOKEN=test` sale `data-cf-beacon='{"token":"test"}'`, sin él no hay beacon.
   - Ojo: `.github/workflows/web.yml` nunca define el token, así que la analítica no se activa. Hay que decidir dónde se configura.
 - [ ] **A7. CSP integrada** (`security.csp`). Mejor después de A1 y A2.
   - Hashes automáticos de scripts y estilos en línea; el beacon de Cloudflare va en `scriptDirective.resources`.
@@ -155,7 +156,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 - [ ] **D1. Restos de Next.js:** borrar `packages/web/.next/`, `next-env.d.ts` y `tsconfig.tsbuildinfo` (761 KB). Quitar del `.gitignore` las entradas que se añadieron para ignorarlos. Revisar el `include: ["**/*"]` de `tsconfig.json`.
 - [x] **D2. Código y assets muertos:** `src/lib/security-headers.ts` (o se resuelve en A7), `@keyframes fade-in-up` (`globals.css`), `assets/Inter-SemiBold.ttf`. También `public/logo.svg` y `logo-light.svg`, que solo usa el README.
   - **Hecho:** borrados `@keyframes fade-in-up` e `Inter-SemiBold.ttf` (las plantillas OG piden ahora `fontWeight: 700`, que es lo que satori ya renderizaba). Los logos del README se movieron a `.github/assets/`. `security-headers.ts` queda para A7.
-- [ ] **D3. Comentarios de Next.js y Vercel:** ~~`SearchBar.tsx:63`~~ (hecho en E8) y `ConfigViewer.tsx:30` ("server component" y `eslint-disable`), `BaseLayout.astro:17`, `og-image.tsx:82`.
+- [ ] **D3. Comentarios de Next.js y Vercel:** ~~`SearchBar.tsx:63`~~ (hecho en E8) y `ConfigViewer.tsx:30` ("server component" y `eslint-disable`), ~~`BaseLayout.astro:17`~~ (hecho en A6), `og-image.tsx:82`.
 - [x] **D4. Cifras escritas a mano.** Hecho en `f3b6385`. Queda opcional: "10 commands" (`StatsBar.tsx`, `CliShowcase.tsx`) podría salir de `COMMANDS.length`.
 
 ## E. Accesibilidad y SEO
