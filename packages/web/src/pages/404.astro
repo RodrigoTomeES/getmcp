@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { NotFound } from "@/components/NotFound";
+import NotFound from "@/components/NotFound.astro";
 import { resolveMetadata } from "@/lib/metadata";
 import { HOME_OG } from "@/lib/og-pages";
 
@@ -12,5 +12,5 @@ const metadata = resolveMetadata(
 ---
 
 <BaseLayout metadata={metadata} preloadSymbols>
-  <NotFound client:load />
+  <NotFound />
 </BaseLayout>

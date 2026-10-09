@@ -394,15 +394,17 @@ Both icons are always rendered; `scripts/copy.ts` toggles `data-copied` and writ
 
 ### 404 Page
 
+`NotFound.astro`, static (no React):
+
 ```
- Error 404                ← text-sm font-mono uppercase tracking-wider
- Page not found           ← text-5xl font-bold tracking-tight
- description text         ← text-lg text-text-secondary max-w-md
- [Browse servers]         ← primary CTA button
+ ASCII "404"              ← two aria-hidden <pre> layers in a role="img" wrapper, clamp(10px, 4.2vw, 26px)
+ terminal window          ← fake `npx @getmcp/cli find <path>` with a red error line and a hint
+ [Browse servers]         ← primary CTA button + `or run npx @getmcp/cli find`
 ```
 
-- Generous vertical padding: `py-32`
-- Centered layout with constrained description width
+- Centered column with `py-20`, filling the viewport below header and footer
+- Fixed CRT scanline overlay; the sweeping scanline, the solid-layer reveal (`motion-safe:animate-ascii-reveal`) and the cursor blink only run without reduced motion
+- The requested path is filled in by a tiny script (`/unknown` without JS)
 
 ### Error Page
 
