@@ -231,6 +231,7 @@ Major content expansion and UX improvements to the web directory.
 
 - [x] **Add twitter:site/creator + hreflang tags** — Added social media metadata and language/region hints.
   - File: `packages/web/src/app/layout.tsx`
+  - hreflang removed in WEB_PLAN E6: it never reached indexable pages (alternates were replaced by canonical), only the noindex 404; single-language site (`<html lang="en">` stays).
 
 - [x] **Optimize title tags across all page types** — Refined titles for homepage, server details, docs, and category pages with consistent SEO patterns.
   - Files: `packages/web/src/app/layout.tsx`, `packages/web/src/app/page.tsx`, `packages/web/src/app/servers/[id]/page.tsx`, `packages/web/src/app/docs/page.tsx`

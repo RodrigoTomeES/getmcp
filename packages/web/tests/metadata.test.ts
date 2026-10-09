@@ -21,8 +21,12 @@ describe("resolveMetadata", () => {
     // A page `openGraph` replaces the root one entirely.
     expect(resolved.openGraph).toEqual({ title: "Page", type: "website" });
     // Keys the page does not set are inherited.
-    expect(resolved.keywords).toEqual(ROOT_METADATA.keywords);
-    expect(resolved.alternates).toEqual(ROOT_METADATA.alternates);
+    expect(resolved.description).toBe(ROOT_METADATA.description);
+  });
+
+  it("sets no default alternates (no hreflang on a single-language site)", () => {
+    expect(ROOT_METADATA.alternates).toBeUndefined();
+    expect(resolveMetadata({}).alternates).toBeUndefined();
   });
 
   it("fills missing Twitter title and description from Open Graph", () => {
