@@ -141,7 +141,8 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
 - [x] **C5. El orden "alfabético" de `/servers`** ordena por ID inverso (`SearchBar.tsx:140-145`); debería ordenar por nombre.
   - Hecho: `sortServers()` en `src/lib/server-search.ts` (con `SortOption`, `DEFAULT_SORT`, `PAGE_SIZES`, `DEFAULT_PAGE_SIZE`). "Alphabetical" ordena por nombre con `Intl.Collator("en", { sensitivity: "base", numeric: true })`; los nombres que empiezan por puntuación van primero. Tests en `tests/server-search.test.ts`.
 - [x] **C6. El botón "Browse servers" del 404 apuntaba a `/`.** Hecho en `430a357`.
-- [ ] **C7. Cabecera móvil:** a 390 px la pastilla "beta" tapa "Servers" (`BaseLayout.astro:81-115`).
+- [x] **C7. Cabecera móvil:** a 390 px la pastilla "beta" tapa "Servers" (`BaseLayout.astro:81-115`).
+  - Hecho: la fila de la cabecera usa `flex-wrap gap-x-4 gap-y-2` (a ~320 px o con texto grande, la nav baja a una segunda línea en vez de solaparse) y la pastilla "beta" lleva `max-sm:hidden` (el enlace ya tiene `aria-label`). GitHub sigue como texto.
   - El flex no tiene `flex-wrap`, y las guías piden `flex-wrap: wrap` siempre que pueda desbordar. _(guía: `css-layout`)_
   - Propuesta: `flex-wrap` con `gap`, y ocultar la pastilla por debajo de `sm`. Alternativa: GitHub como icono.
 - [x] **C8. Riesgos latentes.** Hecho: `CATEGORY_SLUGS` (`lib/categories.ts`) alimenta página, OG, sitemap (ordenado) y `CategoryGrid`; `GUIDE_NAMES` eliminado (OG usa `GUIDES[app].shortName ?? name`, endpoint con `GUIDE_SLUGS`). Rutas: aplazado por decisión del usuario, la comprobación queda en ROADMAP 6b Fase 2.

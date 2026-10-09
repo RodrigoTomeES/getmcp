@@ -437,6 +437,8 @@ Icons used: `Search`, `SlidersHorizontal`, `Terminal`, `Copy`, `Check`, `X`, `Lo
 
 Custom SVG (download arrow + node network). Stroke: `#ededed`, strokeWidth `2.2`. Displayed at `w-6 h-6` in header.
 
+Header row: `flex flex-wrap items-center justify-between gap-x-4 gap-y-2`, so on very narrow screens the nav wraps to a second line instead of overlapping the logo. The "beta" badge is hidden below `sm` (`max-sm:hidden`).
+
 ---
 
 ## Animations & Transitions
