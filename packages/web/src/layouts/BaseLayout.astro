@@ -21,6 +21,27 @@ const ogImageUrl = ogImage && absoluteUrl(ogImage.path);
 
 // Cloudflare Web Analytics beacon (replaces Vercel Analytics + Speed Insights).
 const analyticsToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
+
+// Native speculation rules (Chromium only; other browsers ignore the script).
+// One document rule prefetches same-origin pages on hover/pointerdown
+// ("moderate"), skipping OG images, the sitemap and JSON endpoints.
+// A strict CSP (A7) must allow this inline script by its hash.
+const SPECULATION_RULES = JSON.stringify({
+  prefetch: [
+    {
+      source: "document",
+      where: {
+        and: [
+          { href_matches: "/*" },
+          { not: { href_matches: "/*.png" } },
+          { not: { href_matches: "/*.xml" } },
+          { not: { href_matches: "/*.json" } },
+        ],
+      },
+      eagerness: "moderate",
+    },
+  ],
+});
 ---
 
 <!doctype html>
@@ -72,6 +93,14 @@ const analyticsToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <Font cssVariable="--font-fira-mono" preload={fontPreload} />
+    <!--
+      Cross-document view transitions: hold the first render until the header
+      is parsed so the cross-fade never lands on a blank page. It targets the
+      header, not <main>, because blocking on <main> would wait for a page's
+      whole main content (e.g. the large /servers listing).
+    -->
+    <link rel="expect" href="#site-header" blocking="render" />
+    <script type="speculationrules" is:inline set:html={SPECULATION_RULES} />
     <slot name="head" />
   </head>
   <body class="min-h-dvh flex flex-col">
@@ -82,7 +111,7 @@ const analyticsToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
       Skip to main content
     </a>
 
-    <header class="border-b border-border px-6 py-4">
+    <header id="site-header" class="border-b border-border px-6 py-4">
       <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <a href="/" class="flex items-center gap-2.5" aria-label="getmcp home">
           <img

@@ -38,6 +38,11 @@
   html {
     scroll-behavior: smooth;
   }
+
+  /* Cross-document view transitions (default cross-fade); off for reduced motion. */
+  @view-transition {
+    navigation: auto;
+  }
 }
 
 html {

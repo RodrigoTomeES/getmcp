@@ -452,6 +452,8 @@ Header row: `flex flex-wrap items-center justify-between gap-x-4 gap-y-2`, so on
 | ASCII logo reveal    | `motion-safe:animate-ascii-reveal`                 | 250ms    | Home hero solid layer (`clip-path` wipe, `steps(40)`) |
 | Typing cursor        | `motion-safe:animate-[blink_1s_step-end_infinite]` | 1s       | Hero command cursor (hidden with reduced motion)      |
 
+**Page transitions**: cross-document view transitions with the browser's default cross-fade (`@view-transition { navigation: auto; }` in `globals.css`, inside `@media (prefers-reduced-motion: no-preference)`, so reduced motion gets plain navigations). No `view-transition-name` morphs. `BaseLayout` holds the first render with `<link rel="expect" href="#site-header" blocking="render">` so the fade never lands on a blank page. Browsers without support navigate normally.
+
 ---
 
 ## Form Elements

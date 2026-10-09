@@ -71,7 +71,7 @@ Cada punto tiene un ID para pedirlo por separado ("haz A3", "haz C1 y C2").
   - Devolver `cacheKey` en `getStaticPaths()` de `servers/[id]` y de sus endpoints de OG.
   - Necesita persistir `node_modules/.astro` en CI (~3 GB, `actions/cache`); `astro build --force` reconstruye todo.
   - Es experimental y no está probado con endpoints. Es la mayor mejora posible del build diario (~32 min).
-- [ ] **A5. Precarga de la siguiente página y view transitions nativas.**
+- [x] **A5. Precarga de la siguiente página y view transitions nativas.** _Hecho: `SPECULATION_RULES` en `BaseLayout.astro` (una regla de documento, `prefetch`, `"moderate"`, excluye `*.png`, `*.xml` y `*.json`; sin `prerender`), `@view-transition` dentro del bloque `no-preference` de `globals.css` y `<link rel="expect" href="#site-header" blocking="render">` (el header, no `<main>`, para no esperar al contenido completo)._
   - **Precarga:** speculation rules nativas en `BaseLayout.astro`, en lugar del `prefetch` de Astro. _(guía: `improve-next-page-load-performance`)_
     - Una regla de documento (no una lista de URLs) con `prefetch` y `eagerness: "moderate"`, que se activa al pasar el ratón.
     - Excluir `*.png`, `*.xml` y `*.json`.
