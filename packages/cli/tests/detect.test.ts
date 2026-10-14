@@ -56,7 +56,7 @@ describe("detectApps", () => {
 
   it("dual-scope apps have supportsBothScopes true", () => {
     const apps = detectApps();
-    const dualScopeIds = ["claude-code", "cursor", "codex"];
+    const dualScopeIds = ["claude-code", "cursor", "codex", "opencode"];
     for (const app of apps) {
       if (dualScopeIds.includes(app.id)) {
         expect(app.supportsBothScopes).toBe(true);
@@ -67,7 +67,7 @@ describe("detectApps", () => {
 
   it("single-scope apps have supportsBothScopes false", () => {
     const apps = detectApps();
-    const singleScopeIds = ["claude-desktop", "vscode", "cline", "goose", "opencode"];
+    const singleScopeIds = ["claude-desktop", "vscode", "cline", "goose"];
     for (const app of apps) {
       if (singleScopeIds.includes(app.id)) {
         expect(app.supportsBothScopes).toBe(false);
