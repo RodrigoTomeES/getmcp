@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { getServerBySlug } from "@getmcp/registry";
 import { isStdioConfig } from "@getmcp/core";
 import { getCommand, DEFAULT_PM } from "@/lib/package-manager";
-import { loadOGFonts, OG_FONT_FAMILY, stripEmoji } from "@/lib/og-image";
+import { loadOGFonts, OGGlow, OG_FONT_FAMILY, stripEmoji } from "@/lib/og-image";
 import { getPopularOfficialServers } from "@/lib/popular-servers";
 
 export const revalidate = false;
@@ -72,22 +72,10 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         padding: "60px",
         fontFamily: OG_FONT_FAMILY,
         position: "relative",
-        overflow: "hidden",
       }}
     >
       {/* Background gradient accent */}
-      <div
-        style={{
-          position: "absolute",
-          top: "-200px",
-          right: "-200px",
-          width: "600px",
-          height: "600px",
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)",
-          display: "flex",
-        }}
-      />
+      <OGGlow />
 
       {/* Top bar with accent line */}
       <div
