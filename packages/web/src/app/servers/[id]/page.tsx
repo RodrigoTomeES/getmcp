@@ -58,6 +58,14 @@ export function generateMetadata({ params }: { params: Promise<{ id: string }> }
   });
 }
 
+/**
+ * Config paths are declared with placeholders the CLI resolves at runtime.
+ * Show the conventional human-readable form instead of the raw token.
+ */
+function displayPath(configPath: string | undefined): string | undefined {
+  return configPath?.replace(/%XDGConfigHome%/gi, "~/.config");
+}
+
 function preGenerateConfigs(
   serverId: string,
   config: InternalRegistryEntry["config"],
@@ -73,11 +81,11 @@ function preGenerateConfigs(
           serialized: gen.serialize(generated),
           configPath:
             gen.app.configPaths !== null && gen.app.globalConfigPaths !== null
-              ? `${gen.app.configPaths} (project) or ${gen.app.globalConfigPaths?.darwin ?? "\u2014"} (global)`
+              ? `${gen.app.configPaths} (project) or ${displayPath(gen.app.globalConfigPaths?.darwin) ?? "\u2014"} (global)`
               : (gen.app.configPaths ??
-                gen.app.globalConfigPaths?.darwin ??
-                gen.app.globalConfigPaths?.win32 ??
-                gen.app.globalConfigPaths?.linux ??
+                displayPath(gen.app.globalConfigPaths?.darwin) ??
+                displayPath(gen.app.globalConfigPaths?.win32) ??
+                displayPath(gen.app.globalConfigPaths?.linux) ??
                 "\u2014"),
           format: gen.app.configFormat.toUpperCase(),
           docsUrl: gen.app.docsUrl,
