@@ -63,7 +63,7 @@ Every major AI application that supports MCP has chosen a slightly (or drastical
 | Roo Code          | `mcpServers`      | JSON     | `mcp_settings.json`, `.roo/mcp.json`                                                                                           | `command`         | `env`         | `url`          |
 | Goose             | `extensions`      | **YAML** | `~/.config/goose/config.yaml`                                                                                                  | `cmd`             | `envs`        | `uri`          |
 | Windsurf          | `mcpServers`      | JSON     | `~/.codeium/windsurf/mcp_config.json`                                                                                          | `command`         | `env`         | `serverUrl`    |
-| OpenCode          | `mcp`             | JSONC    | `opencode.json`                                                                                                                | `command` (array) | `environment` | `url`          |
+| OpenCode          | `mcp`             | JSONC    | `opencode.json`, `~/.config/opencode/opencode.json`                                                                            | `command` (array) | `environment` | `url`          |
 | Zed               | `context_servers` | JSON     | `settings.json`                                                                                                                | `command`         | `env`         | `url`          |
 | PyCharm           | `mcpServers`      | JSON     | `.ai/mcp/mcp.json` (project-level)                                                                                             | `command`         | `env`         | `url`          |
 | Codex             | `mcp_servers`     | **TOML** | `~/.codex/config.toml`, `.codex/config.toml`                                                                                   | `command`         | `env`         | `url`          |
@@ -543,7 +543,8 @@ interface AppMetadata {
 - **Adds**: `type: "local"` or `type: "remote"`, `enabled: true`
 - `generateAll()` adds `$schema: "https://opencode.ai/config.json"`
 - Env var syntax: `{env:VAR}` (no `$` prefix)
-- Config path: `opencode.json`
+- Config paths: `opencode.json` (project), `%XDGConfigHome%/opencode/opencode.json` (global, all platforms)
+- Both `opencode.json` and `opencode.jsonc` are read; `.json` takes precedence
 
 #### Zed — `ZedGenerator`
 
@@ -786,7 +787,9 @@ Re-generates and merges configs for all tracked installations using the current 
 Health diagnostics for your MCP setup. Checks:
 
 1. Detect all installed apps and report status
-2. Parse each app's config file (detect syntax errors)
+2. Parse each app's config file (detect syntax errors). Dual-scope apps are
+   checked in both scopes, and the scope is named in the message
+   (e.g. `OpenCode (global): config file is valid`) when both exist
 3. Check if configured servers are still in registry
 4. Check for orphaned servers (in config but not in lock file)
 5. Verify required env vars are set
@@ -877,12 +880,44 @@ The CLI detects installed apps by resolving platform-specific config paths:
 %AppData%       -> process.env.APPDATA (or ~/AppData/Roaming)
 %UserProfile%   -> os.homedir()
 %LocalAppData%  -> process.env.LOCALAPPDATA (or ~/AppData/Local)
+%XDGConfigHome% -> process.env.XDG_CONFIG_HOME (or ~/.config), all platforms
 ```
+
+`%XDGConfigHome%` is for apps that resolve their config directory with the XDG
+convention on every platform rather than using `%AppData%` on Windows (OpenCode,
+via the `xdg-basedir` package). It mirrors `configHome` in
+`packages/generators/src/base.ts`, so a generator's declared path and its
+`detectInstalled()` check always agree.
 
 An app is considered "detected" if either:
 
 - Its config file exists, OR
 - Its config file's parent directory exists (the app is installed but hasn't been configured yet)
+
+#### Reading configs across scopes
+
+`configPath` on `DetectedApp` is always the **project** path for dual-scope
+apps, and is never rewritten based on which files happen to exist. Write
+commands (`add`, `sync`, `update`, `remove`) resolve scope explicitly through
+`resolveAppForScope()`, so a project-scoped install can never land in the
+user's home directory.
+
+Read-only commands (`doctor`, `list`, `check`) instead call
+`getReadableConfigPaths(app)`, which returns every config that exists on disk,
+project first:
+
+```typescript
+interface ReadableConfig {
+  scope: "project" | "global";
+  path: string;
+}
+
+function getReadableConfigPaths(app: DetectedApp): ReadableConfig[];
+```
+
+For apps whose `configFormat` is `jsonc`, the sibling extension is probed too
+(`.json` before `.jsonc`), because such apps accept either filename while
+`globalConfigPaths` can only declare one name per platform.
 
 #### DetectedApp Interface
 
@@ -1202,7 +1237,11 @@ Detailed documentation of every app's MCP config format, gathered from official 
 ### OpenCode
 
 - **Docs**: https://opencode.ai/docs/mcp-servers/
-- **Config file**: `opencode.json` / `opencode.jsonc`
+- **Config file**: `opencode.json` / `opencode.jsonc` — project root, or globally in
+  `$XDG_CONFIG_HOME/opencode/` (default `~/.config/opencode/`). OpenCode resolves this
+  directory with the `xdg-basedir` package, which is platform-agnostic: Windows uses
+  `%UserProfile%\.config\opencode\`, not `%AppData%`. The loader tries `opencode.json`
+  before `opencode.jsonc`.
 - **Format** (local):
   ```json
   {
@@ -1333,13 +1372,13 @@ Detailed documentation of every app's MCP config format, gathered from official 
 
 ## Test Coverage Summary
 
-| Package              | Test Files | Tests   | Description                                                                                                                                                                                                                      |
-| -------------------- | ---------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@getmcp/core`       | 2          | 51      | Schema validation, type guards, transport inference, ProjectManifest                                                                                                                                                             |
-| `@getmcp/generators` | 1          | 113     | All 19 generators (stdio + remote), multi-server, serialization                                                                                                                                                                  |
-| `@getmcp/registry`   | 5          | 86      | Entry validation, lookup, search, categories, content integrity, enrichment, ID mapping, transform, fetch-metrics, loadFromPath, resetRegistry                                                                                   |
-| `@getmcp/cli`        | 22         | 470     | Path resolution, app detection/selection, config I/O, credentials, lock file, errors, format, preferences, registry-cache, registry-config, utils, flags, add, check, doctor, find, import, list, registry, remove, sync, update |
-| **Total**            | **30**     | **720** |                                                                                                                                                                                                                                  |
+| Package              | Test Files | Tests   | Description                                                                                                                                                                                                                                        |
+| -------------------- | ---------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@getmcp/core`       | 2          | 51      | Schema validation, type guards, transport inference, ProjectManifest                                                                                                                                                                               |
+| `@getmcp/generators` | 1          | 115     | All 19 generators (stdio + remote), multi-server, serialization                                                                                                                                                                                    |
+| `@getmcp/registry`   | 5          | 96      | Entry validation, lookup, search, categories, content integrity, enrichment, ID mapping, transform, fetch-metrics, loadFromPath, resetRegistry                                                                                                     |
+| `@getmcp/cli`        | 23         | 488     | Path resolution, app detection/selection, scope resolution, config I/O, credentials, lock file, errors, format, preferences, registry-cache, registry-config, utils, flags, add, check, doctor, find, import, list, registry, remove, sync, update |
+| **Total**            | **31**     | **750** |                                                                                                                                                                                                                                                    |
 
 ---
 

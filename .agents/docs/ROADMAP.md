@@ -31,6 +31,9 @@ These issues should be addressed immediately.
 
 Bugs and incorrect behavior that affect users.
 
+- [x] **Fix OpenCode global config detection** — `doctor` reported "OpenCode: config file is valid" while listing zero servers, because the generator declared `globalConfigPaths: null` while `detectInstalled()` checked `~/.config/opencode`. Declared the real global path using a new `%XDGConfigHome%` placeholder (OpenCode uses `xdg-basedir`, so Windows is `~/.config` too, not `%AppData%`). Read-only commands now use `getReadableConfigPaths()`, which returns every config that exists — project and global — and probes the `.json`/`.jsonc` sibling for jsonc-format apps. `configPath` deliberately stays project-scoped so project-scoped writes can never target the home directory.
+  - Files: `packages/generators/src/opencode.ts`, `packages/cli/src/detect.ts`, `packages/cli/src/commands/doctor.ts`, `packages/cli/src/commands/list.ts`, `packages/cli/src/commands/check.ts`, `packages/cli/tests/detect-scopes.test.ts`, `packages/web/src/app/servers/[id]/page.tsx`, `packages/web/src/lib/guide-data.ts`
+
 - [x] **Fix hardcoded CLI version** — Replaced the hardcoded `VERSION = "0.1.0"` with a dynamic read from `package.json` using `createRequire`. The version can never drift again.
   - File: `packages/cli/src/bin.ts`
 

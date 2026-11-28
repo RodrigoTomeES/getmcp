@@ -95,14 +95,14 @@ This is not optional — documentation drift causes confusion and wastes time. T
 
 ## Testing
 
-- **720 tests** across 30 test files
+- **750 tests** across 31 test files
 - Run all tests: `npx vitest` (from repo root)
 - Run per-package: `npx vitest packages/core`, `npx vitest packages/generators`, etc.
 - Test locations:
   - `packages/core/tests/` — schema validation (including RegistrySource, RegistryCredential, RegistryAuthMethod), type guards, transport inference, ProjectManifest
   - `packages/generators/tests/` — all 19 generators (stdio + remote + multi-server + serialization + detectInstalled)
   - `packages/registry/tests/` — entry validation, lookup, search, categories, content integrity, fetch-metrics
-  - `packages/cli/tests/` — app-selection, bin flags, config-file I/O, credentials, detect, errors, format, lock file, preferences, registry-cache, registry-config, utils
+  - `packages/cli/tests/` — app-selection, bin flags, config-file I/O, credentials, detect, detect-scopes (project/global resolution against a scratch HOME), errors, format, lock file, preferences, registry-cache, registry-config, utils
   - `packages/cli/tests/commands/` — add, check, doctor, find, import, list, registry, remove, sync, update command tests
 
 ---

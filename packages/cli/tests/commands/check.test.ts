@@ -22,6 +22,17 @@ vi.mock("../../src/detect.js", () => ({
       return app;
     },
   ),
+  getReadableConfigPaths: vi.fn(
+    (app: { configPath: string; globalConfigPath?: string; supportsBothScopes: boolean }) => {
+      const configs: { scope: "project" | "global"; path: string }[] = [
+        { scope: "project", path: app.configPath },
+      ];
+      if (app.supportsBothScopes && app.globalConfigPath) {
+        configs.push({ scope: "global", path: app.globalConfigPath });
+      }
+      return configs;
+    },
+  ),
 }));
 
 // Mock config-file to avoid filesystem access

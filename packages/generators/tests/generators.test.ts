@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import YAML from "yaml";
 import * as TOML from "smol-toml";
 import type { LooseServerConfigType } from "@getmcp/core";
+import { supportsBothScopes } from "@getmcp/core";
 import {
   ClaudeDesktopGenerator,
   ClaudeCodeGenerator,
@@ -494,6 +495,21 @@ describe("OpenCodeGenerator", () => {
   it("generateAll includes $schema", () => {
     const result = gen.generateAll({ github: stdioConfig });
     expect(result.$schema).toBe("https://opencode.ai/config.json");
+  });
+
+  it("has correct config paths", () => {
+    expect(gen.app.configPaths).toBe("opencode.json");
+    expect(gen.app.globalConfigPaths).not.toBeNull();
+    // OpenCode uses xdg-basedir, which is platform-agnostic — the same
+    // XDG_CONFIG_HOME (else ~/.config) location on Windows too.
+    const expected = "%XDGConfigHome%/opencode/opencode.json";
+    expect(gen.app.globalConfigPaths!.darwin).toBe(expected);
+    expect(gen.app.globalConfigPaths!.linux).toBe(expected);
+    expect(gen.app.globalConfigPaths!.win32).toBe(expected);
+  });
+
+  it("supports both project and global scopes", () => {
+    expect(supportsBothScopes(gen.app)).toBe(true);
   });
 });
 

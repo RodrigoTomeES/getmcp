@@ -262,6 +262,11 @@ export const GUIDES: Record<string, GuideData> = {
     rootKey: "mcp",
     configPaths: {
       project: "opencode.json",
+      // OpenCode resolves its config dir with xdg-basedir, so Windows uses
+      // the same ~/.config location rather than %AppData%
+      macos: "~/.config/opencode/opencode.json",
+      windows: "%UserProfile%\\.config\\opencode\\opencode.json",
+      linux: "~/.config/opencode/opencode.json",
     },
     overview:
       "OpenCode is an open-source AI coding agent by Anomaly that runs in the terminal with support for multiple AI models. Its MCP configuration differs from the canonical format in several meaningful ways: the root key is mcp instead of mcpServers, stdio servers use an array-format command that merges the command binary and all its arguments into a single list, and environment variables go in an environment field instead of env. Each server also requires an explicit type field (local for stdio servers, remote for HTTP). OpenCode uses JSONC format (JSON with comments), allowing you to annotate your config. Project-level configuration lives in opencode.json at the repository root and can be committed to version control.",
@@ -273,7 +278,7 @@ export const GUIDES: Record<string, GuideData> = {
     troubleshooting: [
       'command must be an array: OpenCode does not accept a string command field. The entire invocation — binary and arguments — must be a JSON array such as ["npx", "-y", "@package/name"]. The getmcp CLI constructs this automatically.',
       "environment vs env: OpenCode uses environment for server-specific variables, not env. If you copy a config from another app, rename the field or the variables will be silently ignored.",
-      "Config not found: OpenCode looks for opencode.json in the current working directory. Make sure you run opencode from the project root, or create the config file there.",
+      "Config not found: OpenCode looks for opencode.json in the current working directory, then walks up to the nearest Git directory, and finally falls back to the global config in ~/.config/opencode/ ($XDG_CONFIG_HOME if set — the same location on Windows, not %AppData%). Make sure you run opencode from the project root, or put the server in the global config.",
       "JSONC parse error: opencode.json supports JavaScript-style comments. If you get a parse error, check for trailing commas after the last item in an object or array — those are not valid even in JSONC.",
     ],
     popularServers: ["github", "filesystem", "postgres", "brave-search", "docker"],
